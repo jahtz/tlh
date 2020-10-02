@@ -310,16 +310,16 @@
         },
         {
             "name": "webonyx/graphql-php",
-            "version": "v14.1.1",
+            "version": "v14.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webonyx/graphql-php.git",
-                "reference": "d6fe86179a388abb0b671eec9688799b96673403"
+                "reference": "4f3430990824ff410fe548102cb85f0c46442704"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webonyx/graphql-php/zipball/d6fe86179a388abb0b671eec9688799b96673403",
-                "reference": "d6fe86179a388abb0b671eec9688799b96673403",
+                "url": "https://api.github.com/repos/webonyx/graphql-php/zipball/4f3430990824ff410fe548102cb85f0c46442704",
+                "reference": "4f3430990824ff410fe548102cb85f0c46442704",
                 "shasum": ""
             },
             "require": {
@@ -368,7 +368,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2020-07-21T17:39:31+00:00"
+            "time": "2020-08-23T11:52:38+00:00"
         },
         {
             "name": "zendframework/zend-escaper",

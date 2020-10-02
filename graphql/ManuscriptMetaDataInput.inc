@@ -4,10 +4,6 @@ namespace tlh_dig\graphql;
 
 require_once __DIR__ . '/ManuscriptMetaData.inc';
 
-/**
- * @var $datingType - set in ManuscriptMetaData.inc
- */
-
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\Type;
 
@@ -17,8 +13,8 @@ class ManuscriptMetaDataInput
   static /*InputObjectType*/
     $graphQLInputObjectType;
 
-  public /*string*/
-    $identifiers;
+  public /*ManuscriptIdentifier*/
+    $mainIdentifier;
   public /*string*/
     $dating;
   public /*?string*/
@@ -31,14 +27,14 @@ class ManuscriptMetaDataInput
     $creatorUsername;
 
   function __construct(
-    string $identifiers,
+    ManuscriptIdentifier $mainIdentifier,
     string $dating,
     ?string $provenance,
     ?string $cthClassification,
     ?string $bibliography,
     string $creatorUsername
   ) {
-    $this->identifiers = $identifiers;
+    $this->mainIdentifier = $mainIdentifier;
     $this->dating = $dating;
     $this->provenance = $provenance;
     $this->cthClassification = $cthClassification;
@@ -48,7 +44,7 @@ class ManuscriptMetaDataInput
 
   public static function fromGraphQLArray(array $values, string $creatorUsername): ManuscriptMetaDataInput {
     return new ManuscriptMetaDataInput(
-      $values['identifiers'],
+      ManuscriptIdentifier::new($values['mainIdentifier'], $values['mainIdentifierType']),
       $values['dating'],
       $values['provenance'],
       $values['cthClassification'],
@@ -61,8 +57,9 @@ class ManuscriptMetaDataInput
 ManuscriptMetaDataInput::$graphQLInputObjectType = new InputObjectType([
   'name' => 'ManuscriptMetaDataInput',
   'fields' => [
-    'identifiers' => Type::nonNull(Type::string()),
-    'dating' => Type::nonNull($datingType),
+    'mainIdentifier' => Type::nonNull(Type::string()),
+    'mainIdentifierType' => Type::nonNull(ManuscriptIdentifierType::$graphQLEnumType),
+    'palaeographicClassification' => Type::nonNull(PalaeographicClassification::$graphQLEnumType),
     'provenance' => Type::string(),
     'cthClassification' => Type::string(),
     'bibliography' => Type::string(),

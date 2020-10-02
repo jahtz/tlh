@@ -19,7 +19,7 @@ function allManuscriptMetaData(): array {
   $db = connect_to_db();
 
   $statement = $db->prepare("
-select id, identifiers, dating, provenance, cth_classification, bibliography, status_id, creator_username
+select main_identifier, main_identifier_type, palaeographic_classification, provenance, cth_classification, bibliography, status, creator_username
     from tlh_dig_manuscript_metadatas;");
 
   if (!$statement->execute()) {
@@ -42,15 +42,15 @@ select id, identifiers, dating, provenance, cth_classification, bibliography, st
   return $manuscripts;
 }
 
-function manuscriptMetaDataById(int $id): ?ManuscriptMetaData {
+function manuscriptMetaDataById(string $mainIdentifier): ?ManuscriptMetaData {
   $db = connect_to_db();
 
   $statement = $db->prepare("
-select id, identifiers, dating, provenance, cth_classification, bibliography, status_id, creator_username
+select main_identifier, main_identifier_type, palaeographic_classification, provenance, cth_classification, bibliography, status, creator_username
     from tlh_dig_manuscript_metadatas
-    where id = ?;");
+    where main_identifier = ?;");
 
-  $statement->bind_param('i', $id);
+  $statement->bind_param('i', $mainIdentifier);
 
   if (!$statement->execute()) {
     $statement->close();
@@ -69,11 +69,11 @@ function insertManuscriptMetaData(ManuscriptMetaDataInput $mmd): int {
   $db = connect_to_db();
 
   $statement = $db->prepare("
-insert into tlh_dig_manuscript_metadatas (identifiers, dating, provenance, cth_classification, bibliography, status_id, creator_username)
-values(?, ?, ? , ?, ?, 0, ?);");
+insert into tlh_dig_manuscript_metadatas (main_identifier, main_identifier_type, palaeographic_classification, provenance, cth_classification, bibliography, status, creator_username)
+values(?, ?, ?, ? , ?, ?, 0, ?);");
 
   $statement->bind_param(
-    'ssssss', $mmd->identifiers, $mmd->dating, $mmd->provenance, $mmd->cthClassification, $mmd->bibliography, $mmd->creatorUsername
+    'ssssss', $mmd->mainIdentifier->identifier, $mmd->mainIdentifier->type, $mmd->dating, $mmd->provenance, $mmd->cthClassification, $mmd->bibliography, $mmd->creatorUsername
   );
 
   $statement->execute();

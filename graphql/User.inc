@@ -3,18 +3,24 @@
 namespace tlh_dig\graphql;
 
 use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
-class User {
+class User
+{
 
-  static /*InputObjectType*/ $graphQLInputObjectType;
+  static /*InputObjectType*/
+    $graphQLInputObjectType;
 
-  public /*string*/ $username;
-  public /*string*/ $pwHash;
-  public /*string*/ $name;
-  public /*string*/ $affiliation;
-  public /*string*/ $email;
+  public /*string*/
+    $username;
+  public /*string*/
+    $pwHash;
+  public /*string*/
+    $name;
+  public /*string*/
+    $affiliation;
+  public /*string*/
+    $email;
 
   function __construct(string $username, string $pwHash, string $name, string $affiliation, string $email) {
     $this->username = $username;
@@ -53,4 +59,3 @@ User::$graphQLInputObjectType = new InputObjectType([
     'email' => Type::nonNull(Type::string())
   ]
 ]);
-

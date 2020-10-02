@@ -2,18 +2,20 @@
 
 namespace tlh_dig\graphql;
 
-require_once __DIR__ . '/ManuscriptStatus.php';
+require_once __DIR__ . '/ManuscriptIdentifier.inc';
+require_once __DIR__ . '/ManuscriptStatus.inc';
+require_once __DIR__ . '/PalaeographicClassification.inc';
 
-use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
 /**
- * @param int $manuscriptId
+ * @param string $manuscriptMainIdentifier
  * @return string[]
  */
-function getPictures(int $manuscriptId): array {
-  $folder = "./uploads/$manuscriptId/";
+function getPictures(string $manuscriptMainIdentifier): array {
+  $folder = "./uploads/$manuscriptMainIdentifier/";
+
   if (file_exists($folder) && is_dir($folder)) {
     return array_filter(
       scandir($folder),
@@ -26,64 +28,57 @@ function getPictures(int $manuscriptId): array {
   }
 }
 
-$datingType = new EnumType([
-  'name' => 'Dating',
-  'values' => ['jh', 'ah']
-]);
-
 class ManuscriptMetaData
 {
 
   static /*ObjectType*/
     $graphQLType;
 
-
-  public /*int*/
-    $id;
-  public /*string*/
-    $identifiers;
-  public /*string*/
-    $dating;
+  public /*ManuscriptIdentifier*/
+    $mainIdentifier;
+  public /*PalaeographicClassification*/
+    $palaeographicClassification;
   public /*?string*/
     $provenance;
   public /*?string*/
     $cthClassification;
   public /*?string*/
     $bibliography;
-  public /*int*/
-    $statusId;
+
+  public /*ManuscriptStatus*/
+    $status;
   public /*string*/
     $creatorUsername;
 
   function __construct(
-    int $id,
-    string $identifiers,
-    string $dating,
+    ManuscriptIdentifier $mainIdentifier,
+    PalaeographicClassification $palaeographicClassification,
     ?string $provenance,
     ?string $cthClassification,
     ?string $bibliography,
-    int $statusId,
+    ManuscriptStatus $status,
     string $creatorUsername
   ) {
-    $this->id = $id;
-    $this->identifiers = $identifiers;
-    $this->dating = $dating;
+    $this->mainIdentifier = $mainIdentifier;
+    $this->palaeographicClassification = $palaeographicClassification;
     $this->provenance = $provenance;
     $this->cthClassification = $cthClassification;
     $this->bibliography = $bibliography;
-    $this->statusId = $statusId;
+    $this->status = $status;
     $this->creatorUsername = $creatorUsername;
   }
 
   static function fromDbAssocArray(array $row): ManuscriptMetaData {
     return new ManuscriptMetaData(
-      $row['id'],
-      $row['identifiers'],
-      $row['dating'],
+      ManuscriptIdentifier::new(
+        new ManuscriptIdentifierType($row['main_identifier_type']),
+        $row['main_identifier']
+      ),
+      new PalaeographicClassification($row['palaeographic_classification']),
       $row['provenance'],
       $row['cth_classification'],
       $row['bibliography'],
-      $row['status_id'],
+      new ManuscriptStatus($row['status']),
       $row['creator_username']
     );
   }
@@ -92,23 +87,33 @@ class ManuscriptMetaData
 ManuscriptMetaData::$graphQLType = new ObjectType([
   'name' => 'ManuscriptMetaData',
   'fields' => [
-    'id' => Type::nonNull(Type::int()),
-    'identifiers' => Type::nonNull(Type::string()),
-    'dating' => Type::nonNull($datingType),
+    'mainIdentifier' => Type::nonNull(ManuscriptIdentifier::$graphQLType),
     'provenance' => Type::string(),
     'cthClassification' => Type::string(),
     'bibliography' => Type::string(),
     'creatorUsername' => Type::nonNull(Type::string()),
+    'palaeographicClassification' => [
+      'type' => Type::nonNull(PalaeographicClassification::$graphQLEnumType),
+      'resolve' => function (ManuscriptMetaData $manuscriptMetaData): ?string {
+        return $manuscriptMetaData->palaeographicClassification->getValue();
+      }
+    ],
     'status' => [
       'type' => ManuscriptStatus::$enumType,
-      'resolve' => function (ManuscriptMetaData $manuscriptMetaData): ?int {
-        return $manuscriptMetaData->statusId;
+      'resolve' => function (ManuscriptMetaData $manuscriptMetaData): ?string {
+        return $manuscriptMetaData->status->getValue();
+      }
+    ],
+    'otherIdentifiers' => [
+      'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptIdentifier::$graphQLType))),
+      'resolve' => function (ManuscriptMetaData $manuscriptMetaData): array {
+        return [];
       }
     ],
     'pictureUrls' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(Type::string()))),
       'resolve' => function (ManuscriptMetaData $manuscriptMetaData): array {
-        return getPictures($manuscriptMetaData->id);
+        return getPictures($manuscriptMetaData->mainIdentifier->identifier);
       }
     ]
   ]

@@ -1,5 +1,8 @@
 <?php
-$appFolder = './app/';
+
+$lang = "de";
+
+$appFolder = "./app/$lang";
 
 if (file_exists($appFolder)) {
   header("Location: $appFolder");
@@ -10,12 +13,12 @@ if (file_exists($appFolder)) {
 ?>
 <!doctype html>
 <html lang="de">
-  <head>
-    <title>TLH_dig</title>
-  </head>
-  <body>
-    <h1>TLH dig...</h1>
+<head>
+  <title>TLH_dig</title>
+</head>
+<body>
+<h1>TLH dig...</h1>
 
-    <a href="graphiql.php">GrahiQL</a>
-  </body>
+<a href="graphiql.php">GrahiQL</a>
+</body>
 </html>

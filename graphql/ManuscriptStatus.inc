@@ -19,29 +19,19 @@ use MyCLabs\Enum\Enum;
  */
 class ManuscriptStatus extends Enum
 {
-
   static /*EnumType*/
     $enumType;
 
-  private const InCreation = 0;
-  private const Created = 1;
-  private const Reviewed = 2;
-  private const ReviewMerged = 3;
-  private const ExecutiveReviewed = 4;
-  private const ExecutiveReviewMerged = 5;
-  private const Approved = 6;
-
+  private const InCreation = 'InCreation';
+  private const Created = 'Created';
+  private const Reviewed = 'Reviewed';
+  private const ReviewMerged = 'ReviewMerged';
+  private const ExecutiveReviewed = 'ExecutiveReviewed';
+  private const ExecutiveReviewMerged = 'ExecutiveReviewMerged';
+  private const Approved = 'Approved';
 }
 
 ManuscriptStatus::$enumType = new EnumType([
   'name' => 'ManuscriptStatus',
-  'values' => [
-    'InCreation' => ['value' => 0],
-    'Created' => ['value' => 1],
-    'Reviewed' => ['value' => 2],
-    'ReviewMerged' => ['value' => 3],
-    'ExecutiveReviewed' => ['value' => 4],
-    'ExecutiveReviewMerged' => ['value' => 5],
-    'Approved' => ['value' => 6]
-  ]
+  'values' => ['InCreation', 'Created', 'Reviewed', 'ReviewMerged', 'ExecutiveReviewed', 'ExecutiveReviewMerged', 'Approved']
 ]);

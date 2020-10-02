@@ -9,6 +9,7 @@ require_once 'graphql/ManuscriptMetaDataInput.inc';
 require_once 'graphql/User.inc';
 require_once 'graphql/LoggedInUser.inc';
 
+use GraphQL\Error\DebugFlag;
 use GraphQL\Error\FormattedError;
 use GraphQL\GraphQL;
 use GraphQL\Type\Definition\ObjectType;
@@ -37,10 +38,10 @@ $queryType = new ObjectType([
     'manuscript' => [
       'type' => ManuscriptMetaData::$graphQLType,
       'args' => [
-        'id' => Type::nonNull(Type::int())
+        'mainIdentifier' => Type::nonNull(Type::string())
       ],
       'resolve' => function ($rootValue, array $args): ?ManuscriptMetaData {
-        return manuscriptMetaDataById($args['id']);
+        return manuscriptMetaDataById($args['mainIdentifier']);
       }
     ]
   ]
@@ -135,26 +136,33 @@ $mutationType = new ObjectType([
   ]
 ]);
 
-$schema = new Schema(
-  SchemaConfig::create()
-    ->setQuery($queryType)
-    ->setMutation($mutationType)
-);
 
 try {
+  $schema = new Schema(
+    SchemaConfig::create()
+      ->setQuery($queryType)
+      ->setMutation($mutationType)
+  );
+
   $rawInput = file_get_contents('php://input');
   $input = json_decode($rawInput, true);
 
   $variablesValues = isset($input['variables']) ? $input['variables'] : null;
   $operationName = isset($input['operationName']) ? $input['operationName'] : null;
 
+  $debug = DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE | DebugFlag::RETHROW_INTERNAL_EXCEPTIONS | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS;
+
   $output = GraphQL::executeQuery($schema, $input['query'], null, null, $variablesValues, $operationName)
-    ->toArray();
+    ->toArray($debug);
+
+  $body = json_encode($output);
   $status = 200;
 } catch (Exception $e) {
-  $output = ['error' => [FormattedError::createFromException($e)]];
+  error_log($e);
+
+  $body = json_encode(['error' => [FormattedError::createFromException($e)]]);
   $status = 500;
 }
 
 header('Content-Type: application/json; charset=UTF-8', true, $status);
-echo json_encode($output);
+echo $body;
