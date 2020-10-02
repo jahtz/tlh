@@ -9,6 +9,7 @@ require_once 'graphql/ManuscriptMetaDataInput.inc';
 require_once 'graphql/User.inc';
 require_once 'graphql/LoggedInUser.inc';
 
+use GraphQL\Error\FormattedError;
 use GraphQL\GraphQL;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
@@ -18,6 +19,7 @@ use ReallySimpleJWT\Token;
 use tlh_dig\graphql\LoggedInUser;
 use tlh_dig\graphql\ManuscriptMetaData;
 use tlh_dig\graphql\ManuscriptMetaDataInput;
+use tlh_dig\graphql\MySafeGraphQLException;
 use tlh_dig\graphql\User;
 
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
@@ -69,14 +71,20 @@ $mutationType = new ObjectType([
         'userInput' => Type::nonNull(User::$graphQLInputObjectType)
       ],
       'type' => Type::string(),
-      'resolve' => function ($rootValue, array $args): ?string {
+      'resolve' => function ($rootValue, array $args): string {
         $user = User::fromGraphQLInput($args['userInput']);
 
         if ($user === null) {
-          return null;
+          throw new MySafeGraphQLException("Could not read input!");
         }
 
-        return insertUserIntoDatabase($user) ? $user->username : null;
+        $inserted = insertUserIntoDatabase($user);
+
+        if ($inserted) {
+          return $user->username;
+        } else {
+          throw new MySafeGraphQLException("Could not insert user into database!");
+        }
       }
     ],
     'login' => [
@@ -98,7 +106,7 @@ $mutationType = new ObjectType([
             Token::create($user->username, $jwtSecret, time() + 3600, 'localhost')
           );
         } else {
-          return null;
+          throw new MySafeGraphQLException("Could not verify user!");
         }
       }
     ],
@@ -140,12 +148,13 @@ try {
   $variablesValues = isset($input['variables']) ? $input['variables'] : null;
   $operationName = isset($input['operationName']) ? $input['operationName'] : null;
 
-  $result = GraphQL::executeQuery($schema, $input['query'], null, null, $variablesValues, $operationName);
-
-  $output = $result->toArray();
+  $output = GraphQL::executeQuery($schema, $input['query'], null, null, $variablesValues, $operationName)
+    ->toArray();
+  $status = 200;
 } catch (Exception $e) {
-  $output = ['error' => ['message' => $e->getMessage()]];
+  $output = ['error' => [FormattedError::createFromException($e)]];
+  $status = 500;
 }
 
-header('Content-Type: application/json; charset=UTF-8');
+header('Content-Type: application/json; charset=UTF-8', true, $status);
 echo json_encode($output);
