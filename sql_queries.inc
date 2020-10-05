@@ -7,6 +7,7 @@ require_once 'vendor/autoload.php';
 require_once 'graphql/ManuscriptMetaData.inc';
 require_once 'graphql/User.inc';
 
+use tlh_dig\graphql\ManuscriptIdentifier;
 use tlh_dig\graphql\ManuscriptMetaData;
 use tlh_dig\graphql\User;
 
@@ -63,6 +64,31 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
   return ManuscriptMetaData::fromDbAssocArray($result->fetch_assoc());
 }
 
+function getOtherIdentifiers(string $mainIdentifier): array {
+  $db = connect_to_db();
+
+  $statement = $db->prepare("select identifier_type, identifier from tlh_dig_manuscript_other_identifiers where main_identifier = ?;");
+
+  $statement->bind_param('s', $mainIdentifier);
+
+  if (!$statement->execute()) {
+    return [];
+  }
+
+  $result = $statement->get_result();
+
+  $otherIdentifiers = [];
+
+  while ($row = $result->fetch_assoc()) {
+    $otherIdentifiers[] = ManuscriptIdentifier::fromDbAssocArray($row);
+  }
+
+  $statement->close();
+  $db->close();
+
+  return $otherIdentifiers;
+}
+
 function insertManuscriptMetaData(ManuscriptMetaData $mmd): ?string {
   $db = connect_to_db();
 
@@ -94,10 +120,29 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?);");
 
   $statement->close();
 
+  insert_other_identifier($db, $mmd->mainIdentifier->identifier, $mmd->otherIdentifiers);
+
   $db->commit();
   $db->close();
 
   return $mmd->mainIdentifier->identifier;
+}
+
+/**
+ * @param string $mainIdentifier
+ * @param ManuscriptIdentifier[] $identifiers
+ */
+function insert_other_identifier(mysqli $db, string $mainIdentifier, array $identifiers) {
+
+  $statement = $db->prepare("insert into tlh_dig_manuscript_other_identifiers (main_identifier, identifier, identifier_type) values (?, ?, ?)");
+
+  foreach ($identifiers as $identifier) {
+    $statement->bind_param('sss', $mainIdentifier, $identifier->identifier, $identifier->type);
+
+    $statement->execute();
+  }
+
+  $statement->close();
 }
 
 function maybeUserFromDatabase(string $username): ?User {

@@ -142,7 +142,7 @@ ManuscriptMetaData::$graphQLType = new ObjectType([
     'otherIdentifiers' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptIdentifier::$graphQLType))),
       'resolve' => function (ManuscriptMetaData $manuscriptMetaData): array {
-        return [];
+        return getOtherIdentifiers($manuscriptMetaData->mainIdentifier->identifier);
       }
     ],
     'pictureUrls' => [

@@ -24,6 +24,8 @@ use tlh_dig\graphql\User;
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
 $jwtSecret = '1234%ASDf_0aosd';
 
+$jwtValidityTime = 3600;
+
 $queryType = new ObjectType([
   'name' => 'Query',
   'fields' => [
@@ -93,7 +95,7 @@ $mutationType = new ObjectType([
       ],
       'type' => LoggedInUser::$graphQLType,
       'resolve' => function ($rootValue, array $args): ?LoggedInUser {
-        global $jwtSecret;
+        global $jwtSecret, $jwtValidityTime;
 
         $user = maybeUserFromDatabase($args['username']);
 
@@ -102,7 +104,7 @@ $mutationType = new ObjectType([
             $user->username,
             $user->name,
             $user->affiliation,
-            Token::create($user->username, $jwtSecret, time() + 3600, 'localhost')
+            Token::create($user->username, $jwtSecret, time() + $jwtValidityTime, 'localhost')
           );
         } else {
           throw new MySafeGraphQLException("Could not verify user!");

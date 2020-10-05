@@ -36,6 +36,13 @@ class ManuscriptIdentifier
     );
   }
 
+  static function fromDbAssocArray(array $row): ManuscriptIdentifier {
+    return new ManuscriptIdentifier(
+      new ManuscriptIdentifierType($row['identifier_type']),
+      $row['identifier']
+    );
+  }
+
 }
 
 ManuscriptIdentifier::$graphQLType = new ObjectType([
