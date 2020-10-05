@@ -29,6 +29,13 @@ class ManuscriptIdentifier
     return new ManuscriptIdentifier($type, $identifier);
   }
 
+  static function fromGraphQLInput(array $input): ManuscriptIdentifier {
+    return new ManuscriptIdentifier(
+      new ManuscriptIdentifierType($input['identifierType']),
+      $input['identifier']
+    );
+  }
+
 }
 
 ManuscriptIdentifier::$graphQLType = new ObjectType([

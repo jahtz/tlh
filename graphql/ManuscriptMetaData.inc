@@ -40,6 +40,8 @@ class ManuscriptMetaData
 
   public /*ManuscriptIdentifier*/
     $mainIdentifier;
+  public /*array*/
+    $otherIdentifiers;
   public /*PalaeographicClassification*/
     $palaeographicClassification;
   public /*bool*/
@@ -58,6 +60,7 @@ class ManuscriptMetaData
 
   function __construct(
     ManuscriptIdentifier $mainIdentifier,
+    ?array $otherIdentifiers,
     PalaeographicClassification $palaeographicClassification,
     bool $palaeographicClassificationSure,
     ?string $provenance,
@@ -67,6 +70,7 @@ class ManuscriptMetaData
     string $creatorUsername
   ) {
     $this->mainIdentifier = $mainIdentifier;
+    $this->otherIdentifiers = $otherIdentifiers;
     $this->palaeographicClassification = $palaeographicClassification;
     $this->palaeographicClassificationSure = $palaeographicClassificationSure;
     $this->provenance = $provenance;
@@ -82,6 +86,7 @@ class ManuscriptMetaData
         new ManuscriptIdentifierType($row['main_identifier_type']),
         $row['main_identifier']
       ),
+      [],
       new PalaeographicClassification($row['palaeo_classification']),
       $row['palaeo_classification_sure'],
       $row['provenance'],
@@ -93,11 +98,15 @@ class ManuscriptMetaData
   }
 
   static function fromGraphQLInput(array $input, string $creatorUsername): ManuscriptMetaData {
+    $otherIdentifiers = array_key_exists('otherIdentifiers', $input) ?
+      array_map(function ($x) {
+        return ManuscriptIdentifier::fromGraphQLInput($x);
+      }, $input['otherIdentifiers'])
+      : null;
+
     return new ManuscriptMetaData(
-      ManuscriptIdentifier::new(
-        new ManuscriptIdentifierType($input['mainIdentifier']['identifierType']),
-        $input['mainIdentifier']['identifier']
-      ),
+      ManuscriptIdentifier::fromGraphQLInput($input['mainIdentifier']),
+      $otherIdentifiers,
       new PalaeographicClassification($input['palaeographicClassification']),
       $input['palaeographicClassificationSure'],
       $input['provenance'],
@@ -148,6 +157,7 @@ ManuscriptMetaData::$graphQLInputObjectType = new InputObjectType([
   'name' => 'ManuscriptMetaDataInput',
   'fields' => [
     'mainIdentifier' => Type::nonNull(ManuscriptIdentifier::$graphQLInputObjectType),
+    'otherIdentifiers' => Type::listOf(ManuscriptIdentifier::$graphQLInputObjectType),
     'palaeographicClassification' => Type::nonNull(PalaeographicClassification::$graphQLEnumType),
     'palaeographicClassificationSure' => Type::nonNull(Type::boolean()),
     'provenance' => Type::string(),
