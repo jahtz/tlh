@@ -132,6 +132,7 @@ ManuscriptMetaData::$graphQLType = new ObjectType([
         return $manuscriptMetaData->palaeographicClassification->getValue();
       }
     ],
+    'palaeographicClassificationSure' => Type::nonNull(Type::boolean()),
     'status' => [
       'type' => ManuscriptStatus::$enumType,
       'resolve' => function (ManuscriptMetaData $manuscriptMetaData): ?string {
