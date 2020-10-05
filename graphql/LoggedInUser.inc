@@ -15,12 +15,12 @@ class LoggedInUser
     $username;
   public /*string*/
     $name;
-  public /*string*/
+  public /*?string*/
     $affiliation;
   public /*string*/
     $jwt;
 
-  function __construct(string $username, string $name, string $affiliation, string $jwt) {
+  function __construct(string $username, string $name, ?string $affiliation, string $jwt) {
     $this->username = $username;
     $this->name = $name;
     $this->jwt = $jwt;
@@ -33,7 +33,7 @@ LoggedInUser::$graphQLType = new ObjectType([
   'fields' => [
     'username' => Type::nonNull(Type::string()),
     'name' => Type::nonNull(Type::string()),
-    'affiliation' => Type::nonNull(Type::string()),
+    'affiliation' => Type::string(),
     'jwt' => Type::nonNull(Type::string())
   ]
 ]);

@@ -5,7 +5,6 @@ require_once 'sql_queries.inc';
 require_once 'vendor/autoload.php';
 
 require_once 'graphql/ManuscriptMetaData.inc';
-require_once 'graphql/ManuscriptMetaDataInput.inc';
 require_once 'graphql/User.inc';
 require_once 'graphql/LoggedInUser.inc';
 
@@ -19,7 +18,6 @@ use GraphQL\Type\SchemaConfig;
 use ReallySimpleJWT\Token;
 use tlh_dig\graphql\LoggedInUser;
 use tlh_dig\graphql\ManuscriptMetaData;
-use tlh_dig\graphql\ManuscriptMetaDataInput;
 use tlh_dig\graphql\MySafeGraphQLException;
 use tlh_dig\graphql\User;
 
@@ -51,14 +49,14 @@ $loggedInUserMutationsType = new ObjectType([
   'name' => 'LoggedInUserMutations',
   'fields' => [
     'createManuscript' => [
-      'type' => Type::int(),
+      'type' => Type::string(),
       'args' => [
-        'values' => ManuscriptMetaDataInput::$graphQLInputObjectType
+        'values' => ManuscriptMetaData::$graphQLInputObjectType
       ],
       'resolve' => function (string $username, array $args): ?int {
-        return insertManuscriptMetaData(
-          ManuscriptMetaDataInput::fromGraphQLArray($args['values'], $username)
-        );
+        $manuscript = ManuscriptMetaData::fromGraphQLInput($args['values'], $username);
+
+        return insertManuscriptMetaData($manuscript);
       }
     ]
   ]

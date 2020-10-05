@@ -5,11 +5,9 @@ require_once '../../mysqliconn.php';
 require_once 'vendor/autoload.php';
 
 require_once 'graphql/ManuscriptMetaData.inc';
-require_once 'graphql/ManuscriptMetaDataInput.inc';
 require_once 'graphql/User.inc';
 
 use tlh_dig\graphql\ManuscriptMetaData;
-use tlh_dig\graphql\ManuscriptMetaDataInput;
 use tlh_dig\graphql\User;
 
 /**
@@ -19,7 +17,7 @@ function allManuscriptMetaData(): array {
   $db = connect_to_db();
 
   $statement = $db->prepare("
-select main_identifier, main_identifier_type, palaeographic_classification, provenance, cth_classification, bibliography, status, creator_username
+select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username
     from tlh_dig_manuscript_metadatas;");
 
   if (!$statement->execute()) {
@@ -46,7 +44,7 @@ function manuscriptMetaDataById(string $mainIdentifier): ?ManuscriptMetaData {
   $db = connect_to_db();
 
   $statement = $db->prepare("
-select main_identifier, main_identifier_type, palaeographic_classification, provenance, cth_classification, bibliography, status, creator_username
+select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username
     from tlh_dig_manuscript_metadatas
     where main_identifier = ?;");
 
@@ -65,25 +63,41 @@ select main_identifier, main_identifier_type, palaeographic_classification, prov
   return ManuscriptMetaData::fromDbAssocArray($result->fetch_assoc());
 }
 
-function insertManuscriptMetaData(ManuscriptMetaDataInput $mmd): int {
+function insertManuscriptMetaData(ManuscriptMetaData $mmd): ?string {
   $db = connect_to_db();
 
   $statement = $db->prepare("
-insert into tlh_dig_manuscript_metadatas (main_identifier, main_identifier_type, palaeographic_classification, provenance, cth_classification, bibliography, status, creator_username)
-values(?, ?, ?, ? , ?, ?, 0, ?);");
+insert into tlh_dig_manuscript_metadatas (main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username)
+values (?, ?, ?, ?, ?, ?, ?, ?, ?);");
 
-  $statement->bind_param(
-    'ssssss', $mmd->mainIdentifier->identifier, $mmd->mainIdentifier->type, $mmd->dating, $mmd->provenance, $mmd->cthClassification, $mmd->bibliography, $mmd->creatorUsername
+  if (!$statement) {
+    error_log('Could not prepare insert statement!');
+    return null;
+  }
+
+  $bind_param_success = $statement->bind_param(
+    'sssisisss',
+    $mmd->mainIdentifier->identifier, $mmd->mainIdentifier->type, $mmd->palaeographicClassification, $mmd->palaeographicClassificationSure,
+    $mmd->provenance, $mmd->cthClassification, $mmd->bibliography, $mmd->status, $mmd->creatorUsername
   );
 
-  $statement->execute();
+  if (!$bind_param_success) {
+    error_log('Could not bind insert statement params!');
+    return null;
+  }
 
-  $newId = $statement->insert_id;
+  if (!$statement->execute()) {
+    error_log('Could not execute insert statement: ' . $statement->error);
+
+    return null;
+  }
 
   $statement->close();
+
+  $db->commit();
   $db->close();
 
-  return $newId;
+  return $mmd->mainIdentifier->identifier;
 }
 
 function maybeUserFromDatabase(string $username): ?User {

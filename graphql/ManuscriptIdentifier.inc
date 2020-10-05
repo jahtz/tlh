@@ -4,12 +4,16 @@ namespace tlh_dig\graphql;
 
 require_once __DIR__ . '/ManuscriptIdentifierType.inc';
 
+use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
 class ManuscriptIdentifier
 {
-  static $graphQLType;
+  static /*ObjectType*/
+    $graphQLType;
+  static /* InputObjectType*/
+    $graphQLInputObjectType;
 
   public /* ManuscriptIdentifierType */
     $type;
@@ -36,6 +40,14 @@ ManuscriptIdentifier::$graphQLType = new ObjectType([
         return $value->type->getValue();
       }
     ],
+    'identifier' => Type::nonNull(Type::string())
+  ]
+]);
+
+ManuscriptIdentifier::$graphQLInputObjectType = new InputObjectType([
+  'name' => 'ManuscriptIdentifierInput',
+  'fields' => [
+    'identifierType' => Type::nonNull(ManuscriptIdentifierType::$graphQLEnumType),
     'identifier' => Type::nonNull(Type::string())
   ]
 ]);

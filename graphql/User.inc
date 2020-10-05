@@ -17,12 +17,12 @@ class User
     $pwHash;
   public /*string*/
     $name;
-  public /*string*/
+  public /*?string*/
     $affiliation;
   public /*string*/
     $email;
 
-  function __construct(string $username, string $pwHash, string $name, string $affiliation, string $email) {
+  function __construct(string $username, string $pwHash, string $name, ?string $affiliation, string $email) {
     $this->username = $username;
     $this->pwHash = $pwHash;
     $this->name = $name;
@@ -55,7 +55,7 @@ User::$graphQLInputObjectType = new InputObjectType([
     'password' => Type::nonNull(Type::string()),
     'passwordRepeat' => Type::nonNull(Type::string()),
     'name' => Type::nonNull(Type::string()),
-    'affiliation' => Type::nonNull(Type::string()),
+    'affiliation' => Type::string(),
     'email' => Type::nonNull(Type::string())
   ]
 ]);
