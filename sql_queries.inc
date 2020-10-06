@@ -89,60 +89,82 @@ function getOtherIdentifiers(string $mainIdentifier): array {
   return $otherIdentifiers;
 }
 
-function insertManuscriptMetaData(ManuscriptMetaData $mmd): ?string {
+function insertManuscriptMetaData(ManuscriptMetaData $mmd): bool {
   $db = connect_to_db();
 
-  $statement = $db->prepare("
+  $mainInsertStatement = $db->prepare("
 insert into tlh_dig_manuscript_metadatas (main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username)
 values (?, ?, ?, ?, ?, ?, ?, ?, ?);");
 
-  if (!$statement) {
-    error_log('Could not prepare insert statement!');
-    return null;
+  $otherIdentifierInsertStatement = $db->prepare("
+insert into tlh_dig_manuscript_other_identifiers (main_identifier, identifier, identifier_type)
+values (?, ?, ?)");
+
+
+  if (!$mainInsertStatement || !$otherIdentifierInsertStatement) {
+    error_log('Could not prepare insert statements!');
+    return false;
   }
 
-  $bind_param_success = $statement->bind_param(
+  $db->begin_transaction();
+
+  # insert main data
+
+  $mainBindParams = $mainInsertStatement->bind_param(
     'sssisisss',
     $mmd->mainIdentifier->identifier, $mmd->mainIdentifier->type, $mmd->palaeographicClassification, $mmd->palaeographicClassificationSure,
     $mmd->provenance, $mmd->cthClassification, $mmd->bibliography, $mmd->status, $mmd->creatorUsername
   );
 
-  if (!$bind_param_success) {
-    error_log('Could not bind insert statement params!');
-    return null;
+  if (!$mainBindParams) {
+    error_log('Could not bind main insert statement params: ' . $mainInsertStatement->error);
+
+    $mainInsertStatement->close();
+    $otherIdentifierInsertStatement->close();
+    $db->rollback();
+    $db->close();
+
+    return false;
   }
 
-  if (!$statement->execute()) {
-    error_log('Could not execute insert statement: ' . $statement->error);
+  if (!$mainInsertStatement->execute()) {
+    error_log('Could not execute main insert statement: ' . $mainInsertStatement->error);
 
-    return null;
+    $mainInsertStatement->close();
+    $otherIdentifierInsertStatement->close();
+    $db->rollback();
+    $db->close();
+
+    return false;
   }
 
-  $statement->close();
+  $mainInsertStatement->close();
 
-  insert_other_identifier($db, $mmd->mainIdentifier->identifier, $mmd->otherIdentifiers);
+  # insert other identifiers
 
-  $db->commit();
+  $allOtherIdentifiersInserted = true;
+  foreach ($mmd->otherIdentifiers as $identifier) {
+    $otherIdentifierInsertStatement->bind_param('sss', $mainIdentifier, $identifier->identifier, $identifier->type);
+
+    if (!$otherIdentifierInsertStatement->execute()) {
+      $allOtherIdentifiersInserted = false;
+    }
+  }
+
+  $otherIdentifierInsertStatement->close();
+
+  if (!$allOtherIdentifiersInserted) {
+    $db->rollback();
+
+    $result = false;
+  } else {
+    $db->commit();
+
+    $result = true;
+  }
+
   $db->close();
-
-  return $mmd->mainIdentifier->identifier;
-}
-
-/**
- * @param string $mainIdentifier
- * @param ManuscriptIdentifier[] $identifiers
- */
-function insert_other_identifier(mysqli $db, string $mainIdentifier, array $identifiers) {
-
-  $statement = $db->prepare("insert into tlh_dig_manuscript_other_identifiers (main_identifier, identifier, identifier_type) values (?, ?, ?)");
-
-  foreach ($identifiers as $identifier) {
-    $statement->bind_param('sss', $mainIdentifier, $identifier->identifier, $identifier->type);
-
-    $statement->execute();
-  }
-
-  $statement->close();
+  return $result;
 }
 
 function maybeUserFromDatabase(string $username): ?User {

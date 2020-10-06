@@ -4,6 +4,8 @@ require_once 'sql_queries.inc';
 
 require_once 'vendor/autoload.php';
 
+require_once 'graphql/MyGraphQLExceptions.inc';
+
 require_once 'graphql/ManuscriptMetaData.inc';
 require_once 'graphql/User.inc';
 require_once 'graphql/LoggedInUser.inc';
@@ -16,6 +18,7 @@ use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Schema;
 use GraphQL\Type\SchemaConfig;
 use ReallySimpleJWT\Token;
+use tlh_dig\graphql\InvalidTokenException;
 use tlh_dig\graphql\LoggedInUser;
 use tlh_dig\graphql\ManuscriptMetaData;
 use tlh_dig\graphql\MySafeGraphQLException;
@@ -55,10 +58,18 @@ $loggedInUserMutationsType = new ObjectType([
       'args' => [
         'values' => ManuscriptMetaData::$graphQLInputObjectType
       ],
-      'resolve' => function (string $username, array $args): ?int {
+      'resolve' => function (string $username, array $args): ?string {
         $manuscript = ManuscriptMetaData::fromGraphQLInput($args['values'], $username);
 
-        return insertManuscriptMetaData($manuscript);
+        $manuscriptIdentifier = $manuscript->mainIdentifier->identifier;
+
+        $manuscriptInserted = insertManuscriptMetaData($manuscript);
+
+        if ($manuscriptInserted) {
+          return $manuscriptIdentifier;
+        } else {
+          throw new MySafeGraphQLException("Could not save manuscript $manuscriptIdentifier to Database!");
+        }
       }
     ]
   ]
@@ -122,14 +133,13 @@ $mutationType = new ObjectType([
         $jwt = $args['jwt'];
 
         if (!Token::validate($jwt, $jwtSecret)) {
-          error_log('Token not valid!');
-          return null;
+          throw new InvalidTokenException('Invalid login information. Maybe your login is expired? Try logging out and logging back in again.');
         }
 
         try {
           return Token::getPayload($jwt, $jwtSecret)['user_id'];
         } catch (Exception $e) {
-          return null;
+          throw new InvalidTokenException('Invalid login information. Maybe your login is expired? Try logging out and logging back in again.');
         }
       }
     ]
@@ -154,15 +164,14 @@ try {
 
   $output = GraphQL::executeQuery($schema, $input['query'], null, null, $variablesValues, $operationName)
     ->toArray($debug);
-
-  $body = json_encode($output);
-  $status = 200;
 } catch (Exception $e) {
   error_log($e);
 
-  $body = json_encode(['error' => [FormattedError::createFromException($e)]]);
-  $status = 500;
+  $output = [
+    'data' => null,
+    'errors' => [FormattedError::createFromException($e)]
+  ];
 }
 
-header('Content-Type: application/json; charset=UTF-8', true, $status);
-echo $body;
+header('Content-Type: application/json; charset=UTF-8', true, 200);
+echo json_encode($output);
