@@ -142,11 +142,15 @@ values (?, ?, ?)");
 
   # insert other identifiers
 
+  $mainIdentifier = $mmd->mainIdentifier->identifier;
+
   $allOtherIdentifiersInserted = true;
   foreach ($mmd->otherIdentifiers as $identifier) {
     $otherIdentifierInsertStatement->bind_param('sss', $mainIdentifier, $identifier->identifier, $identifier->type);
 
     if (!$otherIdentifierInsertStatement->execute()) {
+      error_log("Could not insert other identifier " . json_encode($identifier) . " into database: " . $otherIdentifierInsertStatement->error);
+
       $allOtherIdentifiersInserted = false;
     }
   }
