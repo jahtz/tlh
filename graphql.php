@@ -1,6 +1,7 @@
 <?php
 
 require_once 'sql_queries.inc';
+require_once 'cors.inc';
 
 require_once 'vendor/autoload.php';
 
@@ -157,13 +158,23 @@ try {
   $rawInput = file_get_contents('php://input');
   $input = json_decode($rawInput, true);
 
-  $variablesValues = isset($input['variables']) ? $input['variables'] : null;
-  $operationName = isset($input['operationName']) ? $input['operationName'] : null;
+  if ($input != null) {
 
-  $debug = DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE | DebugFlag::RETHROW_INTERNAL_EXCEPTIONS | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS;
+    $variablesValues = isset($input['variables']) ? $input['variables'] : null;
+    $operationName = isset($input['operationName']) ? $input['operationName'] : null;
 
-  $output = GraphQL::executeQuery($schema, $input['query'], null, null, $variablesValues, $operationName)
-    ->toArray($debug);
+    $debug = DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE | DebugFlag::RETHROW_INTERNAL_EXCEPTIONS | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS;
+
+    $query = $input['query'];
+
+    $output = GraphQL::executeQuery($schema, $query, null, null, $variablesValues, $operationName)
+      ->toArray($debug);
+  } else {
+    $output = [
+      'data' => null,
+      'errors' => [FormattedError::createFromException(new Exception('No input given!'))]
+    ];
+  }
 } catch (Exception $e) {
   error_log($e);
 
@@ -173,5 +184,8 @@ try {
   ];
 }
 
+cors();
+
 header('Content-Type: application/json; charset=UTF-8', true, 200);
+
 echo json_encode($output);
