@@ -49,7 +49,7 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
     from tlh_dig_manuscript_metadatas
     where main_identifier = ?;");
 
-  $statement->bind_param('i', $mainIdentifier);
+  $statement->bind_param('s', $mainIdentifier);
 
   if (!$statement->execute()) {
     $statement->close();
@@ -61,7 +61,11 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
   $statement->close();
   $db->close();
 
-  return ManuscriptMetaData::fromDbAssocArray($result->fetch_assoc());
+  if ($fetched = $result->fetch_assoc()) {
+    return ManuscriptMetaData::fromDbAssocArray($fetched);
+  } else {
+    return null;
+  }
 }
 
 function getOtherIdentifiers(string $mainIdentifier): array {
