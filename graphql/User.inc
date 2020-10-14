@@ -42,7 +42,7 @@ class User
       $username = $graphQLInputObject['username'],
       $pwHash = password_hash($password, PASSWORD_DEFAULT),
       $name = $graphQLInputObject['name'],
-      $affiliation = $graphQLInputObject['affiliation'],
+      $affiliation = $graphQLInputObject['affiliation'] ?? null,
       $email = $graphQLInputObject['email']
     );
   }

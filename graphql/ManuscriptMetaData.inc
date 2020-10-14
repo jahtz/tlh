@@ -109,9 +109,9 @@ class ManuscriptMetaData
       $otherIdentifiers,
       new PalaeographicClassification($input['palaeographicClassification']),
       $input['palaeographicClassificationSure'],
-      $input['provenance'],
-      $input['cthClassification'],
-      $input['bibliography'],
+      $input['provenance'] ?? null,
+      $input['cthClassification'] ?? null,
+      $input['bibliography'] ?? null,
       ManuscriptStatus::InCreation(),
       $creatorUsername
     );
@@ -158,7 +158,7 @@ ManuscriptMetaData::$graphQLInputObjectType = new InputObjectType([
   'name' => 'ManuscriptMetaDataInput',
   'fields' => [
     'mainIdentifier' => Type::nonNull(ManuscriptIdentifier::$graphQLInputObjectType),
-    'otherIdentifiers' => Type::listOf(ManuscriptIdentifier::$graphQLInputObjectType),
+    'otherIdentifiers' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptIdentifier::$graphQLInputObjectType))),
     'palaeographicClassification' => Type::nonNull(PalaeographicClassification::$graphQLEnumType),
     'palaeographicClassificationSure' => Type::nonNull(Type::boolean()),
     'provenance' => Type::string(),
