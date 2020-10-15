@@ -1,16 +1,4 @@
-<?php
-
-$lang = "de";
-
-$appFolder = "./app/$lang";
-
-if (file_exists($appFolder)) {
-  header("Location: $appFolder");
-  exit();
-} else {
-  error_log("Folder $appFolder does not exist!");
-}
-?>
+<?php header("Location: /tlh_dig/graphiql.php"); ?>
 <!doctype html>
 <html lang="de">
 <head>
