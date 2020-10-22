@@ -255,16 +255,16 @@
         },
         {
             "name": "rbdwllr/reallysimplejwt",
-            "version": "3.1.0",
+            "version": "3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RobDWaller/ReallySimpleJWT.git",
-                "reference": "15a1ff880d48948439d9397c182d9021fe53040e"
+                "reference": "2954e559df545c37763a6295726cded288a02277"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RobDWaller/ReallySimpleJWT/zipball/15a1ff880d48948439d9397c182d9021fe53040e",
-                "reference": "15a1ff880d48948439d9397c182d9021fe53040e",
+                "url": "https://api.github.com/repos/RobDWaller/ReallySimpleJWT/zipball/2954e559df545c37763a6295726cded288a02277",
+                "reference": "2954e559df545c37763a6295726cded288a02277",
                 "shasum": ""
             },
             "require": {
@@ -306,7 +306,7 @@
                 "php",
                 "tokens"
             ],
-            "time": "2020-06-09T14:01:27+00:00"
+            "time": "2020-10-15T07:24:22+00:00"
         },
         {
             "name": "webonyx/graphql-php",
