@@ -11,6 +11,11 @@ require_once 'graphql/ManuscriptMetaData.inc';
 require_once 'graphql/User.inc';
 require_once 'graphql/LoggedInUser.inc';
 
+require_once 'model/TransliterationTextLine.inc';
+require_once 'model/StringContent.inc';
+require_once 'model/CorrectionType.inc';
+require_once 'model/DamageType.inc';
+
 use GraphQL\Error\DebugFlag;
 use GraphQL\Error\FormattedError;
 use GraphQL\GraphQL;
@@ -23,7 +28,10 @@ use tlh_dig\graphql\InvalidTokenException;
 use tlh_dig\graphql\LoggedInUser;
 use tlh_dig\graphql\ManuscriptMetaData;
 use tlh_dig\graphql\MySafeGraphQLException;
+use tlh_dig\graphql\TransliterationTextLine;
 use tlh_dig\graphql\User;
+use tlh_dig\model\CorrectionType;
+use tlh_dig\model\StringContent;
 
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
 $jwtSecret = '1234%ASDf_0aosd';
@@ -51,6 +59,21 @@ $queryType = new ObjectType([
   ]
 ]);
 
+$manuscriptMutationsType = new ObjectType([
+  'name' => 'ManuscriptMutations',
+  'fields' => [
+    'updateTransliteration' => [
+      'type' => Type::string(),
+      'args' => [
+        'values' => Type::nonNull(Type::listOf(Type::nonNull(TransliterationTextLine::$graphQLInputType)))
+      ],
+      'resolve' => function (ManuscriptMetaData $manuscriptMetaData, array $args): ?string {
+        return 'TODO!';
+      }
+    ]
+  ]
+]);
+
 $loggedInUserMutationsType = new ObjectType([
   'name' => 'LoggedInUserMutations',
   'fields' => [
@@ -71,6 +94,16 @@ $loggedInUserMutationsType = new ObjectType([
         } else {
           throw new MySafeGraphQLException("Could not save manuscript $manuscriptIdentifier to Database!");
         }
+      }
+    ],
+    'manuscript' => [
+      'type' => $manuscriptMutationsType,
+      'args' => [
+        'id' => Type::int()
+      ],
+      'resolve' => function (string $username, array $args): ?ManuscriptMetaData {
+        // TODO: resolve manuscript metadata from db!
+        return null;
       }
     ]
   ]
