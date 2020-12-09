@@ -30,8 +30,6 @@ use tlh_dig\graphql\ManuscriptMetaData;
 use tlh_dig\graphql\MySafeGraphQLException;
 use tlh_dig\graphql\TransliterationTextLine;
 use tlh_dig\graphql\User;
-use tlh_dig\model\CorrectionType;
-use tlh_dig\model\StringContent;
 
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
 $jwtSecret = '1234%ASDf_0aosd';
@@ -99,7 +97,7 @@ $loggedInUserMutationsType = new ObjectType([
     'manuscript' => [
       'type' => $manuscriptMutationsType,
       'args' => [
-        'id' => Type::int()
+        'mainIdentifier' => Type::string()
       ],
       'resolve' => function (string $username, array $args): ?ManuscriptMetaData {
         // TODO: resolve manuscript metadata from db!
