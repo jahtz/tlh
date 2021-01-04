@@ -6,3 +6,6 @@ vendor/
 
 uploads/*
 !uploads/.gitkeep
+
+public/*
+!public/.gitkeep
