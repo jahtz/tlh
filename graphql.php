@@ -15,21 +15,21 @@ require_once 'model/TransliterationTextLine.inc';
 require_once 'model/StringContent.inc';
 require_once 'model/CorrectionType.inc';
 require_once 'model/DamageType.inc';
+require_once 'model/ManuscriptSide.inc';
 
-use GraphQL\Error\DebugFlag;
-use GraphQL\Error\FormattedError;
+use GraphQL\Error\{DebugFlag, FormattedError};
 use GraphQL\GraphQL;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Schema;
-use GraphQL\Type\SchemaConfig;
+use GraphQL\Type\{Schema, SchemaConfig};
+use GraphQL\Type\Definition\{ObjectType, Type};
 use ReallySimpleJWT\Token;
-use tlh_dig\graphql\InvalidTokenException;
-use tlh_dig\graphql\LoggedInUser;
-use tlh_dig\graphql\ManuscriptMetaData;
-use tlh_dig\graphql\MySafeGraphQLException;
-use tlh_dig\graphql\TransliterationTextLine;
-use tlh_dig\graphql\User;
+use tlh_dig\graphql\{InvalidTokenException,
+  LoggedInUser,
+  ManuscriptMetaData,
+  MySafeGraphQLException,
+  TransliterationTextLine,
+  User
+};
+use tlh_dig\model\ManuscriptSide;
 
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
 $jwtSecret = '1234%ASDf_0aosd';
@@ -184,6 +184,7 @@ try {
     SchemaConfig::create()
       ->setQuery($queryType)
       ->setMutation($mutationType)
+      ->setTypes([ManuscriptSide::$graphQLEnumType])
   );
 
   $rawInput = file_get_contents('php://input');

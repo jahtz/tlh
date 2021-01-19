@@ -1,8 +1,6 @@
 <?php
 
-
 namespace tlh_dig\graphql;
-
 
 use GraphQL\Type\Definition\EnumType;
 use MyCLabs\Enum\Enum;
