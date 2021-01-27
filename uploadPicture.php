@@ -49,7 +49,7 @@ function doUpload(string $manuscriptId): string {
   }
 
   if (!file_exists($targetDir)) {
-    mkdir($targetDir);
+    mkdir($targetDir, 0777, true);
   }
 
   $fileSaved = move_uploaded_file($file['tmp_name'], $targetFile);
