@@ -2,23 +2,17 @@
 
 namespace tlh_dig\graphql;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\{ObjectType, Type};
 
 class LoggedInUser
 {
 
-  static /*ObjectType*/
-    $graphQLType;
+  static ObjectType $graphQLType;
 
-  public /*string*/
-    $username;
-  public /*string*/
-    $name;
-  public /*?string*/
-    $affiliation;
-  public /*string*/
-    $jwt;
+  public string $username;
+  public string $name;
+  public ?string $affiliation;
+  public string $jwt;
 
   function __construct(string $username, string $name, ?string $affiliation, string $jwt) {
     $this->username = $username;

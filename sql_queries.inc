@@ -4,91 +4,113 @@ require_once '../../mysqliconn.php';
 
 require_once 'vendor/autoload.php';
 
-require_once 'graphql/ManuscriptMetaData.inc';
-require_once 'graphql/User.inc';
+require_once 'model/ManuscriptMetaData.inc';
+require_once 'model/TransliterationLine.inc';
+require_once 'model/User.inc';
 
-use tlh_dig\graphql\ManuscriptIdentifier;
-use tlh_dig\graphql\ManuscriptMetaData;
-use tlh_dig\graphql\User;
+use tlh_dig\model\{ManuscriptIdentifier, ManuscriptMetaData, TransliterationLine, User};
 
 /**
  * @return ManuscriptMetaData[]
  */
 function allManuscriptMetaData(): array {
-  $db = connect_to_db();
-
-  $statement = $db->prepare("
+  $sql = "
 select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username
-    from tlh_dig_manuscript_metadatas;");
-
-  if (!$statement->execute()) {
-    $statement->close();
-    $db->close();
-    return array();
-  }
-
-  $result = $statement->get_result();
+    from tlh_dig_manuscript_metadatas;";
 
   $manuscripts = array();
 
-  while ($row = $result->fetch_assoc()) {
-    $manuscripts[] = ManuscriptMetaData::fromDbAssocArray($row);
+  $connection = connect_to_db();
+
+  $statement = $connection->prepare($sql);
+
+  if ($statement) {
+
+    if ($statement->execute()) {
+      $result = $statement->get_result();
+
+      if ($result) {
+        foreach ($result->fetch_all(MYSQLI_ASSOC) as $row) {
+          $manuscripts[] = ManuscriptMetaData::fromDbAssocArray($row);
+        }
+        $result->close();
+      }
+    }
+
+    $statement->close();
   }
 
-  $statement->close();
-  $db->close();
+  $connection->close();
 
   return $manuscripts;
 }
 
 function manuscriptMetaDataById(string $mainIdentifier): ?ManuscriptMetaData {
-  $db = connect_to_db();
-
-  $statement = $db->prepare("
+  $sql = "
 select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username
     from tlh_dig_manuscript_metadatas
-    where main_identifier = ?;");
+    where main_identifier = ?;";
 
-  $statement->bind_param('s', $mainIdentifier);
+  $fetched = null;
 
-  if (!$statement->execute()) {
+  $connection = connect_to_db();
+
+  $statement = $connection->prepare($sql);
+
+  if ($statement) {
+    $paramsBound = $statement->bind_param('s', $mainIdentifier);
+
+    if ($paramsBound && $statement->execute()) {
+
+      $result = $statement->get_result();
+
+      if ($result) {
+        $fetched = $result->fetch_all(MYSQLI_ASSOC)[0] ?? null;
+
+        $result->close();
+      }
+
+    }
     $statement->close();
-    $db->close();
-    return null;
   }
 
-  $result = $statement->get_result();
-  $statement->close();
-  $db->close();
+  $connection->close();
 
-  if ($fetched = $result->fetch_assoc()) {
-    return ManuscriptMetaData::fromDbAssocArray($fetched);
-  } else {
-    return null;
-  }
+  return $fetched ? ManuscriptMetaData::fromDbAssocArray($fetched) : null;
 }
 
+/**
+ * @param string $mainIdentifier
+ * @return ManuscriptIdentifier[]
+ */
 function getOtherIdentifiers(string $mainIdentifier): array {
-  $db = connect_to_db();
-
-  $statement = $db->prepare("select identifier_type, identifier from tlh_dig_manuscript_other_identifiers where main_identifier = ?;");
-
-  $statement->bind_param('s', $mainIdentifier);
-
-  if (!$statement->execute()) {
-    return [];
-  }
-
-  $result = $statement->get_result();
+  $sql = "select identifier_type, identifier from tlh_dig_manuscript_other_identifiers where main_identifier = ?;";
 
   $otherIdentifiers = [];
 
-  while ($row = $result->fetch_assoc()) {
-    $otherIdentifiers[] = ManuscriptIdentifier::fromDbAssocArray($row);
-  }
+  $connection = connect_to_db();
 
-  $statement->close();
-  $db->close();
+  $statement = $connection->prepare($sql);
+
+  if ($statement) {
+    $paramsBound = $statement->bind_param('s', $mainIdentifier);
+
+    if ($paramsBound && $statement->execute()) {
+
+      $result = $statement->get_result();
+
+      if ($result) {
+        foreach ($result->fetch_all(MYSQLI_ASSOC) as $row) {
+          $otherIdentifiers[] = ManuscriptIdentifier::fromDbAssocArray($row);
+        }
+
+        $result->close();
+      }
+    }
+
+    $statement->close();
+  }
+  $connection->close();
 
   return $otherIdentifiers;
 }
@@ -176,45 +198,117 @@ values (?, ?, ?)");
 }
 
 function maybeUserFromDatabase(string $username): ?User {
-  $db = connect_to_db();
+  $sql = "select username, pw_hash, name, affiliation, email from tlh_dig_users where username = ?;";
 
-  $statement = $db->prepare("select username, pw_hash, name, affiliation, email from tlh_dig_users where username = ?;");
-  $statement->bind_param('s', $username);
+  $connection = connect_to_db();
 
-  if (!$statement->execute()) {
+  $userArray = null;
+
+  $statement = $connection->prepare($sql);
+
+  if ($statement) {
+    $paramsBound = $statement->bind_param('s', $username);
+
+    if ($paramsBound && $statement->execute()) {
+
+      $result = $statement->get_result();
+
+      if ($result) {
+        $userArray = $result->fetch_all(MYSQLI_ASSOC)[0] ?? null;
+
+        $result->close();
+      }
+    }
+
     $statement->close();
-    $db->close();
-    return null;
   }
 
-  $userArray = $statement->get_result()->fetch_assoc();
+  $connection->close();
 
-  $statement->close();
-  $db->close();
-
-  if ($userArray) {
-    return new User(
-      $userArray['username'],
-      $userArray['pw_hash'],
-      $userArray['name'],
-      $userArray['affiliation'],
-      $userArray['email']
-    );
-  } else {
-    return null;
-  }
+  return $userArray ? User::fromDbAssocArray($userArray) : null;
 }
 
 function insertUserIntoDatabase(User $user): bool {
+  $sql = "insert into tlh_dig_users (username, pw_hash, name, affiliation, email) values (?, ?, ?, ?, ?);";
+
+  $result = false;
+
   $db = connect_to_db();
 
-  $statement = $db->prepare("insert into tlh_dig_users (username, pw_hash, name, affiliation, email) values (?, ?, ?, ?, ?);");
-  $statement->bind_param('sssss', $user->username, $user->pwHash, $user->name, $user->affiliation, $user->email);
+  $statement = $db->prepare($sql);
+  if ($statement) {
+    $statement->bind_param('sssss', $user->username, $user->pwHash, $user->name, $user->affiliation, $user->email);
 
-  $result = $statement->execute();
+    $result = $statement->execute();
 
-  $statement->close();
+    $statement->close();
+  }
+
   $db->close();
 
   return $result;
+}
+
+/**
+ * @param string $mainIdentifier
+ * @return TransliterationLine[]
+ */
+function getTransliterationResultLines(string $mainIdentifier): ?array {
+  $linesQuery = "select * from tlh_dig_transliteration_lines where main_identifier = ? order by line_index;";
+  $wordsQuery = "select * from tlh_dig_transliteration_word_contents where main_identifier = ? order by line_index, word_index, content_index;";
+
+  $conn = connect_to_db();
+
+  $allRows = null;
+  $allWordsRows = [];
+
+  $linesStatement = $conn->prepare($linesQuery);
+  if ($linesStatement) {
+    $linesParamsBound = $linesStatement->bind_param('s', $mainIdentifier);
+
+    if ($linesParamsBound && $linesStatement->execute()) {
+      $linesResult = $linesStatement->get_result();
+
+      if ($linesResult) {
+        $allRows = $linesResult->fetch_all(MYSQLI_ASSOC);
+        $linesResult->close();
+      }
+    }
+
+    $linesStatement->close();
+  }
+
+  if ($allRows === null && count($allRows) === 0) {
+    $conn->close();
+    return null;
+  }
+
+  $wordsStatement = $conn->prepare($wordsQuery);
+  if ($wordsStatement) {
+    $wordsParamsBound = $wordsStatement->bind_param('s', $mainIdentifier);
+
+    if ($wordsParamsBound && $wordsStatement->execute()) {
+      $wordsResult = $wordsStatement->get_result();
+
+      if ($wordsResult) {
+        $allWordsRows = $wordsResult->fetch_all(MYSQLI_ASSOC);
+        $wordsResult->close();
+      }
+    }
+
+    $wordsStatement->close();
+  }
+
+  $conn->close();
+
+  $wordContents = [];
+  foreach ($allWordsRows as $wordRow) {
+    $lineIndex = $wordRow['line_index'];
+    $wordIndex = $wordRow['word_index'];
+    $contentIndex = $wordRow['content_index'];
+
+    $wordContents[$lineIndex][$wordIndex][$contentIndex] = $wordRow;
+  }
+
+  return array_map(fn($x) => TransliterationLine::fromDbAssocArray($x, $wordContents[$x['line_index']]), $allRows);
 }

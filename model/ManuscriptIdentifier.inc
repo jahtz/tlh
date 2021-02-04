@@ -1,31 +1,40 @@
 <?php
 
-namespace tlh_dig\graphql;
+namespace tlh_dig\model;
 
-require_once __DIR__ . '/ManuscriptIdentifierType.inc';
+use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
+use MyCLabs\Enum\Enum;
 
-use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
+class ManuscriptIdentifierType extends Enum
+{
+  static EnumType $graphQLEnumType;
+
+  public const ExcavationNumber = 'ExcavationNumber';
+  public const CollectionNumber = 'CollectionNumber';
+  public const PublicationShortReference = 'PublicationShortReference';
+
+}
+
+ManuscriptIdentifierType::$graphQLEnumType = new EnumType([
+  'name' => 'ManuscriptIdentifierType',
+  'values' => ['ExcavationNumber', 'CollectionNumber', 'PublicationShortReference']
+]);
+
 
 class ManuscriptIdentifier
 {
-  static /*ObjectType*/
-    $graphQLType;
-  static /* InputObjectType*/
-    $graphQLInputObjectType;
+  static ObjectType $graphQLType;
+  static InputObjectType $graphQLInputObjectType;
 
-  public /* ManuscriptIdentifierType */
-    $type;
-  public /* string */
-    $identifier;
+  public ManuscriptIdentifierType $type;
+  public string $identifier;
 
   function __construct(ManuscriptIdentifierType $type, string $identifier) {
     $this->type = $type;
     $this->identifier = $identifier;
   }
 
-  static function new(ManuscriptIdentifierType $type, string $identifier) {
+  static function new(ManuscriptIdentifierType $type, string $identifier): ManuscriptIdentifier {
     return new ManuscriptIdentifier($type, $identifier);
   }
 
@@ -42,7 +51,6 @@ class ManuscriptIdentifier
       $row['identifier']
     );
   }
-
 }
 
 ManuscriptIdentifier::$graphQLType = new ObjectType([

@@ -6,15 +6,14 @@ require_once 'cors.inc';
 require_once 'vendor/autoload.php';
 
 require_once 'graphql/MyGraphQLExceptions.inc';
-
-require_once 'graphql/ManuscriptMetaData.inc';
-require_once 'graphql/User.inc';
 require_once 'graphql/LoggedInUser.inc';
 
-require_once 'model/TransliterationTextLine.inc';
+require_once 'model/ManuscriptMetaData.inc';
+require_once 'model/User.inc';
+require_once 'model/TransliterationLineResult.inc';
 require_once 'model/StringContent.inc';
 require_once 'model/CorrectionType.inc';
-require_once 'model/DamageType.inc';
+require_once 'model/DamageContent.inc';
 require_once 'model/ManuscriptSide.inc';
 
 use GraphQL\Error\{DebugFlag, FormattedError};
@@ -22,14 +21,8 @@ use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
 use ReallySimpleJWT\Token;
-use tlh_dig\graphql\{InvalidTokenException,
-  LoggedInUser,
-  ManuscriptMetaData,
-  MySafeGraphQLException,
-  TransliterationTextLine,
-  User
-};
-use tlh_dig\model\ManuscriptSide;
+use tlh_dig\graphql\{InvalidTokenException, LoggedInUser, MySafeGraphQLException};
+use tlh_dig\model\{ManuscriptMetaData, ManuscriptSide, TransliterationLine, User};
 
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
 $jwtSecret = '1234%ASDf_0aosd';
@@ -50,9 +43,7 @@ $queryType = new ObjectType([
       'args' => [
         'mainIdentifier' => Type::nonNull(Type::string())
       ],
-      'resolve' => function ($rootValue, array $args): ?ManuscriptMetaData {
-        return manuscriptMetaDataById($args['mainIdentifier']);
-      }
+      'resolve' => fn($rootValue, array $args) => manuscriptMetaDataById($args['mainIdentifier'])
     ]
   ]
 ]);
@@ -61,12 +52,38 @@ $manuscriptMutationsType = new ObjectType([
   'name' => 'ManuscriptMutations',
   'fields' => [
     'updateTransliteration' => [
-      'type' => Type::string(),
+      'type' => Type::nonNull(Type::boolean()),
       'args' => [
-        'values' => Type::nonNull(Type::listOf(Type::nonNull(TransliterationTextLine::$graphQLInputType)))
+        'values' => Type::nonNull(Type::listOf(Type::nonNull(TransliterationLine::$graphQLInputObjectType)))
       ],
       'resolve' => function (ManuscriptMetaData $manuscriptMetaData, array $args): ?string {
-        return 'TODO!';
+        $mainIdentifier = $manuscriptMetaData->mainIdentifier->identifier;
+
+        $mapped = array_map(fn($x) => TransliterationLine::readFromGraphQLInput($mainIdentifier, $x), $args['values']);
+
+        $allSaved = true;
+
+        $connection = connect_to_db();
+
+        $connection->begin_transaction();
+
+        try {
+          foreach ($mapped as $transliterationLine) {
+            $allSaved &= $transliterationLine->saveToDb($connection);
+          }
+
+          if ($allSaved) {
+            $connection->commit();
+          } else {
+            $connection->rollback();
+          }
+        } catch (mysqli_sql_exception $e) {
+          $connection->rollback();
+        }
+
+        $connection->close();
+
+        return $allSaved;
       }
     ]
   ]
@@ -97,12 +114,9 @@ $loggedInUserMutationsType = new ObjectType([
     'manuscript' => [
       'type' => $manuscriptMutationsType,
       'args' => [
-        'mainIdentifier' => Type::string()
+        'mainIdentifier' => Type::nonNull(Type::string())
       ],
-      'resolve' => function (string $username, array $args): ?ManuscriptMetaData {
-        // TODO: resolve manuscript metadata from db!
-        return null;
-      }
+      'resolve' => fn(string $username, array $args) => manuscriptMetaDataById($args['mainIdentifier'])
     ]
   ]
 ]);
@@ -155,14 +169,9 @@ $mutationType = new ObjectType([
       }
     ],
     'me' => [
-      'args' => [
-        'jwt' => Type::nonNull(Type::string())
-      ],
       'type' => $loggedInUserMutationsType,
-      'resolve' => function ($rootValue, array $args): ?string {
+      'resolve' => function ($rootValue, array $args, ?string $jwt): ?string {
         global $jwtSecret;
-
-        $jwt = $args['jwt'];
 
         if (!Token::validate($jwt, $jwtSecret)) {
           throw new InvalidTokenException('Invalid login information. Maybe your login is expired? Try logging out and logging back in again.');
@@ -178,6 +187,7 @@ $mutationType = new ObjectType([
   ]
 ]);
 
+cors();
 
 try {
   $schema = new Schema(
@@ -190,17 +200,18 @@ try {
   $rawInput = file_get_contents('php://input');
   $input = json_decode($rawInput, true);
 
+  $authHeader = apache_request_headers()['Authorization'] ?? null;
+
   if ($input != null) {
 
-    $variablesValues = isset($input['variables']) ? $input['variables'] : null;
-    $operationName = isset($input['operationName']) ? $input['operationName'] : null;
+    $variablesValues = $input['variables'] ?? null;
+    $operationName = $input['operationName'] ?? null;
 
     $debug = DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE | DebugFlag::RETHROW_INTERNAL_EXCEPTIONS | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS;
 
     $query = $input['query'];
 
-    $output = GraphQL::executeQuery($schema, $query, null, null, $variablesValues, $operationName)
-      ->toArray($debug);
+    $output = GraphQL::executeQuery($schema, $query, null, $authHeader, $variablesValues, $operationName)->toArray($debug);
   } else {
     $output = [
       'data' => null,
@@ -216,7 +227,6 @@ try {
   ];
 }
 
-cors();
 
 header('Content-Type: application/json; charset=UTF-8', true, 200);
 

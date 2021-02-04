@@ -1,15 +1,14 @@
 <?php
 
-namespace tlh_dig\graphql;
+namespace tlh_dig\model;
 
 
 require_once __DIR__ . '/ManuscriptIdentifier.inc';
 require_once __DIR__ . '/ManuscriptStatus.inc';
 require_once __DIR__ . '/PalaeographicClassification.inc';
+require_once __DIR__ . '/TransliterationLine.inc';
 
-use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\{InputObjectType, ObjectType, Type};
 
 /**
  * @param string $manuscriptMainIdentifier
@@ -33,30 +32,19 @@ function getPictures(string $manuscriptMainIdentifier): array {
 class ManuscriptMetaData
 {
 
-  static /*ObjectType*/
-    $graphQLType;
-  static /*InputObjectType*/
-    $graphQLInputObjectType;
+  static ObjectType $graphQLType;
+  static InputObjectType $graphQLInputObjectType;
 
-  public /*ManuscriptIdentifier*/
-    $mainIdentifier;
-  public /*array*/
-    $otherIdentifiers;
-  public /*PalaeographicClassification*/
-    $palaeographicClassification;
-  public /*bool*/
-    $palaeographicClassificationSure;
-  public /*?string*/
-    $provenance;
-  public /*?int*/
-    $cthClassification;
-  public /*?string*/
-    $bibliography;
+  public ManuscriptIdentifier $mainIdentifier;
+  public ?array $otherIdentifiers;
+  public PalaeographicClassification $palaeographicClassification;
+  public bool $palaeographicClassificationSure;
+  public ?string $provenance;
+  public ?int $cthClassification;
+  public ?string $bibliography;
 
-  public /*ManuscriptStatus*/
-    $status;
-  public /*string*/
-    $creatorUsername;
+  public ManuscriptStatus $status;
+  public string $creatorUsername;
 
   function __construct(
     ManuscriptIdentifier $mainIdentifier,
@@ -98,10 +86,8 @@ class ManuscriptMetaData
   }
 
   static function fromGraphQLInput(array $input, string $creatorUsername): ManuscriptMetaData {
-    $otherIdentifiers = array_key_exists('otherIdentifiers', $input) ?
-      array_map(function ($x) {
-        return ManuscriptIdentifier::fromGraphQLInput($x);
-      }, $input['otherIdentifiers'])
+    $otherIdentifiers = array_key_exists('otherIdentifiers', $input)
+      ? array_map(fn($x) => ManuscriptIdentifier::fromGraphQLInput($x), $input['otherIdentifiers'])
       : null;
 
     return new ManuscriptMetaData(
@@ -149,6 +135,12 @@ ManuscriptMetaData::$graphQLType = new ObjectType([
       'type' => Type::nonNull(Type::listOf(Type::nonNull(Type::string()))),
       'resolve' => function (ManuscriptMetaData $manuscriptMetaData): array {
         return getPictures($manuscriptMetaData->mainIdentifier->identifier);
+      }
+    ],
+    'transliterationResult' => [
+      'type' => Type::listOf(Type::nonNull(TransliterationLine::$graphQLObjectType)),
+      'resolve' => function (ManuscriptMetaData $manuscriptMetaData): ?array {
+        return getTransliterationResultLines($manuscriptMetaData->mainIdentifier->identifier);
       }
     ]
   ]

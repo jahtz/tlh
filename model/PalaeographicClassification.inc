@@ -1,14 +1,13 @@
 <?php
 
-namespace tlh_dig\graphql;
+namespace tlh_dig\model;
 
 use GraphQL\Type\Definition\EnumType;
 use MyCLabs\Enum\Enum;
 
 class PalaeographicClassification extends Enum
 {
-  static /*EnumType*/
-    $graphQLEnumType;
+  static EnumType $graphQLEnumType;
 
   const OldScript = 'OldScript';
   const MiddleScript = 'MiddleScript';

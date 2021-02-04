@@ -1,6 +1,6 @@
 <?php
 
-namespace tlh_dig\graphql;
+namespace tlh_dig\model;
 
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\Type;
@@ -8,19 +8,13 @@ use GraphQL\Type\Definition\Type;
 class User
 {
 
-  static /*InputObjectType*/
-    $graphQLInputObjectType;
+  static InputObjectType $graphQLInputObjectType;
 
-  public /*string*/
-    $username;
-  public /*string*/
-    $pwHash;
-  public /*string*/
-    $name;
-  public /*?string*/
-    $affiliation;
-  public /*string*/
-    $email;
+  public string $username;
+  public string $pwHash;
+  public string $name;
+  public ?string $affiliation;
+  public string $email;
 
   function __construct(string $username, string $pwHash, string $name, ?string $affiliation, string $email) {
     $this->username = $username;
@@ -28,6 +22,10 @@ class User
     $this->name = $name;
     $this->affiliation = $affiliation;
     $this->email = $email;
+  }
+
+  static function fromDbAssocArray(array $dbArray): User {
+    return new User($dbArray['username'], $dbArray['pw_hash'], $dbArray['name'], $dbArray['affiliation'], $dbArray['email']);
   }
 
   static function fromGraphQLInput(array $graphQLInputObject): ?User {

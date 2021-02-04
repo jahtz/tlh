@@ -1,6 +1,6 @@
 <?php
 
-namespace tlh_dig\graphql;
+namespace tlh_dig\model;
 
 use GraphQL\Type\Definition\EnumType;
 use MyCLabs\Enum\Enum;
@@ -19,8 +19,7 @@ use MyCLabs\Enum\Enum;
  */
 class ManuscriptStatus extends Enum
 {
-  static /*EnumType*/
-    $enumType;
+  static EnumType $enumType;
 
   private const InCreation = 'InCreation';
   private const Created = 'Created';
