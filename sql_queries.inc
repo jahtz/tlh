@@ -310,5 +310,10 @@ function getTransliterationResultLines(string $mainIdentifier): ?array {
     $wordContents[$lineIndex][$wordIndex][$contentIndex] = $wordRow;
   }
 
-  return array_map(fn($x) => TransliterationLine::fromDbAssocArray($x, $wordContents[$x['line_index']]), $allRows);
+  return array_map(function ($x) use ($wordContents): TransliterationLine {
+    $lineIndex = $x['line_index'];
+    $wordsForLine = array_key_exists($lineIndex, $wordContents) ? $wordContents[$lineIndex] : null;
+
+    return TransliterationLine::fromDbAssocArray($x, $wordsForLine);
+  }, $allRows);
 }

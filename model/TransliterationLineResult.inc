@@ -30,7 +30,7 @@ class TransliterationLineResult
     $this->words = $words;
   }
 
-  static function fromDbAssocArray(int $lineNumber, bool $isAbsolute, array $wordContents): TransliterationLineResult {
+  static function fromDbAssocArray(int $lineNumber, bool $isAbsolute, ?array $wordContents): TransliterationLineResult {
     $words = array_map(fn($wordContents) => TransliterationWord::readWords($wordContents), $wordContents);
 
     return new TransliterationLineResult($lineNumber, $isAbsolute, $words);

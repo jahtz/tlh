@@ -50,20 +50,12 @@ class StringContent extends TransliterationWordContent
     return new StringContent(new StringContentTypeEnum($input['type']), urldecode($input['content']));
   }
 
-  function saveToDb(mysqli $conn, string $mainIdentifier, int $lineIndex, int $wordIndex, int $contentIndex): bool {
-    $sql = "
-insert into tlh_dig_transliteration_word_contents (main_identifier, line_index, word_index, content_index, type, content)
-values (?, ?, ?, ?, ?, ?);";
+  function getType(): string {
+    return $this->type->getValue();
+  }
 
-    $statement = $conn->prepare($sql);
-    $statement->bind_param('siiiss', $mainIdentifier, $lineIndex, $wordIndex, $contentIndex, $this->type, $this->content);
-    $executed = $statement->execute();
-    if (!$executed) {
-      error_log("Could not save StringContent to db: " . $statement->error);
-    }
-    $statement->close();
-
-    return $executed;
+  function getContent(): string {
+    return $this->content;
   }
 
   function graphQLType(): ObjectType {

@@ -4,7 +4,6 @@ namespace tlh_dig\model;
 
 use GraphQL\Type\Definition\{EnumType, ObjectType, Type};
 use MyCLabs\Enum\Enum;
-use mysqli;
 
 class DamageType extends Enum
 {
@@ -50,20 +49,8 @@ class DamageContent extends TransliterationWordContent
     return new DamageContent(new DamageType($input));
   }
 
-  function saveToDb(mysqli $conn, string $mainIdentifier, int $lineIndex, int $wordIndex, int $contentIndex): bool {
-    $sql = "
-insert into tlh_dig_transliteration_word_contents (main_identifier, line_index, word_index, content_index, type)
-values (?, ?, ?, ?, ?);";
-
-    $statement = $conn->prepare($sql);
-    $statement->bind_param('siiis', $mainIdentifier, $lineIndex, $wordIndex, $contentIndex, $this->type);
-    $executed = $statement->execute();
-    if (!$executed) {
-      error_log("Could not save DamageContent to db: " . $statement->error);
-    }
-    $statement->close();
-
-    return $executed;
+  function getType(): string {
+    return $this->type->getValue();
   }
 
   function graphQLType(): ObjectType {

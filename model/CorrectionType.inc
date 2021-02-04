@@ -4,7 +4,6 @@ namespace tlh_dig\model;
 
 use GraphQL\Type\Definition\{EnumType, ObjectType, Type};
 use MyCLabs\Enum\Enum;
-use mysqli;
 
 class CorrectionType extends Enum
 {
@@ -37,20 +36,8 @@ class CorrectionContent extends TransliterationWordContent
     return new CorrectionContent(new CorrectionType($type));
   }
 
-  function saveToDb(mysqli $conn, string $mainIdentifier, int $lineIndex, int $wordIndex, int $contentIndex): bool {
-    $sql = "
-insert into tlh_dig_transliteration_word_contents (main_identifier, line_index, word_index, content_index, type)
-values (?, ?, ?, ?, ?);";
-
-    $statement = $conn->prepare($sql);
-    $statement->bind_param('siiis', $mainIdentifier, $lineIndex, $wordIndex, $contentIndex, $this->type);
-    $executed = $statement->execute();
-    if (!$executed) {
-      error_log("\t\tCould not save CorrectionContent to db: " . $statement->error);
-    }
-    $statement->close();
-
-    return $executed;
+  protected function getType(): string {
+    return $this->type->getValue();
   }
 
   function graphQLType(): ObjectType {

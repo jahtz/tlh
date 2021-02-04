@@ -5,7 +5,6 @@ namespace tlh_dig\model;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
-use mysqli;
 
 class NumeralContent extends TransliterationWordContent
 {
@@ -25,20 +24,12 @@ class NumeralContent extends TransliterationWordContent
     return new NumeralContent($input['isSubscript'], urldecode($input['content']));
   }
 
-  function saveToDb(mysqli $conn, string $mainIdentifier, int $lineIndex, int $wordIndex, int $contentIndex): bool {
-    $sql = "
-insert into tlh_dig_transliteration_word_contents (main_identifier, line_index, word_index, content_index, type, content, is_subscript)
-values (?, ?, ?, ?, ?, ?, ?);";
+  protected function getType(): string {
+    return 'numeral';
+  }
 
-    $statement = $conn->prepare($sql);
-    $statement->bind_param('siiissi', $mainIdentifier, $lineIndex, $contentIndex, $wordIndex, $this->type, $this->content, $this->isSubscript);
-    $executed = $statement->execute();
-    if (!$executed) {
-      error_log("\t\tCould not save NumeralContent to db: " . $statement->error);
-    }
-    $statement->close();
-
-    return $executed;
+  protected function isSubscript(): ?bool {
+    return $this->isSubscript;
   }
 
   function graphQLType(): ObjectType {

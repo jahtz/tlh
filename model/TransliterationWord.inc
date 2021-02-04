@@ -31,7 +31,35 @@ abstract class TransliterationWordContent
     }
   }
 
-  abstract function saveToDb(mysqli $conn, string $mainIdentifier, int $lineIndex, int $wordIndex, int $contentIndex): bool;
+  final function saveToDb(mysqli $conn, string $mainIdentifier, int $lineIndex, int $wordIndex, int $contentIndex): bool {
+    $sql = "
+insert into tlh_dig_transliteration_word_contents (main_identifier, line_index, word_index, content_index, type, content, is_subscript)
+values (?, ?, ?, ?, ?, ?, ?);";
+
+    $type = $this->getType();
+    $content = $this->getContent();
+    $isSubscript = $this->isSubscript();
+
+    $statement = $conn->prepare($sql);
+    $statement->bind_param('siiissi', $mainIdentifier, $lineIndex, $wordIndex, $contentIndex, $type, $content, $isSubscript);
+    $executed = $statement->execute();
+    if (!$executed) {
+      error_log("Could not save WordContent to db: " . $statement->error);
+    }
+    $statement->close();
+
+    return $executed;
+  }
+
+  protected function getContent(): string {
+    return '';
+  }
+
+  abstract protected function getType(): string;
+
+  protected function isSubscript(): ?bool {
+    return null;
+  }
 
   abstract function graphQLType(): ObjectType;
 }
@@ -79,8 +107,7 @@ class TransliterationWord
 
   static function readWords(array $wordContents): TransliterationWord {
     // FIXME: read word contents...
-    $contents = array_map(function ($wordContent) {
-      error_log(json_encode($wordContent));
+    $contents = array_map(function (array $wordContent) {
       $type = $wordContent['type'];
       $content = $wordContent['content'];
 

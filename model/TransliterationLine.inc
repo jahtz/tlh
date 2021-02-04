@@ -24,12 +24,15 @@ class TransliterationLine
     $this->result = $result;
   }
 
-  static function fromDbAssocArray(array $array, array $wordContents): TransliterationLine {
+  static function fromDbAssocArray(array $array, ?array $wordContents): TransliterationLine {
     $mainIdentifier = $array['main_identifier'];
     $lineIndex = $array['line_index'];
 
     $result = null;
-    if (array_key_exists('result_line_number', $array) && array_key_exists('result_line_is_absolute', $array)) {
+    $lineNumber = $array['result_line_number'];
+    $lineNumberIsAbsolute = $array['result_line_is_absolute'];
+
+    if (isset($lineNumber) && isset($lineNumberIsAbsolute) && isset($wordContents)) {
       $result = TransliterationLineResult::fromDbAssocArray($array['result_line_number'], $array['result_line_is_absolute'], $wordContents);
     }
 
@@ -64,8 +67,11 @@ values (?, ?, ?, ?, ?);";
       return false;
     }
 
+    $lineNumber = $this->result ? $this->result->lineNumber : null;
+    $lineNumberIsAbsolute = $this->result ? $this->result->isAbsolute : null;
+
     $insertStatement = $conn->prepare($insertSql);
-    $insertStatement->bind_param('sisii', $this->mainIdentifier, $this->lineIndex, $this->transliterationLineInput, $this->result->lineNumber, $this->result->isAbsolute,);
+    $insertStatement->bind_param('sisii', $this->mainIdentifier, $this->lineIndex, $this->transliterationLineInput, $lineNumber, $lineNumberIsAbsolute);
     $insertExecuted = $insertStatement->execute();
     if (!$insertExecuted) {
       error_log("Could not insert TransliterationLine into db: " . $insertStatement->error);
@@ -76,11 +82,15 @@ values (?, ?, ?, ?, ?);";
       return false;
     }
 
-    $allWordsSaved = true;
-    foreach ($this->result->words as $wordIndex => $word) {
-      $allWordsSaved &= $word->saveToDb($conn, $this->mainIdentifier, $this->lineIndex, $wordIndex);
+    if ($this->result === null) {
+      return true;
+    } else {
+      $allWordsSaved = true;
+      foreach ($this->result->words as $wordIndex => $word) {
+        $allWordsSaved &= $word->saveToDb($conn, $this->mainIdentifier, $this->lineIndex, $wordIndex);
+      }
+      return $allWordsSaved;
     }
-    return $allWordsSaved;
   }
 }
 
