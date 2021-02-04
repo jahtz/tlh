@@ -67,7 +67,6 @@ values (?, ?, ?, ?, ?);";
   }
 
   function graphQLType(): ObjectType {
-    // TODO: Implement graphQLType() method.
     return DamageContent::$graphQLObjectType;
   }
 }
@@ -75,6 +74,9 @@ values (?, ?, ?, ?, ?);";
 DamageContent::$graphQLObjectType = new ObjectType([
   'name' => 'DamageContent',
   'fields' => [
-    'type' => Type::nonNull(DamageType::$enumType)
+    'type' => [
+      'type' => Type::nonNull(DamageType::$enumType),
+      'resolve' => fn(DamageContent $damageContent) => $damageContent->type->getValue()
+    ]
   ]
 ]);

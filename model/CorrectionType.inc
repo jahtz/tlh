@@ -61,6 +61,9 @@ values (?, ?, ?, ?, ?);";
 CorrectionContent::$graphQLObjectType = new ObjectType([
   'name' => 'CorrectionContent',
   'fields' => [
-    'type' => Type::nonNull(CorrectionType::$enumType)
+    'type' => [
+      'type' => Type::nonNull(CorrectionType::$enumType),
+      'resolve' => fn(CorrectionContent $correctionContent) => $correctionContent->type->getValue()
+    ]
   ]
 ]);

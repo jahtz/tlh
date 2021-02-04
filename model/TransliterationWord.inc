@@ -77,6 +77,34 @@ class TransliterationWord
     return new TransliterationWord(array_map(fn($x) => TransliterationWordContent::readAbstractFromGraphQLInput($x), $input['content']));
   }
 
+  static function readWords(array $wordContents): TransliterationWord {
+    // FIXME: read word contents...
+    $contents = array_map(function ($wordContent) {
+      error_log(json_encode($wordContent));
+      $type = $wordContent['type'];
+      $content = $wordContent['content'];
+
+      $stringContentType = StringContentTypeEnum::search($type);
+      if ($stringContentType) {
+        return new StringContent(new StringContentTypeEnum($stringContentType), $content);
+      }
+
+      $damageType = DamageType::search($type);
+      if ($damageType) {
+        return new DamageContent(new DamageType($damageType));
+      }
+
+      $correctionType = CorrectionType::search($type);
+      if ($correctionType) {
+        return new CorrectionContent(new CorrectionType($correctionType));
+      }
+
+      return new NumeralContent($wordContent['is_subscript'], 'x');
+    }, $wordContents);
+
+    return new TransliterationWord($contents);
+  }
+
   function saveToDb(mysqli $conn, string $mainIdentifier, int $lineIndex, int $wordIndex): bool {
     $allContentSaved = true;
     foreach ($this->content as $contentIndex => $content) {

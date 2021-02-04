@@ -31,38 +31,7 @@ class TransliterationLineResult
   }
 
   static function fromDbAssocArray(int $lineNumber, bool $isAbsolute, array $wordContents): TransliterationLineResult {
-    // FIXME: read result words!
-    $words = [];
-
-    foreach ($wordContents as $key => $wc) {
-      $contents = [];
-
-      foreach ($wc as $contentKey => $c) {
-        $contents[] = new StringContent(new StringContentTypeEnum('Hittite'), '');
-      }
-
-      $words[] = new TransliterationWord($contents);
-    }
-
-
-    /*
-    $words = array_map(function (array $wordContent): TransliterationWord {
-      error_log(json_encode($wordContent));
-      /*
-      error_log(join(", ", array_keys($wordContent)));
-      $wordIndex = $wordContent['word_index'];
-      error_log($wordIndex . ' :: ' . $wordContent[$wordIndex]);
-      *(/
-
-      $content = array_map(function (array $contentArray): TransliterationWordContent {
-
-        return new StringContent(new StringContentTypeEnum('Hittite'), '');
-      }, $wordContent);
-
-      return new TransliterationWord($content);
-
-    }, $wordContents);
-*/
+    $words = array_map(fn($wordContents) => TransliterationWord::readWords($wordContents), $wordContents);
 
     return new TransliterationLineResult($lineNumber, $isAbsolute, $words);
   }
