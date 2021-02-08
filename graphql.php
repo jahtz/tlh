@@ -23,6 +23,7 @@ use GraphQL\Type\Definition\{ObjectType, Type};
 use ReallySimpleJWT\Token;
 use tlh_dig\graphql\{InvalidTokenException, LoggedInUser, MySafeGraphQLException};
 use tlh_dig\model\{ManuscriptMetaData, ManuscriptSide, TransliterationLine, User};
+use function tlh_dig\graphql\verifyUser;
 
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
 $jwtSecret = '1234%ASDf_0aosd';
@@ -34,9 +35,7 @@ $queryType = new ObjectType([
   'fields' => [
     'allManuscripts' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptMetaData::$graphQLType))),
-      'resolve' => function (): array {
-        return allManuscriptMetaData();
-      }
+      'resolve' => fn() => allManuscriptMetaData()
     ],
     'manuscript' => [
       'type' => ManuscriptMetaData::$graphQLType,
@@ -151,22 +150,7 @@ $mutationType = new ObjectType([
         'password' => Type::nonNull(Type::string())
       ],
       'type' => LoggedInUser::$graphQLType,
-      'resolve' => function ($rootValue, array $args): ?LoggedInUser {
-        global $jwtSecret, $jwtValidityTime;
-
-        $user = maybeUserFromDatabase($args['username']);
-
-        if ($user !== null && password_verify($args['password'], $user->pwHash)) {
-          return new LoggedInUser(
-            $user->username,
-            $user->name,
-            $user->affiliation,
-            Token::create($user->username, $jwtSecret, time() + $jwtValidityTime, 'localhost')
-          );
-        } else {
-          throw new MySafeGraphQLException("Could not verify user!");
-        }
-      }
+      'resolve' => fn($rootValue, array $args) => verifyUser($args['username'], $args['password'])
     ],
     'me' => [
       'type' => $loggedInUserMutationsType,

@@ -3,6 +3,7 @@
 namespace tlh_dig\graphql;
 
 use GraphQL\Type\Definition\{ObjectType, Type};
+use ReallySimpleJWT\Token;
 
 class LoggedInUser
 {
@@ -31,3 +32,25 @@ LoggedInUser::$graphQLType = new ObjectType([
     'jwt' => Type::nonNull(Type::string())
   ]
 ]);
+
+
+function verifyUser(string $username, string $password): ?LoggedInUser {
+  global $jwtSecret, $jwtValidityTime;
+
+  $user = maybeUserFromDatabase($username);
+
+  if ($user === null) {
+    return null;
+  }
+
+  if (password_verify($password, $user->pwHash)) {
+    return new LoggedInUser(
+      $user->username,
+      $user->name,
+      $user->affiliation,
+      Token::create($user->username, $jwtSecret, time() + $jwtValidityTime, 'localhost')
+    );
+  } else {
+    return null;
+  }
+}

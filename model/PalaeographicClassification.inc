@@ -14,16 +14,13 @@ class PalaeographicClassification extends Enum
   const NewScript = 'NewScript';
   const LateNewScript = 'LateNewScript';
   const OldAssyrianScript = 'OldAssyrianScript';
-  const MiddleAssyrianScript = 'MiddleAssyrianScript';
   const MiddleBabylonianScript = 'MiddleBabylonianScript';
+  const MiddleAssyrianScript = 'MiddleAssyrianScript';
   const AssyroMittanianScript = 'AssyroMittanianScript';
   const Unclassified = 'Unclassified';
 }
 
 PalaeographicClassification::$graphQLEnumType = new EnumType([
   'name' => 'PalaeographicClassification',
-  'values' => [
-    'OldScript', 'MiddleScript', 'NewScript', 'LateNewScript', 'OldAssyrianScript', 'MiddleAssyrianScript',
-    'MiddleBabylonianScript', 'AssyroMittanianScript', 'Unclassified'
-  ]
+  'values' => PalaeographicClassification::keys()
 ]);

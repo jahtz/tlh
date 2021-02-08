@@ -7,6 +7,7 @@ require_once 'vendor/autoload.php';
 require_once 'model/ManuscriptMetaData.inc';
 require_once 'model/TransliterationLine.inc';
 require_once 'model/User.inc';
+require_once 'model/KnownProvenance.inc';
 
 use tlh_dig\model\{ManuscriptIdentifier, ManuscriptMetaData, TransliterationLine, User};
 
@@ -278,7 +279,7 @@ function getTransliterationResultLines(string $mainIdentifier): ?array {
     $linesStatement->close();
   }
 
-  if ($allRows === null && count($allRows) === 0) {
+  if ($allRows === null || count($allRows) === 0) {
     $conn->close();
     return null;
   }
