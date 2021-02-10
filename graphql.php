@@ -28,7 +28,7 @@ use function tlh_dig\graphql\verifyUser;
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
 $jwtSecret = '1234%ASDf_0aosd';
 
-$jwtValidityTime = 3600;
+$jwtValidityTime = 24 * 60 * 60; // 24 h
 
 $queryType = new ObjectType([
   'name' => 'Query',
