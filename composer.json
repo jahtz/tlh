@@ -1,8 +1,8 @@
 {
   "require": {
-    "phpoffice/phpword": "^0.17.0",
-    "webonyx/graphql-php": "^14.5.1",
-    "rbdwllr/reallysimplejwt": "^3.1",
+    "phpoffice/phpword": "^0.18.0",
+    "webonyx/graphql-php": "^v14.5.1",
+    "rbdwllr/reallysimplejwt": "^4.0.0",
     "myclabs/php-enum": "^1.7.7",
     "ext-json": "*",
     "ext-xml": "*",
