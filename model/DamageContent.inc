@@ -23,7 +23,7 @@ class DamageType extends Enum
 }
 
 DamageType::$enumType = new EnumType([
-  'name' => 'DamageTypeEnum',
+  'name' => 'DamageType',
   'values' => DamageType::keys()
 ]);
 
