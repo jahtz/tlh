@@ -22,7 +22,13 @@ use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
 use ReallySimpleJWT\Token;
 use tlh_dig\graphql\{InvalidTokenException, LoggedInUser, MySafeGraphQLException};
-use tlh_dig\model\{ManuscriptMetaData, ManuscriptSide, TransliterationLine, User};
+use tlh_dig\model\{ManuscriptColumn,
+  ManuscriptColumnModifier,
+  ManuscriptLanguage,
+  ManuscriptMetaData,
+  ManuscriptSide,
+  TransliterationLine,
+  User};
 use function tlh_dig\graphql\verifyUser;
 
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
@@ -178,7 +184,11 @@ try {
     SchemaConfig::create()
       ->setQuery($queryType)
       ->setMutation($mutationType)
-      ->setTypes([ManuscriptSide::$graphQLEnumType])
+      ->setTypes([
+        ManuscriptSide::$graphQLEnumType,
+        ManuscriptColumn::$graphQLEnumType, ManuscriptColumnModifier::$graphQLEnumType,
+        ManuscriptLanguage::$graphQLEnumType
+      ])
   );
 
   $rawInput = file_get_contents('php://input');

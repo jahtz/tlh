@@ -32,5 +32,5 @@ class ManuscriptStatus extends Enum
 
 ManuscriptStatus::$enumType = new EnumType([
   'name' => 'ManuscriptStatus',
-  'values' => ['InCreation', 'Created', 'Reviewed', 'ReviewMerged', 'ExecutiveReviewed', 'ExecutiveReviewMerged', 'Approved']
+  'values' => ManuscriptStatus::keys()
 ]);

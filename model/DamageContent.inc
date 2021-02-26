@@ -9,12 +9,11 @@ class DamageType extends Enum
 {
   static EnumType $enumType;
 
-  private const DeletionStart = 'DeletionStart';
-  private const DeletionEnd = 'DeletionEnd';
-  private const LesionStart = 'LesionStart';
-  private const LesionEnd = 'LesionEnd';
-  private const RasureStart = 'RasureStart';
-  private const RasureEnd = 'RasureEnd';
+  private const DeletionStart = 'DeletionStart'; // [
+  private const DeletionEnd = 'DeletionEnd'; // ]
+  private const LesionStart = 'LesionStart'; // ⸢
+  private const LesionEnd = 'LesionEnd'; // ⸣
+  private const Rasure = 'Rasure'; // *
   private const SurplusStart = 'SurplusStart';
   private const SurplusEnd = 'SurplusEnd';
   private const SupplementStart = 'SupplementStart';
@@ -25,14 +24,7 @@ class DamageType extends Enum
 
 DamageType::$enumType = new EnumType([
   'name' => 'DamageTypeEnum',
-  'values' => [
-    'DeletionStart', 'DeletionEnd',
-    'LesionStart', 'LesionEnd',
-    'RasureStart', 'RasureEnd',
-    'SurplusStart', 'SurplusEnd',
-    'SupplementStart', 'SupplementEnd',
-    'UnknownDamageStart', 'UnknownDamageEnd'
-  ]
+  'values' => DamageType::keys()
 ]);
 
 class DamageContent extends TransliterationWordContent

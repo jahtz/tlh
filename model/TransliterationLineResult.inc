@@ -6,7 +6,6 @@ namespace tlh_dig\model;
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/TransliterationWord.inc';
 
-
 use GraphQL\Type\Definition\{InputObjectType, ObjectType, Type};
 
 // Line
