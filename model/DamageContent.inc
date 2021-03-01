@@ -34,6 +34,7 @@ class DamageContent extends TransliterationWordContent
   public DamageType $type;
 
   public function __construct(DamageType $type) {
+    parent::__construct('');
     $this->type = $type;
   }
 

@@ -15,20 +15,23 @@ class CorrectionType extends Enum
   private const SicCorrection = 'SicCorrection';
   private const Ellipsis = 'Ellipsis';
   private const ParagraphEnd = 'ParagraphEnd';
+  private const DoubleParagraphEnd = 'DoubleParagraphEnd';
 
 }
 
 CorrectionType::$enumType = new EnumType([
   'name' => 'CorrectionType',
-  'values' => ['UnsureCorrection', 'MaybeUnsureCorrection', 'SureCorrection', 'SicCorrection', 'Ellipsis', 'ParagraphEnd']
+  'values' => CorrectionType::keys()
 ]);
 
 class CorrectionContent extends TransliterationWordContent
 {
   static ObjectType $graphQLObjectType;
+
   public CorrectionType $type;
 
   public function __construct(CorrectionType $type) {
+    parent::__construct('');
     $this->type = $type;
   }
 

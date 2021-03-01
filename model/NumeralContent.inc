@@ -11,13 +11,11 @@ class NumeralContent extends TransliterationWordContent
   static ObjectType $graphQLObjectType;
   static InputObjectType $graphqlInputObjectType;
 
-  private string $type = 'numeral';
   public bool $isSubscript;
-  public string $content;
 
   public function __construct(bool $isSubscript, string $content) {
+    parent::__construct($content);
     $this->isSubscript = $isSubscript;
-    $this->content = $content;
   }
 
   static function readFromGraphQLInput(array $input): NumeralContent {

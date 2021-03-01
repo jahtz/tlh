@@ -7,6 +7,7 @@ require_once __DIR__ . '/DamageContent.inc';
 require_once __DIR__ . '/StringContent.inc';
 require_once __DIR__ . '/CorrectionType.inc';
 require_once __DIR__ . '/NumeralContent.inc';
+require_once __DIR__ . '/MarkContent.inc';
 
 use GraphQL\Type\Definition\{InputObjectType, ObjectType, Type, UnionType};
 use mysqli;
@@ -15,6 +16,12 @@ abstract class TransliterationWordContent
 {
   static UnionType $graphQLUnionType;
   static InputObjectType $graphQLInputType;
+
+  public string $content;
+
+  function __construct(string $content) {
+    $this->content = $content;
+  }
 
   static function readAbstractFromGraphQLInput(array $input): TransliterationWordContent {
     if (array_key_exists('stringContent', $input)) {
@@ -25,6 +32,8 @@ abstract class TransliterationWordContent
       return CorrectionContent::readFromGraphQLInput($input['correctionContent']);
     } else if (array_key_exists('numeralContent', $input)) {
       return NumeralContent::readFromGraphQLInput($input['numeralContent']);
+    } else if (array_key_exists('markContent', $input)) {
+      return MarkContent::readFromGraphQLInput($input['markContent']);
     } else {
       // not possible!
       return new StringContent(StringContentTypeEnum::Hittite(), '');
@@ -37,7 +46,7 @@ insert into tlh_dig_transliteration_word_contents (main_identifier, line_index, 
 values (?, ?, ?, ?, ?, ?, ?);";
 
     $type = $this->getType();
-    $content = $this->getContent();
+    $content = $this->content;
     $isSubscript = $this->isSubscript();
 
     $statement = $conn->prepare($sql);
@@ -49,10 +58,6 @@ values (?, ?, ?, ?, ?, ?, ?);";
     $statement->close();
 
     return $executed;
-  }
-
-  protected function getContent(): string {
-    return '';
   }
 
   abstract protected function getType(): string;
@@ -70,7 +75,8 @@ TransliterationWordContent::$graphQLUnionType = new UnionType([
     StringContent::$graphQLObjectType,
     DamageContent::$graphQLObjectType,
     CorrectionContent::$graphQLObjectType,
-    NumeralContent::$graphQLObjectType
+    NumeralContent::$graphQLObjectType,
+    MarkContent::$graphQLObjectType
   ],
   'resolveType' => fn(TransliterationWordContent $value) => $value->graphQLType()
 ]);
@@ -82,6 +88,7 @@ TransliterationWordContent::$graphQLInputType = new InputObjectType([
     'numeralContent' => NumeralContent::$graphqlInputObjectType,
     'damageContent' => DamageType::$enumType,
     'correctionContent' => CorrectionType::$enumType,
+    'markContent' => MarkContent::$graphQLInputObjectType
   ]
 ]);
 
@@ -124,6 +131,11 @@ class TransliterationWord
       $correctionType = CorrectionType::search($type);
       if ($correctionType) {
         return new CorrectionContent(new CorrectionType($correctionType));
+      }
+
+      $markType = MarkType::search($type);
+      if($markType) {
+        return new MarkContent(new MarkType($markType), $content);
       }
 
       return new NumeralContent($wordContent['is_subscript'], 'x');

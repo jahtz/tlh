@@ -2,10 +2,8 @@
 
 namespace tlh_dig\model;
 
-
 use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
 use MyCLabs\Enum\Enum;
-use mysqli;
 
 /**
  * Class StringContentTypeEnum
@@ -39,11 +37,10 @@ class StringContent extends TransliterationWordContent
   static InputObjectType $graphQLInputObjectType;
 
   public StringContentTypeEnum $type;
-  public string $content;
 
   public function __construct(StringContentTypeEnum $type, string $content) {
+    parent::__construct($content);
     $this->type = $type;
-    $this->content = $content;
   }
 
   static function readFromGraphQLInput(array $input): StringContent {
@@ -52,10 +49,6 @@ class StringContent extends TransliterationWordContent
 
   function getType(): string {
     return $this->type->getValue();
-  }
-
-  function getContent(): string {
-    return $this->content;
   }
 
   function graphQLType(): ObjectType {

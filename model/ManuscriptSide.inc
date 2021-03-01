@@ -32,6 +32,7 @@ class ManuscriptColumn extends Enum
 {
   static EnumType $graphQLEnumType;
 
+  const None = 'None';
   const I = 'I';
   const II = 'II';
   const III = 'III';
