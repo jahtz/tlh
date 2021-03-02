@@ -185,9 +185,9 @@ try {
       ->setQuery($queryType)
       ->setMutation($mutationType)
       ->setTypes([
-        ManuscriptSide::$graphQLEnumType,
-        ManuscriptColumn::$graphQLEnumType, ManuscriptColumnModifier::$graphQLEnumType,
-        ManuscriptLanguage::$graphQLEnumType
+        // TODO: delete if used!
+        ManuscriptSide::$graphQLEnumType, ManuscriptLanguage::$graphQLEnumType,
+        ManuscriptColumn::$graphQLEnumType, ManuscriptColumnModifier::$graphQLEnumType
       ])
   );
 

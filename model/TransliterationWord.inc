@@ -70,7 +70,7 @@ values (?, ?, ?, ?, ?, ?, ?);";
 }
 
 TransliterationWordContent::$graphQLUnionType = new UnionType([
-  'name' => 'TransliterationWordContentUnion',
+  'name' => 'WordContentUnion',
   'types' => [
     StringContent::$graphQLObjectType,
     DamageContent::$graphQLObjectType,
@@ -82,7 +82,7 @@ TransliterationWordContent::$graphQLUnionType = new UnionType([
 ]);
 
 TransliterationWordContent::$graphQLInputType = new InputObjectType([
-  'name' => 'TransliterationWordContentInputUnion',
+  'name' => 'WordContentInputUnion',
   'fields' => [
     'stringContent' => StringContent::$graphQLInputObjectType,
     'numeralContent' => NumeralContent::$graphqlInputObjectType,
@@ -134,7 +134,7 @@ class TransliterationWord
       }
 
       $markType = MarkType::search($type);
-      if($markType) {
+      if ($markType) {
         return new MarkContent(new MarkType($markType), $content);
       }
 
@@ -154,14 +154,14 @@ class TransliterationWord
 }
 
 TransliterationWord::$graphQLInputObjectType = new InputObjectType([
-  'name' => 'TransliterationWordInput',
+  'name' => 'WordInput',
   'fields' => [
-    'content' => Type::nonNull(Type::listOf(TransliterationWordContent::$graphQLInputType))
+    'content' => Type::nonNull(Type::listOf(Type::nonNull(TransliterationWordContent::$graphQLInputType)))
   ]
 ]);
 
 TransliterationWord::$graphQLObjectType = new ObjectType([
-  'name' => 'TransliterationWord',
+  'name' => 'Word',
   'fields' => [
     'content' => Type::nonNull(Type::listOf(Type::nonNull(TransliterationWordContent::$graphQLUnionType)))
   ]
