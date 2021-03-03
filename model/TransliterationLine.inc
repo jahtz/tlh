@@ -14,13 +14,13 @@ class TransliterationLine
 
   public string $mainIdentifier;
   public int $lineIndex;
-  public string $transliterationLineInput;
+  public string $lineInput;
   public ?TransliterationLineResult $result;
 
-  public function __construct(string $mainIdentifier, int $lineIndex, string $transliterationLineInput, ?TransliterationLineResult $result) {
+  public function __construct(string $mainIdentifier, int $lineIndex, string $lineInput, ?TransliterationLineResult $result) {
     $this->mainIdentifier = $mainIdentifier;
     $this->lineIndex = $lineIndex;
-    $this->transliterationLineInput = $transliterationLineInput;
+    $this->lineInput = $lineInput;
     $this->result = $result;
   }
 
@@ -41,7 +41,7 @@ class TransliterationLine
 
   static function readFromGraphQLInput(string $mainIdentifier, array $input): TransliterationLine {
     return new TransliterationLine(
-      $mainIdentifier, $input['lineIndex'], $input['transliterationLineInput'],
+      $mainIdentifier, $input['lineIndex'], $input['lineInput'],
       array_key_exists('result', $input) ? TransliterationLineResult::readFromGraphQLInput($input['result']) : null
     );
   }
@@ -58,12 +58,10 @@ values (?, ?, ?, ?, ?);";
     $deleteStatement = $conn->prepare($deleteSql);
     $deleteStatement->bind_param('si', $this->mainIdentifier, $this->lineIndex);
     $deleteExecuted = $deleteStatement->execute();
-    if (!$deleteExecuted) {
-      error_log("Could not delete TransliterationLine from db: " . $deleteStatement->error);
-    }
     $deleteStatement->close();
 
     if (!$deleteExecuted) {
+      error_log("Could not delete TransliterationLine from db: " . $deleteStatement->error);
       return false;
     }
 
@@ -71,26 +69,25 @@ values (?, ?, ?, ?, ?);";
     $lineNumberIsAbsolute = $this->result ? $this->result->isAbsolute : null;
 
     $insertStatement = $conn->prepare($insertSql);
-    $insertStatement->bind_param('sisii', $this->mainIdentifier, $this->lineIndex, $this->transliterationLineInput, $lineNumber, $lineNumberIsAbsolute);
+    $insertStatement->bind_param('sisii', $this->mainIdentifier, $this->lineIndex, $this->lineInput, $lineNumber, $lineNumberIsAbsolute);
     $insertExecuted = $insertStatement->execute();
-    if (!$insertExecuted) {
-      error_log("Could not insert TransliterationLine into db: " . $insertStatement->error);
-    }
     $insertStatement->close();
 
     if (!$insertExecuted) {
+      error_log("Could not insert TransliterationLine into db: " . $insertStatement->error);
       return false;
     }
 
     if ($this->result === null) {
       return true;
-    } else {
-      $allWordsSaved = true;
-      foreach ($this->result->words as $wordIndex => $word) {
-        $allWordsSaved &= $word->saveToDb($conn, $this->mainIdentifier, $this->lineIndex, $wordIndex);
-      }
-      return $allWordsSaved;
     }
+
+    $allWordsSaved = true;
+    foreach ($this->result->words as $wordIndex => $word) {
+      $allWordsSaved &= $word->saveToDb($conn, $this->mainIdentifier, $this->lineIndex, $wordIndex);
+    }
+
+    return $allWordsSaved;
   }
 }
 
@@ -98,7 +95,7 @@ TransliterationLine::$graphQLObjectType = new ObjectType([
   'name' => 'TransliterationLine',
   'fields' => [
     'lineIndex' => Type::nonNull(Type::int()),
-    'transliterationLineInput' => Type::nonNull(Type::string()),
+    'lineInput' => Type::nonNull(Type::string()),
     'result' => TransliterationLineResult::$graphQLObjectType
   ]
 ]);
@@ -107,7 +104,7 @@ TransliterationLine::$graphQLInputObjectType = new InputObjectType([
   'name' => 'TransliterationLineInput',
   'fields' => [
     'lineIndex' => Type::nonNull(Type::int()),
-    'transliterationLineInput' => Type::nonNull(Type::string()),
+    'lineInput' => Type::nonNull(Type::string()),
     'result' => TransliterationLineResult::$graphQLInputObjectType
   ]
 ]);

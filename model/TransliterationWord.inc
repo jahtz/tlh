@@ -8,6 +8,7 @@ require_once __DIR__ . '/StringContent.inc';
 require_once __DIR__ . '/CorrectionType.inc';
 require_once __DIR__ . '/NumeralContent.inc';
 require_once __DIR__ . '/MarkContent.inc';
+require_once __DIR__ . '/XContent.inc';
 
 use GraphQL\Type\Definition\{InputObjectType, ObjectType, Type, UnionType};
 use mysqli;
@@ -34,6 +35,8 @@ abstract class TransliterationWordContent
       return NumeralContent::readFromGraphQLInput($input['numeralContent']);
     } else if (array_key_exists('markContent', $input)) {
       return MarkContent::readFromGraphQLInput($input['markContent']);
+    } else if (array_key_exists('xContent', $input)) {
+      return new XContent();
     } else {
       // not possible!
       return new StringContent(StringContentTypeEnum::Hittite(), '');
@@ -42,22 +45,23 @@ abstract class TransliterationWordContent
 
   final function saveToDb(mysqli $conn, string $mainIdentifier, int $lineIndex, int $wordIndex, int $contentIndex): bool {
     $sql = "
-insert into tlh_dig_transliteration_word_contents (main_identifier, line_index, word_index, content_index, type, content, is_subscript)
+insert into tlh_dig_word_contents (main_identifier, line_index, word_index, content_index, type, content, is_subscript)
 values (?, ?, ?, ?, ?, ?, ?);";
 
     $type = $this->getType();
     $content = $this->content;
     $isSubscript = $this->isSubscript();
 
-    $statement = $conn->prepare($sql);
-    $statement->bind_param('siiissi', $mainIdentifier, $lineIndex, $wordIndex, $contentIndex, $type, $content, $isSubscript);
-    $executed = $statement->execute();
-    if (!$executed) {
-      error_log("Could not save WordContent to db: " . $statement->error);
-    }
-    $statement->close();
+    $insertStatement = $conn->prepare($sql);
+    $insertStatement->bind_param('siiissi', $mainIdentifier, $lineIndex, $wordIndex, $contentIndex, $type, $content, $isSubscript);
+    $insertExecuted = $insertStatement->execute();
+    $insertStatement->close();
 
-    return $executed;
+    if (!$insertExecuted) {
+      error_log("Could not save WordContent to db: " . $insertStatement->error);
+    }
+
+    return $insertExecuted;
   }
 
   abstract protected function getType(): string;
@@ -76,7 +80,8 @@ TransliterationWordContent::$graphQLUnionType = new UnionType([
     DamageContent::$graphQLObjectType,
     CorrectionContent::$graphQLObjectType,
     NumeralContent::$graphQLObjectType,
-    MarkContent::$graphQLObjectType
+    MarkContent::$graphQLObjectType,
+    XContent::$graphQLObjectType,
   ],
   'resolveType' => fn(TransliterationWordContent $value) => $value->graphQLType()
 ]);
@@ -88,7 +93,8 @@ TransliterationWordContent::$graphQLInputType = new InputObjectType([
     'numeralContent' => NumeralContent::$graphqlInputObjectType,
     'damageContent' => DamageType::$enumType,
     'correctionContent' => CorrectionType::$enumType,
-    'markContent' => MarkContent::$graphQLInputObjectType
+    'markContent' => MarkContent::$graphQLInputObjectType,
+    'xContent' => XContent::$graphQLInputObjectType
   ]
 ]);
 
@@ -99,22 +105,32 @@ class TransliterationWord
   static InputObjectType $graphQLInputObjectType;
   static ObjectType $graphQLObjectType;
 
+
+  public string $input;
   /**
    * @var TransliterationWordContent[]
    */
   public array $content;
 
-  public function __construct(array $content) {
+  public function __construct(string $input, array $content) {
+    $this->input = $input;
     $this->content = $content;
   }
 
   static function readFromGraphQLInput(array $input): TransliterationWord {
-    return new TransliterationWord(array_map(fn($x) => TransliterationWordContent::readAbstractFromGraphQLInput($x), $input['content']));
+    return new TransliterationWord(
+      $input['input'],
+      array_map(fn(array $x): TransliterationWordContent => TransliterationWordContent::readAbstractFromGraphQLInput($x), $input['content'])
+    );
   }
 
-  static function readWords(array $wordContents): TransliterationWord {
+  /**
+   * @param array $wordContents
+   * @return TransliterationWordContent[]
+   */
+  static function readWords(array $wordContents): array {
     // FIXME: read word contents...
-    $contents = array_map(function (array $wordContent) {
+    return array_map(function (array $wordContent) {
       $type = $wordContent['type'];
       $content = $wordContent['content'];
 
@@ -140,15 +156,26 @@ class TransliterationWord
 
       return new NumeralContent($wordContent['is_subscript'], 'x');
     }, $wordContents);
-
-    return new TransliterationWord($contents);
   }
 
   function saveToDb(mysqli $conn, string $mainIdentifier, int $lineIndex, int $wordIndex): bool {
+    $sql = "
+insert into tlh_dig_words (main_identifier, line_index, word_index, word_input)
+values (?, ?, ?, ?);";
+
+    $insertStatement = $conn->prepare($sql);
+    $insertStatement->bind_param('siis', $mainIdentifier, $lineIndex, $wordIndex, $this->content);
+    $insertExecuted = $insertStatement->execute();
+    if ($insertExecuted) {
+      error_log("Could not insert TransliterationWord into db:" . $insertStatement->error);
+    }
+    $insertStatement->close();
+
     $allContentSaved = true;
     foreach ($this->content as $contentIndex => $content) {
       $allContentSaved &= $content->saveToDb($conn, $mainIdentifier, $lineIndex, $wordIndex, $contentIndex);
     }
+
     return $allContentSaved;
   }
 }
@@ -156,6 +183,7 @@ class TransliterationWord
 TransliterationWord::$graphQLInputObjectType = new InputObjectType([
   'name' => 'WordInput',
   'fields' => [
+    'input' => Type::nonNull(Type::string()),
     'content' => Type::nonNull(Type::listOf(Type::nonNull(TransliterationWordContent::$graphQLInputType)))
   ]
 ]);
@@ -163,6 +191,7 @@ TransliterationWord::$graphQLInputObjectType = new InputObjectType([
 TransliterationWord::$graphQLObjectType = new ObjectType([
   'name' => 'Word',
   'fields' => [
+    'input' => Type::nonNull(Type::string()),
     'content' => Type::nonNull(Type::listOf(Type::nonNull(TransliterationWordContent::$graphQLUnionType)))
   ]
 ]);

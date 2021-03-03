@@ -5,6 +5,7 @@ namespace tlh_dig\model;
 use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
 use MyCLabs\Enum\Enum;
 
+
 class ManuscriptIdentifierType extends Enum
 {
   static EnumType $graphQLEnumType;
@@ -12,14 +13,12 @@ class ManuscriptIdentifierType extends Enum
   public const ExcavationNumber = 'ExcavationNumber';
   public const CollectionNumber = 'CollectionNumber';
   public const PublicationShortReference = 'PublicationShortReference';
-
 }
 
 ManuscriptIdentifierType::$graphQLEnumType = new EnumType([
   'name' => 'ManuscriptIdentifierType',
-  'values' => ['ExcavationNumber', 'CollectionNumber', 'PublicationShortReference']
+  'values' => ManuscriptIdentifierType::keys()
 ]);
-
 
 class ManuscriptIdentifier
 {
@@ -32,10 +31,6 @@ class ManuscriptIdentifier
   function __construct(ManuscriptIdentifierType $type, string $identifier) {
     $this->type = $type;
     $this->identifier = $identifier;
-  }
-
-  static function new(ManuscriptIdentifierType $type, string $identifier): ManuscriptIdentifier {
-    return new ManuscriptIdentifier($type, $identifier);
   }
 
   static function fromGraphQLInput(array $input): ManuscriptIdentifier {
@@ -58,9 +53,7 @@ ManuscriptIdentifier::$graphQLType = new ObjectType([
   'fields' => [
     'type' => [
       'type' => Type::nonNull(ManuscriptIdentifierType::$graphQLEnumType),
-      'resolve' => function (ManuscriptIdentifier $value) {
-        return $value->type->getValue();
-      }
+      'resolve' => fn(ManuscriptIdentifier $value) => $value->type->getValue()
     ],
     'identifier' => Type::nonNull(Type::string())
   ]

@@ -30,7 +30,12 @@ class TransliterationLineResult
   }
 
   static function fromDbAssocArray(int $lineNumber, bool $isAbsolute, ?array $wordContents): TransliterationLineResult {
-    $words = array_map(fn($wordContents) => TransliterationWord::readWords($wordContents), $wordContents);
+    $words = array_map(function ($wordContents) {
+      // FIXME: get input for word!
+      $wordContents = TransliterationWord::readWords($wordContents);
+
+      return new TransliterationWord('', $wordContents);
+    }, $wordContents);
 
     return new TransliterationLineResult($lineNumber, $isAbsolute, $words);
   }

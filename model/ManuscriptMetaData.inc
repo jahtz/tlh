@@ -17,21 +17,15 @@ use GraphQL\Type\Definition\{InputObjectType, ObjectType, Type};
 function getPictures(string $manuscriptMainIdentifier): array {
   $folder = "./uploads/$manuscriptMainIdentifier/";
 
-  if (file_exists($folder) && is_dir($folder)) {
-    return array_filter(
-      scandir($folder),
-      function (string $value): bool {
-        return !in_array($value, ['.', '..']);
-      }
-    );
-  } else {
+  if (!file_exists($folder) || is_dir($folder)) {
     return [];
   }
+
+  return array_filter(scandir($folder), fn(string $value): bool => !in_array($value, ['.', '..']));
 }
 
 class ManuscriptMetaData
 {
-
   static ObjectType $graphQLType;
   static InputObjectType $graphQLInputObjectType;
 
@@ -70,7 +64,7 @@ class ManuscriptMetaData
 
   static function fromDbAssocArray(array $row): ManuscriptMetaData {
     return new ManuscriptMetaData(
-      ManuscriptIdentifier::new(
+      new ManuscriptIdentifier(
         new ManuscriptIdentifierType($row['main_identifier_type']),
         $row['main_identifier']
       ),
@@ -114,34 +108,24 @@ ManuscriptMetaData::$graphQLType = new ObjectType([
     'creatorUsername' => Type::nonNull(Type::string()),
     'palaeographicClassification' => [
       'type' => Type::nonNull(PalaeographicClassification::$graphQLEnumType),
-      'resolve' => function (ManuscriptMetaData $manuscriptMetaData): ?string {
-        return $manuscriptMetaData->palaeographicClassification->getValue();
-      }
+      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): ?string => $manuscriptMetaData->palaeographicClassification->getValue()
     ],
     'palaeographicClassificationSure' => Type::nonNull(Type::boolean()),
     'status' => [
       'type' => ManuscriptStatus::$enumType,
-      'resolve' => function (ManuscriptMetaData $manuscriptMetaData): ?string {
-        return $manuscriptMetaData->status->getValue();
-      }
+      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): ?string => $manuscriptMetaData->status->getValue()
     ],
     'otherIdentifiers' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptIdentifier::$graphQLType))),
-      'resolve' => function (ManuscriptMetaData $manuscriptMetaData): array {
-        return getOtherIdentifiers($manuscriptMetaData->mainIdentifier->identifier);
-      }
+      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): array => getOtherIdentifiers($manuscriptMetaData->mainIdentifier->identifier)
     ],
     'pictureUrls' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(Type::string()))),
-      'resolve' => function (ManuscriptMetaData $manuscriptMetaData): array {
-        return getPictures($manuscriptMetaData->mainIdentifier->identifier);
-      }
+      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): array => getPictures($manuscriptMetaData->mainIdentifier->identifier)
     ],
     'transliterationResult' => [
       'type' => Type::listOf(Type::nonNull(TransliterationLine::$graphQLObjectType)),
-      'resolve' => function (ManuscriptMetaData $manuscriptMetaData): ?array {
-        return getTransliterationResultLines($manuscriptMetaData->mainIdentifier->identifier);
-      }
+      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): ?array => getTransliterationResultLines($manuscriptMetaData->mainIdentifier->identifier)
     ]
   ]
 ]);

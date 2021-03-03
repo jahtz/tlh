@@ -14,7 +14,7 @@ require_once 'model/TransliterationLineResult.inc';
 require_once 'model/StringContent.inc';
 require_once 'model/CorrectionType.inc';
 require_once 'model/DamageContent.inc';
-require_once 'model/ManuscriptSide.inc';
+require_once 'model/ManuscriptProperties.inc';
 
 use GraphQL\Error\{DebugFlag, FormattedError};
 use GraphQL\GraphQL;
