@@ -71,10 +71,12 @@ values (?, ?, ?, ?, ?);";
     $insertStatement = $conn->prepare($insertSql);
     $insertStatement->bind_param('sisii', $this->mainIdentifier, $this->lineIndex, $this->lineInput, $lineNumber, $lineNumberIsAbsolute);
     $insertExecuted = $insertStatement->execute();
+    if (!$insertExecuted) {
+      error_log("Could not insert TransliterationLine into db: " . $insertStatement->error);
+    }
     $insertStatement->close();
 
     if (!$insertExecuted) {
-      error_log("Could not insert TransliterationLine into db: " . $insertStatement->error);
       return false;
     }
 

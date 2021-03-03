@@ -255,7 +255,7 @@ function insertUserIntoDatabase(User $user): bool {
  */
 function getTransliterationResultLines(string $mainIdentifier): ?array {
   $linesQuery = "select * from tlh_dig_transliteration_lines where main_identifier = ? order by line_index;";
-  $wordsQuery = "select * from tlh_dig_transliteration_word_contents where main_identifier = ? order by line_index, word_index, content_index;";
+  $wordsQuery = "select * from tlh_dig_word_contents where main_identifier = ? order by line_index, word_index, content_index;";
 
   $conn = connect_to_db();
 

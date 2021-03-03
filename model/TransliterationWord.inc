@@ -55,11 +55,10 @@ values (?, ?, ?, ?, ?, ?, ?);";
     $insertStatement = $conn->prepare($sql);
     $insertStatement->bind_param('siiissi', $mainIdentifier, $lineIndex, $wordIndex, $contentIndex, $type, $content, $isSubscript);
     $insertExecuted = $insertStatement->execute();
-    $insertStatement->close();
-
     if (!$insertExecuted) {
       error_log("Could not save WordContent to db: " . $insertStatement->error);
     }
+    $insertStatement->close();
 
     return $insertExecuted;
   }
@@ -154,7 +153,12 @@ class TransliterationWord
         return new MarkContent(new MarkType($markType), $content);
       }
 
-      return new NumeralContent($wordContent['is_subscript'], 'x');
+      $isSubscript = $wordContent['is_subscript'];
+      if (isset($isSubscript)) {
+        return new NumeralContent($isSubscript, 'x');
+      }
+
+      return new XContent();
     }, $wordContents);
   }
 
@@ -164,12 +168,16 @@ insert into tlh_dig_words (main_identifier, line_index, word_index, word_input)
 values (?, ?, ?, ?);";
 
     $insertStatement = $conn->prepare($sql);
-    $insertStatement->bind_param('siis', $mainIdentifier, $lineIndex, $wordIndex, $this->content);
+    $insertStatement->bind_param('siis', $mainIdentifier, $lineIndex, $wordIndex, $this->input);
     $insertExecuted = $insertStatement->execute();
-    if ($insertExecuted) {
+    if (!$insertExecuted) {
       error_log("Could not insert TransliterationWord into db:" . $insertStatement->error);
     }
     $insertStatement->close();
+
+    if (!$insertExecuted) {
+      return false;
+    }
 
     $allContentSaved = true;
     foreach ($this->content as $contentIndex => $content) {
