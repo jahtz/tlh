@@ -212,7 +212,7 @@ try {
       'errors' => [FormattedError::createFromException(new Exception('No input given!'))]
     ];
   }
-} catch (Exception $e) {
+} catch (Throwable $e) {
   error_log($e);
 
   $output = [

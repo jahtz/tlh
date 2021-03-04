@@ -24,7 +24,7 @@ class TransliterationLine
     $this->result = $result;
   }
 
-  static function fromDbAssocArray(array $array, ?array $wordContents): TransliterationLine {
+  static function fromDbAssocArray(array $array, ?array $wordForLine): TransliterationLine {
     $mainIdentifier = $array['main_identifier'];
     $lineIndex = $array['line_index'];
 
@@ -32,8 +32,8 @@ class TransliterationLine
     $lineNumber = $array['result_line_number'];
     $lineNumberIsAbsolute = $array['result_line_is_absolute'];
 
-    if (isset($lineNumber) && isset($lineNumberIsAbsolute) && isset($wordContents)) {
-      $result = TransliterationLineResult::fromDbAssocArray($array['result_line_number'], $array['result_line_is_absolute'], $wordContents);
+    if (isset($lineNumber) && isset($lineNumberIsAbsolute) && isset($wordForLine)) {
+      $result = TransliterationLineResult::fromDbAssocArray($array['result_line_number'], $array['result_line_is_absolute'], $wordForLine);
     }
 
     return new TransliterationLine($mainIdentifier, $lineIndex, $array['transliteration_input'], $result);

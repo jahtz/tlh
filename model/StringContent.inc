@@ -24,6 +24,10 @@ class StringContentTypeEnum extends Enum
   public const Determinativ = 'Determinativ';
   public const MaterLectionis = 'MaterLectionis';
   public const Sumerogramm = 'Sumerogramm';
+
+  static function fromString(string $value): StringContentTypeEnum {
+    return new StringContentTypeEnum($value);
+  }
 }
 
 StringContentTypeEnum::$enumType = new EnumType([
@@ -33,26 +37,36 @@ StringContentTypeEnum::$enumType = new EnumType([
 
 class StringContent extends TransliterationWordContent
 {
+  const jsonTypeName = 'stringContent';
+
   static ObjectType $graphQLObjectType;
   static InputObjectType $graphQLInputObjectType;
 
-  public StringContentTypeEnum $type;
+  public StringContentTypeEnum $stringContentType;
 
-  public function __construct(StringContentTypeEnum $type, string $content) {
+  public function __construct(StringContentTypeEnum $stringContentType, string $content) {
     parent::__construct($content);
-    $this->type = $type;
+    $this->stringContentType = $stringContentType;
   }
 
   static function readFromGraphQLInput(array $input): StringContent {
-    return new StringContent(new StringContentTypeEnum($input['type']), urldecode($input['content']));
-  }
-
-  function getType(): string {
-    return $this->type->getValue();
+    return new StringContent(StringContentTypeEnum::fromString($input['type']), urldecode($input['content']));
   }
 
   function graphQLType(): ObjectType {
     return StringContent::$graphQLObjectType;
+  }
+
+  static function fromJson(array $wordContent): StringContent {
+    return new StringContent(new StringContentTypeEnum($wordContent['stringContentType']), $wordContent['content']);
+  }
+
+  function toJson(): array {
+    return [
+      '_type' => StringContent::jsonTypeName,
+      'stringContentType' => $this->stringContentType->getValue(),
+      'content' => $this->content
+    ];
   }
 }
 
@@ -61,7 +75,7 @@ StringContent::$graphQLObjectType = new ObjectType([
   'fields' => [
     'type' => [
       'type' => Type::nonNull(StringContentTypeEnum::$enumType),
-      'resolve' => fn(StringContent $stringContent) => $stringContent->type->getValue()
+      'resolve' => fn(StringContent $stringContent) => $stringContent->stringContentType->getValue()
     ],
     'content' => Type::nonNull(Type::string())
   ]

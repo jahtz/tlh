@@ -8,6 +8,8 @@ use GraphQL\Type\Definition\Type;
 
 class NumeralContent extends TransliterationWordContent
 {
+  const jsonTypeName = 'numeral';
+
   static ObjectType $graphQLObjectType;
   static InputObjectType $graphqlInputObjectType;
 
@@ -22,16 +24,20 @@ class NumeralContent extends TransliterationWordContent
     return new NumeralContent($input['isSubscript'], urldecode($input['content']));
   }
 
-  protected function getType(): string {
-    return 'numeral';
-  }
-
-  protected function isSubscript(): ?bool {
-    return $this->isSubscript;
-  }
-
   function graphQLType(): ObjectType {
     return NumeralContent::$graphQLObjectType;
+  }
+
+  static function fromJson(array $wordContent): NumeralContent {
+    return new NumeralContent($wordContent['isSubscript'], $wordContent['content']);
+  }
+
+  function toJson(): array {
+    return [
+      '_type' => NumeralContent::jsonTypeName,
+      'content' => $this->content,
+      'isSubscript' => $this->isSubscript
+    ];
   }
 }
 

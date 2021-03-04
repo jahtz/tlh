@@ -255,7 +255,7 @@ function insertUserIntoDatabase(User $user): bool {
  */
 function getTransliterationResultLines(string $mainIdentifier): ?array {
   $linesQuery = "select * from tlh_dig_transliteration_lines where main_identifier = ? order by line_index;";
-  $wordsQuery = "select * from tlh_dig_word_contents where main_identifier = ? order by line_index, word_index, content_index;";
+  $wordsQuery = "select * from tlh_dig_words where main_identifier = ? order by line_index, word_index;";
 
   $conn = connect_to_db();
 
@@ -305,9 +305,8 @@ function getTransliterationResultLines(string $mainIdentifier): ?array {
   foreach ($allWordsRows as $wordRow) {
     $lineIndex = $wordRow['line_index'];
     $wordIndex = $wordRow['word_index'];
-    $contentIndex = $wordRow['content_index'];
 
-    $wordContents[$lineIndex][$wordIndex][$contentIndex] = $wordRow;
+    $wordContents[$lineIndex][$wordIndex] = $wordRow;
   }
 
   return array_map(function ($x) use ($wordContents): TransliterationLine {

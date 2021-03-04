@@ -26,25 +26,34 @@ CorrectionType::$enumType = new EnumType([
 
 class CorrectionContent extends TransliterationWordContent
 {
+  const jsonTypeName = 'correction';
+
   static ObjectType $graphQLObjectType;
 
-  public CorrectionType $type;
+  public CorrectionType $correctionType;
 
-  public function __construct(CorrectionType $type) {
+  public function __construct(CorrectionType $correctionType) {
     parent::__construct('');
-    $this->type = $type;
+    $this->correctionType = $correctionType;
   }
 
   static function readFromGraphQLInput(string $type): CorrectionContent {
     return new CorrectionContent(new CorrectionType($type));
   }
 
-  protected function getType(): string {
-    return $this->type->getValue();
-  }
-
   function graphQLType(): ObjectType {
     return CorrectionContent::$graphQLObjectType;
+  }
+
+  static function fromJson(array $wordContent): CorrectionContent {
+    return new CorrectionContent(new CorrectionType($wordContent['correctionType']));
+  }
+
+  function toJson(): array {
+    return [
+      '_type' => CorrectionContent::jsonTypeName,
+      'correctionType' => $this->correctionType->getValue()
+    ];
   }
 }
 
@@ -53,7 +62,7 @@ CorrectionContent::$graphQLObjectType = new ObjectType([
   'fields' => [
     'type' => [
       'type' => Type::nonNull(CorrectionType::$enumType),
-      'resolve' => fn(CorrectionContent $correctionContent) => $correctionContent->type->getValue()
+      'resolve' => fn(CorrectionContent $correctionContent) => $correctionContent->correctionType->getValue()
     ]
   ]
 ]);

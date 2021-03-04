@@ -29,13 +29,16 @@ class TransliterationLineResult
     $this->words = $words;
   }
 
-  static function fromDbAssocArray(int $lineNumber, bool $isAbsolute, ?array $wordContents): TransliterationLineResult {
+  static function fromDbAssocArray(int $lineNumber, bool $isAbsolute, ?array $wordsForLine): TransliterationLineResult {
     $words = array_map(function ($wordContents) {
+
+      $contents = json_decode($wordContents['content'], true);
+
       // FIXME: get input for word!
-      $wordContents = TransliterationWord::readWords($wordContents);
+      $wordContents = TransliterationWord::readContent($contents);
 
       return new TransliterationWord('', $wordContents);
-    }, $wordContents);
+    }, $wordsForLine);
 
     return new TransliterationLineResult($lineNumber, $isAbsolute, $words);
   }

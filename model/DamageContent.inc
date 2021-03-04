@@ -29,25 +29,34 @@ DamageType::$enumType = new EnumType([
 
 class DamageContent extends TransliterationWordContent
 {
+  const jsonTypeName = 'damage';
+
   static ObjectType $graphQLObjectType;
 
-  public DamageType $type;
+  public DamageType $damageType;
 
-  public function __construct(DamageType $type) {
+  public function __construct(DamageType $damageType) {
     parent::__construct('');
-    $this->type = $type;
+    $this->damageType = $damageType;
   }
 
   static function readFromGraphQLInput(string $input): DamageContent {
     return new DamageContent(new DamageType($input));
   }
 
-  function getType(): string {
-    return $this->type->getValue();
-  }
-
   function graphQLType(): ObjectType {
     return DamageContent::$graphQLObjectType;
+  }
+
+  static function fromJson(array $wordContent): DamageContent {
+    return new DamageContent(new DamageType($wordContent['damageType']));
+  }
+
+  function toJson(): array {
+    return [
+      '_type' => DamageContent::jsonTypeName,
+      'damageType' => $this->damageType->getValue()
+    ];
   }
 }
 
@@ -56,7 +65,7 @@ DamageContent::$graphQLObjectType = new ObjectType([
   'fields' => [
     'type' => [
       'type' => Type::nonNull(DamageType::$enumType),
-      'resolve' => fn(DamageContent $damageContent) => $damageContent->type->getValue()
+      'resolve' => fn(DamageContent $damageContent) => $damageContent->damageType->getValue()
     ]
   ]
 ]);

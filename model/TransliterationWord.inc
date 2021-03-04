@@ -8,7 +8,7 @@ require_once __DIR__ . '/StringContent.inc';
 require_once __DIR__ . '/CorrectionType.inc';
 require_once __DIR__ . '/NumeralContent.inc';
 require_once __DIR__ . '/MarkContent.inc';
-require_once __DIR__ . '/XContent.inc';
+require_once __DIR__ . '/IllegibleContent.inc';
 
 use GraphQL\Type\Definition\{InputObjectType, ObjectType, Type, UnionType};
 use mysqli;
@@ -35,39 +35,15 @@ abstract class TransliterationWordContent
       return NumeralContent::readFromGraphQLInput($input['numeralContent']);
     } else if (array_key_exists('markContent', $input)) {
       return MarkContent::readFromGraphQLInput($input['markContent']);
-    } else if (array_key_exists('xContent', $input)) {
-      return new XContent();
+    } else if (array_key_exists('illegibleContent', $input)) {
+      return new IllegibleContent();
     } else {
       // not possible!
       return new StringContent(StringContentTypeEnum::Hittite(), '');
     }
   }
 
-  final function saveToDb(mysqli $conn, string $mainIdentifier, int $lineIndex, int $wordIndex, int $contentIndex): bool {
-    $sql = "
-insert into tlh_dig_word_contents (main_identifier, line_index, word_index, content_index, type, content, is_subscript)
-values (?, ?, ?, ?, ?, ?, ?);";
-
-    $type = $this->getType();
-    $content = $this->content;
-    $isSubscript = $this->isSubscript();
-
-    $insertStatement = $conn->prepare($sql);
-    $insertStatement->bind_param('siiissi', $mainIdentifier, $lineIndex, $wordIndex, $contentIndex, $type, $content, $isSubscript);
-    $insertExecuted = $insertStatement->execute();
-    if (!$insertExecuted) {
-      error_log("Could not save WordContent to db: " . $insertStatement->error);
-    }
-    $insertStatement->close();
-
-    return $insertExecuted;
-  }
-
-  abstract protected function getType(): string;
-
-  protected function isSubscript(): ?bool {
-    return null;
-  }
+  abstract function toJson(): array;
 
   abstract function graphQLType(): ObjectType;
 }
@@ -80,7 +56,7 @@ TransliterationWordContent::$graphQLUnionType = new UnionType([
     CorrectionContent::$graphQLObjectType,
     NumeralContent::$graphQLObjectType,
     MarkContent::$graphQLObjectType,
-    XContent::$graphQLObjectType,
+    IllegibleContent::$graphQLObjectType,
   ],
   'resolveType' => fn(TransliterationWordContent $value) => $value->graphQLType()
 ]);
@@ -93,7 +69,7 @@ TransliterationWordContent::$graphQLInputType = new InputObjectType([
     'damageContent' => DamageType::$enumType,
     'correctionContent' => CorrectionType::$enumType,
     'markContent' => MarkContent::$graphQLInputObjectType,
-    'xContent' => XContent::$graphQLInputObjectType
+    'illegibleContent' => IllegibleContent::$graphQLInputObjectType
   ]
 ]);
 
@@ -119,7 +95,7 @@ class TransliterationWord
   static function readFromGraphQLInput(array $input): TransliterationWord {
     return new TransliterationWord(
       $input['input'],
-      array_map(fn(array $x): TransliterationWordContent => TransliterationWordContent::readAbstractFromGraphQLInput($x), $input['content'])
+      array_map(fn(array $x) => TransliterationWordContent::readAbstractFromGraphQLInput($x), $input['content'])
     );
   }
 
@@ -127,64 +103,45 @@ class TransliterationWord
    * @param array $wordContents
    * @return TransliterationWordContent[]
    */
-  static function readWords(array $wordContents): array {
+  static function readContent(array $wordContents): array {
     // FIXME: read word contents...
+    error_log(json_encode($wordContents));
+
     return array_map(function (array $wordContent) {
-      $type = $wordContent['type'];
-      $content = $wordContent['content'];
-
-      $stringContentType = StringContentTypeEnum::search($type);
-      if ($stringContentType) {
-        return new StringContent(new StringContentTypeEnum($stringContentType), $content);
+      switch ($wordContent['_type']) {
+        case StringContent::jsonTypeName:
+          return StringContent::fromJson($wordContent);
+        case NumeralContent::jsonTypeName:
+          return NumeralContent::fromJson($wordContent);
+        case DamageContent::jsonTypeName:
+          return DamageContent::fromJson($wordContent);
+        case MarkContent::jsonTypeName:
+          return MarkContent::fromJson($wordContent);
+        case CorrectionContent::jsonTypeName:
+          return CorrectionContent::fromJson($wordContent);
+        case 'illegible':
+        default:
+          return new IllegibleContent();
       }
-
-      $damageType = DamageType::search($type);
-      if ($damageType) {
-        return new DamageContent(new DamageType($damageType));
-      }
-
-      $correctionType = CorrectionType::search($type);
-      if ($correctionType) {
-        return new CorrectionContent(new CorrectionType($correctionType));
-      }
-
-      $markType = MarkType::search($type);
-      if ($markType) {
-        return new MarkContent(new MarkType($markType), $content);
-      }
-
-      $isSubscript = $wordContent['is_subscript'];
-      if (isset($isSubscript)) {
-        return new NumeralContent($isSubscript, 'x');
-      }
-
-      return new XContent();
     }, $wordContents);
   }
 
   function saveToDb(mysqli $conn, string $mainIdentifier, int $lineIndex, int $wordIndex): bool {
     $sql = "
-insert into tlh_dig_words (main_identifier, line_index, word_index, word_input)
-values (?, ?, ?, ?);";
+insert into tlh_dig_words (main_identifier, line_index, word_index, word_input, content)
+values (?, ?, ?, ?, ?);";
+
+    $content = json_encode(array_map(fn(TransliterationWordContent $x) => $x->toJson(), $this->content));
 
     $insertStatement = $conn->prepare($sql);
-    $insertStatement->bind_param('siis', $mainIdentifier, $lineIndex, $wordIndex, $this->input);
+    $insertStatement->bind_param('siiss', $mainIdentifier, $lineIndex, $wordIndex, $this->input, $content);
     $insertExecuted = $insertStatement->execute();
     if (!$insertExecuted) {
       error_log("Could not insert TransliterationWord into db:" . $insertStatement->error);
     }
     $insertStatement->close();
 
-    if (!$insertExecuted) {
-      return false;
-    }
-
-    $allContentSaved = true;
-    foreach ($this->content as $contentIndex => $content) {
-      $allContentSaved &= $content->saveToDb($conn, $mainIdentifier, $lineIndex, $wordIndex, $contentIndex);
-    }
-
-    return $allContentSaved;
+    return $insertExecuted;
   }
 }
 

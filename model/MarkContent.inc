@@ -23,6 +23,8 @@ MarkType::$graphQLEnumType = new EnumType([
 
 class MarkContent extends TransliterationWordContent
 {
+  const jsonTypeName = 'mark';
+
   static ObjectType $graphQLObjectType;
   static InputObjectType $graphQLInputObjectType;
 
@@ -37,12 +39,20 @@ class MarkContent extends TransliterationWordContent
     return new MarkContent(new MarkType($input['type']), urldecode($input['content']));
   }
 
-  protected function getType(): string {
-    return $this->markType->getValue();
-  }
-
   function graphQLType(): ObjectType {
     return MarkContent::$graphQLObjectType;
+  }
+
+  static function fromJson(array $wordContent): MarkContent {
+    return new MarkContent(new MarkType($wordContent['markType']), $wordContent['content']);
+  }
+
+  function toJson(): array {
+    return [
+      '_type' => MarkContent::jsonTypeName,
+      'markType' => $this->markType->getValue(),
+      'content' => $this->content
+    ];
   }
 }
 
