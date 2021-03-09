@@ -2,13 +2,10 @@
 
 namespace tlh_dig\model;
 
-
 require_once __DIR__ . '/ManuscriptIdentifier.inc';
-require_once __DIR__ . '/ManuscriptStatus.inc';
-require_once __DIR__ . '/PalaeographicClassification.inc';
-require_once __DIR__ . '/TransliterationLine.inc';
+require_once __DIR__ . '/Transliteration.inc';
 
-use GraphQL\Type\Definition\{InputObjectType, ObjectType, Type};
+use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
 
 /**
  * @param string $manuscriptMainIdentifier
@@ -31,24 +28,24 @@ class ManuscriptMetaData
 
   public ManuscriptIdentifier $mainIdentifier;
   public ?array $otherIdentifiers;
-  public PalaeographicClassification $palaeographicClassification;
+  public string $palaeographicClassification;
   public bool $palaeographicClassificationSure;
   public ?string $provenance;
   public ?int $cthClassification;
   public ?string $bibliography;
 
-  public ManuscriptStatus $status;
+  public string $status;
   public string $creatorUsername;
 
   function __construct(
     ManuscriptIdentifier $mainIdentifier,
     ?array $otherIdentifiers,
-    PalaeographicClassification $palaeographicClassification,
+    string $palaeographicClassification,
     bool $palaeographicClassificationSure,
     ?string $provenance,
     ?int $cthClassification,
     ?string $bibliography,
-    ManuscriptStatus $status,
+    string $status,
     string $creatorUsername
   ) {
     $this->mainIdentifier = $mainIdentifier;
@@ -64,17 +61,14 @@ class ManuscriptMetaData
 
   static function fromDbAssocArray(array $row): ManuscriptMetaData {
     return new ManuscriptMetaData(
-      new ManuscriptIdentifier(
-        new ManuscriptIdentifierType($row['main_identifier_type']),
-        $row['main_identifier']
-      ),
+      new ManuscriptIdentifier($row['main_identifier_type'], $row['main_identifier']),
       [],
-      new PalaeographicClassification($row['palaeo_classification']),
+      $row['palaeo_classification'],
       $row['palaeo_classification_sure'],
       $row['provenance'],
       $row['cth_classification'],
       $row['bibliography'],
-      new ManuscriptStatus($row['status']),
+      $row['status'],
       $row['creator_username']
     );
   }
@@ -87,16 +81,30 @@ class ManuscriptMetaData
     return new ManuscriptMetaData(
       ManuscriptIdentifier::fromGraphQLInput($input['mainIdentifier']),
       $otherIdentifiers,
-      new PalaeographicClassification($input['palaeographicClassification']),
+      $input['palaeographicClassification'],
       $input['palaeographicClassificationSure'],
       $input['provenance'] ?? null,
       $input['cthClassification'] ?? null,
       $input['bibliography'] ?? null,
-      ManuscriptStatus::InCreation(),
+      'InCreation',
       $creatorUsername
     );
   }
 }
+
+// GraphQL
+
+$palaeographicClassificationGraphQLEnumType = new EnumType([
+  'name' => 'PalaeographicClassification',
+  'values' => [
+    'OldScript', 'MiddleScript', 'NewScript', 'LateNewScript', 'OldAssyrianScript', 'MiddleBabylonianScript',
+    'MiddleAssyrianScript', 'AssyroMittanianScript', 'Unclassified']
+]);
+
+$manuscriptStatusEnumType = new EnumType([
+  'name' => 'ManuscriptStatus',
+  'values' => ['InCreation', 'Created', 'Reviewed', 'ReviewMerged', 'ExecutiveReviewed', 'ExecutiveReviewMerged', 'Approved']
+]);
 
 ManuscriptMetaData::$graphQLType = new ObjectType([
   'name' => 'ManuscriptMetaData',
@@ -106,15 +114,9 @@ ManuscriptMetaData::$graphQLType = new ObjectType([
     'cthClassification' => Type::int(),
     'bibliography' => Type::string(),
     'creatorUsername' => Type::nonNull(Type::string()),
-    'palaeographicClassification' => [
-      'type' => Type::nonNull(PalaeographicClassification::$graphQLEnumType),
-      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): ?string => $manuscriptMetaData->palaeographicClassification->getValue()
-    ],
+    'palaeographicClassification' => Type::nonNull($palaeographicClassificationGraphQLEnumType),
     'palaeographicClassificationSure' => Type::nonNull(Type::boolean()),
-    'status' => [
-      'type' => ManuscriptStatus::$enumType,
-      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): ?string => $manuscriptMetaData->status->getValue()
-    ],
+    'status' => $manuscriptStatusEnumType,
     'otherIdentifiers' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptIdentifier::$graphQLType))),
       'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): array => getOtherIdentifiers($manuscriptMetaData->mainIdentifier->identifier)
@@ -124,7 +126,7 @@ ManuscriptMetaData::$graphQLType = new ObjectType([
       'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): array => getPictures($manuscriptMetaData->mainIdentifier->identifier)
     ],
     'transliterationResult' => [
-      'type' => Type::listOf(Type::nonNull(TransliterationLine::$graphQLObjectType)),
+      'type' => Type::listOf(Type::nonNull(Transliteration::$graphQLObjectType)),
       'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): ?array => getTransliterationResultLines($manuscriptMetaData->mainIdentifier->identifier)
     ]
   ]
@@ -135,7 +137,7 @@ ManuscriptMetaData::$graphQLInputObjectType = new InputObjectType([
   'fields' => [
     'mainIdentifier' => Type::nonNull(ManuscriptIdentifier::$graphQLInputObjectType),
     'otherIdentifiers' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptIdentifier::$graphQLInputObjectType))),
-    'palaeographicClassification' => Type::nonNull(PalaeographicClassification::$graphQLEnumType),
+    'palaeographicClassification' => Type::nonNull($palaeographicClassificationGraphQLEnumType),
     'palaeographicClassificationSure' => Type::nonNull(Type::boolean()),
     'provenance' => Type::string(),
     'cthClassification' => Type::int(),

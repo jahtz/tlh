@@ -10,11 +10,6 @@ require_once 'graphql/LoggedInUser.inc';
 
 require_once 'model/ManuscriptMetaData.inc';
 require_once 'model/User.inc';
-require_once 'model/TransliterationLineResult.inc';
-require_once 'model/StringContent.inc';
-require_once 'model/CorrectionType.inc';
-require_once 'model/DamageContent.inc';
-require_once 'model/ManuscriptProperties.inc';
 
 use GraphQL\Error\{DebugFlag, FormattedError};
 use GraphQL\GraphQL;
@@ -22,13 +17,7 @@ use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
 use ReallySimpleJWT\Token;
 use tlh_dig\graphql\{InvalidTokenException, LoggedInUser, MySafeGraphQLException};
-use tlh_dig\model\{ManuscriptColumn,
-  ManuscriptColumnModifier,
-  ManuscriptLanguage,
-  ManuscriptMetaData,
-  ManuscriptSide,
-  TransliterationLine,
-  User};
+use tlh_dig\model\{ManuscriptMetaData, Transliteration, User};
 use function tlh_dig\graphql\verifyUser;
 
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
@@ -59,12 +48,12 @@ $manuscriptMutationsType = new ObjectType([
     'updateTransliteration' => [
       'type' => Type::nonNull(Type::boolean()),
       'args' => [
-        'values' => Type::nonNull(Type::listOf(Type::nonNull(TransliterationLine::$graphQLInputObjectType)))
+        'values' => Type::nonNull(Type::listOf(Type::nonNull(Transliteration::$graphQLInputObjectType)))
       ],
       'resolve' => function (ManuscriptMetaData $manuscriptMetaData, array $args): ?string {
         $mainIdentifier = $manuscriptMetaData->mainIdentifier->identifier;
 
-        $mapped = array_map(fn($x) => TransliterationLine::readFromGraphQLInput($mainIdentifier, $x), $args['values']);
+        $mapped = array_map(fn($x) => Transliteration::readFromGraphQLInput($mainIdentifier, $x), $args['values']);
 
         $allSaved = true;
 
@@ -184,11 +173,6 @@ try {
     SchemaConfig::create()
       ->setQuery($queryType)
       ->setMutation($mutationType)
-      ->setTypes([
-        // TODO: delete if used!
-        ManuscriptSide::$graphQLEnumType, ManuscriptLanguage::$graphQLEnumType,
-        ManuscriptColumn::$graphQLEnumType, ManuscriptColumnModifier::$graphQLEnumType
-      ])
   );
 
   $rawInput = file_get_contents('php://input');

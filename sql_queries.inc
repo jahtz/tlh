@@ -5,7 +5,7 @@ require_once '../../mysqliconn.php';
 require_once 'vendor/autoload.php';
 
 require_once 'model/ManuscriptMetaData.inc';
-require_once 'model/TransliterationLine.inc';
+require_once 'model/Transliteration.inc';
 require_once 'model/User.inc';
 
 use tlh_dig\model\{ManuscriptIdentifier, ManuscriptMetaData, TransliterationLine, User};
