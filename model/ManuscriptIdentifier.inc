@@ -14,11 +14,11 @@ class ManuscriptIdentifier
   static ObjectType $graphQLType;
   static InputObjectType $graphQLInputObjectType;
 
-  public string $type;
+  public string $identifierType;
   public string $identifier;
 
-  function __construct(string $type, string $identifier) {
-    $this->type = $type;
+  function __construct(string $identifierType, string $identifier) {
+    $this->identifierType = $identifierType;
     $this->identifier = $identifier;
   }
 

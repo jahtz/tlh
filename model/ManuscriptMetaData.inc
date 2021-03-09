@@ -27,6 +27,9 @@ class ManuscriptMetaData
   static InputObjectType $graphQLInputObjectType;
 
   public ManuscriptIdentifier $mainIdentifier;
+  /**
+   * @var ManuscriptIdentifier[] | null
+   */
   public ?array $otherIdentifiers;
   public string $palaeographicClassification;
   public bool $palaeographicClassificationSure;

@@ -138,7 +138,7 @@ values (?, ?, ?)");
 
   $mainBindParams = $mainInsertStatement->bind_param(
     'sssisisss',
-    $mmd->mainIdentifier->identifier, $mmd->mainIdentifier->type, $mmd->palaeographicClassification, $mmd->palaeographicClassificationSure,
+    $mmd->mainIdentifier->identifier, $mmd->mainIdentifier->identifierType, $mmd->palaeographicClassification, $mmd->palaeographicClassificationSure,
     $mmd->provenance, $mmd->cthClassification, $mmd->bibliography, $mmd->status, $mmd->creatorUsername
   );
 
@@ -172,7 +172,7 @@ values (?, ?, ?)");
 
   $allOtherIdentifiersInserted = true;
   foreach ($mmd->otherIdentifiers as $identifier) {
-    $otherIdentifierInsertStatement->bind_param('sss', $mainIdentifier, $identifier->identifier, $identifier->type);
+    $otherIdentifierInsertStatement->bind_param('sss', $mainIdentifier, $identifier->identifier, $identifier->identifierType);
 
     if (!$otherIdentifierInsertStatement->execute()) {
       error_log("Could not insert other identifier " . json_encode($identifier) . " into database: " . $otherIdentifierInsertStatement->error);
