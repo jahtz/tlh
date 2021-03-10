@@ -2,7 +2,7 @@
 
 namespace tlh_dig\model;
 
-use GraphQL\Type\Definition\{InputObjectType, ObjectType, Type};
+use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
 use mysqli;
 
 class Transliteration
@@ -11,37 +11,30 @@ class Transliteration
   static InputObjectType $graphQLInputObjectType;
 
   public string $mainIdentifier;
+  public string $side;
   public int $version;
   public string $input;
   public string $resultXml;
 
-  public function __construct(string $mainIdentifier, int $version, string $input, string $resultXml) {
+  public function __construct(string $mainIdentifier, string $side, int $version, string $input, string $resultXml) {
     $this->mainIdentifier = $mainIdentifier;
+    $this->side = $side;
     $this->version = $version;
     $this->input = $input;
     $this->resultXml = $resultXml;
   }
 
-  static function fromDbAssocArray(array $array, ?array $wordForLine): Transliteration {
-    return new Transliteration(
-      $array['main_identifier'],
-      $array['version'],
-      $array['transliteration_input'],
-      $array['transliteration_result_xml']
-    );
-  }
-
   static function readFromGraphQLInput(string $mainIdentifier, array $input): Transliteration {
-    return new Transliteration($mainIdentifier, -1, $input['input'], $input['result']);
+    return new Transliteration($mainIdentifier, $input['side'], -1, $input['input'], $input['result']);
   }
 
   function saveToDb(mysqli $conn): bool {
-    $nextVersionSql = "select max(version) as max_version from tlh_dig_transliterations where main_identifier = ?;";
+    $nextVersionSql = "select max(version) as max_version from tlh_dig_transliterations where main_identifier = ? and side = ?;";
 
-    $insertSql = "insert into tlh_dig_transliterations (main_identifier, version, input, result_xml) values (?, ?, ?, ?);";
+    $insertSql = "insert into tlh_dig_transliterations (main_identifier,side, version, input, result_xml) values (?, ?, ?, ?, ?);";
 
     $nextVersionStatement = $conn->prepare($nextVersionSql);
-    $nextVersionStatement->bind_param('s', $this->mainIdentifier);
+    $nextVersionStatement->bind_param('ss', $this->mainIdentifier, $this->side);
     $nextVersionExecuted = $nextVersionStatement->execute();
 
     if (!$nextVersionExecuted) {
@@ -49,11 +42,15 @@ class Transliteration
       return false;
     }
 
-    $version = $nextVersionStatement->get_result()->fetch_object();
+    $version = $nextVersionStatement->get_result()->fetch_assoc()['max_version'] + 1;
     $nextVersionStatement->close();
 
     $insertStatement = $conn->prepare($insertSql);
-    $insertStatement->bind_param('sisii', $this->mainIdentifier, $version, $this->input, $this->resultXml);
+    $insertParamsBound = $insertStatement->bind_param('ssiss', $this->mainIdentifier, $this->side, $version, $this->input, $this->resultXml);
+
+    if (!$insertParamsBound) {
+      error_log("Could not bind params: " . $insertStatement->error);
+    }
 
     $insertExecuted = $insertStatement->execute();
     if (!$insertExecuted) {
@@ -66,9 +63,18 @@ class Transliteration
   }
 }
 
+$manuscriptSideType = new EnumType([
+  'name' => 'ManuscriptSide',
+  'values' => [
+    'NotIdentifiable', 'Obverse', 'Reverse', 'LowerEdge', 'UpperEdge', 'LeftEdge', 'RightEdge',
+    'SideA', 'SideB', 'InscriptionNumber', 'SealInscription'
+  ]
+]);
+
 Transliteration::$graphQLObjectType = new ObjectType([
   'name' => 'Transliteration',
   'fields' => [
+    'side' => Type::nonNull($manuscriptSideType),
     'version' => Type::nonNull(Type::int()),
     'input' => Type::nonNull(Type::string()),
     'resultXml' => Type::nonNull(Type::string())
@@ -78,6 +84,7 @@ Transliteration::$graphQLObjectType = new ObjectType([
 Transliteration::$graphQLInputObjectType = new InputObjectType([
   'name' => 'TransliterationInput',
   'fields' => [
+    'side' => Type::nonNull($manuscriptSideType),
     'input' => Type::nonNull(Type::string()),
     'result' => Type::nonNull(Type::string())
   ]

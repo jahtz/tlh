@@ -128,9 +128,9 @@ ManuscriptMetaData::$graphQLType = new ObjectType([
       'type' => Type::nonNull(Type::listOf(Type::nonNull(Type::string()))),
       'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): array => getPictures($manuscriptMetaData->mainIdentifier->identifier)
     ],
-    'transliterationResult' => [
+    'transliterations' => [
       'type' => Type::listOf(Type::nonNull(Transliteration::$graphQLObjectType)),
-      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): ?array => getTransliterationResultLines($manuscriptMetaData->mainIdentifier->identifier)
+      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): ?array => getTransliterations($manuscriptMetaData->mainIdentifier->identifier)
     ]
   ]
 ]);
