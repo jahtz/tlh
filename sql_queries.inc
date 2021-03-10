@@ -11,54 +11,6 @@ require_once 'model/User.inc';
 use tlh_dig\model\{ManuscriptIdentifier, ManuscriptMetaData, Transliteration, User};
 
 /**
- * @param string $sql
- * @param ?Closure $bindParams
- * @param Closure $f
- *
- * @return mixed
- *
- * @throws Exception
- */
-function execute_select_query(string $sql, ?Closure $bindParams, Closure $f) {
-  $connection = connect_to_db();
-
-  $statement = $connection->prepare($sql);
-  if (!$statement) {
-    $connection->close();
-    throw new Exception("Could not prepare statement: " . $connection->error);
-  }
-
-  $paramsBound = $bindParams === null || $bindParams($statement);
-  if (!$paramsBound) {
-    $statement->close();
-    $connection->close();
-    throw new Exception("Could not bind params: " . $statement->error);
-  }
-
-  $executed = $statement->execute();
-  if (!$executed) {
-    $statement->close();
-    $connection->close();
-    throw new Exception("Could not execute statement: " . $statement->error);
-  }
-
-  $stmtResult = $statement->get_result();
-  if (!$stmtResult) {
-    $statement->close();
-    $connection->close();
-    throw new Exception("Could not get result: " . $statement->error);
-  }
-
-  $result = $f($stmtResult);
-
-  $stmtResult->close();
-  $statement->close();
-  $connection->close();
-
-  return $result;
-}
-
-/**
  * @return ManuscriptMetaData[]
  */
 function allManuscriptMetaData(): array {
