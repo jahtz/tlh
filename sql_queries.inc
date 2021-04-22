@@ -8,7 +8,7 @@ require_once 'model/ManuscriptMetaData.inc';
 require_once 'model/Transliteration.inc';
 require_once 'model/User.inc';
 
-use tlh_dig\model\{ManuscriptIdentifier, ManuscriptMetaData, Transliteration, User};
+use tlh_dig\model\{ManuscriptIdentifier, ManuscriptMetaData, User};
 
 /**
  * @return ManuscriptMetaData[]
@@ -76,18 +76,19 @@ function getOtherIdentifiers(string $mainIdentifier): array {
 }
 
 function insertManuscriptMetaData(ManuscriptMetaData $mmd): bool {
+  $mainInsertSql = "
+insert into tlh_dig_manuscript_metadatas (main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username)
+values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
   $db = connect_to_db();
 
-  $mainInsertStatement = $db->prepare("
-insert into tlh_dig_manuscript_metadatas (main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username)
-values (?, ?, ?, ?, ?, ?, ?, ?, ?);");
 
   $otherIdentifierInsertStatement = $db->prepare("
 insert into tlh_dig_manuscript_other_identifiers (main_identifier, identifier, identifier_type)
 values (?, ?, ?)");
 
 
-  if (!$mainInsertStatement || !$otherIdentifierInsertStatement) {
+  if (!$otherIdentifierInsertStatement) {
     error_log('Could not prepare insert statements!');
     return false;
   }
@@ -95,36 +96,23 @@ values (?, ?, ?)");
   $db->begin_transaction();
 
   # insert main data
+  try {
+    execute_query(
+      $db,
+      $mainInsertSql,
+      fn(mysqli_stmt $mainInsertStatement) => $mainInsertStatement->bind_param(
+        'sssisisss',
+        $mmd->mainIdentifier->identifier, $mmd->mainIdentifier->identifierType, $mmd->palaeographicClassification, $mmd->palaeographicClassificationSure,
+        $mmd->provenance, $mmd->cthClassification, $mmd->bibliography, $mmd->status, $mmd->creatorUsername
+      ),
+      fn(mysqli_stmt $stmt) => null
+    );
 
-  $mainBindParams = $mainInsertStatement->bind_param(
-    'sssisisss',
-    $mmd->mainIdentifier->identifier, $mmd->mainIdentifier->identifierType, $mmd->palaeographicClassification, $mmd->palaeographicClassificationSure,
-    $mmd->provenance, $mmd->cthClassification, $mmd->bibliography, $mmd->status, $mmd->creatorUsername
-  );
-
-  if (!$mainBindParams) {
-    error_log('Could not bind main insert statement params: ' . $mainInsertStatement->error);
-
-    $mainInsertStatement->close();
-    $otherIdentifierInsertStatement->close();
+  } catch (Exception $e) {
     $db->rollback();
     $db->close();
-
     return false;
   }
-
-  if (!$mainInsertStatement->execute()) {
-    error_log('Could not execute main insert statement: ' . $mainInsertStatement->error);
-
-    $mainInsertStatement->close();
-    $otherIdentifierInsertStatement->close();
-    $db->rollback();
-    $db->close();
-
-    return false;
-  }
-
-  $mainInsertStatement->close();
 
   # insert other identifiers
 
@@ -177,47 +165,22 @@ function maybeUserFromDatabase(string $username): ?User {
 function insertUserIntoDatabase(User $user): bool {
   $sql = "insert into tlh_dig_users (username, pw_hash, name, affiliation, email) values (?, ?, ?, ?, ?);";
 
-  $result = false;
-
-  $db = connect_to_db();
-
-  $statement = $db->prepare($sql);
-  if ($statement) {
-    $statement->bind_param('sssss', $user->username, $user->pwHash, $user->name, $user->affiliation, $user->email);
-
-    $result = $statement->execute();
-
-    $statement->close();
-  }
-
-  $db->close();
-
-  return $result;
-}
-
-
-/**
- * @param string $mainIdentifier
- * @return ?Transliteration[]
- */
-function getTransliterations(string $mainIdentifier): ?array {
-  $sql = "select main_identifier, side, version, input, result_xml from tlh_dig_transliterations where main_identifier = ?;";
+  $conn = connect_to_db();
 
   try {
-    return execute_select_query(
+    $executed = execute_query(
+      $conn,
       $sql,
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
-      function (mysqli_result $result): ?array {
-        $allRows = $result->fetch_all(MYSQLI_ASSOC);
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('sssss', $user->username, $user->pwHash, $user->name, $user->affiliation, $user->email),
+      fn(mysqli_stmt $stmt) => true
+    );
 
-        return count($allRows) === 0
-          ? null
-          : array_map(
-            fn(array $x) => new Transliteration($x['main_identifier'], $x['side'], $x['version'], $x['input'], $x['result_xml']),
-            $allRows
-          );
-      });
+    $conn->close();
+
+    return $executed;
   } catch (Exception $e) {
-    return null;
+    $conn->close();
+    return false;
   }
 }
+

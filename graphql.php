@@ -66,6 +66,8 @@ $manuscriptMutationsType = new ObjectType([
             $allSaved &= $transliterationLine->saveToDb($connection);
           }
 
+          error_log("All saved: " . ($allSaved ? "true" : "false"));
+
           if ($allSaved) {
             $connection->commit();
           } else {
