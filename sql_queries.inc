@@ -10,6 +10,74 @@ require_once 'model/User.inc';
 
 use tlh_dig\model\{ManuscriptIdentifier, ManuscriptMetaData, User};
 
+
+/**
+ * @param mysqli $connection
+ * @param string $sql
+ * @param Closure|null $bindParams
+ * @param Closure $f
+ *
+ * @return mixed
+ *
+ * @throws Exception
+ */
+function execute_query(mysqli $connection, string $sql, ?Closure $bindParams, Closure $f) {
+  $statement = $connection->prepare($sql);
+  if (!$statement) {
+    throw new Exception("Could not prepare statement: " . $connection->error);
+  }
+
+  $paramsBound = $bindParams === null || $bindParams($statement);
+  if (!$paramsBound) {
+    $errorMsg = $statement->error;
+    $statement->close();
+    throw new Exception("Could not bind params: " . $errorMsg);
+  }
+
+  $executed = $statement->execute();
+  if (!$executed) {
+    $errorMsg = $statement->error;
+    $statement->close();
+    throw new Exception("Could not execute statement: " . $errorMsg);
+  }
+
+  try {
+    $result = $f($statement);
+  } catch (Exception $e) {
+    $statement->close();
+    throw $e;
+  }
+
+  $statement->close();
+
+  return $result;
+}
+
+/**
+ * @param string $sql
+ * @param Closure | null $bindParams
+ * @param Closure $f
+ *
+ * @return mixed
+ *
+ * @throws Exception
+ */
+function execute_select_query(string $sql, ?Closure $bindParams, Closure $f) {
+  return execute_query(connect_to_db(), $sql, $bindParams, function (mysqli_stmt $stmt) use ($f) {
+    $stmtResult = $stmt->get_result();
+
+    if (!$stmtResult) {
+      throw new Exception("Could not get result: " . $stmt->error);
+    }
+
+    $result = $f($stmtResult);
+
+    $stmtResult->close();
+    return $result;
+  });
+}
+
+
 /**
  * @return ManuscriptMetaData[]
  */
