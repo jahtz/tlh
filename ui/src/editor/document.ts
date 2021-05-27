@@ -1,7 +1,7 @@
 import {AOBody, aoBodyFormat} from "./documentBody";
 import {AOHeader, aoHeaderFormat} from "./documentHeader";
-import {childElementReader, indent, XmlFormat} from "./xmlLib";
-import {zipResult} from "../functional/result";
+import {childElementReader, indent, XmlFormat, xmlLoadError} from "./xmlLib";
+import {transformResult, zipResult} from "../functional/result";
 
 interface GenericAttribute {
   name: string;
@@ -26,12 +26,13 @@ export interface AOXml {
 }
 
 export const aoXmlFormat: XmlFormat<AOXml> = {
-  read: (el) => zipResult(
-    childElementReader(el, 'AOHeader', aoHeaderFormat),
-    childElementReader(el, 'body', aoBodyFormat)
-  ).transformContent(
+  read: (el) => transformResult(
+    zipResult(
+      childElementReader(el, 'AOHeader', aoHeaderFormat),
+      childElementReader(el, 'body', aoBodyFormat)
+    ),
     ([header, body]) => aoXml(extractGenericAttributes(el), header, body),
-    (errs) => errs.flat()
+    (errs) => errs.flat().map(({message, path}) => xmlLoadError(message, [el.tagName, ...path]))
   ),
   write: ({attributes, aoHeader, body}) => [
     '<?xml-stylesheet href="HPMxml.css" type="text/css"?>',

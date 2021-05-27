@@ -1,8 +1,8 @@
-import {indent, XmlFormat} from "../editor/xmlLib";
+import {indent, XmlFormat, xmlLoadError, XmlLoadError} from "../editor/xmlLib";
 import {AOGap, aoGapFormat, isAOGap} from "./sentenceContent/gap";
 import {AOLineBreak, aoLineBreakFormat, isAOLineBreak} from "./sentenceContent/linebreak";
 import {AOWord, aoWordFormat} from "./sentenceContent/word";
-import {failure, flattenResults, Result} from '../functional/result';
+import {failure, flattenResults, Result, transformResult} from '../functional/result';
 
 export interface AOSentence {
   type: 'AOSentence';
@@ -11,14 +11,14 @@ export interface AOSentence {
 
 export const aoSentenceFormat: XmlFormat<AOSentence> = {
   read: (el) => {
-    const children: Result<AOSentenceContent, string[]>[] = Array.from(el.children)
+    const children: Result<AOSentenceContent, XmlLoadError[]>[] = Array.from(el.children)
       .map(aoSentenceContentFormat.read);
 
-    return flattenResults<AOSentenceContent, string[]>(children)
-      .transformContent(
-        (content) => aoSentence(content),
-        (errs) => errs.flat()
-      )
+    return transformResult(
+      flattenResults(children),
+      (content) => aoSentence(content),
+      (errs) => errs.flat()
+    )
   },
   write: ({content}) => ['<s>', ...content.flatMap(aoSentenceContentFormat.write).map(indent), '</s>']
 }
@@ -39,7 +39,7 @@ const aoSentenceContentFormat: XmlFormat<AOSentenceContent> = {
       case 'w':
         return aoWordFormat.read(el);
       default:
-        return failure([`Found illegal tag name ${el.tagName}`]);
+        return failure([xmlLoadError(`Found illegal tag name ${el.tagName}`, [el.tagName])]);
     }
   },
   write: (sc) => {

@@ -1,5 +1,5 @@
-import {attributeReader, indent, XmlFormat} from "../../editor/xmlLib";
-import {failure, flattenResults, Result, success} from '../../functional/result';
+import {indent, readAttribute, XmlFormat, XmlLoadError, xmlLoadError} from "../../editor/xmlLib";
+import {failure, flattenResults, Result, success, transformResult} from '../../functional/result';
 import {AOWordContent, aoWordContentFormat} from "../wordContent/wordContent";
 import {MorphologicalAnalysis, readMorphAnalysis, writeMorphAnalysisAttribute} from "../morphologicalAnalysis";
 import {AOSentenceContent} from "../sentence";
@@ -23,36 +23,36 @@ export interface AOWord {
 
 export const aoWordFormat: XmlFormat<AOWord> = {
   read: (el: Element) => {
-    const readContent: Result<AOWordContent[], string[][]> = flattenResults(
+    const readContent: Result<AOWordContent[], XmlLoadError[][]> = flattenResults(
       Array.from(el.childNodes).map((x: ChildNode) => {
         if (x instanceof Text) {
           return success(aoBasicText(x.textContent || ''));
         } else if (x instanceof Element) {
           return aoWordContentFormat.read(x);
         } else {
-          return failure([`Illegal node type found`]);
+          return failure([xmlLoadError(`Illegal node type found`, [el.tagName])]);
         }
       })
     );
 
     const morphologies: MorphologicalAnalysis[] = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-      .map((i) => attributeReader(el, `mrp${i}`, (v) => readMorphAnalysis(i, v)))
+      .map((i) => readAttribute(el, `mrp${i}`, (v) => readMorphAnalysis(i, v)))
       .flatMap((x) => x ? [x] : []);
 
-    return readContent
-      .transformContent(
-        (content) => {
-          return {
-            type: 'AOWord',
-            content,
-            language: attributeReader(el, 'lg', (v) => v || undefined),
-            mrp0sel: attributeReader(el, 'mrp0sel', readSelectedMorphology),
-            morphologies,
-            transliteration: attributeReader(el, 'trans', (v) => v || undefined)
-          }
-        },
-        (errs) => errs.flat()
-      );
+    return transformResult(
+      readContent,
+      (content) => {
+        return {
+          type: 'AOWord',
+          content,
+          language: readAttribute(el, 'lg', (v) => v || undefined),
+          mrp0sel: readAttribute(el, 'mrp0sel', readSelectedMorphology),
+          morphologies,
+          transliteration: readAttribute(el, 'trans', (v) => v || undefined)
+        }
+      },
+      (errs) => errs.flat()
+    );
   },
   write: ({content, mrp0sel, type, transliteration, morphologies, language}) =>
     [

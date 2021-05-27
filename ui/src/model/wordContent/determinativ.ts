@@ -1,5 +1,5 @@
 import {XmlFormat} from "../../editor/xmlLib";
-import {flattenResults} from '../../functional/result';
+import {flattenResults, transformResult} from '../../functional/result';
 import {AOWordContent} from "./wordContent";
 import {clearUpperMultiStringContent, readMultiWordContent, UpperMultiStringContent, writeMultiWordContent} from "./multiStringContent";
 
@@ -18,8 +18,11 @@ export function determinativ(...content: (UpperMultiStringContent | string)[]): 
 }
 
 export const determinativFormat: XmlFormat<AODeterminativ> = {
-  read: (el) => flattenResults(Array.from(el.childNodes).map(readMultiWordContent))
-    .map((content) => determinativ(...content)),
+  read: (el) => transformResult(
+    flattenResults(Array.from(el.childNodes).map(readMultiWordContent)),
+    (content) => determinativ(...content),
+    (errors) => errors.flat()
+  ),
   write: ({content}) => [`<d>${content.flatMap(writeMultiWordContent).join('')}</d>`]
 };
 

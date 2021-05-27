@@ -1,5 +1,5 @@
 import {childElementReader, indent, XmlFormat} from "../../editor/xmlLib";
-import {success} from '../../functional/result';
+import {mapResult, success} from '../../functional/result';
 
 export interface AOTxtPubl {
   type: 'AO:TxtPubl';
@@ -23,7 +23,7 @@ export interface AOManuscripts {
 }
 
 export const aoManuscriptsFormat: XmlFormat<AOManuscripts> = {
-  read: (el) => childElementReader(el, 'AO:TxtPubl', aoTxtPublFormat).map(aoManuscripts),
+  read: (el) => mapResult(childElementReader(el, 'AO:TxtPubl', aoTxtPublFormat), aoManuscripts),
   write: ({aoTxtPubl}) => ['<AO:Manuscripts>', ...aoTxtPublFormat.write(aoTxtPubl).map(indent), '</AO:Manuscripts>']
 }
 

@@ -23,7 +23,7 @@ interface MorphAnalysisOptionIProps {
 
 export function MorphAnalysisOption({ma, selectedOption, updateSelected}: MorphAnalysisOptionIProps): JSX.Element {
 
-  const {number, translation, transcription, analyses} = ma;
+  const {number, translation, transcription, analyses, other} = ma;
 
   return (
     <div className="my-3">
@@ -35,10 +35,13 @@ export function MorphAnalysisOption({ma, selectedOption, updateSelected}: MorphA
             <MorphAnalysisButton x={number.toString()} analysis={analyses} select={updateSelected} selectedOption={selectedOption}/>
           </div>
           : analyses.map(({letter, analysis}, index) =>
-            <div key={index} className="column is-half-desktop">
+            <div key={index} className="column is-one-third-desktop">
               <MorphAnalysisButton x={`${number}${letter}`} analysis={analysis} select={updateSelected} selectedOption={selectedOption}/>
-            </div>)}
+            </div>
+          )}
       </div>
+
+      <div className="box has-text-centered">{other.join(" @ ")}</div>
     </div>
   );
 }

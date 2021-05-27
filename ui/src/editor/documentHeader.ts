@@ -1,5 +1,5 @@
-import {attributeReader, childElementReader, indent, XmlFormat,} from "./xmlLib";
-import {flattenResults, success, zipResult} from "../functional/result";
+import {childElementReader, indent, readAttribute, XmlFormat,} from "./xmlLib";
+import {flattenResults, success, transformResult, zipResult} from "../functional/result";
 
 // AOHeader
 
@@ -10,10 +10,11 @@ export interface AOHeader {
 }
 
 export const aoHeaderFormat: XmlFormat<AOHeader> = {
-  read: (el) => zipResult(
-    childElementReader(el, 'docID', aoDocIdFormat),
-    childElementReader(el, 'meta', aoMetaFormat)
-  ).transformContent(
+  read: (el) => transformResult(
+    zipResult(
+      childElementReader(el, 'docID', aoDocIdFormat),
+      childElementReader(el, 'meta', aoMetaFormat)
+    ),
     ([docId, meta]) => aoHeader(docId, meta),
     (errs) => errs.flat()
   ),
@@ -56,20 +57,20 @@ export interface AOMeta {
 }
 
 const aoMetaFormat: XmlFormat<AOMeta> = {
-  read: (el: Element) => zipResult(
+  read: (el: Element) => transformResult(
     zipResult(
-      childElementReader(el, 'creation-date', datedStringElementFormat),
-      childElementReader(el, 'kor2', datedStringElementFormat)
+      zipResult(
+        childElementReader(el, 'creation-date', datedStringElementFormat),
+        childElementReader(el, 'kor2', datedStringElementFormat)
+      ),
+      zipResult(
+        childElementReader(el, 'AOxml-creation', datedStringElementFormat),
+        childElementReader(el, 'annotation', aoAnnotationFormat)
+      ),
     ),
-    zipResult(
-      childElementReader(el, 'AOxml-creation', datedStringElementFormat),
-      childElementReader(el, 'annotation', aoAnnotationFormat)
-    ),
-  )
-    .transformContent(
-      ([[cd, kor2], [xmlCreation, annotation]]) => aoMeta(cd, kor2, xmlCreation, annotation),
-      (errs) => errs.flat().flat()
-    ),
+    ([[cd, kor2], [xmlCreation, annotation]]) => aoMeta(cd, kor2, xmlCreation, annotation),
+    (errs) => errs.flat().flat()
+  ),
   write: ({creationDate, kor2, aoXmlCreation, annotation}) => [
     '<meta>',
     indent(`<creation-date date="${creationDate.date}"/>`),
@@ -92,13 +93,13 @@ export interface AOAnnotation {
 }
 
 const aoAnnotationFormat: XmlFormat<AOAnnotation> = {
-  read: (el) => flattenResults(
-    Array.from(el.children).map((el) => aoAnnotFormat.read(el))
-  )
-    .transformContent(
-      (annots) => aoAnnotation(annots),
-      (errs) => errs.flat()
+  read: (el) => transformResult(
+    flattenResults(
+      Array.from(el.children).map((el) => aoAnnotFormat.read(el))
     ),
+    (annots) => aoAnnotation(annots),
+    (errs) => errs.flat()
+  ),
   write: ({content}) => [
     '<annotation>',
     ...content.flatMap(aoAnnotFormat.write).map(indent),
@@ -120,8 +121,8 @@ export interface AOAnnot extends DatedAttributeElement {
 const aoAnnotFormat: XmlFormat<AOAnnot> = {
   read: (el) => success(
     aoAnnot(
-      attributeReader(el, 'date', (v) => v || ''),
-      attributeReader(el, 'editor', (v) => v || '')
+      el.getAttribute('date') || '',
+      el.getAttribute('editor') || ''
     )
   ),
   write: ({date, editor}) => [`<annot editor="${editor}" date="${date}"/>`]
@@ -142,6 +143,6 @@ function datedAttributeElement(date: string): DatedAttributeElement {
 }
 
 const datedStringElementFormat: XmlFormat<DatedAttributeElement> = {
-  read: (el) => success(datedAttributeElement(attributeReader(el, 'date', (v) => v || ''))),
+  read: (el) => success(datedAttributeElement(readAttribute(el, 'date', (v) => v || ''))),
   write: ({date}) => []
 }

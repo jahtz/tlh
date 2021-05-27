@@ -11,6 +11,7 @@ import {AOSentenceContent} from "../model/sentence";
 import {WordComponent} from "../manuscript/TransliterationLineResult";
 import {isAOLineBreak} from "../model/sentenceContent/linebreak";
 import {useTranslation} from "react-i18next";
+import {isSuccess} from "../functional/result";
 
 interface AOSentenceContentRenderIProps {
   sc: AOSentenceContent;
@@ -20,7 +21,9 @@ interface AOSentenceContentRenderIProps {
   currentEditedWord: EditedWord | undefined;
 }
 
-function AoSentenceContentRender({sc, paragraphIndex, wordIndex, onWordClick, currentEditedWord}: AOSentenceContentRenderIProps): JSX.Element {
+function AoSentenceContentRender(
+  {sc, paragraphIndex, wordIndex, onWordClick, currentEditedWord}: AOSentenceContentRenderIProps
+): JSX.Element {
   if (isAOWord(sc)) {
     const otherStyles = {
       'is-underlined': !sc.mrp0sel,
@@ -28,7 +31,8 @@ function AoSentenceContentRender({sc, paragraphIndex, wordIndex, onWordClick, cu
     };
 
     return <>
-      <WordComponent word={sc} onClick={() => onWordClick({word: sc, paragraphIndex, wordIndex})} otherStyles={otherStyles}/>
+      <WordComponent word={sc} onClick={() => onWordClick({word: sc, paragraphIndex, wordIndex})}
+                     otherStyles={otherStyles}/>
       &nbsp;&nbsp;
     </>;
   } else if (isAOLineBreak(sc)) {
@@ -45,12 +49,14 @@ interface TextContentRenderIProps {
   currentEditedWord: EditedWord | undefined;
 }
 
-function TextContentRender({paragraphIndex, content, onWordClick, currentEditedWord}: TextContentRenderIProps): JSX.Element {
+function TextContentRender(
+  {paragraphIndex, content, onWordClick, currentEditedWord}: TextContentRenderIProps
+): JSX.Element {
   if (isAOParagraph(content)) {
     return <>
       {content.s.content.map((c, index) =>
-        <AoSentenceContentRender key={index} sc={c} paragraphIndex={paragraphIndex} wordIndex={index} onWordClick={onWordClick}
-                                 currentEditedWord={currentEditedWord}/>
+        <AoSentenceContentRender key={index} sc={c} paragraphIndex={paragraphIndex} wordIndex={index}
+                                 onWordClick={onWordClick} currentEditedWord={currentEditedWord}/>
       )}
     </>;
   } else if (isParagraphSeparator(content)) {
@@ -85,6 +91,54 @@ function handleSaveToPC(data: string, filename: string = 'exported.xml'): void {
   link.click();
 }
 
+function selectPreviousWord(aoXml: AOXml, currentParagraphIndex: number, currentWordIndex: number): EditedWord | undefined {
+  const textContents = aoXml.body.div1.text.content;
+
+  for (let paragraphIndex = currentParagraphIndex; paragraphIndex >= 0; paragraphIndex--) {
+    const textContent = textContents[paragraphIndex];
+
+    if (isAOParagraph(textContent)) {
+      const contents = textContent.s.content;
+
+      const lastWordIndex = paragraphIndex === currentParagraphIndex ? currentWordIndex : contents.length;
+
+      for (let wordIndex = lastWordIndex - 1; wordIndex >= 0; wordIndex--) {
+        const content = contents[wordIndex];
+
+        if (isAOWord(content)) {
+          return {paragraphIndex, wordIndex, word: content};
+        }
+      }
+    }
+
+  }
+
+  return undefined;
+}
+
+function selectNextWord(aoXml: AOXml, currentParagraphIndex: number, currentWordIndex: number): EditedWord | undefined {
+  const textContents = aoXml.body.div1.text.content;
+
+  for (let paragraphIndex = currentParagraphIndex; paragraphIndex < textContents.length; paragraphIndex++) {
+    const textContent = textContents[paragraphIndex];
+
+    if (isAOParagraph(textContent)) {
+      const contents = textContent.s.content;
+
+      const firstWordIndex = paragraphIndex === currentParagraphIndex ? currentWordIndex : 0;
+
+      for (let wordIndex = firstWordIndex + 1; wordIndex < contents.length; wordIndex++) {
+        const content = contents[wordIndex];
+
+        if (isAOWord(content)) {
+          return {paragraphIndex, wordIndex, word: content};
+        }
+      }
+    }
+  }
+
+  return undefined;
+}
 
 function DocumentEditor({aoXml: initialAoXml}: DocumentEditorIProps): JSX.Element {
 
@@ -92,13 +146,37 @@ function DocumentEditor({aoXml: initialAoXml}: DocumentEditorIProps): JSX.Elemen
   const [state, setState] = useState<DocumentEditorIState>({aoXml: initialAoXml});
 
   function updateMorphology(morph: string, paragraphId: number, wordId: number): void {
-    setState(({aoXml, editedWord: _}) => {
+    setState(({aoXml, editedWord}) => {
       const paragraph = (aoXml.body.div1.text.content[paragraphId] as Paragraph);
       const word = paragraph.s.content[wordId] as AOWord;
       word.mrp0sel = morph;
 
-      return {aoXml, editedWord: undefined};
+      return {aoXml, editedWord};
     });
+  }
+
+  function previousWord(): void {
+    if (state.editedWord) {
+      const editedWord = selectPreviousWord(state.aoXml, state.editedWord.paragraphIndex, state.editedWord.wordIndex);
+
+      if (editedWord) {
+        setState(({aoXml}) => {
+          return {aoXml, editedWord};
+        });
+      }
+    }
+  }
+
+  function nextWord(): void {
+    if (state.editedWord) {
+      const editedWord = selectNextWord(state.aoXml, state.editedWord.paragraphIndex, state.editedWord.wordIndex);
+
+      if (editedWord) {
+        setState(({aoXml}) => {
+          return {aoXml, editedWord}
+        });
+      }
+    }
   }
 
   function setEditedWord(editedWord: EditedWord): void {
@@ -128,7 +206,9 @@ function DocumentEditor({aoXml: initialAoXml}: DocumentEditorIProps): JSX.Elemen
         </div>
       </div>
       <div className="column">
-        {state.editedWord && <WordEditor key={state.editedWord.word.transliteration} w={state.editedWord} update={updateMorphology}/>}
+        {state.editedWord &&
+        <WordEditor key={state.editedWord.word.transliteration} w={state.editedWord} update={updateMorphology} previousWord={previousWord}
+                    nextWord={nextWord}/>}
       </div>
     </div>
   );
@@ -139,8 +219,13 @@ export function DocumentEditorContainer(): JSX.Element {
   const [state, setState] = useState<AOXml | undefined>();
 
   async function readFile(file: File): Promise<void> {
-    const aoXml = await loadXml(file);
-    setState(() => aoXml);
+    const aoXmlResult = await loadXml(file);
+
+    if (isSuccess(aoXmlResult)) {
+      setState(() => aoXmlResult.value);
+    } else {
+      aoXmlResult.error.forEach((e) => console.error(JSON.stringify(e)));
+    }
   }
 
   return (

@@ -4,6 +4,7 @@ import {aoBasicText, BasicText, isBasicText} from "./basicText";
 import {AOCorr, aoCorrFormat, isCorrectionContent} from "./corrections";
 import {InscribedLetter, inscribedLetterFormat, isInscribedLetter} from "./inscribedLetter";
 import {IndexDigit} from "./indexDigit";
+import {xmlLoadError, XmlLoadError} from "../../editor/xmlLib";
 
 export type UpperMultiStringContent = AOCorr | DamageContent | InscribedLetter | BasicText | IndexDigit;
 
@@ -18,7 +19,7 @@ export function clearUpperMultiStringContent(c: UpperMultiStringContent | string
  * @deprecated
  * @param el
  */
-export function readMultiWordContent(el: ChildNode): Result<UpperMultiStringContent> {
+export function readMultiWordContent(el: ChildNode): Result<UpperMultiStringContent, XmlLoadError[]> {
   if (el instanceof Element) {
     switch (el.tagName) {
       case 'del_in':
@@ -34,12 +35,12 @@ export function readMultiWordContent(el: ChildNode): Result<UpperMultiStringCont
       case 'laes_fin':
         return success(damageContent(DamageType.LesionEnd));
       default:
-        return failure(`Illegal tag name found: ${el.tagName}`);
+        return failure([xmlLoadError(`Illegal tag name found: ${el.tagName}`, [el.tagName])]);
     }
   } else if (el instanceof Text) {
     return success(aoBasicText(el.textContent || ''));
   } else {
-    return failure(`Illegal tag found: ${el.nodeType}`);
+    return failure([xmlLoadError(`Illegal tag found: ${el.nodeType}`, [])]);
   }
 }
 

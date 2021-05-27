@@ -2,7 +2,7 @@ import {transliteration} from "./parser";
 import {determinativ} from "../model/wordContent/determinativ";
 import {materLectionis} from "../model/wordContent/materLectionis";
 import {damageContent, DamageType} from "../model/wordContent/damages";
-import {aoCorr, AOCorrType} from "../model/wordContent/corrections";
+import {aoCorr} from "../model/wordContent/corrections";
 import {paragraphSeparator, paragraphSeparatorDouble} from "../model/paragraphSeparators";
 import {aoEllipsis} from "../model/wordContent/ellipsis";
 import {aoSign} from "../model/wordContent/sign";
@@ -57,7 +57,7 @@ describe('damageParser', () => {
 // Corrections
 
 export function testParseCorrections(parser: Parser<AOWordContent>): void {
-  const cases: AOCorrType[] = ['?', '(?)', '!', 'sic', '!?'];
+  const cases = ['?', '(?)', '!', 'sic', '!?'];
 
   test.each(cases)(
     'should parse correction type %p as Correction Content with correction type %p',

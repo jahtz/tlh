@@ -21,11 +21,11 @@ import {AOFootNote, aoNoteFormat, isAoFootNote} from "./footNote";
 import {AOKolonMark, aoKolonMarkFormat, isAoKolonMark} from "./kolonMark";
 import {AOIllegibleContent} from "./illegible";
 import {AOSpace, aoSpaceFormat, isSpace} from "./space";
-import {XmlFormat} from "../../editor/xmlLib";
+import {XmlFormat, xmlLoadError} from "../../editor/xmlLib";
 import {InscribedLetter, inscribedLetterFormat, isInscribedLetter} from "./inscribedLetter";
 import {Ellipsis, ellipsisFormat, isEllipsis} from "./ellipsis";
 import {BasicText, isBasicText} from "./basicText";
-import {failure} from "../../functional/result";
+import {failure, mapResult} from "../../functional/result";
 import {IndexDigit} from "./indexDigit";
 
 // Word content
@@ -55,17 +55,17 @@ export const aoWordContentFormat: XmlFormat<AOWordContent> = {
   read: (el) => {
     switch (el.tagName) {
       case 'del_in':
-        return deletionStartFormat.read(el).map(damageContent);
+        return mapResult(deletionStartFormat.read(el), damageContent);
       case 'del_fin':
-        return deletionEndFormat.read(el).map(damageContent);
+        return mapResult(deletionEndFormat.read(el), damageContent);
       case 'ras_in':
-        return rasureStartFormat.read(el).map(damageContent);
+        return mapResult(rasureStartFormat.read(el), damageContent);
       case 'ras_fin':
-        return rasureEndFormat.read(el).map(damageContent);
+        return mapResult(rasureEndFormat.read(el), damageContent);
       case 'laes_in':
-        return lesionStartFormat.read(el).map(damageContent);
+        return mapResult(lesionStartFormat.read(el), damageContent);
       case 'laes_fin':
-        return lesionEndFormat.read(el).map(damageContent);
+        return mapResult(lesionEndFormat.read(el), damageContent);
       case 'sGr':
         return sumerogrammFormat.read(el);
       case 'aGr':
@@ -87,7 +87,7 @@ export const aoWordContentFormat: XmlFormat<AOWordContent> = {
       case 'note':
         return aoNoteFormat.read(el);
       default:
-        return failure([`Illegal tag name ${el.tagName} found!`])
+        return failure([xmlLoadError(`Illegal tag name ${el.tagName} found!`, [el.tagName])])
     }
   },
   write: (c) => {

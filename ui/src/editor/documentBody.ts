@@ -1,5 +1,5 @@
-import {attributeReader, childElementReader, indent, XmlFormat} from "./xmlLib";
-import {failure, flattenResults, Result, zipResult} from '../functional/result';
+import {childElementReader, indent, readAttribute, XmlFormat, xmlLoadError, XmlLoadError} from "./xmlLib";
+import {failure, flattenResults, mapResult, Result, transformResult, zipResult} from '../functional/result';
 import {
   isParagraphSeparator,
   ParagraphSeparator,
@@ -17,15 +17,15 @@ export interface AOBody {
 }
 
 export const aoBodyFormat: XmlFormat<AOBody> = {
-  read: (el) => zipResult(
-    childElementReader(el, 'AO:Manuscripts', aoManuscriptsFormat),
-    childElementReader(el, 'div1', aoDiv1Format)
-  )
-    .transformContent(
-      ([m, div1]) => aoBody(m, div1),
-      (errs) => errs.flat()
+  read: (el) => transformResult(
+    zipResult(
+      childElementReader(el, 'AO:Manuscripts', aoManuscriptsFormat),
+      childElementReader(el, 'div1', aoDiv1Format)
     ),
-  write: ({aoManuscripts,div1}) => [
+    ([m, div1]) => aoBody(m, div1),
+    (errs) => errs.flat()
+  ),
+  write: ({aoManuscripts, div1}) => [
     '<body>',
     ...aoManuscriptsFormat.write(aoManuscripts).map(indent),
     ...aoDiv1Format.write(div1).map(indent),
@@ -45,7 +45,10 @@ export interface AODiv1 {
 }
 
 const aoDiv1Format: XmlFormat<AODiv1> = {
-  read: (el) => childElementReader(el, 'text', aoTextFormat).map((aoText) => aoDiv1(aoText, attributeReader(el, 'type', (v) => v || ''))),
+  read: (el) => mapResult(
+    childElementReader(el, 'text', aoTextFormat),
+    (aoText) => aoDiv1(aoText, readAttribute(el, 'type', (v) => v || ''))
+  ),
   write: ({text, type}) => [
     `<div1 type="${type}">`,
     ...aoTextFormat.write(text).map(indent),
@@ -72,7 +75,7 @@ const aoTextContentFormat: XmlFormat<AOTextContent> = {
       case 'parsep_dbl':
         return paragraphSeparatorDoubleXmlFormat.read(el);
       default:
-        return failure([`Found illegal tag name ${el.tagName}`]);
+        return failure([xmlLoadError(`Found illegal tag name ${el.tagName}`, [el.tagName])]);
     }
   },
   write: (tc) => {
@@ -95,13 +98,13 @@ export interface AOText {
 
 const aoTextFormat: XmlFormat<AOText> = {
   read: (el) => {
-    const childResults: Result<AOTextContent, string[]>[] = Array.from(el.children).map(aoTextContentFormat.read);
+    const childResults: Result<AOTextContent, XmlLoadError[]>[] = Array.from(el.children).map(aoTextContentFormat.read);
 
-    return flattenResults(childResults)
-      .transformContent(
-        (contents) => aoText(contents),
-        (errorMessages) => errorMessages.flat()
-      );
+    return transformResult(
+      flattenResults(childResults),
+      (contents) => aoText(contents),
+      (errors) => errors.flat()
+    );
   },
   write: ({content}) => [
     '<text>',

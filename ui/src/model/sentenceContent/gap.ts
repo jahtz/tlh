@@ -1,4 +1,4 @@
-import {attributeReader, XmlFormat} from "../../editor/xmlLib";
+import {readAttribute, XmlFormat} from "../../editor/xmlLib";
 import {AOSentenceContent} from "../sentence";
 import {success} from "../../functional/result";
 
@@ -11,8 +11,8 @@ export interface AOGap {
 export const aoGapFormat: XmlFormat<AOGap> = {
   read: (el) => success(
     aoGap(
-      attributeReader(el, 'c', (v) => v || ''),
-      attributeReader(el, 't', (v) => v || undefined)
+      readAttribute(el, 'c', (v) => v || ''),
+      readAttribute(el, 't', (v) => v || undefined)
     )
   ),
   write: ({c, t}) => t ? [`<gap c="${c}" t="${t}"/>`] : [`<gap c="${c}"/>`]
