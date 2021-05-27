@@ -1,6 +1,29 @@
-type Query {
-  allManuscripts: [ManuscriptMetaData!]!
-  manuscript(mainIdentifier: String!): ManuscriptMetaData
+type LoggedInUser {
+  username: String!
+  name: String!
+  affiliation: String
+  jwt: String!
+}
+
+type LoggedInUserMutations {
+  createManuscript(values: ManuscriptMetaDataInput): String
+  manuscript(mainIdentifier: String!): ManuscriptMutations
+}
+
+type ManuscriptIdentifier {
+  identifierType: ManuscriptIdentifierType!
+  identifier: String!
+}
+
+input ManuscriptIdentifierInput {
+  identifierType: ManuscriptIdentifierType!
+  identifier: String!
+}
+
+enum ManuscriptIdentifierType {
+  ExcavationNumber
+  CollectionNumber
+  PublicationShortReference
 }
 
 type ManuscriptMetaData {
@@ -17,45 +40,18 @@ type ManuscriptMetaData {
   transliterations: [Transliteration!]
 }
 
-type ManuscriptIdentifier {
-  identifierType: ManuscriptIdentifierType!
-  identifier: String!
+input ManuscriptMetaDataInput {
+  mainIdentifier: ManuscriptIdentifierInput!
+  otherIdentifiers: [ManuscriptIdentifierInput!]!
+  palaeographicClassification: PalaeographicClassification!
+  palaeographicClassificationSure: Boolean!
+  provenance: String
+  cthClassification: Int
+  bibliography: String
 }
 
-enum ManuscriptIdentifierType {
-  ExcavationNumber
-  CollectionNumber
-  PublicationShortReference
-}
-
-enum PalaeographicClassification {
-  OldScript
-  MiddleScript
-  NewScript
-  LateNewScript
-  OldAssyrianScript
-  MiddleBabylonianScript
-  MiddleAssyrianScript
-  AssyroMittanianScript
-  Unclassified
-}
-
-enum ManuscriptStatus {
-  InCreation
-  Created
-  Reviewed
-  ReviewMerged
-  ExecutiveReviewed
-  ExecutiveReviewMerged
-  Approved
-}
-
-type Transliteration {
-  side: ManuscriptSide!
-  version: Int!
-  input: String!
-  resultXml: String!
-  resultJson: String!
+type ManuscriptMutations {
+  updateTransliteration(values: [TransliterationInput!]!): Boolean!
 }
 
 enum ManuscriptSide {
@@ -72,10 +68,53 @@ enum ManuscriptSide {
   SealInscription
 }
 
+enum ManuscriptStatus {
+  InCreation
+  Created
+  Reviewed
+  ReviewMerged
+  ExecutiveReviewed
+  ExecutiveReviewMerged
+  Approved
+}
+
 type Mutation {
   register(userInput: UserInput!): String
   login(username: String!, password: String!): LoggedInUser
   me: LoggedInUserMutations
+}
+
+enum PalaeographicClassification {
+  OldScript
+  MiddleScript
+  NewScript
+  LateNewScript
+  OldAssyrianScript
+  MiddleBabylonianScript
+  MiddleAssyrianScript
+  AssyroMittanianScript
+  Unclassified
+}
+
+type Query {
+  manuscriptCount: Int!
+  allManuscripts(paginationSize: Int!, page: Int!): [ManuscriptMetaData!]!
+  manuscript(mainIdentifier: String!): ManuscriptMetaData
+}
+
+type Transliteration {
+  side: ManuscriptSide!
+  version: Int!
+  input: String!
+  resultXml: String!
+  resultJson: String!
+}
+
+input TransliterationInput {
+  side: ManuscriptSide!
+  input: String!
+  resultXml: String!
+  resultJson: String!
 }
 
 input UserInput {
@@ -85,42 +124,4 @@ input UserInput {
   name: String!
   affiliation: String
   email: String!
-}
-
-type LoggedInUser {
-  username: String!
-  name: String!
-  affiliation: String
-  jwt: String!
-}
-
-type LoggedInUserMutations {
-  createManuscript(values: ManuscriptMetaDataInput): String
-  manuscript(mainIdentifier: String!): ManuscriptMutations
-}
-
-input ManuscriptMetaDataInput {
-  mainIdentifier: ManuscriptIdentifierInput!
-  otherIdentifiers: [ManuscriptIdentifierInput!]!
-  palaeographicClassification: PalaeographicClassification!
-  palaeographicClassificationSure: Boolean!
-  provenance: String
-  cthClassification: Int
-  bibliography: String
-}
-
-input ManuscriptIdentifierInput {
-  identifierType: ManuscriptIdentifierType!
-  identifier: String!
-}
-
-type ManuscriptMutations {
-  updateTransliteration(values: [TransliterationInput!]!): Boolean!
-}
-
-input TransliterationInput {
-  side: ManuscriptSide!
-  input: String!
-  resultXml: String!
-  resultJson: String!
 }

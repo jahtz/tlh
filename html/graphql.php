@@ -28,9 +28,17 @@ $jwtValidityTime = 24 * 60 * 60; // 24 h
 $queryType = new ObjectType([
   'name' => 'Query',
   'fields' => [
+    'manuscriptCount' => [
+      'type' => Type::nonNull(Type::int()),
+      'resolve' => fn() => allManuscriptsCount()
+    ],
     'allManuscripts' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptMetaData::$graphQLType))),
-      'resolve' => fn() => allManuscriptMetaData()
+      'args' => [
+        'paginationSize' => Type::nonNull(Type::int()),
+        'page' => Type::nonNull(Type::int())
+      ],
+      'resolve' => fn($rootValue, array $args) => allManuscriptMetaData($args['paginationSize'], $args['page'])
     ],
     'manuscript' => [
       'type' => ManuscriptMetaData::$graphQLType,

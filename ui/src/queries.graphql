@@ -32,8 +32,9 @@ fragment ManuscriptBasicData on ManuscriptMetaData {
   creatorUsername
 }
 
-query Index {
-  allManuscripts {
+query Index($paginationSize: Int! = 10, $page: Int! = 0) {
+  manuscriptCount
+  allManuscripts(paginationSize: $paginationSize, page: $page) {
     ...ManuscriptBasicData
   }
 }

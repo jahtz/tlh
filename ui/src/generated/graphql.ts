@@ -14,116 +14,6 @@ export type Scalars = {
   Float: number;
 };
 
-export type Query = {
-  __typename?: 'Query';
-  allManuscripts: Array<ManuscriptMetaData>;
-  manuscript?: Maybe<ManuscriptMetaData>;
-};
-
-
-export type QueryManuscriptArgs = {
-  mainIdentifier: Scalars['String'];
-};
-
-export type ManuscriptMetaData = {
-  __typename?: 'ManuscriptMetaData';
-  mainIdentifier: ManuscriptIdentifier;
-  provenance?: Maybe<Scalars['String']>;
-  cthClassification?: Maybe<Scalars['Int']>;
-  bibliography?: Maybe<Scalars['String']>;
-  creatorUsername: Scalars['String'];
-  palaeographicClassification: PalaeographicClassification;
-  palaeographicClassificationSure: Scalars['Boolean'];
-  status?: Maybe<ManuscriptStatus>;
-  otherIdentifiers: Array<ManuscriptIdentifier>;
-  pictureUrls: Array<Scalars['String']>;
-  transliterations?: Maybe<Array<Transliteration>>;
-};
-
-export type ManuscriptIdentifier = {
-  __typename?: 'ManuscriptIdentifier';
-  identifierType: ManuscriptIdentifierType;
-  identifier: Scalars['String'];
-};
-
-export enum ManuscriptIdentifierType {
-  ExcavationNumber = 'ExcavationNumber',
-  CollectionNumber = 'CollectionNumber',
-  PublicationShortReference = 'PublicationShortReference'
-}
-
-export enum PalaeographicClassification {
-  OldScript = 'OldScript',
-  MiddleScript = 'MiddleScript',
-  NewScript = 'NewScript',
-  LateNewScript = 'LateNewScript',
-  OldAssyrianScript = 'OldAssyrianScript',
-  MiddleBabylonianScript = 'MiddleBabylonianScript',
-  MiddleAssyrianScript = 'MiddleAssyrianScript',
-  AssyroMittanianScript = 'AssyroMittanianScript',
-  Unclassified = 'Unclassified'
-}
-
-export enum ManuscriptStatus {
-  InCreation = 'InCreation',
-  Created = 'Created',
-  Reviewed = 'Reviewed',
-  ReviewMerged = 'ReviewMerged',
-  ExecutiveReviewed = 'ExecutiveReviewed',
-  ExecutiveReviewMerged = 'ExecutiveReviewMerged',
-  Approved = 'Approved'
-}
-
-export type Transliteration = {
-  __typename?: 'Transliteration';
-  side: ManuscriptSide;
-  version: Scalars['Int'];
-  input: Scalars['String'];
-  resultXml: Scalars['String'];
-  resultJson: Scalars['String'];
-};
-
-export enum ManuscriptSide {
-  NotIdentifiable = 'NotIdentifiable',
-  Obverse = 'Obverse',
-  Reverse = 'Reverse',
-  LowerEdge = 'LowerEdge',
-  UpperEdge = 'UpperEdge',
-  LeftEdge = 'LeftEdge',
-  RightEdge = 'RightEdge',
-  SideA = 'SideA',
-  SideB = 'SideB',
-  InscriptionNumber = 'InscriptionNumber',
-  SealInscription = 'SealInscription'
-}
-
-export type Mutation = {
-  __typename?: 'Mutation';
-  register?: Maybe<Scalars['String']>;
-  login?: Maybe<LoggedInUser>;
-  me?: Maybe<LoggedInUserMutations>;
-};
-
-
-export type MutationRegisterArgs = {
-  userInput: UserInput;
-};
-
-
-export type MutationLoginArgs = {
-  username: Scalars['String'];
-  password: Scalars['String'];
-};
-
-export type UserInput = {
-  username: Scalars['String'];
-  password: Scalars['String'];
-  passwordRepeat: Scalars['String'];
-  name: Scalars['String'];
-  affiliation?: Maybe<Scalars['String']>;
-  email: Scalars['String'];
-};
-
 export type LoggedInUser = {
   __typename?: 'LoggedInUser';
   username: Scalars['String'];
@@ -148,6 +38,38 @@ export type LoggedInUserMutationsManuscriptArgs = {
   mainIdentifier: Scalars['String'];
 };
 
+export type ManuscriptIdentifier = {
+  __typename?: 'ManuscriptIdentifier';
+  identifierType: ManuscriptIdentifierType;
+  identifier: Scalars['String'];
+};
+
+export type ManuscriptIdentifierInput = {
+  identifierType: ManuscriptIdentifierType;
+  identifier: Scalars['String'];
+};
+
+export enum ManuscriptIdentifierType {
+  ExcavationNumber = 'ExcavationNumber',
+  CollectionNumber = 'CollectionNumber',
+  PublicationShortReference = 'PublicationShortReference'
+}
+
+export type ManuscriptMetaData = {
+  __typename?: 'ManuscriptMetaData';
+  mainIdentifier: ManuscriptIdentifier;
+  provenance?: Maybe<Scalars['String']>;
+  cthClassification?: Maybe<Scalars['Int']>;
+  bibliography?: Maybe<Scalars['String']>;
+  creatorUsername: Scalars['String'];
+  palaeographicClassification: PalaeographicClassification;
+  palaeographicClassificationSure: Scalars['Boolean'];
+  status?: Maybe<ManuscriptStatus>;
+  otherIdentifiers: Array<ManuscriptIdentifier>;
+  pictureUrls: Array<Scalars['String']>;
+  transliterations?: Maybe<Array<Transliteration>>;
+};
+
 export type ManuscriptMetaDataInput = {
   mainIdentifier: ManuscriptIdentifierInput;
   otherIdentifiers: Array<ManuscriptIdentifierInput>;
@@ -156,11 +78,6 @@ export type ManuscriptMetaDataInput = {
   provenance?: Maybe<Scalars['String']>;
   cthClassification?: Maybe<Scalars['Int']>;
   bibliography?: Maybe<Scalars['String']>;
-};
-
-export type ManuscriptIdentifierInput = {
-  identifierType: ManuscriptIdentifierType;
-  identifier: Scalars['String'];
 };
 
 export type ManuscriptMutations = {
@@ -173,11 +90,101 @@ export type ManuscriptMutationsUpdateTransliterationArgs = {
   values: Array<TransliterationInput>;
 };
 
+export enum ManuscriptSide {
+  NotIdentifiable = 'NotIdentifiable',
+  Obverse = 'Obverse',
+  Reverse = 'Reverse',
+  LowerEdge = 'LowerEdge',
+  UpperEdge = 'UpperEdge',
+  LeftEdge = 'LeftEdge',
+  RightEdge = 'RightEdge',
+  SideA = 'SideA',
+  SideB = 'SideB',
+  InscriptionNumber = 'InscriptionNumber',
+  SealInscription = 'SealInscription'
+}
+
+export enum ManuscriptStatus {
+  InCreation = 'InCreation',
+  Created = 'Created',
+  Reviewed = 'Reviewed',
+  ReviewMerged = 'ReviewMerged',
+  ExecutiveReviewed = 'ExecutiveReviewed',
+  ExecutiveReviewMerged = 'ExecutiveReviewMerged',
+  Approved = 'Approved'
+}
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  register?: Maybe<Scalars['String']>;
+  login?: Maybe<LoggedInUser>;
+  me?: Maybe<LoggedInUserMutations>;
+};
+
+
+export type MutationRegisterArgs = {
+  userInput: UserInput;
+};
+
+
+export type MutationLoginArgs = {
+  username: Scalars['String'];
+  password: Scalars['String'];
+};
+
+export enum PalaeographicClassification {
+  OldScript = 'OldScript',
+  MiddleScript = 'MiddleScript',
+  NewScript = 'NewScript',
+  LateNewScript = 'LateNewScript',
+  OldAssyrianScript = 'OldAssyrianScript',
+  MiddleBabylonianScript = 'MiddleBabylonianScript',
+  MiddleAssyrianScript = 'MiddleAssyrianScript',
+  AssyroMittanianScript = 'AssyroMittanianScript',
+  Unclassified = 'Unclassified'
+}
+
+export type Query = {
+  __typename?: 'Query';
+  manuscriptCount: Scalars['Int'];
+  allManuscripts: Array<ManuscriptMetaData>;
+  manuscript?: Maybe<ManuscriptMetaData>;
+};
+
+
+export type QueryAllManuscriptsArgs = {
+  paginationSize: Scalars['Int'];
+  page: Scalars['Int'];
+};
+
+
+export type QueryManuscriptArgs = {
+  mainIdentifier: Scalars['String'];
+};
+
+export type Transliteration = {
+  __typename?: 'Transliteration';
+  side: ManuscriptSide;
+  version: Scalars['Int'];
+  input: Scalars['String'];
+  resultXml: Scalars['String'];
+  resultJson: Scalars['String'];
+};
+
 export type TransliterationInput = {
   side: ManuscriptSide;
   input: Scalars['String'];
   resultXml: Scalars['String'];
   resultJson: Scalars['String'];
+};
+
+export type UserInput = {
+  username: Scalars['String'];
+  password: Scalars['String'];
+  passwordRepeat: Scalars['String'];
+  name: Scalars['String'];
+  affiliation?: Maybe<Scalars['String']>;
+  email: Scalars['String'];
 };
 
 export type ManuscriptIdentifierFragment = (
@@ -223,11 +230,15 @@ export type ManuscriptBasicDataFragment = (
   ) }
 );
 
-export type IndexQueryVariables = Exact<{ [key: string]: never; }>;
+export type IndexQueryVariables = Exact<{
+  paginationSize?: Scalars['Int'];
+  page?: Scalars['Int'];
+}>;
 
 
 export type IndexQuery = (
   { __typename?: 'Query' }
+  & Pick<Query, 'manuscriptCount'>
   & { allManuscripts: Array<(
     { __typename?: 'ManuscriptMetaData' }
     & ManuscriptBasicDataFragment
@@ -452,8 +463,9 @@ export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const IndexDocument = gql`
-    query Index {
-  allManuscripts {
+    query Index($paginationSize: Int! = 10, $page: Int! = 0) {
+  manuscriptCount
+  allManuscripts(paginationSize: $paginationSize, page: $page) {
     ...ManuscriptBasicData
   }
 }
@@ -471,6 +483,8 @@ export const IndexDocument = gql`
  * @example
  * const { data, loading, error } = useIndexQuery({
  *   variables: {
+ *      paginationSize: // value for 'paginationSize'
+ *      page: // value for 'page'
  *   },
  * });
  */

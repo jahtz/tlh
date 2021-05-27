@@ -4,7 +4,7 @@
   "extensions": {
     "endpoints": {
       "Default GraphQL Endpoint": {
-        "url": "http://localhost:8066/tlh_dig/graphql.php",
+        "url": "http://localhost:8066/graphql.php",
         "headers": {
           "user-agent": "JS GraphQL"
         },

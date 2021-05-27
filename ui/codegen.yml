@@ -1,6 +1,6 @@
 overwrite: true
 
-schema: "http://localhost:8066/tlh_dig/graphql.php"
+schema: "http://localhost:8066/graphql.php"
 documents: "src/**/*.graphql"
 
 generates:

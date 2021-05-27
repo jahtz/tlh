@@ -77,19 +77,43 @@ function execute_select_query(string $sql, ?Closure $bindParams, Closure $f) {
   });
 }
 
-
-/**
- * @return ManuscriptMetaData[]
- */
-function allManuscriptMetaData(): array {
-  $sql = "
-select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username
-    from tlh_dig_manuscript_metadatas;";
+function allManuscriptsCount(): int {
+  $sql = "select count(*) from tlh_dig_manuscript_metadatas;";
 
   try {
     return execute_select_query(
       $sql,
       null,
+      function (mysqli_result $result) {
+        return $result->fetch_row()[0];
+      });
+  } catch (Exception $e) {
+    error_log($e);
+    return -1;
+  }
+}
+
+/**
+ * @return ManuscriptMetaData[]
+ */
+function allManuscriptMetaData(int $paginationSize, int $page): array {
+
+  $paginationSize = max(10, $paginationSize);
+
+  $sql = "
+select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username
+    from tlh_dig_manuscript_metadatas
+    limit ?, ?;";
+
+  $first = $page * $paginationSize;
+  $last = ($page + 1) * $paginationSize;
+
+  error_log($page . ' --> ' . $first . ' - ' . $last);
+
+  try {
+    return execute_select_query(
+      $sql,
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('ii', $first, $last),
       fn(mysqli_result $result): array => array_map(
         fn(array $row): ManuscriptMetaData => ManuscriptMetaData::fromDbAssocArray($row),
         $result->fetch_all(MYSQLI_ASSOC)
