@@ -1,5 +1,5 @@
 <?php
-$graphqlUrl = '/tlh_dig/graphql.php';
+$graphqlUrl = '/graphql.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">

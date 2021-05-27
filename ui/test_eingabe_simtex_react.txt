@@ -1,0 +1,47 @@
+$ KBo 99.9876
+@Hit
+1# ta LUGAL-uš A-NA DUTU AN-E x GUx.MAḪ pa-a-i {K:34}
+1'# [ ... ] ⸢ú?-e?-te-na-an-za⸣ 
+2'# [ ... ] ⸢nu⸣ LÚKÚR ku-e-da-ni pé-di 
+3'# [ ... wa-ar-pa da-a]-iš* *na-aš-kán a-pé-e-ez 
+4'# [ ... Mdu-ut-ḫa-l]i-ia-aš GAL ME-ŠE-DI 
+5'# [ ... -uš-m]a-⸢aš-ši⸣ ku-i-e-eš 
+6'# [ ... pa-ra-a] da-a-aš ¬¬¬ 
+7'# [ ... ] x  °m°mur-ši--DINGIR-LIM °MUNUS°ŠU.GI LÚ°MEŠ° DINGIR°MEŠ°-aš
+8'# [ ] °m°°.°°D°30--SUM  ù °m.D°30--SUM{F: Problem mit den Punkten in Determinativen.}
+9' # °URU°?ša-mu-ḫa °URU°!ša-*mu-ḫa*   °URU?°ša?-mu-ḫa °URU!°ša-mu!-ḫa
+10# BLABLA-ṢU _ŠI-PÁT
+11 # šaṭ-rat°at° °MUNUS.MEŠ°kat°at°-re-eš {G: fünf Zeichen abgebr.} kar-°di°dim-mi-ia-az §§
+12 # GU4 ka4 ubx ub[x K]AxU §
+13 # 4 GU4
+14 # 4 GU4 
+15 # DUB 2°KAM°
+@Hur
+16 # ú-wa|a ù wa|a-an-da
+17 # ú-we| ù we|e-en-di wu|u-un-da
+18 # ;bar-ba-ri-iš a-uḫ :bar-ba-ri-iš ><
+19 # hu-<up->sa ḫu-pu-<<pu>>-up-sa
+20 # ap!-pasic-an? bar-ba-ri-iš(?) {S:AN} ka-ni-it-ú-aš-ta-an
+21 # haŝ miḫ
+
+@Akk
+22 #  ba-bu-um
+@Hit
+4ʹ # ki-iš-ša-an me-ma-i
+@Hur
+5ʹ # a-na-ḫi-te-eš ki-lu-um
+@Hit
+6ʹ # nu-uš-ša-an
+
+@Luw
+21 # lu-wi-li
+@Pal
+22# pa-al-la-di-u
+
+@Hat
+23 #  hat-ti
+
+%{€1+2} Vs. III
+1' # nu LUGAL e-ku-zi
+2' # MUNUS.LUGAL-ma
+

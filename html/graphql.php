@@ -3,7 +3,7 @@
 require_once 'sql_queries.inc';
 require_once 'cors.inc';
 
-require_once 'vendor/autoload.php';
+require_once '../vendor/autoload.php';
 
 require_once 'graphql/MyGraphQLExceptions.inc';
 require_once 'graphql/LoggedInUser.inc';

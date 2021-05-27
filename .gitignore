@@ -7,5 +7,5 @@ vendor/
 uploads/*
 !uploads/.gitkeep
 
-public/*
-!public/.gitkeep
+html/public/*
+!html/public/.gitkeep
