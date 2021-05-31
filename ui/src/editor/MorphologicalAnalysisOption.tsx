@@ -1,24 +1,30 @@
 import classNames from "classnames";
 import {MorphologicalAnalysis} from "../model/morphologicalAnalysis";
-import React from "react";
+import React, {MouseEvent} from "react";
+import {isSelected, SelectedAnalysisOption} from "./selectedAnalysisOption";
 
 interface MorphAnalysisButtonIProps {
-  x: string;
+  identifier: SelectedAnalysisOption;
   analysis: string;
-  selectedOption: string | undefined;
-  select: (s: string) => void;
+  selectedOption: SelectedAnalysisOption[];
+  select: (s: SelectedAnalysisOption, ctrl: boolean) => void;
 }
 
-function MorphAnalysisButton({x, analysis, selectedOption, select}: MorphAnalysisButtonIProps): JSX.Element {
-  const classes = classNames('button', 'is-fullwidth', 'has-text-left', {'is-link': selectedOption && selectedOption === x});
+function MorphAnalysisButton({identifier, analysis, selectedOption, select}: MorphAnalysisButtonIProps): JSX.Element {
 
-  return <button onClick={() => select(x)} className={classes}>{x} - {analysis}</button>;
+  const classes = classNames('button', 'is-fullwidth', 'has-text-left', {'is-link': isSelected(identifier, selectedOption)});
+
+  function updateSelected(event: MouseEvent<HTMLButtonElement>): void {
+    select(identifier, event.ctrlKey);
+  }
+
+  return <button onClick={updateSelected} className={classes}>{identifier.num}{identifier.letter} - {analysis}</button>;
 }
 
 interface MorphAnalysisOptionIProps {
   ma: MorphologicalAnalysis;
-  selectedOption: string | undefined;
-  updateSelected: (s: string) => void;
+  selectedOption: SelectedAnalysisOption[];
+  updateSelected: (s: SelectedAnalysisOption, ctrl: boolean) => void;
 }
 
 export function MorphAnalysisOption({ma, selectedOption, updateSelected}: MorphAnalysisOptionIProps): JSX.Element {
@@ -32,11 +38,11 @@ export function MorphAnalysisOption({ma, selectedOption, updateSelected}: MorphA
       <div className="columns is-multiline">
         {typeof analyses === 'string'
           ? <div className="column is-fullwidth">
-            <MorphAnalysisButton x={number.toString()} analysis={analyses} select={updateSelected} selectedOption={selectedOption}/>
+            <MorphAnalysisButton identifier={{num: number}} analysis={analyses} select={updateSelected} selectedOption={selectedOption}/>
           </div>
           : analyses.map(({letter, analysis}, index) =>
             <div key={index} className="column is-one-third-desktop">
-              <MorphAnalysisButton x={`${number}${letter}`} analysis={analysis} select={updateSelected} selectedOption={selectedOption}/>
+              <MorphAnalysisButton identifier={{num: number, letter}} analysis={analysis} select={updateSelected} selectedOption={selectedOption}/>
             </div>
           )}
       </div>

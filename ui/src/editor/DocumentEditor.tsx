@@ -146,11 +146,13 @@ function DocumentEditor({aoXml: initialAoXml, filename}: DocumentEditorIProps): 
   const {t} = useTranslation('common');
   const [state, setState] = useState<DocumentEditorIState>({aoXml: initialAoXml});
 
-  function updateMorphology(morph: string, paragraphId: number, wordId: number): void {
+  function updateMorphology(morph: string | string[], paragraphId: number, wordId: number): void {
+
+
     setState(({aoXml, editedWord}) => {
       const paragraph = (aoXml.body.div1.text.content[paragraphId] as Paragraph);
       const word = paragraph.s.content[wordId] as AOWord;
-      word.mrp0sel = morph;
+      word.mrp0sel = typeof morph === 'string' ? morph : morph.join(',');
 
       return {aoXml, editedWord};
     });
@@ -203,7 +205,7 @@ function DocumentEditor({aoXml: initialAoXml, filename}: DocumentEditorIProps): 
         </div>
 
         <div className="buttons my-3">
-          <button className="button is-link is-fullwidth" onClick={exportDocument} disabled={!!state.editedWord}>{t('exportDocument')}</button>
+          <button className="button is-link is-fullwidth" onClick={exportDocument}>{t('exportDocument')}</button>
         </div>
       </div>
       <div className="column">

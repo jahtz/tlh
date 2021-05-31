@@ -3,6 +3,16 @@ import React, {useState} from "react";
 import {WordComponent} from "../manuscript/TransliterationLineResult";
 import {MorphAnalysisOption} from "./MorphologicalAnalysisOption";
 import {EditedWord} from "./DocumentEditor";
+import {AnalysisOption} from "../model/morphologicalAnalysis";
+import {
+  isSelected,
+  morphSplitCharacter,
+  readSelectedMorphology,
+  SelectedAnalysisOption,
+  selectedAnalysisOptionEquals,
+  stringifySelectedAnalysisOption
+} from "./selectedAnalysisOption";
+
 
 interface WordEditorIProps {
   w: EditedWord;
@@ -11,19 +21,48 @@ interface WordEditorIProps {
   nextWord: () => void;
 }
 
+
 export function WordEditor({w: {word, paragraphIndex, wordIndex}, update, previousWord, nextWord}: WordEditorIProps): JSX.Element {
 
+  const initialMorphology = word.mrp0sel ? readSelectedMorphology(word.mrp0sel) : [];
+
   const {t} = useTranslation('common');
-  const [selectedMorphology, setSelectedMorphology] = useState<string | undefined>(word.mrp0sel);
+  const [selectedMorphologies, setSelectedMorphology] = useState<SelectedAnalysisOption[]>(initialMorphology);
 
   function resetMorphAnalysis(): void {
-    setSelectedMorphology(word.mrp0sel);
+    setSelectedMorphology(initialMorphology);
   }
 
   function handleUpdate(): void {
-    if (selectedMorphology) {
-      update(selectedMorphology, paragraphIndex, wordIndex);
+    const newValue = selectedMorphologies
+      .map(stringifySelectedAnalysisOption)
+      .join(morphSplitCharacter);
+
+    update(newValue, paragraphIndex, wordIndex);
+  }
+
+  function updateSelected(newValue: SelectedAnalysisOption, ctrl: boolean): void {
+    if (!ctrl) {
+      setSelectedMorphology([newValue]);
+    } else {
+      setSelectedMorphology((currentSelection) => isSelected(newValue, currentSelection)
+        ? currentSelection.filter((v) => !selectedAnalysisOptionEquals(v, newValue))
+        : [...currentSelection, newValue]);
     }
+  }
+
+  function getMorphologicalAnalysisOption(identifier: SelectedAnalysisOption): string | AnalysisOption {
+    if (!word.morphologies) {
+      return '';
+    }
+
+    const morphAnalysis = word.morphologies.find(({number}) => number === identifier.num)!!;
+
+    if (typeof morphAnalysis.analyses === 'string') {
+      return morphAnalysis.analyses;
+    }
+
+    return morphAnalysis.analyses.find(({letter}) => identifier.letter === letter)!!;
   }
 
   return (
@@ -34,29 +73,36 @@ export function WordEditor({w: {word, paragraphIndex, wordIndex}, update, previo
 
       {word.language && <p><b>{t('language')}:</b> {word.language}</p>}
 
-      {/* <p>
-        <b>{t('currentSelectedMorphology')}:</b>
-        {selectedMorphology || t('noSelection')}
-      </p>
-      */}
-
       {word.morphologies && word.morphologies.map((m, index) =>
-        <MorphAnalysisOption key={index} ma={m} selectedOption={selectedMorphology} updateSelected={setSelectedMorphology}/>
+        <MorphAnalysisOption key={index} ma={m} selectedOption={selectedMorphologies} updateSelected={updateSelected}/>
       )}
 
-      {selectedMorphology && selectedMorphology !== word.mrp0sel && <>
+      {selectedMorphologies && <>
         <hr/>
 
-        <div className="box has-text-centered">{t('selected')}: {selectedMorphology} {/*TODO: show selected morphology!*/}</div>
+        <div className="box has-text-centered">
+          <p>{t('selected')}:</p>
+          {/*TODO: show selected morphologies!*/}
+          {selectedMorphologies.map((selectedMorph) => {
 
-        <div className="level">
-          <div className="level-item">
-            <button onClick={resetMorphAnalysis} className="button is-warning is-fullwidth">{t('resetMorphAnalysis')}</button>
-          </div>
-          <div className="level-item">
-            <button onClick={handleUpdate} className="button is-link is-fullwidth">{t('updateMorphAnalysis')}</button>
-          </div>
+            const analysis = getMorphologicalAnalysisOption(selectedMorph);
+
+            return <p key={stringifySelectedAnalysisOption(selectedMorph)}>
+              {stringifySelectedAnalysisOption(selectedMorph)}: {typeof analysis === 'string' ? analysis : analysis.analysis}
+            </p>;
+          })}
         </div>
+
+        {/*selectedMorphologies !== initialMorphology  TODO: does not work anymore...  && */
+          <div className="level">
+            <div className="level-item">
+              <button onClick={resetMorphAnalysis} className="button is-warning is-fullwidth">{t('resetMorphAnalysis')}</button>
+            </div>
+            <div className="level-item">
+              <button onClick={handleUpdate} className="button is-link is-fullwidth">{t('updateMorphAnalysis')}</button>
+            </div>
+          </div>
+        }
 
       </>}
 
