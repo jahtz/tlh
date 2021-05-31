@@ -74,6 +74,7 @@ export interface EditedWord {
 
 interface DocumentEditorIProps {
   aoXml: AOXml;
+  filename: string;
 }
 
 interface DocumentEditorIState {
@@ -81,7 +82,7 @@ interface DocumentEditorIState {
   editedWord?: EditedWord;
 }
 
-function handleSaveToPC(data: string, filename: string = 'exported.xml'): void {
+function handleSaveToPC(data: string, filename: string): void {
   const blob = new Blob([data], {type: "text/plain"});
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -140,7 +141,7 @@ function selectNextWord(aoXml: AOXml, currentParagraphIndex: number, currentWord
   return undefined;
 }
 
-function DocumentEditor({aoXml: initialAoXml}: DocumentEditorIProps): JSX.Element {
+function DocumentEditor({aoXml: initialAoXml, filename}: DocumentEditorIProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [state, setState] = useState<DocumentEditorIState>({aoXml: initialAoXml});
@@ -190,7 +191,7 @@ function DocumentEditor({aoXml: initialAoXml}: DocumentEditorIProps): JSX.Elemen
   }
 
   function exportDocument(): void {
-    handleSaveToPC(aoXmlFormat.write(state.aoXml).join('\n'));
+    handleSaveToPC(aoXmlFormat.write(state.aoXml).join('\n'), filename);
   }
 
   return (
@@ -214,15 +215,24 @@ function DocumentEditor({aoXml: initialAoXml}: DocumentEditorIProps): JSX.Elemen
   );
 }
 
+interface DocumentEditorContainerState {
+  aoXml: AOXml;
+  filename: string;
+}
+
+function documentEditorContainerState(aoXml: AOXml, filename: string): DocumentEditorContainerState {
+  return {aoXml, filename};
+}
+
 export function DocumentEditorContainer(): JSX.Element {
 
-  const [state, setState] = useState<AOXml | undefined>();
+  const [state, setState] = useState<DocumentEditorContainerState | undefined>();
 
   async function readFile(file: File): Promise<void> {
     const aoXmlResult = await loadXml(file);
 
     if (isSuccess(aoXmlResult)) {
-      setState(() => aoXmlResult.value);
+      setState(() => documentEditorContainerState(aoXmlResult.value, file.name));
     } else {
       aoXmlResult.error.forEach((e) => console.error(JSON.stringify(e)));
     }
@@ -231,7 +241,7 @@ export function DocumentEditorContainer(): JSX.Element {
   return (
     <div className="container">
       {state
-        ? <DocumentEditor aoXml={state}/>
+        ? <DocumentEditor aoXml={state.aoXml} filename={state.filename}/>
         : <FileLoader accept="text/xml" onLoad={readFile}/>}
     </div>
   );

@@ -37,7 +37,7 @@
     "@types/react-redux": "^7.1.16",
     "@types/react-router-dom": "^5.1.7",
     "@types/yup": "^0.29.11",
-    "i18next-parser": "^3.6.0",
+    "i18next-parser": "^4.2.0",
     "node-sass": "^5.0.0",
     "typescript": "^4.2.4"
   },
