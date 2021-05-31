@@ -108,8 +108,6 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
   $first = $page * $paginationSize;
   $last = ($page + 1) * $paginationSize;
 
-  error_log($page . ' --> ' . $first . ' - ' . $last);
-
   try {
     return execute_select_query(
       $sql,
