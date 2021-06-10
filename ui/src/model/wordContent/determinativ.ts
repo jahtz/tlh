@@ -1,7 +1,7 @@
-import {XmlFormat} from "../../editor/xmlLib";
+import {XmlFormat} from '../../editor/xmlLib';
 import {flattenResults, transformResult} from '../../functional/result';
-import {AOWordContent} from "./wordContent";
-import {clearUpperMultiStringContent, readMultiWordContent, UpperMultiStringContent, writeMultiWordContent} from "./multiStringContent";
+import {AOWordContent} from './wordContent';
+import {clearUpperMultiStringContent, readMultiWordContent, UpperMultiStringContent, writeMultiWordContent} from './multiStringContent';
 
 /*
  * Determinativ:

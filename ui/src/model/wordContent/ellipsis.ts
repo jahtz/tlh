@@ -1,6 +1,6 @@
-import {AOWordContent} from "./wordContent";
-import {XmlFormat} from "../../editor/xmlLib";
-import {success} from "../../functional/result";
+import {AOWordContent} from './wordContent';
+import {XmlFormat} from '../../editor/xmlLib';
+import {success} from '../../functional/result';
 
 export interface Ellipsis {
   type: 'AOEllipsis'
@@ -15,4 +15,4 @@ export function isEllipsis(c: AOWordContent): c is Ellipsis {
 export const ellipsisFormat: XmlFormat<Ellipsis> = {
   read: () => success(aoEllipsis),
   write: () => ['…']
-}
+};

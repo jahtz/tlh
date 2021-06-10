@@ -48,11 +48,11 @@ export const manuscriptColumnModifiers: ManuscriptColumnModifier[] = [
 
 function getXmlNameForManuscriptColumnModifier(m: ManuscriptColumnModifier): string {
   switch (m) {
-    case ManuscriptColumnModifier.None:
-      return '';
-    case ManuscriptColumnModifier.Slash:
-      return "'";
-    case ManuscriptColumnModifier.SlashQuestion:
-      return "'?";
+  case ManuscriptColumnModifier.None:
+    return '';
+  case ManuscriptColumnModifier.Slash:
+    return '\'';
+  case ManuscriptColumnModifier.SlashQuestion:
+    return '\'?';
   }
 }

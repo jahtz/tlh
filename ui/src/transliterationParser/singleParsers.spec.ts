@@ -1,21 +1,21 @@
-import {transliteration} from "./parser";
-import {determinativ} from "../model/wordContent/determinativ";
-import {materLectionis} from "../model/wordContent/materLectionis";
-import {damageContent, DamageType} from "../model/wordContent/damages";
-import {aoCorr} from "../model/wordContent/corrections";
-import {paragraphSeparator, paragraphSeparatorDouble} from "../model/paragraphSeparators";
-import {aoEllipsis} from "../model/wordContent/ellipsis";
-import {aoSign} from "../model/wordContent/sign";
-import {aoKolonMark} from "../model/wordContent/kolonMark";
-import {aoNote} from "../model/wordContent/footNote";
-import {aoGap} from "../model/sentenceContent/gap";
-import {aoIllegibleContent} from "../model/wordContent/illegible";
-import {Parser} from "parsimmon";
-import {AOWordContent} from "../model/wordContent/wordContent";
-import {numeralContent} from "../model/wordContent/numeralContent";
-import {AOTextContent} from "../editor/documentBody";
-import {aoBasicText} from "../model/wordContent/basicText";
-import {AOSentenceContent} from "../model/sentence";
+import {transliteration} from './parser';
+import {determinativ} from '../model/wordContent/determinativ';
+import {materLectionis} from '../model/wordContent/materLectionis';
+import {damageContent, DamageType} from '../model/wordContent/damages';
+import {aoCorr} from '../model/wordContent/corrections';
+import {paragraphSeparator, paragraphSeparatorDouble} from '../model/paragraphSeparators';
+import {aoEllipsis} from '../model/wordContent/ellipsis';
+import {aoSign} from '../model/wordContent/sign';
+import {aoKolonMark} from '../model/wordContent/kolonMark';
+import {aoNote} from '../model/wordContent/footNote';
+import {aoGap} from '../model/sentenceContent/gap';
+import {aoIllegibleContent} from '../model/wordContent/illegible';
+import {Parser} from 'parsimmon';
+import {AOWordContent} from '../model/wordContent/wordContent';
+import {numeralContent} from '../model/wordContent/numeralContent';
+import {AOTextContent} from '../editor/documentBody';
+import {aoBasicText} from '../model/wordContent/basicText';
+import {AOSentenceContent} from '../model/sentence';
 
 const determinativSpecialGenusCases: [string][] = [['m'], ['f']];
 const determinativSpecialDeityCases: [string][] = [['m.D'], ['f.D']];
@@ -95,7 +95,7 @@ export function testParseEllipsis(parser: Parser<AOWordContent>): void {
   test.each([['…'], ['...']])(
     'should parse %p as Ellipsis',
     (toParse) => expect(parser.tryParse(toParse)).toEqual(aoEllipsis)
-  )
+  );
 }
 
 describe('ellipsisParser', () => testParseEllipsis(transliteration.ellipsis));
@@ -127,14 +127,14 @@ function testParseSpecialGenusDeterminativ(parser: Parser<AOWordContent>): void 
   test.each(determinativSpecialGenusCases)(
     'should parse °%p° as a determinativ [!Special Case!]',
     (toParse) => expect(parser.tryParse(`°${toParse}°`)).toEqual(determinativ(aoBasicText(toParse)))
-  )
+  );
 }
 
 function testParseSpecialDeityDeterminativ(parser: Parser<AOWordContent>): void {
   test.each(determinativSpecialDeityCases)(
     'should parse °%p° as a determinativ [!Special Case!]',
     (toParse) => expect(parser.tryParse(`°${toParse}°`)).toEqual(determinativ(aoBasicText(toParse)))
-  )
+  );
 }
 
 export function testParseDeterminativ(parser: Parser<AOWordContent>): void {

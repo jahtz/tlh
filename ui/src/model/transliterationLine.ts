@@ -1,4 +1,4 @@
-import {AOLineBreak, aoLineBreakFormat} from "./sentenceContent/linebreak";
+import {AOLineBreak, aoLineBreakFormat} from './sentenceContent/linebreak';
 
 export interface TransliterationLine {
   lineInput: string;
@@ -12,5 +12,5 @@ export function transliterationLine(lineInput: string, result?: AOLineBreak): Tr
 export function xmlifyTransliterationLine({lineInput, result}: TransliterationLine): string {
   return result
     ? aoLineBreakFormat.write(result).join('\n')
-    : `<error>${lineInput}</error>`
+    : `<error>${lineInput}</error>`;
 }

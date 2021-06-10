@@ -1,4 +1,4 @@
-import {TFunction} from "i18next";
+import {TFunction} from 'i18next';
 
 export enum ManuscriptLanguage {
   Hittite = 'Hittite',
@@ -24,21 +24,21 @@ export function getNameForManuscriptLanguage(l: ManuscriptLanguage, t: TFunction
 
 export function getAbbreviationForManuscriptLanguage(l: ManuscriptLanguage): string {
   switch (l) {
-    case ManuscriptLanguage.Akkadian:
-      return 'Akk';
-    case ManuscriptLanguage.Hattic:
-      return 'Hat';
-    case ManuscriptLanguage.Hittite:
-      return 'Hit';
-    case ManuscriptLanguage.Hurrian:
-      return 'Hur';
-    case ManuscriptLanguage.Luwian:
-      return 'Luw';
-    case ManuscriptLanguage.Palaic:
-      return 'Pal';
-    case ManuscriptLanguage.Sumerian:
-      return 'Sum';
-    case ManuscriptLanguage.NotIdentifiable:
-      return '';
+  case ManuscriptLanguage.Akkadian:
+    return 'Akk';
+  case ManuscriptLanguage.Hattic:
+    return 'Hat';
+  case ManuscriptLanguage.Hittite:
+    return 'Hit';
+  case ManuscriptLanguage.Hurrian:
+    return 'Hur';
+  case ManuscriptLanguage.Luwian:
+    return 'Luw';
+  case ManuscriptLanguage.Palaic:
+    return 'Pal';
+  case ManuscriptLanguage.Sumerian:
+    return 'Sum';
+  case ManuscriptLanguage.NotIdentifiable:
+    return '';
   }
 }

@@ -1,6 +1,6 @@
-import {readAttribute, XmlFormat} from "../../editor/xmlLib";
-import {AOWordContent} from "./wordContent";
-import {success} from "../../functional/result";
+import {readAttribute, XmlFormat} from '../../editor/xmlLib';
+import {AOWordContent} from './wordContent';
+import {success} from '../../functional/result';
 
 export interface AOSpace {
   type: 'AOSpace';
@@ -10,7 +10,7 @@ export interface AOSpace {
 export const aoSpaceFormat: XmlFormat<AOSpace> = {
   read: (el) => success(aoSpace(readAttribute(el, 'c', (v) => v || ''))),
   write: ({c}) => [`<space c="${c}"/>`]
-}
+};
 
 export function aoSpace(c: string): AOSpace {
   return {type: 'AOSpace', c};

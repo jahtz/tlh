@@ -1,9 +1,9 @@
-import {indent, readAttribute, XmlFormat, XmlLoadError, xmlLoadError} from "../../editor/xmlLib";
+import {indent, readAttribute, XmlFormat, XmlLoadError, xmlLoadError} from '../../editor/xmlLib';
 import {failure, flattenResults, Result, success, transformResult} from '../../functional/result';
-import {AOWordContent, aoWordContentFormat} from "../wordContent/wordContent";
-import {MorphologicalAnalysis, readMorphAnalysis, writeMorphAnalysisAttribute} from "../morphologicalAnalysis";
-import {AOSentenceContent} from "../sentence";
-import {aoBasicText} from "../wordContent/basicText";
+import {AOWordContent, aoWordContentFormat} from '../wordContent/wordContent';
+import {MorphologicalAnalysis, readMorphAnalysis, writeMorphAnalysisAttribute} from '../morphologicalAnalysis';
+import {AOSentenceContent} from '../sentence';
+import {aoBasicText} from '../wordContent/basicText';
 
 // AOWord
 
@@ -30,7 +30,7 @@ export const aoWordFormat: XmlFormat<AOWord> = {
         } else if (x instanceof Element) {
           return aoWordContentFormat.read(x);
         } else {
-          return failure([xmlLoadError(`Illegal node type found`, [el.tagName])]);
+          return failure([xmlLoadError('Illegal node type found', [el.tagName])]);
         }
       })
     );
@@ -49,12 +49,12 @@ export const aoWordFormat: XmlFormat<AOWord> = {
           mrp0sel: readAttribute(el, 'mrp0sel', readSelectedMorphology),
           morphologies,
           transliteration: readAttribute(el, 'trans', (v) => v || undefined)
-        }
+        };
       },
       (errs) => errs.flat()
     );
   },
-  write: ({content, mrp0sel, type, transliteration, morphologies, language}) =>
+  write: ({content, mrp0sel, transliteration, morphologies, language}) =>
     [
       `<w trans="${transliteration}"`,
       indent(`mrp0sel="${mrp0sel || ''}"`),
@@ -62,7 +62,7 @@ export const aoWordFormat: XmlFormat<AOWord> = {
       ...(morphologies || []).flatMap(writeMorphAnalysisAttribute).map(indent),
       `>${content.map(aoWordContentFormat.write).join('')}</w>`
     ]
-}
+};
 
 export function parsedWord(...content: (AOWordContent | string)[]): AOWord {
   return {type: 'AOWord', content: content.map((c) => typeof c === 'string' ? aoBasicText(c) : c)};

@@ -1,6 +1,6 @@
-import {XmlFormat} from "../../editor/xmlLib";
-import {AOWordContent} from "./wordContent";
-import {success} from "../../functional/result";
+import {XmlFormat} from '../../editor/xmlLib';
+import {AOWordContent} from './wordContent';
+import {success} from '../../functional/result';
 
 /**
  * Mater lectionis:

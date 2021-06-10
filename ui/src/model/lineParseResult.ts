@@ -1,4 +1,4 @@
-import {AOWord} from "./sentenceContent/word";
+import {AOWord} from './sentenceContent/word';
 
 export interface LineParseResult {
   type: 'LineParseResult';

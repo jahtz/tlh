@@ -1,7 +1,7 @@
-import {XmlFormat} from "../../editor/xmlLib";
-import {AOWordContent} from "./wordContent";
-import {flattenResults, transformResult} from "../../functional/result";
-import {clearUpperMultiStringContent, readMultiWordContent, UpperMultiStringContent, writeMultiWordContent} from "./multiStringContent";
+import {XmlFormat} from '../../editor/xmlLib';
+import {AOWordContent} from './wordContent';
+import {flattenResults, transformResult} from '../../functional/result';
+import {clearUpperMultiStringContent, readMultiWordContent, UpperMultiStringContent, writeMultiWordContent} from './multiStringContent';
 
 /*
  * Zahl
@@ -22,7 +22,7 @@ export const numeralContentFormat: XmlFormat<AONumeralContent> = {
     (errors) => errors.flat()
   ),
   write: ({content}) => [`<num>${content.flatMap(writeMultiWordContent).join('')}</num>`]
-}
+};
 
 export function isNumeralContent(c: AOWordContent): c is AONumeralContent {
   return c.type === 'AONumeralContent';

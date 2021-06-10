@@ -1,6 +1,6 @@
-import {XmlFormat} from "../editor/xmlLib";
-import {AOTextContent} from "../editor/documentBody";
-import {success} from "../functional/result";
+import {XmlFormat} from '../editor/xmlLib';
+import {AOTextContent} from '../editor/documentBody';
+import {success} from '../functional/result';
 
 // ParagraphSeparator
 
@@ -30,7 +30,7 @@ export const paragraphSeparatorDouble: ParagraphSeparatorDouble = {type: 'Paragr
 export const paragraphSeparatorDoubleXmlFormat: XmlFormat<ParagraphSeparatorDouble> = {
   read: () => success(paragraphSeparatorDouble),
   write: () => ['<parsep_dbl/>']
-}
+};
 
 export function isParagraphSeparatorDouble(c: AOTextContent): c is ParagraphSeparatorDouble {
   return c.type === 'ParagraphSeparatorDouble';

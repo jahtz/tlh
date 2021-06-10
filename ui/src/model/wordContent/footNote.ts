@@ -1,6 +1,6 @@
-import {failableAttributeReader, readAttribute, XmlFormat, xmlLoadError, XmlLoadError} from "../../editor/xmlLib";
+import {failableAttributeReader, readAttribute, XmlFormat, xmlLoadError, XmlLoadError} from '../../editor/xmlLib';
 import {failure, myTry, Result, transformResult} from '../../functional/result';
-import {AOWordContent} from "./wordContent";
+import {AOWordContent} from './wordContent';
 
 export interface AOFootNote {
   type: 'AONote';
@@ -21,9 +21,9 @@ export const aoNoteFormat: XmlFormat<AOFootNote> = {
     (errors) => errors.flat()
   ),
   write: ({content, number}) => [`<note c="${content}" n="${number}"/>`]
-}
+};
 
-export function aoNote(content: string, number: number = -1): AOFootNote {
+export function aoNote(content: string, number = -1): AOFootNote {
   return {type: 'AONote', content, number};
 }
 

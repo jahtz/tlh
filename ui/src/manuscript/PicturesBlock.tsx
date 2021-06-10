@@ -1,5 +1,5 @@
-import React from "react";
-import {pictureBaseUrl} from "../urls";
+import React from 'react';
+import {pictureBaseUrl} from '../urls';
 
 interface IProps {
   mainIdentifier: string;

@@ -1,5 +1,5 @@
 import React from 'react';
-import {useTranslation} from "react-i18next";
+import {useTranslation} from 'react-i18next';
 import {
   LoggedInUserFragment,
   ManuscriptIdentifierInput,
@@ -7,18 +7,18 @@ import {
   ManuscriptMetaDataInput,
   PalaeographicClassification,
   useCreateManuscriptMutation
-} from "./generated/graphql";
-import {ErrorMessage, Field, FieldArray, FieldArrayRenderProps, Form, Formik, FormikErrors} from "formik";
+} from './generated/graphql';
+import {ErrorMessage, Field, FieldArray, FieldArrayRenderProps, Form, Formik, FormikErrors} from 'formik';
 import {manuscriptSchema} from './forms/schemas';
-import classNames from "classnames";
+import classNames from 'classnames';
 import {ManuscriptIdInputField} from './forms/ManuscriptIdInputField';
-import {loginUrl} from "./urls";
+import {loginUrl} from './urls';
 import {Redirect} from 'react-router-dom';
-import {BulmaField} from "./forms/BulmaFields";
-import {useSelector} from "react-redux";
-import {activeUserSelector} from "./store/store";
-import {allPalaeographicClassifications, getNameForPalaeoClassification} from "./palaeoClassification";
-import {allKnownProvenances} from "./provenances";
+import {BulmaField} from './forms/BulmaFields';
+import {useSelector} from 'react-redux';
+import {activeUserSelector} from './store/store';
+import {allPalaeographicClassifications, getNameForPalaeoClassification} from './palaeoClassification';
+import {allKnownProvenances} from './provenances';
 
 function newManuscriptIdentifier(): ManuscriptIdentifierInput {
   return {
@@ -36,11 +36,11 @@ export function CreateManuscriptForm() {
   const createdManuscript: string | null | undefined = data?.me?.createManuscript;
 
   if (!currentUser) {
-    return <Redirect to={loginUrl}/>
+    return <Redirect to={loginUrl}/>;
   }
 
-  if (!!createdManuscript) {
-    return <Redirect to={`./manuscripts/${encodeURIComponent(createdManuscript)}/data`}/>
+  if (createdManuscript) {
+    return <Redirect to={`./manuscripts/${encodeURIComponent(createdManuscript)}/data`}/>;
   }
 
   const initialValues: ManuscriptMetaDataInput = {
@@ -51,7 +51,7 @@ export function CreateManuscriptForm() {
     bibliography: '',
     provenance: '',
     cthClassification: undefined
-  }
+  };
 
   function handleSubmit(manuscriptMetaData: ManuscriptMetaDataInput): void {
     // noinspection JSIgnoredPromiseFromCall
@@ -107,7 +107,7 @@ export function CreateManuscriptForm() {
               <div className="field">
                 <label className="label">{t('palaeographicClassification')}:</label>
                 <div className="control">
-                  <div className={classNames("select", 'is-fullwidth', {
+                  <div className={classNames('select', 'is-fullwidth', {
                     'is-success': touched.palaeographicClassification && !errors.palaeographicClassification,
                     'is-danger': touched.palaeographicClassification && errors.palaeographicClassification
                   })}>
@@ -161,7 +161,7 @@ export function CreateManuscriptForm() {
 
               <div className="field">
                 <button type="submit" disabled={loading || !!createdManuscript}
-                        className={classNames("button", "is-link", "is-fullwidth", {'is-loading': loading})}>
+                        className={classNames('button', 'is-link', 'is-fullwidth', {'is-loading': loading})}>
                   {t('createManuscript')}
                 </button>
               </div>

@@ -1,4 +1,4 @@
-import * as yup from "yup";
+import * as yup from 'yup';
 import {
   CreateManuscriptMutationVariables,
   LoginMutationVariables,
@@ -6,7 +6,7 @@ import {
   ManuscriptIdentifierType,
   PalaeographicClassification,
   UserInput
-} from "../generated/graphql";
+} from '../generated/graphql';
 
 export const registerSchema: yup.SchemaOf<UserInput> = yup.object()
   .shape({

@@ -1,4 +1,4 @@
-import {AOWordContent} from "./wordContent";
+import {AOWordContent} from './wordContent';
 
 export interface BasicText {
   type: 'BasicTest';

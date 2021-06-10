@@ -1,17 +1,17 @@
-import React, {useState} from "react";
+import React, {useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
 import {loadXml} from './xmlLoader';
-import {AOXml, aoXmlFormat} from "./document";
-import {AOTextContent} from "./documentBody";
-import {isAOParagraph, Paragraph} from "../model/paragraph";
-import {AOWord, isAOWord} from "../model/sentenceContent/word";
+import {AOXml, aoXmlFormat} from './document';
+import {AOTextContent} from './documentBody';
+import {isAOParagraph, Paragraph} from '../model/paragraph';
+import {AOWord, isAOWord} from '../model/sentenceContent/word';
 import {WordEditor} from './WordEditor';
-import {isParagraphSeparator} from "../model/paragraphSeparators";
-import {AOSentenceContent} from "../model/sentence";
-import {WordComponent} from "../manuscript/TransliterationLineResult";
-import {isAOLineBreak} from "../model/sentenceContent/linebreak";
-import {useTranslation} from "react-i18next";
-import {isSuccess} from "../functional/result";
+import {isParagraphSeparator} from '../model/paragraphSeparators';
+import {AOSentenceContent} from '../model/sentence';
+import {WordComponent} from '../manuscript/TransliterationLineResult';
+import {isAOLineBreak} from '../model/sentenceContent/linebreak';
+import {useTranslation} from 'react-i18next';
+import {isSuccess} from '../functional/result';
 
 interface AOSentenceContentRenderIProps {
   sc: AOSentenceContent;
@@ -83,7 +83,7 @@ interface DocumentEditorIState {
 }
 
 function handleSaveToPC(data: string, filename: string): void {
-  const blob = new Blob([data], {type: "text/plain"});
+  const blob = new Blob([data], {type: 'text/plain'});
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
 
@@ -176,7 +176,7 @@ function DocumentEditor({aoXml: initialAoXml, filename}: DocumentEditorIProps): 
 
       if (editedWord) {
         setState(({aoXml}) => {
-          return {aoXml, editedWord}
+          return {aoXml, editedWord};
         });
       }
     }
@@ -189,7 +189,7 @@ function DocumentEditor({aoXml: initialAoXml, filename}: DocumentEditorIProps): 
       } else {
         return {aoXml, editedWord};
       }
-    })
+    });
   }
 
   function exportDocument(): void {

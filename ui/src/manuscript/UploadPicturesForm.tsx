@@ -1,8 +1,8 @@
 import React, {ChangeEvent, createRef, useState} from 'react';
-import {useTranslation} from "react-i18next";
-import {serverUrl} from "../urls";
-import {ManuscriptBaseIProps} from "./ManuscriptBase";
-import {PicturesBlock} from "./PicturesBlock";
+import {useTranslation} from 'react-i18next';
+import {serverUrl} from '../urls';
+import {ManuscriptBaseIProps} from './ManuscriptBase';
+import {PicturesBlock} from './PicturesBlock';
 
 interface IState {
   selectedFile: File | null;

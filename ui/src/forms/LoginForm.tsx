@@ -1,15 +1,15 @@
 import React, {Dispatch, useState} from 'react';
-import {LoginMutationVariables, useLoginMutation} from "../generated/graphql";
-import {useTranslation} from "react-i18next";
+import {LoginMutationVariables, useLoginMutation} from '../generated/graphql';
+import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
-import {BulmaField} from "./BulmaFields";
+import {BulmaField} from './BulmaFields';
 import {loginSchema} from './schemas';
-import classnames from "classnames";
-import {homeUrl} from "../urls";
+import classnames from 'classnames';
+import {homeUrl} from '../urls';
 import {Redirect} from 'react-router-dom';
-import {useDispatch, useSelector} from "react-redux";
-import {StoreAction, userLoggedInAction} from "../store/actions";
-import {activeUserSelector} from "../store/store";
+import {useDispatch, useSelector} from 'react-redux';
+import {StoreAction, userLoggedInAction} from '../store/actions';
+import {activeUserSelector} from '../store/store';
 
 export function LoginForm() {
 
@@ -18,12 +18,12 @@ export function LoginForm() {
   const [invalidLoginTry, setInvalidLoginTry] = useState(false);
   const [login, {loading, error}] = useLoginMutation();
 
-  if (!!useSelector(activeUserSelector)) {
+  if (useSelector(activeUserSelector)) {
     // User is already logged in
     return <Redirect to={homeUrl}/>;
   }
 
-  const initialValues: LoginMutationVariables = {username: '', password: ''}
+  const initialValues: LoginMutationVariables = {username: '', password: ''};
 
   function handleSubmit(values: LoginMutationVariables): void {
     login({variables: values})
@@ -70,5 +70,5 @@ export function LoginForm() {
         }
       </Formik>
     </div>
-  )
+  );
 }

@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
-import {useTranslation} from "react-i18next";
-import {useSelector} from "react-redux";
-import {activeUserSelector} from "../store/store";
-import {homeUrl} from "../urls";
+import {useTranslation} from 'react-i18next';
+import {useSelector} from 'react-redux';
+import {activeUserSelector} from '../store/store';
+import {homeUrl} from '../urls';
 import {Redirect} from 'react-router-dom';
-import {TransliterationInput as TI, useUploadTransliterationMutation} from "../generated/graphql";
-import {ManuscriptBaseIProps} from "./ManuscriptBase";
-import {TransliterationSideInput} from "./TransliterationSideInput";
+import {TransliterationInput as TI, useUploadTransliterationMutation} from '../generated/graphql';
+import {ManuscriptBaseIProps} from './ManuscriptBase';
+import {TransliterationSideInput} from './TransliterationSideInput';
 
 interface SideParseResultContainer {
   newSideParseResult?: TI;
@@ -19,7 +19,7 @@ interface IState {
 export function TransliterationInput({manuscript}: ManuscriptBaseIProps): JSX.Element {
 
   const {t} = useTranslation('common');
-  const [state, setState] = useState<IState>({sideParseResults: [{}]})
+  const [state, setState] = useState<IState>({sideParseResults: [{}]});
   const currentUser = useSelector(activeUserSelector);
 
   const [uploadTransliteration, {data, loading, error}] = useUploadTransliterationMutation();
@@ -30,7 +30,7 @@ export function TransliterationInput({manuscript}: ManuscriptBaseIProps): JSX.El
     return <Redirect to={homeUrl}/>;
   }
 
-  if (!!data) {
+  if (data) {
     console.info(JSON.stringify(data, null, 2));
   }
 
@@ -43,8 +43,8 @@ export function TransliterationInput({manuscript}: ManuscriptBaseIProps): JSX.El
 
   function addTransliterationSideInput(): void {
     setState((state) => {
-      return {...state, sideParseResults: [...state.sideParseResults, {}]}
-    })
+      return {...state, sideParseResults: [...state.sideParseResults, {}]};
+    });
   }
 
   function updateTransliteration(index: number, result: TI): void {
@@ -53,7 +53,7 @@ export function TransliterationInput({manuscript}: ManuscriptBaseIProps): JSX.El
         ...state,
         sideParseResults: state.sideParseResults
           .map((sprc, runningIndex) => index === runningIndex ? {newSideParseResult: result} : sprc),
-      }
+      };
     });
   }
 

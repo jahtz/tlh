@@ -1,7 +1,7 @@
-import classNames from "classnames";
-import {MorphologicalAnalysis} from "../model/morphologicalAnalysis";
-import React, {MouseEvent} from "react";
-import {isSelected, SelectedAnalysisOption} from "./selectedAnalysisOption";
+import classNames from 'classnames';
+import {MorphologicalAnalysis} from '../model/morphologicalAnalysis';
+import React, {MouseEvent} from 'react';
+import {isSelected, SelectedAnalysisOption} from './selectedAnalysisOption';
 
 interface MorphAnalysisButtonIProps {
   identifier: SelectedAnalysisOption;
@@ -47,7 +47,7 @@ export function MorphAnalysisOption({ma, selectedOption, updateSelected}: MorphA
           )}
       </div>
 
-      <div className="box has-text-centered">{other.join(" @ ")}</div>
+      <div className="box has-text-centered">{other.join(' @ ')}</div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import {failure, Result} from "../functional/result";
+import {failure, Result} from '../functional/result';
 
 export interface XmlLoadError {
   message: string;
@@ -37,5 +37,5 @@ export function childElementReader<T>(el: Element, tagName: string, childElement
 }
 
 export function indent(s: string): string {
-  return " ".repeat(2) + s;
+  return ' '.repeat(2) + s;
 }

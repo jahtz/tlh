@@ -1,9 +1,9 @@
-import {akkadogrammFormat, AOAkkadogramm, isAkkadogramm,} from "./akkadogramm";
-import {AOSumerogramm, isSumerogramm, sumerogrammFormat} from "./sumerogramm";
-import {AONumeralContent, isNumeralContent, numeralContentFormat} from "./numeralContent";
-import {AODeterminativ, determinativFormat, isDeterminativ} from "./determinativ";
-import {AOMaterLectionis, isMaterLectionis, materLectionisFormat} from "./materLectionis";
-import {AOCorr, aoCorrFormat, isCorrectionContent} from "./corrections";
+import {akkadogrammFormat, AOAkkadogramm, isAkkadogramm,} from './akkadogramm';
+import {AOSumerogramm, isSumerogramm, sumerogrammFormat} from './sumerogramm';
+import {AONumeralContent, isNumeralContent, numeralContentFormat} from './numeralContent';
+import {AODeterminativ, determinativFormat, isDeterminativ} from './determinativ';
+import {AOMaterLectionis, isMaterLectionis, materLectionisFormat} from './materLectionis';
+import {AOCorr, aoCorrFormat, isCorrectionContent} from './corrections';
 import {
   damageContent,
   DamageContent,
@@ -15,18 +15,18 @@ import {
   rasureEndFormat,
   rasureStartFormat,
   xmlifyDamageContent
-} from "./damages";
-import {AOSign, aoSignFormat, isAoSign} from "./sign";
-import {AOFootNote, aoNoteFormat, isAoFootNote} from "./footNote";
-import {AOKolonMark, aoKolonMarkFormat, isAoKolonMark} from "./kolonMark";
-import {AOIllegibleContent} from "./illegible";
-import {AOSpace, aoSpaceFormat, isSpace} from "./space";
-import {XmlFormat, xmlLoadError} from "../../editor/xmlLib";
-import {InscribedLetter, inscribedLetterFormat, isInscribedLetter} from "./inscribedLetter";
-import {Ellipsis, ellipsisFormat, isEllipsis} from "./ellipsis";
-import {BasicText, isBasicText} from "./basicText";
-import {failure, mapResult} from "../../functional/result";
-import {IndexDigit} from "./indexDigit";
+} from './damages';
+import {AOSign, aoSignFormat, isAoSign} from './sign';
+import {AOFootNote, aoNoteFormat, isAoFootNote} from './footNote';
+import {AOKolonMark, aoKolonMarkFormat, isAoKolonMark} from './kolonMark';
+import {AOIllegibleContent} from './illegible';
+import {AOSpace, aoSpaceFormat, isSpace} from './space';
+import {XmlFormat, xmlLoadError} from '../../editor/xmlLib';
+import {InscribedLetter, inscribedLetterFormat, isInscribedLetter} from './inscribedLetter';
+import {Ellipsis, ellipsisFormat, isEllipsis} from './ellipsis';
+import {BasicText, isBasicText} from './basicText';
+import {failure, mapResult} from '../../functional/result';
+import {IndexDigit} from './indexDigit';
 
 // Word content
 
@@ -54,40 +54,40 @@ export type AOWordContent =
 export const aoWordContentFormat: XmlFormat<AOWordContent> = {
   read: (el) => {
     switch (el.tagName) {
-      case 'del_in':
-        return mapResult(deletionStartFormat.read(el), damageContent);
-      case 'del_fin':
-        return mapResult(deletionEndFormat.read(el), damageContent);
-      case 'ras_in':
-        return mapResult(rasureStartFormat.read(el), damageContent);
-      case 'ras_fin':
-        return mapResult(rasureEndFormat.read(el), damageContent);
-      case 'laes_in':
-        return mapResult(lesionStartFormat.read(el), damageContent);
-      case 'laes_fin':
-        return mapResult(lesionEndFormat.read(el), damageContent);
-      case 'sGr':
-        return sumerogrammFormat.read(el);
-      case 'aGr':
-        return akkadogrammFormat.read(el);
-      case 'd':
-        return determinativFormat.read(el);
-      case 'SP___AO_3a_MaterLect':
-        return materLectionisFormat.read(el);
-      case 'num':
-        return numeralContentFormat.read(el);
-      case 'space':
-        return aoSpaceFormat.read(el);
-      case 'corr':
-        return aoCorrFormat.read(el);
-      case 'SP___AO_3a_-KolonMark':
-        return aoKolonMarkFormat.read(el);
-      case 'AO:Sign':
-        return aoSignFormat.read(el);
-      case 'note':
-        return aoNoteFormat.read(el);
-      default:
-        return failure([xmlLoadError(`Illegal tag name ${el.tagName} found!`, [el.tagName])])
+    case 'del_in':
+      return mapResult(deletionStartFormat.read(el), damageContent);
+    case 'del_fin':
+      return mapResult(deletionEndFormat.read(el), damageContent);
+    case 'ras_in':
+      return mapResult(rasureStartFormat.read(el), damageContent);
+    case 'ras_fin':
+      return mapResult(rasureEndFormat.read(el), damageContent);
+    case 'laes_in':
+      return mapResult(lesionStartFormat.read(el), damageContent);
+    case 'laes_fin':
+      return mapResult(lesionEndFormat.read(el), damageContent);
+    case 'sGr':
+      return sumerogrammFormat.read(el);
+    case 'aGr':
+      return akkadogrammFormat.read(el);
+    case 'd':
+      return determinativFormat.read(el);
+    case 'SP___AO_3a_MaterLect':
+      return materLectionisFormat.read(el);
+    case 'num':
+      return numeralContentFormat.read(el);
+    case 'space':
+      return aoSpaceFormat.read(el);
+    case 'corr':
+      return aoCorrFormat.read(el);
+    case 'SP___AO_3a_-KolonMark':
+      return aoKolonMarkFormat.read(el);
+    case 'AO:Sign':
+      return aoSignFormat.read(el);
+    case 'note':
+      return aoNoteFormat.read(el);
+    default:
+      return failure([xmlLoadError(`Illegal tag name ${el.tagName} found!`, [el.tagName])]);
     }
   },
   write: (c) => {

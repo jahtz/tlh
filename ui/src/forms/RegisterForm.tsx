@@ -1,12 +1,12 @@
 import React from 'react';
-import {useRegisterMutation, UserInput} from "../generated/graphql";
-import {useTranslation} from "react-i18next";
-import {Field, Form, Formik, FormikHelpers} from "formik";
-import {registerSchema} from "./schemas";
-import {BulmaField} from "./BulmaFields";
+import {useRegisterMutation, UserInput} from '../generated/graphql';
+import {useTranslation} from 'react-i18next';
+import {Field, Form, Formik, FormikHelpers} from 'formik';
+import {registerSchema} from './schemas';
+import {BulmaField} from './BulmaFields';
 import classnames from 'classnames';
 
-export function RegisterForm() {
+export function RegisterForm(): JSX.Element {
 
   const {t} = useTranslation('common');
   const [register, {data, loading, error}] = useRegisterMutation();
@@ -18,7 +18,7 @@ export function RegisterForm() {
     name: '',
     email: '',
     affiliation: ''
-  }
+  };
 
   function onSubmit(values: UserInput, {setSubmitting}: FormikHelpers<UserInput>): void {
     register({variables: {userInput: values}})
@@ -64,5 +64,5 @@ export function RegisterForm() {
         }
       </Formik>
     </div>
-  )
+  );
 }

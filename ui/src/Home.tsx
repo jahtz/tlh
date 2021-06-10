@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
-import {useTranslation} from "react-i18next";
+import {useTranslation} from 'react-i18next';
 import {IndexQuery, useIndexLazyQuery} from './generated/graphql';
 import {Link} from 'react-router-dom';
-import {WithQuery} from "./WithQuery";
-import {createManuscriptUrl} from "./urls";
+import {WithQuery} from './WithQuery';
+import {createManuscriptUrl} from './urls';
 import {Pagination} from './Pagination';
 
 export function Home(): JSX.Element {
@@ -30,7 +30,7 @@ export function Home(): JSX.Element {
 
   function goToPage(pageNumber: number): void {
     setPage(pageNumber);
-    getIndexQuery({variables: {page: pageNumber, paginationSize}})
+    getIndexQuery({variables: {page: pageNumber, paginationSize}});
   }
 
   function render({manuscriptCount, allManuscripts}: IndexQuery): JSX.Element {
@@ -74,7 +74,7 @@ export function Home(): JSX.Element {
     <div className="container">
       <h1 className="title is-3 has-text-centered">{t('manuskript_plural')}</h1>
 
-      {indexQuery.called && <WithQuery query={indexQuery} children={render}/>}
+      {indexQuery.called && <WithQuery query={indexQuery} render={render}/>}
 
       <Link className="button is-link is-fullwidth" to={createManuscriptUrl}>
         {t('createManuscript')}

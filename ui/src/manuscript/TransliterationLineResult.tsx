@@ -1,22 +1,22 @@
-import React from "react";
-import {isDeterminativ} from "../model/wordContent/determinativ";
-import {TransliterationLine} from "../model/transliterationLine";
-import {isAoSign} from "../model/wordContent/sign";
-import {getSymbolForDamageType, isDamageContent} from "../model/wordContent/damages";
-import {isCorrectionContent} from "../model/wordContent/corrections";
-import {isAkkadogramm} from "../model/wordContent/akkadogramm";
-import {isSumerogramm} from "../model/wordContent/sumerogramm";
-import {AOWord} from "../model/sentenceContent/word";
-import {isMaterLectionis} from "../model/wordContent/materLectionis";
-import {isNumeralContent} from "../model/wordContent/numeralContent";
-import {isAoFootNote} from "../model/wordContent/footNote";
-import {isAoKolonMark} from "../model/wordContent/kolonMark";
-import {AOSimpleWordContent, AOWordContent} from "../model/wordContent/wordContent";
-import {isIllegibleContent} from "../model/wordContent/illegible";
-import {isSpace} from "../model/wordContent/space";
-import {isEllipsis} from "../model/wordContent/ellipsis";
-import {isBasicText} from "../model/wordContent/basicText";
-import classNames from "classnames";
+import React from 'react';
+import {isDeterminativ} from '../model/wordContent/determinativ';
+import {TransliterationLine} from '../model/transliterationLine';
+import {isAoSign} from '../model/wordContent/sign';
+import {getSymbolForDamageType, isDamageContent} from '../model/wordContent/damages';
+import {isCorrectionContent} from '../model/wordContent/corrections';
+import {isAkkadogramm} from '../model/wordContent/akkadogramm';
+import {isSumerogramm} from '../model/wordContent/sumerogramm';
+import {AOWord} from '../model/sentenceContent/word';
+import {isMaterLectionis} from '../model/wordContent/materLectionis';
+import {isNumeralContent} from '../model/wordContent/numeralContent';
+import {isAoFootNote} from '../model/wordContent/footNote';
+import {isAoKolonMark} from '../model/wordContent/kolonMark';
+import {AOSimpleWordContent, AOWordContent} from '../model/wordContent/wordContent';
+import {isIllegibleContent} from '../model/wordContent/illegible';
+import {isSpace} from '../model/wordContent/space';
+import {isEllipsis} from '../model/wordContent/ellipsis';
+import {isBasicText} from '../model/wordContent/basicText';
+import classNames from 'classnames';
 
 function renderSimpleWordContent(content: AOSimpleWordContent): JSX.Element {
   if (isMaterLectionis(content)) {
@@ -81,7 +81,7 @@ export function WordComponent(
     {content.length > 0
       ? content.map((c, i) => <span className="hittite" key={i}>{renderWordContent(c)}</span>)
       : <span className="has-text-danger">{transliteration}</span>}
-  </span>
+  </span>;
 }
 
 // Single line

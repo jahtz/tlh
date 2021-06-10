@@ -1,5 +1,5 @@
-import {childElementReader, indent, readAttribute, XmlFormat,} from "./xmlLib";
-import {flattenResults, success, transformResult, zipResult} from "../functional/result";
+import {childElementReader, indent, readAttribute, XmlFormat,} from './xmlLib';
+import {flattenResults, success, transformResult, zipResult} from '../functional/result';
 
 // AOHeader
 
@@ -79,7 +79,7 @@ const aoMetaFormat: XmlFormat<AOMeta> = {
     ...aoAnnotationFormat.write(annotation).map(indent),
     '</meta>'
   ]
-}
+};
 
 function aoMeta(creationDate: DatedAttributeElement, kor2: DatedAttributeElement, aoXmlCreation: DatedAttributeElement, annotation: AOAnnotation): AOMeta {
   return {type: 'AOMeta', creationDate, kor2, aoXmlCreation, annotation};
@@ -145,4 +145,4 @@ function datedAttributeElement(date: string): DatedAttributeElement {
 const datedStringElementFormat: XmlFormat<DatedAttributeElement> = {
   read: (el) => success(datedAttributeElement(readAttribute(el, 'date', (v) => v || ''))),
   write: ({date}) => []
-}
+};

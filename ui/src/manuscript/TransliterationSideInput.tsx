@@ -1,26 +1,17 @@
-import React, {useState} from "react";
-import {
-  ManuscriptColumn,
-  ManuscriptColumnModifier,
-  manuscriptColumnModifiers,
-  manuscriptColumns,
-} from "../model/manuscriptProperties/manuscriptProperties";
-import {
-  allManuscriptLanguages,
-  getNameForManuscriptLanguage,
-  ManuscriptLanguage
-} from "../model/manuscriptProperties/manuscriptLanugage";
-import {useTranslation} from "react-i18next";
-import {parseTransliterationLine} from "../transliterationParser/parser";
-import {defaultSideBasics, SideBasics, SideParseResult} from "../model/sideParseResult";
-import {BulmaObjectSelect, SelectOption, selectOption} from "../forms/BulmaFields";
-import {Transliteration} from "./TransliterationLineResult";
-import {transliterationLine, TransliterationLine, xmlifyTransliterationLine} from "../model/transliterationLine";
-import {ManuscriptSide, TransliterationInput} from "../generated/graphql";
-import {BulmaTabs, TabConfig} from "../BulmaTabs";
-import {getNameForManuscriptSide, manuscriptSides} from "../model/manuscriptProperties/manuscriptSide";
-import {LineParseResult} from "../model/lineParseResult";
-import {aoLineBreak} from "../model/sentenceContent/linebreak";
+import React, {useState} from 'react';
+import {ManuscriptColumn, ManuscriptColumnModifier, manuscriptColumnModifiers, manuscriptColumns,} from '../model/manuscriptProperties/manuscriptProperties';
+import {allManuscriptLanguages, getNameForManuscriptLanguage, ManuscriptLanguage} from '../model/manuscriptProperties/manuscriptLanugage';
+import {useTranslation} from 'react-i18next';
+import {parseTransliterationLine} from '../transliterationParser/parser';
+import {defaultSideBasics, SideBasics, SideParseResult} from '../model/sideParseResult';
+import {BulmaObjectSelect, SelectOption, selectOption} from '../forms/BulmaFields';
+import {Transliteration} from './TransliterationLineResult';
+import {transliterationLine, TransliterationLine, xmlifyTransliterationLine} from '../model/transliterationLine';
+import {ManuscriptSide, TransliterationInput} from '../generated/graphql';
+import {BulmaTabs, TabConfig} from '../BulmaTabs';
+import {getNameForManuscriptSide, manuscriptSides} from '../model/manuscriptProperties/manuscriptSide';
+import {LineParseResult} from '../model/lineParseResult';
+import {aoLineBreak} from '../model/sentenceContent/linebreak';
 
 interface IProps {
   mainIdentifier: string;
@@ -60,7 +51,7 @@ function SideParseResultComponent({mainIdentifier, sideParseResult}: SideParseRe
         {exportAsXml(mainIdentifier, sideParseResult).map((line, index) => <p key={index}>{line}</p>)}
       </div>
     }
-  ]
+  ];
 
   return <BulmaTabs tabs={tabConfigs}/>;
 }

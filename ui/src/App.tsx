@@ -4,18 +4,18 @@ import {createManuscriptUrl, editDocumentUrl, homeUrl, loginUrl, registerUrl} fr
 import {Home} from './Home';
 import {RegisterForm} from './forms/RegisterForm';
 import {LoginForm} from './forms/LoginForm';
-import {useTranslation} from "react-i18next";
-import i18next from "i18next";
-import {CreateManuscriptForm} from "./CreateManuscriptForm";
+import {useTranslation} from 'react-i18next';
+import i18next from 'i18next';
+import {CreateManuscriptForm} from './CreateManuscriptForm';
 import {NotFound} from './NotFound';
 import {DocumentEditorContainer} from './editor/DocumentEditor';
-import {useDispatch, useSelector} from "react-redux";
-import {activeUserSelector} from "./store/store";
-import {StoreAction, userLoggedOutAction} from "./store/actions";
-import {ManuscriptBase} from "./manuscript/ManuscriptBase";
+import {useDispatch, useSelector} from 'react-redux';
+import {activeUserSelector} from './store/store';
+import {StoreAction, userLoggedOutAction} from './store/actions';
+import {ManuscriptBase} from './manuscript/ManuscriptBase';
 
 // TODO: solve languages different?
-const languages: string[] = ["de", "en"];
+const languages: string[] = ['de', 'en'];
 
 export function App(): JSX.Element {
 

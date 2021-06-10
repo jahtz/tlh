@@ -40,7 +40,7 @@ export function morphologicalAnalysis(number: number, content: string): Morpholo
     translation,
     analysesString,
     ...other
-  ] = content.split("@").map((s) => s.trim());
+  ] = content.split('@').map((s) => s.trim());
 
   const analyses = parseAnalysis(analysesString);
 

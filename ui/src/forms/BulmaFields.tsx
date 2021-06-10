@@ -1,6 +1,6 @@
-import {ErrorMessage, Field, FieldProps} from "formik";
-import classNames from "classnames";
-import React, {ChangeEvent} from "react";
+import {ErrorMessage, Field, FieldProps} from 'formik';
+import classNames from 'classnames';
+import React, {ChangeEvent} from 'react';
 
 interface CustomFieldProps extends FieldProps {
   label: string;
@@ -88,5 +88,5 @@ export function BulmaObjectSelect<T>({label, id, currentValue, options, onUpdate
         </select>
       </div>
     </div>
-  </div>
+  </div>;
 }

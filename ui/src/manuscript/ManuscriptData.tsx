@@ -1,15 +1,15 @@
 import React from 'react';
-import {useTranslation} from "react-i18next";
-import {Link} from "react-router-dom";
-import {LoggedInUserFragment, ManuscriptIdentifierFragment} from "../generated/graphql";
-import {useSelector} from "react-redux";
-import {activeUserSelector} from "../store/store";
-import {getNameForPalaeoClassification} from "../palaeoClassification";
-import {createTransliterationUrl, ManuscriptBaseIProps, uploadPicturesUrl} from "./ManuscriptBase";
-import {PicturesBlock} from "./PicturesBlock";
-import {transliteration} from "../transliterationParser/parser";
-import {SideParseResult} from "../model/sideParseResult";
-import {Transliteration} from "./TransliterationLineResult";
+import {useTranslation} from 'react-i18next';
+import {Link} from 'react-router-dom';
+import {LoggedInUserFragment, ManuscriptIdentifierFragment} from '../generated/graphql';
+import {useSelector} from 'react-redux';
+import {activeUserSelector} from '../store/store';
+import {getNameForPalaeoClassification} from '../palaeoClassification';
+import {createTransliterationUrl, ManuscriptBaseIProps, uploadPicturesUrl} from './ManuscriptBase';
+import {PicturesBlock} from './PicturesBlock';
+import {transliteration} from '../transliterationParser/parser';
+import {SideParseResult} from '../model/sideParseResult';
+import {Transliteration} from './TransliterationLineResult';
 
 export function ManuscriptData({manuscript}: ManuscriptBaseIProps): JSX.Element {
 
@@ -96,7 +96,7 @@ export function ManuscriptData({manuscript}: ManuscriptBaseIProps): JSX.Element 
 
         {sideParseResults
           ? <div className="my-3">
-            {sideParseResults.map(({lineResults}) => <Transliteration lines={lineResults}/>)}
+            {sideParseResults.map(({lineResults}, index) => <Transliteration key={index} lines={lineResults}/>)}
           </div>
           : <div className="notification is-info has-text-centered">
             {t('noTransliterationCraetedYet')}.

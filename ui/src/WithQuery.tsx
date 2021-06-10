@@ -1,7 +1,7 @@
-import React from "react";
-import {useTranslation} from "react-i18next";
-import classNames from "classnames";
-import {ApolloError} from "@apollo/client";
+import React from 'react';
+import {useTranslation} from 'react-i18next';
+import classNames from 'classnames';
+import {ApolloError} from '@apollo/client';
 
 interface QueryData<T> {
   data: T | undefined;
@@ -11,10 +11,10 @@ interface QueryData<T> {
 
 interface IProps<T> {
   query: QueryData<T>;
-  children: (t: T) => JSX.Element;
+  render: (t: T) => JSX.Element;
 }
 
-export function WithQuery<T>({query: {data, loading, error}, children}: IProps<T>): JSX.Element {
+export function WithQuery<T>({query: {data, loading, error}, render}: IProps<T>): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -28,6 +28,6 @@ export function WithQuery<T>({query: {data, loading, error}, children}: IProps<T
       </div>
     );
   } else {
-    return children(data);
+    return render(data);
   }
 }

@@ -1,6 +1,6 @@
 import {AOXml, aoXmlFormat} from './document';
-import {Result} from "../functional/result";
-import {XmlLoadError} from "./xmlLib";
+import {Result} from '../functional/result';
+import {XmlLoadError} from './xmlLib';
 
 // Document elements
 

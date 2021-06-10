@@ -1,6 +1,6 @@
-import {AOWordContent} from "./wordContent";
-import {XmlFormat} from "../../editor/xmlLib";
-import {success} from "../../functional/result";
+import {AOWordContent} from './wordContent';
+import {XmlFormat} from '../../editor/xmlLib';
+import {success} from '../../functional/result';
 
 export interface InscribedLetter {
   type: 'InscribedLetter';
@@ -12,7 +12,7 @@ export function inscribedLetter(content: string): InscribedLetter {
 }
 
 export const inscribedLetterFormat: XmlFormat<InscribedLetter> = {
-  read: (el) => success(inscribedLetter('TODO!')),
+  read: (/*TODO: el*/) => success(inscribedLetter('TODO!')),
   write: () => ['x']
 };
 

@@ -1,6 +1,6 @@
-import {readAttribute, XmlFormat} from "../../editor/xmlLib";
-import {AOSentenceContent} from "../sentence";
-import {success} from "../../functional/result";
+import {readAttribute, XmlFormat} from '../../editor/xmlLib';
+import {AOSentenceContent} from '../sentence';
+import {success} from '../../functional/result';
 
 export interface AOGap {
   type: 'gap';
@@ -16,7 +16,7 @@ export const aoGapFormat: XmlFormat<AOGap> = {
     )
   ),
   write: ({c, t}) => t ? [`<gap c="${c}" t="${t}"/>`] : [`<gap c="${c}"/>`]
-}
+};
 
 export function aoGap(c: string, t?: string): AOGap {
   return {type: 'gap', c, t};

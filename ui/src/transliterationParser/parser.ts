@@ -1,30 +1,30 @@
-import {alt, createLanguage, end, oneOf, optWhitespace, Parser, regex, regexp, Result as ParsimmonResult, seq, string, TypedLanguage} from "parsimmon";
-import {lineParseResult, LineParseResult} from "../model/lineParseResult";
-import {AOSign, aoSign} from "../model/wordContent/sign";
-import {damageContent, DamageContent, DamageType} from "../model/wordContent/damages";
-import {aoCorr, AOCorr} from "../model/wordContent/corrections";
+import {alt, createLanguage, end, oneOf, optWhitespace, Parser, regex, regexp, Result as ParsimmonResult, seq, string, TypedLanguage} from 'parsimmon';
+import {lineParseResult, LineParseResult} from '../model/lineParseResult';
+import {AOSign, aoSign} from '../model/wordContent/sign';
+import {damageContent, DamageContent, DamageType} from '../model/wordContent/damages';
+import {aoCorr, AOCorr} from '../model/wordContent/corrections';
 import {paragraphSeparator, ParagraphSeparator, paragraphSeparatorDouble, ParagraphSeparatorDouble} from '../model/paragraphSeparators';
-import {AODeterminativ, determinativ,} from "../model/wordContent/determinativ";
-import {akkadogramm, AOAkkadogramm} from "../model/wordContent/akkadogramm";
-import {AOSumerogramm, sumerogramm} from "../model/wordContent/sumerogramm";
-import {inscribedLetter, InscribedLetter} from "../model/wordContent/inscribedLetter";
-import {AOGap, aoGap} from "../model/sentenceContent/gap";
-import {aoEllipsis, Ellipsis} from "../model/wordContent/ellipsis";
-import {AOWord, parsedWord} from "../model/sentenceContent/word";
-import {AOMaterLectionis, materLectionis} from "../model/wordContent/materLectionis";
-import {AONumeralContent, numeralContent} from "../model/wordContent/numeralContent";
-import {AOFootNote, aoNote} from "../model/wordContent/footNote";
-import {aoIllegibleContent, AOIllegibleContent} from "../model/wordContent/illegible";
-import {aoKolonMark, AOKolonMark} from "../model/wordContent/kolonMark";
-import {AOSimpleWordContent, AOWordContent} from "../model/wordContent/wordContent";
-import {aoBasicText, BasicText} from "../model/wordContent/basicText";
-import {ForeignCharacter, UpperMultiStringContent} from "../model/wordContent/multiStringContent";
-import {indexDigit, IndexDigit} from "../model/wordContent/indexDigit";
+import {AODeterminativ, determinativ,} from '../model/wordContent/determinativ';
+import {akkadogramm, AOAkkadogramm} from '../model/wordContent/akkadogramm';
+import {AOSumerogramm, sumerogramm} from '../model/wordContent/sumerogramm';
+import {inscribedLetter, InscribedLetter} from '../model/wordContent/inscribedLetter';
+import {AOGap, aoGap} from '../model/sentenceContent/gap';
+import {aoEllipsis, Ellipsis} from '../model/wordContent/ellipsis';
+import {AOWord, parsedWord} from '../model/sentenceContent/word';
+import {AOMaterLectionis, materLectionis} from '../model/wordContent/materLectionis';
+import {AONumeralContent, numeralContent} from '../model/wordContent/numeralContent';
+import {AOFootNote, aoNote} from '../model/wordContent/footNote';
+import {aoIllegibleContent, AOIllegibleContent} from '../model/wordContent/illegible';
+import {aoKolonMark, AOKolonMark} from '../model/wordContent/kolonMark';
+import {AOSimpleWordContent, AOWordContent} from '../model/wordContent/wordContent';
+import {aoBasicText, BasicText} from '../model/wordContent/basicText';
+import {ForeignCharacter, UpperMultiStringContent} from '../model/wordContent/multiStringContent';
+import {indexDigit, IndexDigit} from '../model/wordContent/indexDigit';
 
 // Other
 
-const lowerTextRegex: RegExp = /\p{Ll}+/u;
-const upperTextRegex: RegExp = /\p{Lu}+/u;
+const lowerTextRegex = /\p{Ll}+/u;
+const upperTextRegex = /\p{Lu}+/u;
 
 type LanguageSpec = {
   indexDigit: IndexDigit;
@@ -82,7 +82,7 @@ const lineParser: Parser<LinePreParseResult> = seq(
   string('#'),
   optWhitespace,
   regexp(/[\w\W]+/)
-).map(([number, _ows1, _hash, _ows2, content]) => newLinePreParseResult(number, content))
+).map(([number, _ows1, _hash, _ows2, content]) => newLinePreParseResult(number, content));
 
 export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<LanguageSpec>({
   damages: () => alt(
