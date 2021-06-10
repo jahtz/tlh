@@ -65,7 +65,7 @@ export function TransliterationSideInput({mainIdentifier, onTransliterationUpdat
     .map((side) => selectOption(side, getNameForManuscriptSide(side, t)));
 
   const languageOptions: SelectOption<ManuscriptLanguage>[] = allManuscriptLanguages
-    .map((language) => selectOption(language, getNameForManuscriptLanguage(language, t)));
+    .map((language) => selectOption(language, getNameForManuscriptLanguage(language/*, t*/)));
 
   const columnOptions: SelectOption<ManuscriptColumn>[] = manuscriptColumns
     // FIXME: label!

@@ -1,5 +1,3 @@
-import {TFunction} from 'i18next';
-
 export enum ManuscriptLanguage {
   Hittite = 'Hittite',
   Luwian = 'Luwian',
@@ -17,7 +15,7 @@ export const allManuscriptLanguages: ManuscriptLanguage[] = [
   ManuscriptLanguage.Hurrian, ManuscriptLanguage.Akkadian, ManuscriptLanguage.Sumerian, ManuscriptLanguage.NotIdentifiable
 ];
 
-export function getNameForManuscriptLanguage(l: ManuscriptLanguage, t: TFunction): string {
+export function getNameForManuscriptLanguage(l: ManuscriptLanguage/*, t: TFunction*/): string {
   // FIXME: implement!
   return 'TODO: ' + l.toString();
 }

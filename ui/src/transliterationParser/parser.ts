@@ -82,7 +82,7 @@ const lineParser: Parser<LinePreParseResult> = seq(
   string('#'),
   optWhitespace,
   regexp(/[\w\W]+/)
-).map(([number, _ows1, _hash, _ows2, content]) => newLinePreParseResult(number, content));
+).map(([number, , , , content]) => newLinePreParseResult(number, content));
 
 export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<LanguageSpec>({
   damages: () => alt(
@@ -126,28 +126,28 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
       string('.')
     ).atLeast(1).tie(),
     string('°')
-  ).map(([_degSym1, result, _degSym2]) => result === 'm' || result === 'f' ? determinativ(aoBasicText(result)) : materLectionis(result)),
+  ).map(([, result,]) => result === 'm' || result === 'f' ? determinativ(aoBasicText(result)) : materLectionis(result)),
 
   numeralContent: () => regexp(/[[\d]+/).map((result) => numeralContent(aoBasicText(result))),
 
   illegible: () => string('x').result(aoIllegibleContent),
 
   sign: () => seq(string('{S:'), optWhitespace, regexp(/[^}]*/), string('}'))
-    .map(([_opening, _ws, content, _closing]) => aoSign(content)),
+    .map(([, , content,]) => aoSign(content)),
 
   kolonMark: () => seq(string('{K:'), optWhitespace, regexp(/[^}]*/), string('}'))
-    .map(([_opening, _ws, content, _closing_]) => aoKolonMark(content)),
+    .map(([, , content,]) => aoKolonMark(content)),
 
   footNote: () => seq(string('{F:'), optWhitespace, regexp(/[^}]*/), string('}'))
-    .map(([_opening, _ws, content, _closing]) => aoNote(content)),
+    .map(([, , content,]) => aoNote(content)),
 
   gap: () => seq(string('{G:'), optWhitespace, regexp(/[^}]*/), string('}'))
-    .map(([_opening, _ws, content, _closing]) => aoGap(content)),
+    .map(([, , content,]) => aoGap(content)),
 
   inscribedLetter: () => seq(
     string('x'),
     regexp(upperTextRegex).times(0, 1)
-  ).map(([_x, result]) => result.length === 0 ? indexDigit('x') : inscribedLetter(result[0])),
+  ).map(([, result]) => result.length === 0 ? indexDigit('x') : inscribedLetter(result[0])),
 
   indexDigit: () => alt(
     // FIXME: subscript!
@@ -194,7 +194,7 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
       r.specialDeterminativContent
     ),
     string('°')
-  ).map(([_deg1, content, _deg2]) => determinativ(aoBasicText(content))),
+  ).map(([, content,]) => determinativ(aoBasicText(content))),
 
   akkadogramm: r => seq(
     oneOf('_-').map((m) => m === '-' ? [m] : []),
@@ -212,7 +212,8 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
       string('.'),
       r.foreignCharacter
     ).atLeast(1),
-  ).map(([_x, /*first,*/ rest]) => sumerogramm(/*...first.flat(), */...rest.flat().flat())),
+  ).map(([, rest]) => sumerogramm(...rest.flat().flat())),
+
 
   wordContent: r => alt(r.akkadogramm, r.sumerogramm, r.simpleWordContent, r.paragraphSeparatorDouble, r.paragraphSeparator),
 
