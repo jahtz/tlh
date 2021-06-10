@@ -31,8 +31,7 @@ function AoSentenceContentRender(
     };
 
     return <>
-      <WordComponent word={sc} onClick={() => onWordClick({word: sc, paragraphIndex, wordIndex})}
-                     otherStyles={otherStyles}/>
+      <WordComponent word={sc} onClick={() => onWordClick({word: sc, paragraphIndex, wordIndex})} otherStyles={otherStyles}/>
       &nbsp;&nbsp;
     </>;
   } else if (isAOLineBreak(sc)) {
@@ -55,8 +54,8 @@ function TextContentRender(
   if (isAOParagraph(content)) {
     return <>
       {content.s.content.map((c, index) =>
-        <AoSentenceContentRender key={index} sc={c} paragraphIndex={paragraphIndex} wordIndex={index}
-                                 onWordClick={onWordClick} currentEditedWord={currentEditedWord}/>
+        <AoSentenceContentRender key={index} sc={c} paragraphIndex={paragraphIndex} wordIndex={index} onWordClick={onWordClick}
+                                 currentEditedWord={currentEditedWord}/>
       )}
     </>;
   } else if (isParagraphSeparator(content)) {

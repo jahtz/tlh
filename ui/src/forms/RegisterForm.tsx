@@ -36,11 +36,9 @@ export function RegisterForm(): JSX.Element {
           <Form>
             <Field name="username" id="username" label={t('username')} component={BulmaField}/>
 
-            <Field type="password" name="password" id="password" label={t('password')}
-                   component={BulmaField}/>
+            <Field type="password" name="password" id="password" label={t('password')} component={BulmaField}/>
 
-            <Field type="password" name="passwordRepeat" id="passwordRepeat" label={t('passwordRepeat')}
-                   component={BulmaField}/>
+            <Field type="password" name="passwordRepeat" id="passwordRepeat" label={t('passwordRepeat')} component={BulmaField}/>
 
             <Field name="name" id="name" label={t('name')} component={BulmaField}/>
 
@@ -55,8 +53,7 @@ export function RegisterForm(): JSX.Element {
             {error && <div className="notification is-danger has-text-centered">{error.message}</div>}
 
             <div className="field">
-              <button type="submit" disabled={loading || !!data?.register}
-                      className={classnames('button', 'is-link', 'is-fullwidth', {'is-loading': loading})}>
+              <button type="submit" disabled={loading || !!data?.register} className={classnames('button', 'is-link', 'is-fullwidth', {'is-loading': loading})}>
                 {t('register')}
               </button>
             </div>

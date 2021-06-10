@@ -83,8 +83,7 @@ export function UploadPicturesForm({manuscript}: ManuscriptBaseIProps): JSX.Elem
         <input type="file" className="input" onChange={selectFile} ref={fileUploadRef}/>
       </div>
       <div className="control">
-        <button className="button is-link" disabled={!state.selectedFile}
-                onClick={performUpload}>{t('uploadPicture')}</button>
+        <button className="button is-link" disabled={!state.selectedFile} onClick={performUpload}>{t('uploadPicture')}</button>
       </div>
     </div>
 

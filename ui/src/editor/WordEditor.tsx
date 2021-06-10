@@ -1,9 +1,9 @@
-import {useTranslation} from "react-i18next";
-import React, {useState} from "react";
-import {WordComponent} from "../manuscript/TransliterationLineResult";
-import {MorphAnalysisOption} from "./MorphologicalAnalysisOption";
-import {EditedWord} from "./DocumentEditor";
-import {AnalysisOption} from "../model/morphologicalAnalysis";
+import {useTranslation} from 'react-i18next';
+import React, {useState} from 'react';
+import {WordComponent} from '../manuscript/TransliterationLineResult';
+import {MorphAnalysisOption} from './MorphologicalAnalysisOption';
+import {EditedWord} from './DocumentEditor';
+import {AnalysisOption} from '../model/morphologicalAnalysis';
 import {
   isSelected,
   morphSplitCharacter,
@@ -11,7 +11,7 @@ import {
   SelectedAnalysisOption,
   selectedAnalysisOptionEquals,
   stringifySelectedAnalysisOption
-} from "./selectedAnalysisOption";
+} from './selectedAnalysisOption';
 
 
 interface WordEditorIProps {

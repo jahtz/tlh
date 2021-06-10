@@ -11,7 +11,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {StoreAction, userLoggedInAction} from '../store/actions';
 import {activeUserSelector} from '../store/store';
 
-export function LoginForm() {
+export function LoginForm(): JSX.Element {
 
   const {t} = useTranslation('common');
   const dispatch = useDispatch<Dispatch<StoreAction>>();
@@ -51,8 +51,7 @@ export function LoginForm() {
           <Form>
             <Field name="username" id="username" label={t('username')} component={BulmaField}/>
 
-            <Field type="password" name="password" id="password" label={t('password')}
-                   component={BulmaField}/>
+            <Field type="password" name="password" id="password" label={t('password')} component={BulmaField}/>
 
             {invalidLoginTry && <div className="notification is-warning has-text-centered">
               {t('invalidUsernamePasswordCombination')}.
@@ -61,8 +60,7 @@ export function LoginForm() {
             {error && <div className="notification is-danger has-text-centered">{error.message}</div>}
 
             <div className="field">
-              <button type="submit" disabled={loading}
-                      className={classnames('button', 'is-link', 'is-fullwidth', {'is-loading': loading})}>
+              <button type="submit" disabled={loading} className={classnames('button', 'is-link', 'is-fullwidth', {'is-loading': loading})}>
                 {t('login')}
               </button>
             </div>

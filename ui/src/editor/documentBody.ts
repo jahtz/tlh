@@ -1,4 +1,4 @@
-import {childElementReader, indent, readAttribute, XmlFormat, xmlLoadError, XmlLoadError} from "./xmlLib";
+import {childElementReader, indent, readAttribute, XmlFormat, xmlLoadError, XmlLoadError} from './xmlLib';
 import {failure, flattenResults, mapResult, Result, transformResult, zipResult} from '../functional/result';
 import {
   isParagraphSeparator,
@@ -6,9 +6,9 @@ import {
   ParagraphSeparatorDouble,
   paragraphSeparatorDoubleXmlFormat,
   paragraphSeparatorXmlFormat
-} from "../model/paragraphSeparators";
-import {isAOParagraph, Paragraph, paragraphFormat} from "../model/paragraph";
-import {AOManuscripts, aoManuscriptsFormat} from "../model/sentenceContent/aoManuscripts";
+} from '../model/paragraphSeparators';
+import {isAOParagraph, Paragraph, paragraphFormat} from '../model/paragraph';
+import {AOManuscripts, aoManuscriptsFormat} from '../model/sentenceContent/aoManuscripts';
 
 export interface AOBody {
   type: 'AOBody';
@@ -54,7 +54,7 @@ const aoDiv1Format: XmlFormat<AODiv1> = {
     ...aoTextFormat.write(text).map(indent),
     '</div1>'
   ]
-}
+};
 
 function aoDiv1(text: AOText, type: string): AODiv1 {
   return {text, type};
@@ -68,14 +68,14 @@ export type AOTextContent = ParagraphSeparator | ParagraphSeparatorDouble | Para
 const aoTextContentFormat: XmlFormat<AOTextContent> = {
   read: (el) => {
     switch (el.tagName) {
-      case 'p':
-        return paragraphFormat.read(el);
-      case 'parsep':
-        return paragraphSeparatorXmlFormat.read(el);
-      case 'parsep_dbl':
-        return paragraphSeparatorDoubleXmlFormat.read(el);
-      default:
-        return failure([xmlLoadError(`Found illegal tag name ${el.tagName}`, [el.tagName])]);
+    case 'p':
+      return paragraphFormat.read(el);
+    case 'parsep':
+      return paragraphSeparatorXmlFormat.read(el);
+    case 'parsep_dbl':
+      return paragraphSeparatorDoubleXmlFormat.read(el);
+    default:
+      return failure([xmlLoadError(`Found illegal tag name ${el.tagName}`, [el.tagName])]);
     }
   },
   write: (tc) => {
@@ -87,7 +87,7 @@ const aoTextContentFormat: XmlFormat<AOTextContent> = {
       return paragraphSeparatorDoubleXmlFormat.write(tc);
     }
   }
-}
+};
 
 
 export interface AOText {
@@ -111,7 +111,7 @@ const aoTextFormat: XmlFormat<AOText> = {
     ...content.flatMap(aoTextContentFormat.write).map(indent),
     '</text>'
   ]
-}
+};
 
 function aoText(content: AOTextContent[]): AOText {
   return {type: 'AOText', content};

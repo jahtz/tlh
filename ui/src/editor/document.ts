@@ -1,7 +1,7 @@
-import {AOBody, aoBodyFormat} from "./documentBody";
-import {AOHeader, aoHeaderFormat} from "./documentHeader";
-import {childElementReader, indent, XmlFormat, xmlLoadError} from "./xmlLib";
-import {transformResult, zipResult} from "../functional/result";
+import {AOBody, aoBodyFormat} from './documentBody';
+import {AOHeader, aoHeaderFormat} from './documentHeader';
+import {childElementReader, indent, XmlFormat, xmlLoadError} from './xmlLib';
+import {transformResult, zipResult} from '../functional/result';
 
 interface GenericAttribute {
   name: string;
@@ -13,7 +13,7 @@ function genericAttribute(name: string, value: string): GenericAttribute {
 }
 
 function extractGenericAttributes(el: Element): GenericAttribute[] {
-  return Array.from(el.attributes).map(({name, value}) => genericAttribute(name, value))
+  return Array.from(el.attributes).map(({name, value}) => genericAttribute(name, value));
 }
 
 // AOXml
@@ -36,7 +36,7 @@ export const aoXmlFormat: XmlFormat<AOXml> = {
   ),
   write: ({attributes, aoHeader, body}) => [
     '<?xml-stylesheet href="HPMxml.css" type="text/css"?>',
-    `<!DOCTYPE AOxml SYSTEM "annot.dtd">`,
+    '<!DOCTYPE AOxml SYSTEM "annot.dtd">',
     '<AOxml',
     ...attributes.map(({name, value}) => `${name}="${value}"`).map(indent),
     '>',
@@ -44,8 +44,8 @@ export const aoXmlFormat: XmlFormat<AOXml> = {
     ...aoBodyFormat.write(body).map(indent),
     '</AOxml>'
   ]
-}
+};
 
 function aoXml(attributes: GenericAttribute[], aoHeader: AOHeader, body: AOBody): AOXml {
-  return {type: 'AOXml', attributes, aoHeader, body}
+  return {type: 'AOXml', attributes, aoHeader, body};
 }

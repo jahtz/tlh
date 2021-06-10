@@ -27,7 +27,7 @@ function newManuscriptIdentifier(): ManuscriptIdentifierInput {
   };
 }
 
-export function CreateManuscriptForm() {
+export function CreateManuscriptForm(): JSX.Element {
 
   const {t} = useTranslation('common');
   const [createManuscript, {data, loading, error}] = useCreateManuscriptMutation();
@@ -145,17 +145,14 @@ export function CreateManuscriptForm() {
                 </ErrorMessage>
               </div>
 
-              <Field name="provenance" id="provenance" label={t('provenance')} list="provenances"
-                     component={BulmaField}/>
+              <Field name="provenance" id="provenance" label={t('provenance')} list="provenances" component={BulmaField}/>
               <datalist id="provenances">
                 {allKnownProvenances.map(({englishName}) => <option key={englishName} value={englishName}/>)}
               </datalist>
 
-              <Field type="number" name="cthClassification" id="cthClassification"
-                     label={t('(proposed)CthClassification')} component={BulmaField}/>
+              <Field type="number" name="cthClassification" id="cthClassification" label={t('(proposed)CthClassification')} component={BulmaField}/>
 
-              <Field name="bibliography" id="bibliography" label={t('bibliography')}
-                     component={BulmaField} asTextArea={true}/>
+              <Field name="bibliography" id="bibliography" label={t('bibliography')} component={BulmaField} asTextArea={true}/>
 
               {error && <div className="notification is-danger has-text-centered">{error.message}</div>}
 
