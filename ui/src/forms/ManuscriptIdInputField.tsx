@@ -30,8 +30,7 @@ export function ManuscriptIdInputField({mainId, deleteFunc, value, errors, touch
     <>
       <div className="field has-addons">
         <div className="control is-expanded">
-          <Field id={`${mainId}.identifier`} name={`${mainId}.identifier`} value={value?.identifier}
-                 className={identifierClassName} placeholder={t('Identifikator')}/>
+          <Field id={`${mainId}.identifier`} name={`${mainId}.identifier`}  className={identifierClassName} placeholder={t('Identifikator')}/>
         </div>
         <div className="control">
           <div className={identifierTypeClassName}>
