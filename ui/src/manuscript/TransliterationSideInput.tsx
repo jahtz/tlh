@@ -8,7 +8,7 @@ import {BulmaObjectSelect, SelectOption, selectOption} from '../forms/BulmaField
 import {Transliteration} from './TransliterationLineResult';
 import {transliterationLine, TransliterationLine, xmlifyTransliterationLine} from '../model/transliterationLine';
 import {ManuscriptSide, TransliterationInput} from '../generated/graphql';
-import {BulmaTabs, TabConfig} from '../BulmaTabs';
+import {BulmaTabs, Tabs} from '../BulmaTabs';
 import {getNameForManuscriptSide, manuscriptSides} from '../model/manuscriptProperties/manuscriptSide';
 import {LineParseResult} from '../model/lineParseResult';
 import {aoLineBreak} from '../model/sentenceContent/linebreak';
@@ -44,14 +44,18 @@ function SideParseResultComponent({mainIdentifier, sideParseResult}: SideParseRe
 
   const {t} = useTranslation('common');
 
-  const tabConfigs: TabConfig[] = [
-    {id: 'rendered', name: t('rendered'), render: () => <Transliteration lines={sideParseResult.lineResults}/>},
-    {
-      id: 'asXml', name: t('asXml'), render: () => <div className="box">
+  const tabConfigs: Tabs = {
+    rendered: {
+      name: t('rendered'),
+      render: () => <Transliteration lines={sideParseResult.lineResults}/>
+    },
+    asXml: {
+      name: t('asXml'),
+      render: () => <div className="box">
         {exportAsXml(mainIdentifier, sideParseResult).map((line, index) => <p key={index}>{line}</p>)}
       </div>
     }
-  ];
+  };
 
   return <BulmaTabs tabs={tabConfigs}/>;
 }
