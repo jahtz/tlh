@@ -1,17 +1,7 @@
-export interface XmlAttribute {
-  __type: 'XmlAttribute';
-  name: string;
-  value: string;
-}
-
-function xmlAttribute(name: string, value: string): XmlAttribute {
-  return {__type: 'XmlAttribute', name, value};
-}
-
 export interface XmlElementNode {
   __type: 'XmlElementNode';
   tagName: string;
-  attributes: XmlAttribute[]; // TODO: { [name: string] }
+  attributes: Attributes;
   children: XmlNode[];
 }
 
@@ -24,6 +14,10 @@ export type XmlNode = XmlElementNode | XmlTextNode;
 
 // Read, Write
 
+interface Attributes {
+  [name: string]: string;
+}
+
 export function loadNode(el: ChildNode): XmlNode {
   if (el instanceof Text) {
     return {__type: 'XmlTextNode', textContent: el.textContent || ''};
@@ -31,14 +25,15 @@ export function loadNode(el: ChildNode): XmlNode {
     return {
       __type: 'XmlElementNode',
       tagName: el.tagName,
-      attributes: Array.from(el.attributes).map(({name, value}) => xmlAttribute(name, value)),
+      attributes: Array.from(el.attributes).reduce<Attributes>((acc, {name, value}) => {
+        return {...acc, [name]: value};
+      }, {}),
       children: Array.from(el.childNodes).map(loadNode)
     };
   } else {
     throw new Error(`unexpected element: ${el.nodeType}`);
   }
 }
-
 
 // Old version
 

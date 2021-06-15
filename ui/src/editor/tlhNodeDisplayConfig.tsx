@@ -10,10 +10,10 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfig = {
 
   // Words
   'w': xmlEditableNode(
-    (props) => <WordNodeEditor props={props}/>,
+    (props) => <WordNodeEditor props={props} key={props.path.join('.')}/>,
     (node) => {
-      const selectedMorph = node.attributes.find(({name}) => name === 'mrp0sel');
-      return selectedMorph && selectedMorph.value.trim().length > 0 ? [] : ['is-underlined'];
+      const selectedMorph = node.attributes.mrp0sel;
+      return selectedMorph && selectedMorph.trim().length > 0 ? [] : ['is-underlined'];
     }
   ),
 

@@ -18,9 +18,11 @@ export function DisplayNode({node, currentNode, displayConfig = tlhNodeDisplayCo
 
   const currentConfig = displayConfig[node.tagName];
 
-  const renderedChildren = <>{node.children.map((c, i) =>
-    <DisplayNode key={i} node={c} currentNode={currentNode} displayConfig={displayConfig} onEdit={onEdit} path={[...path, i]}/>
-  )}</>;
+  const renderedChildren = <>
+    {node.children.map((c, i) =>
+      <DisplayNode key={i} node={c} currentNode={currentNode} displayConfig={displayConfig} onEdit={onEdit} path={[...path, i]}/>
+    )}
+  </>;
 
   if (!currentConfig) {
     return renderedChildren;

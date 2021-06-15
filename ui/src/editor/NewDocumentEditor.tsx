@@ -10,52 +10,59 @@ export interface NodeEditorIProps {
   displayConfig?: XmlNodeDisplayConfig;
 }
 
-interface IState {
+interface IEditState {
   editConfig: XmlEditableNode;
-  editedNode: XmlElementNode;
-  renderedChildren: JSX.Element;
-  path: number[];
+  editProps: {
+    node: XmlElementNode;
+    renderedChildren: JSX.Element;
+    path: number[]
+  };
 }
 
-export function NewDocumentEditor({node, displayConfig = tlhNodeDisplayConfig}: NodeEditorIProps): JSX.Element {
+interface IState {
+  rootNode: XmlNode;
+  editState?: IEditState;
+}
+
+export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDisplayConfig}: NodeEditorIProps): JSX.Element {
 
   const {t} = useTranslation('common');
-  const [rootNode, setRootNode] = useState(node);
-  const [state, setState] = useState<IState | undefined>();
+  const [state, setState] = useState<IState>({rootNode: initialNode});
 
-  const onEdit: EditTriggerFunc = (editedNode, renderedChildren, editConfig, path) => {
-    setState({editedNode, renderedChildren, editConfig, path});
-  };
+  const onEdit: EditTriggerFunc = (node, renderedChildren, editConfig, path) =>
+    setState(({rootNode}) => {
+      return {rootNode, editState: {editConfig, editProps: {node, renderedChildren, path}}};
+    });
 
   const updateNode: UpdateNode = (node, path) => {
-    setRootNode((currentRootNode) => {
-      let nodeToUpdate: XmlElementNode = currentRootNode as XmlElementNode;
-      path.slice(0, -1).forEach((pathContent) => {
-        nodeToUpdate = nodeToUpdate.children[pathContent] as XmlElementNode;
-      });
+    setState(({rootNode, editState}) => {
+
+      const nodeToUpdate = path.slice(0, -1).reduce<XmlElementNode>(
+        (nodeToUpdate, pathContent) => nodeToUpdate.children[pathContent] as XmlElementNode,
+        rootNode as XmlElementNode
+      );
 
       nodeToUpdate.children[path[path.length]] = node;
 
-      return currentRootNode;
+      return {rootNode, editState};
     });
-    // setState(undefined);
   };
 
   function exportXml(): void {
-    console.info('TODO: export xml...');
+    console.error('TODO: export xml...');
   }
 
   return (
     <div className="columns">
       <div className="column">
         <div className="box hittite">
-          <DisplayNode node={rootNode} currentNode={state?.editedNode} displayConfig={displayConfig} onEdit={onEdit} path={[]}/>
+          <DisplayNode node={state.rootNode} currentNode={state.editState?.editProps.node} displayConfig={displayConfig} onEdit={onEdit} path={[]}/>
         </div>
 
         <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>
       </div>
       <div className="column">
-        {state && state.editConfig.edit({node: state.editedNode, renderedChildren: state.renderedChildren, updateNode, path: state.path})}
+        {state.editState && state.editState.editConfig.edit({...state.editState.editProps, updateNode})}
       </div>
     </div>
   );
