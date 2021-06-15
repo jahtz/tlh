@@ -82,7 +82,7 @@ export function BulmaObjectSelect<T>({label, id, currentValue, options, onUpdate
     <div className="control">
       <div className="select is-fullwidth">
         <select id={id} onChange={onValueChange} defaultValue={currentValueLabel}>
-          {options.map(({value, label}, index) =>
+          {options.map(({/*value,*/ label}, index) =>
             <option key={index}>{label}</option>
           )}
         </select>

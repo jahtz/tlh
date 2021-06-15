@@ -1,14 +1,12 @@
-import {readAttribute, XmlFormat} from '../../editor/xmlLib';
+import {XmlWriter} from '../../editor/xmlModel';
 import {AOWordContent} from './wordContent';
-import {success} from '../../functional/result';
 
 export interface AOSpace {
   type: 'AOSpace';
   c: string;
 }
 
-export const aoSpaceFormat: XmlFormat<AOSpace> = {
-  read: (el) => success(aoSpace(readAttribute(el, 'c', (v) => v || ''))),
+export const aoSpaceFormat: XmlWriter<AOSpace> = {
   write: ({c}) => [`<space c="${c}"/>`]
 };
 

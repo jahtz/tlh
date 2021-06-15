@@ -1,54 +1,25 @@
 import React, {useState} from 'react';
 import {XmlElementNode, XmlNode} from './xmlModel';
 import {EditTriggerFunc, UpdateNode, XmlEditableNode, XmlNodeDisplayConfig} from './xmlDisplayConfigs';
-import classNames from 'classnames';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
+import {DisplayNode} from './NodeDisplay';
+import {useTranslation} from 'react-i18next';
 
-interface IProps {
+export interface NodeEditorIProps {
   node: XmlNode;
   displayConfig?: XmlNodeDisplayConfig;
 }
 
-interface NodeDisplayIProps extends IProps {
-  currentNode?: XmlElementNode;
-  onEdit: (node: XmlElementNode, renderedChildren: JSX.Element, e: XmlEditableNode, path: number[]) => void;
-  path: number[];
-}
-
-function DisplayNode({node, currentNode, displayConfig = tlhNodeDisplayConfig, onEdit, path}: NodeDisplayIProps): JSX.Element {
-  if (node.__type === 'XmlTextNode') {
-    return <span>{node.textContent}</span>;
-  }
-
-  const currentConfig = displayConfig[node.tagName];
-
-  const renderedChildren = <>{node.children.map((c, i) =>
-    <DisplayNode key={i} node={c} currentNode={currentNode} displayConfig={displayConfig} onEdit={onEdit} path={[...path, i]}/>
-  )}</>;
-
-  if (!currentConfig) {
-    return renderedChildren;
-  } else if (currentConfig.__type === 'XmlNodeReplacement') {
-    return currentConfig.f(node);
-  } else if (currentConfig.__type === 'XmlNodeStyling') {
-    return <span className={classNames(currentConfig.f(node))}>{renderedChildren}</span>;
-  } else {
-    // Editable node!
-    const classes = currentConfig.styling ? currentConfig.styling(node) : [];
-
-    return <span className={classNames(classes)} onClick={() => onEdit(node, renderedChildren, currentConfig, path)}>{renderedChildren}</span>;
-  }
-}
-
 interface IState {
+  editConfig: XmlEditableNode;
   editedNode: XmlElementNode;
   renderedChildren: JSX.Element;
-  editConfig: XmlEditableNode;
   path: number[];
 }
 
-export function NewDocumentEditor({node, displayConfig = tlhNodeDisplayConfig}: IProps): JSX.Element {
+export function NewDocumentEditor({node, displayConfig = tlhNodeDisplayConfig}: NodeEditorIProps): JSX.Element {
 
+  const {t} = useTranslation('common');
   const [rootNode, setRootNode] = useState(node);
   const [state, setState] = useState<IState | undefined>();
 
@@ -67,11 +38,11 @@ export function NewDocumentEditor({node, displayConfig = tlhNodeDisplayConfig}: 
 
       return currentRootNode;
     });
-    setState(undefined);
+    // setState(undefined);
   };
 
-  function cancelEdit(): void {
-    setState(undefined);
+  function exportXml(): void {
+    console.info('TODO: export xml...');
   }
 
   return (
@@ -80,9 +51,11 @@ export function NewDocumentEditor({node, displayConfig = tlhNodeDisplayConfig}: 
         <div className="box hittite">
           <DisplayNode node={rootNode} currentNode={state?.editedNode} displayConfig={displayConfig} onEdit={onEdit} path={[]}/>
         </div>
+
+        <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>
       </div>
       <div className="column">
-        {state && state.editConfig.edit({node: state.editedNode, renderedChildren: state.renderedChildren, updateNode, cancelEdit, path: state.path})}
+        {state && state.editConfig.edit({node: state.editedNode, renderedChildren: state.renderedChildren, updateNode, path: state.path})}
       </div>
     </div>
   );

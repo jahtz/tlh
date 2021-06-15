@@ -1,4 +1,3 @@
-import React from 'react';
 import {XmlElementNode} from './xmlModel';
 
 interface XmlNodeReplacement {
@@ -29,7 +28,6 @@ export interface XmlEditableNodeIProps {
   node: XmlElementNode;
   renderedChildren: JSX.Element;
   updateNode: UpdateNode;
-  cancelEdit: () => void;
   path: number[];
 }
 

@@ -39,3 +39,13 @@ export function loadNode(el: ChildNode): XmlNode {
   }
 }
 
+
+// Old version
+
+export interface XmlWriter<T> {
+  write: (t: T) => string[];
+}
+
+export function indent(s: string): string {
+  return ' '.repeat(2) + s;
+}

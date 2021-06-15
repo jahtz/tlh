@@ -3,7 +3,7 @@ import {lineParseResult, LineParseResult} from '../model/lineParseResult';
 import {AOSign, aoSign} from '../model/wordContent/sign';
 import {damageContent, DamageContent, DamageType} from '../model/wordContent/damages';
 import {aoCorr, AOCorr} from '../model/wordContent/corrections';
-import {paragraphSeparator, ParagraphSeparator, paragraphSeparatorDouble, ParagraphSeparatorDouble} from '../model/paragraphSeparators';
+import {paragraphSeparator, ParagraphSeparator, paragraphSeparatorDouble, ParagraphSeparatorDouble} from '../model/paragraph';
 import {AODeterminativ, determinativ,} from '../model/wordContent/determinativ';
 import {akkadogramm, AOAkkadogramm} from '../model/wordContent/akkadogramm';
 import {AOSumerogramm, sumerogramm} from '../model/wordContent/sumerogramm';

@@ -1,14 +1,12 @@
-import {XmlFormat} from '../../editor/xmlLib';
+import {XmlWriter} from '../../editor/xmlModel';
 import {AOWordContent} from './wordContent';
-import {success} from '../../functional/result';
 
 export interface AOSign {
   type: 'AOSign'
   content: string;
 }
 
-export const aoSignFormat: XmlFormat<AOSign> = {
-  read: (el) => success(aoSign(el.textContent || '')),
+export const aoSignFormat: XmlWriter<AOSign> = {
   write: ({content}) => [`<AO:Sign>${content}</AO:Sign>`]
 };
 

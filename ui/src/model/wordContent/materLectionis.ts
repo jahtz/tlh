@@ -1,6 +1,5 @@
-import {XmlFormat} from '../../editor/xmlLib';
+import {XmlWriter} from '../../editor/xmlModel';
 import {AOWordContent} from './wordContent';
-import {success} from '../../functional/result';
 
 /**
  * Mater lectionis:
@@ -15,8 +14,7 @@ export function materLectionis(content: string): AOMaterLectionis {
   return {type: 'AOMaterLectionis', content};
 }
 
-export const materLectionisFormat: XmlFormat<AOMaterLectionis> = {
-  read: (el) => success(materLectionis(el.textContent || '')),
+export const materLectionisFormat: XmlWriter<AOMaterLectionis> = {
   write: ({content}) => [`<SP___AO_3a_MaterLect>${content}</SP___AO_3a_MaterLect>`]
 };
 

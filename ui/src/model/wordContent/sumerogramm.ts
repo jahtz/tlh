@@ -3,9 +3,8 @@
 // - im Wortinnern durch vorausgehendes `--` markiert
 
 import {AOWordContent} from './wordContent';
-import {XmlFormat} from '../../editor/xmlLib';
-import {flattenResults, transformResult} from '../../functional/result';
-import {clearUpperMultiStringContent, readMultiWordContent, UpperMultiStringContent, writeMultiWordContent} from './multiStringContent';
+import {XmlWriter} from '../../editor/xmlModel';
+import {clearUpperMultiStringContent, UpperMultiStringContent, writeMultiWordContent} from './multiStringContent';
 
 export interface AOSumerogramm {
   type: 'AOSumerogramm';
@@ -16,12 +15,7 @@ export function sumerogramm(...contents: (UpperMultiStringContent | string)[]): 
   return {type: 'AOSumerogramm', contents: contents.map(clearUpperMultiStringContent)};
 }
 
-export const sumerogrammFormat: XmlFormat<AOSumerogramm> = {
-  read: (el) => transformResult(
-    flattenResults(Array.from(el.childNodes).map(readMultiWordContent)),
-    (content) => sumerogramm(...content),
-    (errors) => errors.flat()
-  ),
+export const sumerogrammFormat: XmlWriter<AOSumerogramm> = {
   write: ({contents}) => [`<sGr>${contents.flatMap(writeMultiWordContent).join('')}</sGr>`]
 };
 

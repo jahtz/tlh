@@ -1,7 +1,6 @@
-import {XmlFormat} from '../../editor/xmlLib';
+import {XmlWriter} from '../../editor/xmlModel';
 import {AOWordContent} from './wordContent';
-import {flattenResults, transformResult} from '../../functional/result';
-import {clearUpperMultiStringContent, readMultiWordContent, UpperMultiStringContent, writeMultiWordContent} from './multiStringContent';
+import {clearUpperMultiStringContent, UpperMultiStringContent, writeMultiWordContent} from './multiStringContent';
 
 /*
  * Zahl
@@ -15,12 +14,7 @@ export function numeralContent(...content: (UpperMultiStringContent | string)[])
   return {type: 'AONumeralContent', content: content.map(clearUpperMultiStringContent)};
 }
 
-export const numeralContentFormat: XmlFormat<AONumeralContent> = {
-  read: (el) => transformResult(
-    flattenResults(Array.from(el.childNodes).map(readMultiWordContent)),
-    (content) => numeralContent(...content),
-    (errors) => errors.flat()
-  ),
+export const numeralContentFormat: XmlWriter<AONumeralContent> = {
   write: ({content}) => [`<num>${content.flatMap(writeMultiWordContent).join('')}</num>`]
 };
 

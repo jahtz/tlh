@@ -1,7 +1,6 @@
-import {readAttribute, XmlFormat} from '../../editor/xmlLib';
+import {XmlWriter} from '../../editor/xmlModel';
 import {AOSentenceContent} from '../sentence';
 import {AOWord, aoWordFormat} from './word';
-import {success} from '../../functional/result';
 
 export interface AOLineBreak {
   type: 'AOLineBreak';
@@ -13,15 +12,7 @@ export interface AOLineBreak {
   words: AOWord[]
 }
 
-export const aoLineBreakFormat: XmlFormat<AOLineBreak> = {
-  read: (el) => success(
-    aoLineBreak(
-      readAttribute(el, 'txtid', (v) => v || ''),
-      readAttribute(el, 'lnr', (v) => v || ''),
-      readAttribute(el, 'lg', (v) => v || ''),
-      []
-    )
-  ),
+export const aoLineBreakFormat: XmlWriter<AOLineBreak> = {
   write: ({textId, side, column, lineNumber, language, words}) =>
     [`<lb lg="${language}" lnr="${lineNumber}" txtid="${textId}"/>`, ...words.flatMap((w) => aoWordFormat.write(w))]
 };

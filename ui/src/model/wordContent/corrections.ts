@@ -1,5 +1,4 @@
-import {XmlFormat} from '../../editor/xmlLib';
-import {success} from '../../functional/result';
+import {XmlWriter} from '../../editor/xmlModel';
 import {AOWordContent} from './wordContent';
 
 export interface AOCorr {
@@ -7,8 +6,7 @@ export interface AOCorr {
   c: string;
 }
 
-export const aoCorrFormat: XmlFormat<AOCorr> = {
-  read: (el) => success(aoCorr(el.getAttribute('c') || '')),
+export const aoCorrFormat: XmlWriter<AOCorr> = {
   write: ({c}) => [`<corr c="${c}"/>`]
 };
 

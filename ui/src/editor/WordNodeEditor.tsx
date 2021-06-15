@@ -15,7 +15,7 @@ import {MorphAnalysisOption} from './MorphologicalAnalysisOption';
 
 const morphologyAttributeNameRegex = /^mrp(\d+)$/;
 
-export function WordNodeEditor({props: {node, renderedChildren, updateNode,/* cancelEdit,*/ path}}: { props: XmlEditableNodeIProps }): JSX.Element {
+export function WordNodeEditor({props: {node, renderedChildren, updateNode, path}}: { props: XmlEditableNodeIProps }): JSX.Element {
 
   const initialSelectedMorphologies: SelectedAnalysisOption[] = readSelectedMorphology(
     node.attributes.find(({name}) => name === 'mrp0sel')?.value?.trim() || ''
