@@ -16,7 +16,6 @@ import {isIllegibleContent} from '../model/wordContent/illegible';
 import {isSpace} from '../model/wordContent/space';
 import {isEllipsis} from '../model/wordContent/ellipsis';
 import {isBasicText} from '../model/wordContent/basicText';
-import classNames from 'classnames';
 
 function renderSimpleWordContent(content: AOSimpleWordContent): JSX.Element {
   if (isMaterLectionis(content)) {
@@ -71,13 +70,10 @@ function renderWordContent(content: AOWordContent): JSX.Element {
 interface WordComponentIProps {
   word: AOWord;
   onClick?: () => void;
-  otherStyles?: { [key: string]: any };
 }
 
-export function WordComponent(
-  {word: {transliteration, content}, onClick, otherStyles}: WordComponentIProps
-): JSX.Element {
-  return <span onClick={onClick} className={classNames(otherStyles)}>
+export function WordComponent({word: {transliteration, content}, onClick}: WordComponentIProps): JSX.Element {
+  return <span onClick={onClick}>
     {content.length > 0
       ? content.map((c, i) => <span className="hittite" key={i}>{renderWordContent(c)}</span>)
       : <span className="has-text-danger">{transliteration}</span>}

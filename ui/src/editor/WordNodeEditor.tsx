@@ -11,17 +11,23 @@ import {useTranslation} from 'react-i18next';
 import React, {useState} from 'react';
 import {AnalysisOption, MorphologicalAnalysis, readMorphAnalysis} from '../model/morphologicalAnalysis';
 import {MorphAnalysisOption} from './MorphologicalAnalysisOption';
+import {DisplayNode} from './NodeDisplay';
+import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 
 const morphologyAttributeNameRegex = /^mrp(\d+)$/;
 
-export function WordNodeEditor({props: {node, renderedChildren, updateNode, path}}: { props: XmlEditableNodeIProps }): JSX.Element {
+interface IProps {
+  props: XmlEditableNodeIProps;
+}
+
+export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNodes}}: IProps): JSX.Element {
 
   const initialSelectedMorphologies: SelectedAnalysisOption[] = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
 
   const {t} = useTranslation('common');
   const [selectedMorphologies, setSelectedMorphologies] = useState<SelectedAnalysisOption[]>(initialSelectedMorphologies);
 
-  const morphologies = Object.entries(node.attributes)
+  const morphologies: MorphologicalAnalysis[] = Object.entries(node.attributes)
     .map(([name, value]) => {
       const match = name.trim().match(morphologyAttributeNameRegex);
 
@@ -46,7 +52,6 @@ export function WordNodeEditor({props: {node, renderedChildren, updateNode, path
 
   function handleUpdate(): void {
     node.attributes.mrp0sel = selectedMorphologies.map(stringifySelectedAnalysisOption).join(morphSplitCharacter);
-
     updateNode(node, path);
   }
 
@@ -62,7 +67,10 @@ export function WordNodeEditor({props: {node, renderedChildren, updateNode, path
 
   return (
     <div>
-      <div className="box has-text-centered">{renderedChildren}</div>
+      <div className="box has-text-centered">
+        {node.children.map((c, i) => <DisplayNode key={i} onEdit={() => {
+        }} path={[]} currentSelectedPath={undefined} node={c} displayConfig={tlhNodeDisplayConfig}/>)}
+      </div>
 
       {morphologies.map((m, index) =>
         <MorphAnalysisOption key={index} ma={m} selectedOption={selectedMorphologies} updateSelected={updateSelected}/>
@@ -84,12 +92,21 @@ export function WordNodeEditor({props: {node, renderedChildren, updateNode, path
           })}
         </div>
 
-        <div className="level">
-          <div className="level-item">
+        <div className="columns">
+          <div className="column">
             <button onClick={resetMorphAnalysis} className="button is-warning is-fullwidth">{t('resetMorphAnalysis')}</button>
           </div>
-          <div className="level-item">
+          <div className="column">
             <button onClick={handleUpdate} className="button is-link is-fullwidth">{t('updateMorphAnalysis')}</button>
+          </div>
+        </div>
+
+        <div className="columns">
+          <div className="column">
+            <button className="button is-fullwidth" onClick={() => jumpEditableNodes(node.tagName, false)}>{t('previousEditable')}</button>
+          </div>
+          <div className="column">
+            <button className="button is-fullwidth" onClick={() => jumpEditableNodes(node.tagName, true)}>{t('nextEditable')}</button>
           </div>
         </div>
 

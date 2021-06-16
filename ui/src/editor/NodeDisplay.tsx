@@ -1,17 +1,18 @@
-import {XmlElementNode} from './xmlModel';
-import {XmlEditableNode} from './xmlDisplayConfigs';
+import {XmlNode} from './xmlModel';
+import {EditTriggerFunc, XmlNodeDisplayConfig} from './xmlDisplayConfigs';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 import classNames from 'classnames';
 import React from 'react';
-import {NodeEditorIProps} from './NewDocumentEditor';
 
-interface NodeDisplayIProps extends NodeEditorIProps {
-  currentNode?: XmlElementNode;
-  onEdit: (node: XmlElementNode, renderedChildren: JSX.Element, e: XmlEditableNode, path: number[]) => void;
+interface NodeDisplayIProps {
+  node: XmlNode;
+  displayConfig?: XmlNodeDisplayConfig;
+  currentSelectedPath: number[] | undefined;
+  onEdit: EditTriggerFunc;
   path: number[];
 }
 
-export function DisplayNode({node, currentNode, displayConfig = tlhNodeDisplayConfig, onEdit, path}: NodeDisplayIProps): JSX.Element {
+export function DisplayNode({node, currentSelectedPath, displayConfig = tlhNodeDisplayConfig, onEdit, path}: NodeDisplayIProps): JSX.Element {
   if (node.__type === 'XmlTextNode') {
     return <span>{node.textContent}</span>;
   }
@@ -20,7 +21,7 @@ export function DisplayNode({node, currentNode, displayConfig = tlhNodeDisplayCo
 
   const renderedChildren = <>
     {node.children.map((c, i) =>
-      <DisplayNode key={i} node={c} currentNode={currentNode} displayConfig={displayConfig} onEdit={onEdit} path={[...path, i]}/>
+      <DisplayNode key={i} node={c} displayConfig={displayConfig} currentSelectedPath={currentSelectedPath} onEdit={onEdit} path={[...path, i]}/>
     )}
   </>;
 
@@ -29,11 +30,11 @@ export function DisplayNode({node, currentNode, displayConfig = tlhNodeDisplayCo
   } else if (currentConfig.__type === 'XmlNodeReplacement') {
     return currentConfig.f(node);
   } else if (currentConfig.__type === 'XmlNodeStyling') {
-    return <span className={classNames(currentConfig.f(node))}>{renderedChildren}</span>;
+    return <span className={classNames(currentConfig.f(node, path, currentSelectedPath))}>{renderedChildren}</span>;
   } else {
     // Editable node!
-    const classes = currentConfig.styling ? currentConfig.styling(node) : [];
+    const classes = currentConfig.styling ? currentConfig.styling(node, path, currentSelectedPath) : [];
 
-    return <span className={classNames(classes)} onClick={() => onEdit(node, renderedChildren, currentConfig, path)}>{renderedChildren}</span>;
+    return <span className={classNames(classes)} onClick={() => onEdit(node, path)}>{renderedChildren}</span>;
   }
 }

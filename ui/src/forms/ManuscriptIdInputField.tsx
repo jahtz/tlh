@@ -7,12 +7,11 @@ import classnames from 'classnames';
 interface IProps {
   mainId: string;
   deleteFunc?: () => void;
-  value?: ManuscriptIdentifierInput | null;
   errors: FormikErrors<ManuscriptIdentifierInput> | undefined;
   touched: FormikTouched<ManuscriptIdentifierInput> | undefined;
 }
 
-export function ManuscriptIdInputField({mainId, deleteFunc, value, errors, touched}: IProps): JSX.Element {
+export function ManuscriptIdInputField({mainId, deleteFunc, errors, touched}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -30,7 +29,7 @@ export function ManuscriptIdInputField({mainId, deleteFunc, value, errors, touch
     <>
       <div className="field has-addons">
         <div className="control is-expanded">
-          <Field id={`${mainId}.identifier`} name={`${mainId}.identifier`}  className={identifierClassName} placeholder={t('Identifikator')}/>
+          <Field id={`${mainId}.identifier`} name={`${mainId}.identifier`} className={identifierClassName} placeholder={t('Identifikator')}/>
         </div>
         <div className="control">
           <div className={identifierTypeClassName}>

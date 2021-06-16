@@ -54,7 +54,6 @@ export function CreateManuscriptForm(): JSX.Element {
   };
 
   function handleSubmit(manuscriptMetaData: ManuscriptMetaDataInput): void {
-    // noinspection JSIgnoredPromiseFromCall
     createManuscript({variables: {manuscriptMetaData}})
       .catch((e) => console.error(e));
   }
@@ -72,8 +71,7 @@ export function CreateManuscriptForm(): JSX.Element {
               <div className="field">
                 <label className="label">{t('mainIdentifier')}*:</label>
                 <div className="control">
-                  <ManuscriptIdInputField mainId="mainIdentifier" value={values.mainIdentifier}
-                                          errors={errors.mainIdentifier} touched={touched.mainIdentifier}/>
+                  <ManuscriptIdInputField mainId="mainIdentifier" errors={errors.mainIdentifier} touched={touched.mainIdentifier}/>
                 </div>
               </div>
 
@@ -86,7 +84,6 @@ export function CreateManuscriptForm(): JSX.Element {
                         {values.otherIdentifiers!.map((otherIdentifier: ManuscriptIdentifierInput, index: number) =>
                           <ManuscriptIdInputField
                             mainId={`otherIdentifiers.${index}`} key={index}
-                            value={otherIdentifier}
                             deleteFunc={() => arrayHelpers.remove(index)}
                             errors={errors.otherIdentifiers ? errors.otherIdentifiers[index] as FormikErrors<ManuscriptIdentifierInput> : undefined}
                             touched={touched.otherIdentifiers ? touched.otherIdentifiers[index] : undefined}/>

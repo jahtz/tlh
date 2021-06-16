@@ -1,4 +1,5 @@
 import {XmlElementNode} from './xmlModel';
+import {Argument as ClassNamesArgument} from 'classnames';
 
 interface XmlNodeReplacement {
   __type: 'XmlNodeReplacement';
@@ -12,41 +13,42 @@ export function nodeReplacement(f: (n: XmlElementNode) => JSX.Element): XmlNodeR
 
 interface XmlNodeStyling {
   __type: 'XmlNodeStyling';
-  f: (n: XmlElementNode) => string[];
+  f: NodeStylingFunc;
 }
 
 export function nodeStyling(f: (n: XmlElementNode) => string[]): XmlNodeStyling {
   return {__type: 'XmlNodeStyling', f};
 }
 
+export type NodeStylingFunc = (node: XmlElementNode, path: number[], currentSelectedPath?: number[]) => ClassNamesArgument;
 
-export type EditTriggerFunc = (editedNode: XmlElementNode, renderedChildren: JSX.Element, editConfig: XmlEditableNode, path: number[]) => void;
+export type EditTriggerFunc = (node: XmlElementNode, path: number[]) => void;
 
 export type UpdateNode = (node: XmlElementNode, path: number[]) => void;
 
 export interface XmlEditableNodeIProps {
   node: XmlElementNode;
-  renderedChildren: JSX.Element;
   updateNode: UpdateNode;
   path: number[];
+  jumpEditableNodes: (tagName: string, forward: boolean) => void;
 }
 
 export interface XmlEditableNode {
   __type: 'XmlEditableNode';
-  styling?: (n: XmlElementNode) => string[];
+  styling?: NodeStylingFunc;
   edit: (props: XmlEditableNodeIProps) => JSX.Element;
 }
 
 export function xmlEditableNode(
   edit: (props: XmlEditableNodeIProps) => JSX.Element,
-  styling?: (n: XmlElementNode) => string[]
+  styling?: NodeStylingFunc
 ): XmlEditableNode {
   return {__type: 'XmlEditableNode', edit, styling};
 }
 
 
 export interface XmlNodeDisplayConfig {
-  [nodeTagName: string]: XmlNodeReplacement | XmlNodeStyling | XmlEditableNode;
+  [tagName: string]: XmlNodeReplacement | XmlNodeStyling | XmlEditableNode;
 }
 
 

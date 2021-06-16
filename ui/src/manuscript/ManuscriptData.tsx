@@ -7,7 +7,6 @@ import {activeUserSelector} from '../store/store';
 import {getNameForPalaeoClassification} from '../palaeoClassification';
 import {createTransliterationUrl, ManuscriptBaseIProps, uploadPicturesUrl} from './ManuscriptBase';
 import {PicturesBlock} from './PicturesBlock';
-import {transliteration} from '../transliterationParser/parser';
 import {SideParseResult} from '../model/sideParseResult';
 import {Transliteration} from './TransliterationLineResult';
 

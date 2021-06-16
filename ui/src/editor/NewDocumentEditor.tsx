@@ -1,22 +1,19 @@
-import React, {useState} from 'react';
-import {XmlElementNode, XmlNode} from './xmlModel';
+import React, {useEffect, useState} from 'react';
+import {writeNode, XmlElementNode, XmlNode} from './xmlModel';
 import {EditTriggerFunc, UpdateNode, XmlEditableNode, XmlNodeDisplayConfig} from './xmlDisplayConfigs';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 import {DisplayNode} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
 
-export interface NodeEditorIProps {
+interface IProps {
   node: XmlNode;
   displayConfig?: XmlNodeDisplayConfig;
+  download: (content: string) => void;
 }
 
 interface IEditState {
-  editConfig: XmlEditableNode;
-  editProps: {
-    node: XmlElementNode;
-    renderedChildren: JSX.Element;
-    path: number[]
-  };
+  node: XmlElementNode;
+  path: number[]
 }
 
 interface IState {
@@ -24,23 +21,54 @@ interface IState {
   editState?: IEditState;
 }
 
-export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDisplayConfig}: NodeEditorIProps): JSX.Element {
+function searchEditableNode(tagName: string, rootNode: XmlElementNode, currentPath: number[], forward: boolean): number[] | undefined {
+  if (rootNode.tagName === tagName) {
+    return [];
+  }
+
+  const [pathHead, ...pathTail] = currentPath;
+
+  const firstSearch = pathHead
+    ? (pathTail.length === 0 ? (forward ? pathHead + 1 : pathHead - 1) : pathHead)
+    : 0;
+
+  for (let i = firstSearch; i < rootNode.children.length && i > 0; forward ? i++ : i--) {
+    console.info(i);
+    const child = rootNode.children[i];
+
+    const pathRest = i === pathHead ? pathTail : [];
+
+    const foundChild = child.__type === 'XmlElementNode'
+      ? searchEditableNode(tagName, child, pathRest, forward)
+      : undefined;
+
+    if (foundChild) {
+      return [i, ...foundChild];
+    }
+  }
+}
+
+function findElement(node: XmlElementNode, path: number[]): XmlElementNode {
+  return path.reduce<XmlElementNode>((nodeToUpdate, pathContent) => nodeToUpdate.children[pathContent] as XmlElementNode, node);
+}
+
+export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDisplayConfig, download}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [state, setState] = useState<IState>({rootNode: initialNode});
 
-  const onEdit: EditTriggerFunc = (node, renderedChildren, editConfig, path) =>
-    setState(({rootNode}) => {
-      return {rootNode, editState: {editConfig, editProps: {node, renderedChildren, path}}};
-    });
+  useEffect(() => {
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  });
+
+  const onEdit: EditTriggerFunc = (node, path) => setState(({rootNode}) => {
+    return {rootNode, editState: {node, path}};
+  });
 
   const updateNode: UpdateNode = (node, path) => {
     setState(({rootNode, editState}) => {
-
-      const nodeToUpdate = path.slice(0, -1).reduce<XmlElementNode>(
-        (nodeToUpdate, pathContent) => nodeToUpdate.children[pathContent] as XmlElementNode,
-        rootNode as XmlElementNode
-      );
+      const nodeToUpdate = findElement(rootNode as XmlElementNode, path.slice(0, -1));
 
       nodeToUpdate.children[path[path.length]] = node;
 
@@ -49,20 +77,51 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
   };
 
   function exportXml(): void {
-    console.error('TODO: export xml...');
+    download(writeNode(state.rootNode).join('\n'));
+  }
+
+  const editConfig: XmlEditableNode | undefined = state.editState
+    ? displayConfig[state.editState.node.tagName] as XmlEditableNode
+    : undefined;
+
+  function jumpEditableNodes(tagName: string, forward: boolean): void {
+    if (state.editState) {
+      const currentPath = state.editState.path;
+
+      const path = searchEditableNode(tagName, state.rootNode as XmlElementNode, currentPath, forward);
+      if (path) {
+        // console.info(currentPath.join('.') + ' --> ' + path.join('.'));
+
+        const node = findElement(state.rootNode as XmlElementNode, path);
+
+        setState(({rootNode}) => {
+          return {rootNode, editState: {node, path, renderedChildren: <div>TODO!</div>}};
+        });
+      }
+    }
+  }
+
+  function handleKey(event: KeyboardEvent): void {
+    if (state.editState) {
+      if (event.key === 'w') {
+        jumpEditableNodes(state.editState.node.tagName, true);
+      } else if (event.key === 'q') {
+        jumpEditableNodes(state.editState.node.tagName, false);
+      }
+    }
   }
 
   return (
     <div className="columns">
       <div className="column">
         <div className="box hittite">
-          <DisplayNode node={state.rootNode} currentNode={state.editState?.editProps.node} displayConfig={displayConfig} onEdit={onEdit} path={[]}/>
+          <DisplayNode node={state.rootNode} currentSelectedPath={state.editState?.path} displayConfig={displayConfig} onEdit={onEdit} path={[]}/>
         </div>
 
         <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>
       </div>
       <div className="column">
-        {state.editState && state.editState.editConfig.edit({...state.editState.editProps, updateNode})}
+        {state.editState && editConfig && editConfig.edit({...state.editState, updateNode, jumpEditableNodes})}
       </div>
     </div>
   );
