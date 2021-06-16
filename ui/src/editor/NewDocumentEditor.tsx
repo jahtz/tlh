@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {writeNode, XmlElementNode, XmlNode} from './xmlModel';
-import {EditTriggerFunc, UpdateNode, XmlEditableNode, XmlNodeDisplayConfig} from './xmlDisplayConfigs';
+import {EditTriggerFunc, UpdateNodeFunc, XmlSingleNodeConfig, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 import {DisplayNode} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
 
 interface IProps {
   node: XmlNode;
-  displayConfig?: XmlNodeDisplayConfig;
+  displayConfig?: XmlNodeDisplayConfigObject;
   download: (content: string) => void;
 }
 
@@ -32,8 +32,7 @@ function searchEditableNode(tagName: string, rootNode: XmlElementNode, currentPa
     ? (pathTail.length === 0 ? (forward ? pathHead + 1 : pathHead - 1) : pathHead)
     : 0;
 
-  for (let i = firstSearch; i < rootNode.children.length && i > 0; forward ? i++ : i--) {
-    console.info(i);
+  for (let i = firstSearch; i < rootNode.children.length && i >= 0; forward ? i++ : i--) {
     const child = rootNode.children[i];
 
     const pathRest = i === pathHead ? pathTail : [];
@@ -66,7 +65,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
     return {rootNode, editState: {node, path}};
   });
 
-  const updateNode: UpdateNode = (node, path) => {
+  const updateNode: UpdateNodeFunc = (node, path) => {
     setState(({rootNode, editState}) => {
       const nodeToUpdate = findElement(rootNode as XmlElementNode, path.slice(0, -1));
 
@@ -76,12 +75,10 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
     });
   };
 
-  function exportXml(): void {
-    download(writeNode(state.rootNode).join('\n'));
-  }
+  const exportXml = () => download(writeNode(state.rootNode).join('\n'));
 
-  const editConfig: XmlEditableNode | undefined = state.editState
-    ? displayConfig[state.editState.node.tagName] as XmlEditableNode
+  const editConfig: XmlSingleNodeConfig | undefined = state.editState
+    ? displayConfig[state.editState.node.tagName] as XmlSingleNodeConfig
     : undefined;
 
   function jumpEditableNodes(tagName: string, forward: boolean): void {
@@ -121,7 +118,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
         <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>
       </div>
       <div className="column">
-        {state.editState && editConfig && editConfig.edit({...state.editState, updateNode, jumpEditableNodes})}
+        {state.editState && editConfig && editConfig.edit!!({...state.editState, updateNode, jumpEditableNodes})}
       </div>
     </div>
   );

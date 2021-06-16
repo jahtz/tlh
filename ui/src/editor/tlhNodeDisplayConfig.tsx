@@ -1,36 +1,37 @@
 import React from 'react';
-import {nodeReplacement, nodeStyling, xmlEditableNode, XmlNodeDisplayConfig} from './xmlDisplayConfigs';
+import {XmlEditableNodeIProps, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {WordNodeEditor} from './WordNodeEditor';
 import {XmlWriteConfig} from './xmlModel';
 
 
-export const tlhNodeDisplayConfig: XmlNodeDisplayConfig = {
-  docID: nodeReplacement(() => <span/>),
-  'AO:Manuscripts': nodeReplacement(() => <span/>),
-  lb: nodeReplacement((node) => <><br/><span>{node.attributes.lnr}</span>&nbsp;</>),
+export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
+  docID: {replace: () => <span/>},
+  'AO:Manuscripts': {replace: () => <span/>},
+  lb: {replace: (node) => <><br/><span>{node.attributes.lnr}</span>&nbsp;</>},
 
   // Words
-  w: xmlEditableNode(
-    (props) => <WordNodeEditor props={props} key={props.path.join('.')}/>,
-    (node, path, currentSelectedPath) => {
+  w: {
+    replace: (node, renderedChildren) => <>{renderedChildren}&nbsp;&nbsp;</>,
+    edit: (props:XmlEditableNodeIProps) => <WordNodeEditor props={props} key={props.path.join('.')}/>,
+    styling: (node, path, currentSelectedPath) => {
       return {
-        'is-underlined': !!node.attributes.mrp0sel && node.attributes.mrp0sel.trim().length > 0,
+        'is-underlined': !!node.attributes.mrp0sel && node.attributes.mrp0sel.trim().length === 0,
         'has-background-primary': !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.')
       };
     }
-  ),
+  },
 
   // Word contents
-  aGr: nodeStyling(() => ['akkadogramm']),
-  sGr: nodeStyling(() => ['sumerogramm']),
-  d: nodeStyling(() => ['determinativ']),
+  aGr: {styling: () => ['akkadogramm']},
+  sGr: {styling: () => ['sumerogramm']},
+  d: {styling: () => ['determinativ']},
 
-  del_in: nodeReplacement(() => <span>[</span>),
-  del_fin: nodeReplacement(() => <span>]</span>),
-  ras_in: nodeReplacement(() => <span>*</span>),
-  ras_fin: nodeReplacement(() => <span>*</span>),
-  laes_in: nodeReplacement(() => <span>⸢</span>),
-  laes_fin: nodeReplacement(() => <span>⸣</span>)
+  del_in: {replace: () => <span>[</span>},
+  del_fin: {replace: () => <span>]</span>},
+  ras_in: {replace: () => <span>*</span>},
+  ras_fin: {replace: () => <span>*</span>},
+  laes_in: {replace: () => <span>⸢</span>},
+  laes_fin: {replace: () => <span>⸣</span>}
 };
 
 export const tlhXmlWriteConfig: XmlWriteConfig = {

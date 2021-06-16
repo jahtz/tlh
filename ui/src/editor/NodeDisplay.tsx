@@ -1,12 +1,12 @@
 import {XmlNode} from './xmlModel';
-import {EditTriggerFunc, XmlNodeDisplayConfig} from './xmlDisplayConfigs';
+import {EditTriggerFunc, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 import classNames from 'classnames';
 import React from 'react';
 
 interface NodeDisplayIProps {
   node: XmlNode;
-  displayConfig?: XmlNodeDisplayConfig;
+  displayConfig?: XmlNodeDisplayConfigObject;
   currentSelectedPath: number[] | undefined;
   onEdit: EditTriggerFunc;
   path: number[];
@@ -25,16 +25,16 @@ export function DisplayNode({node, currentSelectedPath, displayConfig = tlhNodeD
     )}
   </>;
 
-  if (!currentConfig) {
-    return renderedChildren;
-  } else if (currentConfig.__type === 'XmlNodeReplacement') {
-    return currentConfig.f(node);
-  } else if (currentConfig.__type === 'XmlNodeStyling') {
-    return <span className={classNames(currentConfig.f(node, path, currentSelectedPath))}>{renderedChildren}</span>;
-  } else {
-    // Editable node!
-    const classes = currentConfig.styling ? currentConfig.styling(node, path, currentSelectedPath) : [];
+  const display = currentConfig?.replace
+    ? currentConfig.replace(node, renderedChildren)
+    : renderedChildren;
 
-    return <span className={classNames(classes)} onClick={() => onEdit(node, path)}>{renderedChildren}</span>;
-  }
+  const classes = currentConfig?.styling ? currentConfig.styling(node, path, currentSelectedPath) : [];
+
+  const onClick = currentConfig?.edit
+    ? () => onEdit(node, path)
+    : () => {
+    };
+
+  return <span className={classNames(classes)} onClick={onClick}>{display}</span>;
 }
