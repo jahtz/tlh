@@ -28,9 +28,12 @@ function searchEditableNode(tagName: string, rootNode: XmlElementNode, currentPa
 
   const [pathHead, ...pathTail] = currentPath;
 
-  const firstSearch = pathHead
-    ? (pathTail.length === 0 ? (forward ? pathHead + 1 : pathHead - 1) : pathHead)
-    : 0;
+  let firstSearch: number;
+  if (currentPath.length > 0) {
+    firstSearch = pathTail.length === 0 ? (forward ? pathHead + 1 : pathHead - 1) : pathHead;
+  } else {
+    firstSearch = forward ? 0 : rootNode.children.length - 1;
+  }
 
   for (let i = firstSearch; i < rootNode.children.length && i >= 0; forward ? i++ : i--) {
     const child = rootNode.children[i];
