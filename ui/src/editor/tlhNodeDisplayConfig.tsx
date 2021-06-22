@@ -1,24 +1,33 @@
 import React from 'react';
 import {XmlEditableNodeIProps, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {WordNodeEditor} from './WordNodeEditor';
-import {XmlWriteConfig} from './xmlModel';
+import {XmlElementNode, XmlWriteConfig} from './xmlModel';
 
+
+export interface WordNodeAttributes {
+  lg?: 'Sum' | 'Akk' | 'Hit' | 'Hur' | 'Luw' | 'Hat';
+  mrp0sel?: string;
+}
 
 export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
   docID: {replace: () => <span/>},
   'AO:Manuscripts': {replace: () => <span/>},
-  lb: {replace: (node) => <><br/><span>{node.attributes.lnr}</span>&nbsp;</>},
+  lb: {
+    replace: (node) => <><br/>{node.attributes.lnr}:&nbsp;&nbsp;&nbsp;</>,
+    styling: () => ['lb']
+  },
 
   // Words
   w: {
     replace: (node, renderedChildren) => <>{renderedChildren}&nbsp;&nbsp;</>,
-    edit: (props:XmlEditableNodeIProps) => <WordNodeEditor props={props} key={props.path.join('.')}/>,
-    styling: (node, path, currentSelectedPath) => {
-      return {
+    edit: (props: XmlEditableNodeIProps<WordNodeAttributes>) => <WordNodeEditor props={props} key={props.path.join('.')}/>,
+    styling: (node: XmlElementNode<WordNodeAttributes>, path, currentSelectedPath) => [
+      ...(node.attributes.lg ? [node.attributes.lg] : []),
+      {
         'is-underlined': !!node.attributes.mrp0sel && node.attributes.mrp0sel.trim().length === 0,
         'has-background-primary': !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.')
-      };
-    }
+      }
+    ]
   },
 
   // Word contents
@@ -31,7 +40,17 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
   ras_in: {replace: () => <span>*</span>},
   ras_fin: {replace: () => <span>*</span>},
   laes_in: {replace: () => <span>⸢</span>},
-  laes_fin: {replace: () => <span>⸣</span>}
+  laes_fin: {replace: () => <span>⸣</span>},
+
+  gap: {
+    styling: () => ['gap'],
+    replace: (node) => <span>{node.attributes.c}</span>
+  },
+
+  corr: {
+    styling: () => ['corr'],
+    replace: (node) => <span>!</span>
+  }
 };
 
 export const tlhXmlWriteConfig: XmlWriteConfig = {

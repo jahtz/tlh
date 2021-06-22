@@ -1,13 +1,13 @@
 import {tlhXmlWriteConfig} from './tlhNodeDisplayConfig';
 
-interface Attributes {
+export interface GenericAttributes {
   [name: string]: string;
 }
 
-export interface XmlElementNode {
+export interface XmlElementNode<A = GenericAttributes> {
   __type: 'XmlElementNode';
   tagName: string;
-  attributes: Attributes;
+  attributes: A;
   children: XmlNode[];
 }
 
@@ -28,7 +28,7 @@ export function loadNode(el: ChildNode): XmlNode {
       __type: 'XmlElementNode',
       tagName: el.tagName,
       attributes: Array.from(el.attributes)
-        .reduce<Attributes>((acc, {name, value}) => {
+        .reduce<GenericAttributes>((acc, {name, value}) => {
           return {...acc, [name]: value};
         }, {}),
       children: Array.from(el.childNodes)

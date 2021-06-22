@@ -1,21 +1,21 @@
-import {XmlElementNode} from './xmlModel';
+import {GenericAttributes, XmlElementNode} from './xmlModel';
 import {Argument as ClassNamesArgument} from 'classnames';
 
 type ReplaceFunc = (node: XmlElementNode, renderedChildren: JSX.Element) => JSX.Element;
 
-export type NodeStylingFunc = (node: XmlElementNode, path: number[], currentSelectedPath?: number[]) => ClassNamesArgument;
+export type NodeStylingFunc<A = GenericAttributes> = (node: XmlElementNode<A>, path: number[], currentSelectedPath?: number[]) => ClassNamesArgument;
 
-type EditFunc = (props: XmlEditableNodeIProps) => JSX.Element;
+type EditFunc<A = GenericAttributes> = (props: XmlEditableNodeIProps<A>) => JSX.Element;
 
 
 export type EditTriggerFunc = (node: XmlElementNode, path: number[]) => void;
 
-export type UpdateNodeFunc = (node: XmlElementNode, path: number[]) => void;
+export type UpdateNodeFunc<A = GenericAttributes> = (node: XmlElementNode<A>, path: number[]) => void;
 
 
-export interface XmlEditableNodeIProps {
-  node: XmlElementNode;
-  updateNode: UpdateNodeFunc;
+export interface XmlEditableNodeIProps<A = GenericAttributes> {
+  node: XmlElementNode<A>;
+  updateNode: UpdateNodeFunc<A>;
   path: number[];
   jumpEditableNodes: (tagName: string, forward: boolean) => void;
 }
@@ -23,8 +23,8 @@ export interface XmlEditableNodeIProps {
 
 export interface XmlSingleNodeConfig {
   replace?: ReplaceFunc;
-  styling?: NodeStylingFunc;
-  edit?: EditFunc;
+  styling?: NodeStylingFunc<any>;
+  edit?: EditFunc<any>;
 }
 
 

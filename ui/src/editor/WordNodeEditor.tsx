@@ -12,12 +12,12 @@ import React, {useState} from 'react';
 import {AnalysisOption, MorphologicalAnalysis, readMorphAnalysis} from '../model/morphologicalAnalysis';
 import {MorphAnalysisOption} from './MorphologicalAnalysisOption';
 import {DisplayNode} from './NodeDisplay';
-import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
+import {tlhNodeDisplayConfig, WordNodeAttributes} from './tlhNodeDisplayConfig';
 
 const morphologyAttributeNameRegex = /^mrp(\d+)$/;
 
 interface IProps {
-  props: XmlEditableNodeIProps;
+  props: XmlEditableNodeIProps<WordNodeAttributes>;
 }
 
 export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNodes}}: IProps): JSX.Element {

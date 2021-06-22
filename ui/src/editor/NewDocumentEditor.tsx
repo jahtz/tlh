@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {writeNode, XmlElementNode, XmlNode} from './xmlModel';
+import {GenericAttributes, writeNode, XmlElementNode, XmlNode} from './xmlModel';
 import {EditTriggerFunc, UpdateNodeFunc, XmlNodeDisplayConfigObject, XmlSingleNodeConfig} from './xmlDisplayConfigs';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 import {DisplayNode} from './NodeDisplay';
@@ -70,7 +70,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
 
   const updateNode: UpdateNodeFunc = (node, path) => {
     setState(({rootNode, editState}) => {
-      const nodeToUpdate = findElement(rootNode as XmlElementNode, path.slice(0, -1));
+      const nodeToUpdate: XmlElementNode = findElement(rootNode as XmlElementNode, path.slice(0, -1));
 
       nodeToUpdate.children[path[path.length]] = node;
 
@@ -112,7 +112,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
   return (
     <div className="columns">
       <div className="column">
-        <div className="box hittite">
+        <div className="box">
           <DisplayNode node={state.rootNode} currentSelectedPath={state.editState?.path} displayConfig={displayConfig} onEdit={onEdit} path={[]}/>
         </div>
 
