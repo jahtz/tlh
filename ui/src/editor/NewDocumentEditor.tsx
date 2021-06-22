@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {writeNode, XmlElementNode, XmlNode} from './xmlModel';
-import {EditTriggerFunc, UpdateNodeFunc, XmlSingleNodeConfig, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
+import {EditTriggerFunc, UpdateNodeFunc, XmlNodeDisplayConfigObject, XmlSingleNodeConfig} from './xmlDisplayConfigs';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 import {DisplayNode} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
@@ -90,12 +90,10 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
 
       const path = searchEditableNode(tagName, state.rootNode as XmlElementNode, currentPath, forward);
       if (path) {
-        // console.info(currentPath.join('.') + ' --> ' + path.join('.'));
-
         const node = findElement(state.rootNode as XmlElementNode, path);
 
         setState(({rootNode}) => {
-          return {rootNode, editState: {node, path, renderedChildren: <div>TODO!</div>}};
+          return {rootNode, editState: {node, path}};
         });
       }
     }
