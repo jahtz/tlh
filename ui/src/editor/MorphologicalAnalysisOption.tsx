@@ -12,7 +12,7 @@ interface MorphAnalysisButtonIProps {
 
 function MorphAnalysisButton({identifier, analysis, selectedOption, select}: MorphAnalysisButtonIProps): JSX.Element {
 
-  const classes = classNames('button', 'is-fullwidth', 'has-text-left', {'is-link': isSelected(identifier, selectedOption)});
+  const classes = classNames('button', 'is-fullwidth', 'button-text-left', {'is-link': isSelected(identifier, selectedOption)});
 
   function updateSelected(event: MouseEvent<HTMLButtonElement>): void {
     select(identifier, event.ctrlKey);

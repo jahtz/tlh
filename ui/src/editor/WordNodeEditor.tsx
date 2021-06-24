@@ -78,7 +78,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
       {selectedMorphologies && <>
         <hr/>
 
-        <div className="box has-text-centered has-background-primary has-text-left">
+        <div className="box has-text-centered has-background-primary has-text-left has-text-weight-bold is-size-5">
           {/*TODO: show selected morphologies!*/}
           {selectedMorphologies
             .sort((sm1, sm2) => {
@@ -93,7 +93,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
               const analysis: string | AnalysisOption | undefined = getMorphologicalAnalysisOption(selectedMorph);
 
               return <p key={stringifySelectedAnalysisOption(selectedMorph)}>
-                {stringifySelectedAnalysisOption(selectedMorph)}: &nbsp;&nbsp;&nbsp;&nbsp; {x.translation} &nbsp; {typeof analysis === 'string' ? analysis : analysis?.analysis}
+                {stringifySelectedAnalysisOption(selectedMorph)} - &nbsp;&nbsp;&nbsp;&nbsp; {x.translation} &nbsp; {typeof analysis === 'string' ? analysis : analysis?.analysis} &nbsp; {x.other}
               </p>;
             })}
         </div>
