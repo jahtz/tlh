@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {GenericAttributes, writeNode, XmlElementNode, XmlNode} from './xmlModel';
+import {writeNode, XmlElementNode, XmlNode} from './xmlModel';
 import {EditTriggerFunc, UpdateNodeFunc, XmlNodeDisplayConfigObject, XmlSingleNodeConfig} from './xmlDisplayConfigs';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 import {DisplayNode} from './NodeDisplay';
