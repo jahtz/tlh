@@ -1,5 +1,6 @@
 import {XmlEditableNodeIProps} from './xmlDisplayConfigs';
 import {
+  compareSelectedAnalysisOptions,
   isSelected,
   readSelectedMorphology,
   SelectedAnalysisOption,
@@ -23,20 +24,18 @@ interface IProps {
 
 export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNodes}}: IProps): JSX.Element {
 
-  const initialSelectedMorphologies: SelectedAnalysisOption[] = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
+  const initialSelectedMorphologies: SelectedAnalysisOption[] = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '')
+    .sort(compareSelectedAnalysisOptions);
 
   const {t} = useTranslation('common');
   const [selectedMorphologies, setSelectedMorphologies] = useState<SelectedAnalysisOption[]>(initialSelectedMorphologies);
 
-  function handleKey(event: KeyboardEvent): void {
-    event.key === 'Enter' && handleUpdate();
-  }
+  const handleKey = (event: KeyboardEvent) => event.key === 'Enter' && handleUpdate();
 
   useEffect(() => {
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
   });
-
 
   const morphologies: MorphologicalAnalysis[] = Object.entries(node.attributes)
     .map(([name, value]) => {
@@ -48,10 +47,6 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
     })
     .filter((m): m is MorphologicalAnalysis => !!m);
 
-  function resetMorphAnalysis(): void {
-    setSelectedMorphologies(initialSelectedMorphologies);
-  }
-
   function handleUpdate(): void {
     node.attributes.mrp0sel = writeSelectedMorphologies(selectedMorphologies);
     updateNode(node, path);
@@ -59,11 +54,13 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
 
   function updateSelected(newValue: SelectedAnalysisOption, ctrl: boolean): void {
     setSelectedMorphologies((currentSelection) => {
-      return ctrl
+      const newValues = ctrl
         ? (isSelected(newValue, currentSelection)
           ? currentSelection.filter((v) => !selectedAnalysisOptionEquals(v, newValue))
           : [...currentSelection, newValue])
         : [newValue];
+
+      return newValues.sort(compareSelectedAnalysisOptions);
     });
   }
 
@@ -78,8 +75,11 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
         });
     });
 
-    setSelectedMorphologies(allValues);
+    setSelectedMorphologies(allValues.sort(compareSelectedAnalysisOptions));
   }
+
+  // works only if initialSelectedMorphologies and selectedMorphologies are sorted!
+  const morphologiesChanged = initialSelectedMorphologies.length !== selectedMorphologies.length || initialSelectedMorphologies.some((im, index) => !selectedAnalysisOptionEquals(im, selectedMorphologies[index]));
 
   return (
     <div>
@@ -93,40 +93,32 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
 
       <hr/>
 
-      <div className="buttons">
-        <button type="button" className="button is-fullwidth" onClick={selectAll}>{t('selectAllMorphologies')}</button>
+      <div className="columns">
+        <div className="column">
+          <button type="button" className="button is-fullwidth" disabled>{t('editContent')}</button>
+        </div>
+        <div className="column">
+          <button type="button" className="button is-fullwidth" onClick={selectAll}>{t('selectAllMorphologies')}</button>
+        </div>
       </div>
 
       <div className="box has-text-centered has-background-primary has-text-left has-text-weight-bold is-size-5">
-        {/*TODO: show selected morphologies!*/}
-        {selectedMorphologies
-          .sort((sm1, sm2) => {
-            const n1 = sm1.num * 1000 + (sm1.letter?.charCodeAt(0) || 0);
-            const n2 = sm2.num * 1000 + (sm2.letter?.charCodeAt(0) || 0);
-            return n1 - n2;
-          })
-          .map((selectedMorph) => {
+        {selectedMorphologies.sort(compareSelectedAnalysisOptions).map((selectedMorph) => {
+          const x: MorphologicalAnalysis = morphologies.find(({number}) => number === selectedMorph.num)!;
 
-            const x: MorphologicalAnalysis = morphologies.find(({number}) => number === selectedMorph.num)!;
+          const analysis: string | AnalysisOption | undefined = isSingleMorphologicalAnalysis(x)
+            ? x.analysis
+            : x.analyses.find(({letter}) => selectedMorph.letter === letter);
 
-            const analysis: string | AnalysisOption | undefined = isSingleMorphologicalAnalysis(x)
-              ? x.analysis
-              : x.analyses.find(({letter}) => selectedMorph.letter === letter);
-
-            return <p key={stringifySelectedAnalysisOption(selectedMorph)}>
-              {stringifySelectedAnalysisOption(selectedMorph)} - &nbsp;&nbsp;&nbsp;&nbsp; {x.translation} &nbsp; {typeof analysis === 'string' ? analysis : analysis?.analysis} &nbsp; {x.other}
-            </p>;
-          })}
+          return <p key={stringifySelectedAnalysisOption(selectedMorph)}>
+            {stringifySelectedAnalysisOption(selectedMorph)} - &nbsp;&nbsp;&nbsp;&nbsp; {x.translation} &nbsp; {typeof analysis === 'string' ? analysis : analysis?.analysis} &nbsp; {x.other}
+          </p>;
+        })}
       </div>
 
-      <div className="columns">
-        <div className="column">
-          <button onClick={resetMorphAnalysis} className="button is-warning is-fullwidth">{t('resetMorphAnalysis')}</button>
-        </div>
-        <div className="column">
-          {/* FIXME: disable if not changed! */}
-          <button onClick={handleUpdate} className="button is-link is-fullwidth">{t('updateMorphAnalysis')}</button>
-        </div>
+      <div className="buttons">
+        {/* FIXME: disable if not changed! */}
+        <button onClick={handleUpdate} className="button is-link is-fullwidth" disabled={!morphologiesChanged}>{t('updateMorphAnalysis')}</button>
       </div>
 
       <div className="columns">

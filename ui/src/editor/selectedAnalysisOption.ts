@@ -7,6 +7,15 @@ function selectAnalysisOption(num: number, letter?: string): SelectedAnalysisOpt
   return {num, letter};
 }
 
+export function compareSelectedAnalysisOptions(
+  {num: num1, letter: letter1}: SelectedAnalysisOption,
+  {num: num2, letter: letter2}: SelectedAnalysisOption
+): number {
+  const n1 = num1 * 1000 + (letter1?.charCodeAt(0) || 0);
+  const n2 = num2 * 1000 + (letter2?.charCodeAt(0) || 0);
+  return n1 - n2;
+}
+
 export function selectedAnalysisOptionEquals(
   {num: num1, letter: letter1}: SelectedAnalysisOption,
   {num: num2, letter: letter2}: SelectedAnalysisOption
