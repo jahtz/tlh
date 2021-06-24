@@ -39,7 +39,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
 
 
   function getMorphologicalAnalysisOption(identifier: SelectedAnalysisOption): string | AnalysisOption | undefined {
-    const morphAnalysis = morphologies.find(({number}) => number === identifier.num)!!;
+    const morphAnalysis: MorphologicalAnalysis = morphologies.find(({number}) => number === identifier.num)!!;
 
     return typeof morphAnalysis.analyses === 'string'
       ? morphAnalysis.analyses
@@ -68,8 +68,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
   return (
     <div>
       <div className="box has-text-centered">
-        {node.children.map((c, i) => <DisplayNode key={i} onEdit={() => {
-        }} path={[]} currentSelectedPath={undefined} node={c} displayConfig={tlhNodeDisplayConfig}/>)}
+        {node.children.map((c, i) => <DisplayNode key={i} path={[]} currentSelectedPath={undefined} node={c} displayConfig={tlhNodeDisplayConfig}/>)}
       </div>
 
       {morphologies.map((m, index) =>
@@ -79,17 +78,24 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
       {selectedMorphologies && <>
         <hr/>
 
-        <div className="box has-text-centered">
-          <p>{t('selected')}:</p>
+        <div className="box has-text-centered has-background-primary has-text-left">
           {/*TODO: show selected morphologies!*/}
-          {selectedMorphologies.map((selectedMorph) => {
+          {selectedMorphologies
+            .sort((sm1, sm2) => {
+              const n1 = sm1.num * 1000 + (sm1.letter?.charCodeAt(0) || 0);
+              const n2 = sm2.num * 1000 + (sm2.letter?.charCodeAt(0) || 0);
+              return n1 - n2;
+            })
+            .map((selectedMorph) => {
 
-            const analysis = getMorphologicalAnalysisOption(selectedMorph);
+              const x: MorphologicalAnalysis = morphologies.find(({number}) => number === selectedMorph.num)!!;
 
-            return <p key={stringifySelectedAnalysisOption(selectedMorph)}>
-              {stringifySelectedAnalysisOption(selectedMorph)}: {typeof analysis === 'string' ? analysis : analysis?.analysis}
-            </p>;
-          })}
+              const analysis: string | AnalysisOption | undefined = getMorphologicalAnalysisOption(selectedMorph);
+
+              return <p key={stringifySelectedAnalysisOption(selectedMorph)}>
+                {stringifySelectedAnalysisOption(selectedMorph)}: &nbsp;&nbsp;&nbsp;&nbsp; {x.translation} &nbsp; {typeof analysis === 'string' ? analysis : analysis?.analysis}
+              </p>;
+            })}
         </div>
 
         <div className="columns">

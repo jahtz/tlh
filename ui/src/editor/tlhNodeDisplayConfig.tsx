@@ -14,7 +14,7 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
   docID: {replace: () => <span/>},
   'AO:Manuscripts': {replace: () => <span/>},
   lb: {
-    replace: (node) => <><br/>{node.attributes.lnr}:&nbsp;&nbsp;&nbsp;</>,
+    replace: (node) => <><br style={{marginTop: '10px'}}/>{node.attributes.lnr}:&nbsp;&nbsp;&nbsp;</>,
     styling: () => ['lb']
   },
 

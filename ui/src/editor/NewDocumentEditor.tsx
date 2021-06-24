@@ -112,7 +112,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
   return (
     <div className="columns">
       <div className="column">
-        <div className="box">
+        <div className="box documentText">
           <DisplayNode node={state.rootNode} currentSelectedPath={state.editState?.path} displayConfig={displayConfig} onEdit={onEdit} path={[]}/>
         </div>
 

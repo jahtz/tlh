@@ -8,7 +8,7 @@ interface NodeDisplayIProps {
   node: XmlNode;
   displayConfig?: XmlNodeDisplayConfigObject;
   currentSelectedPath: number[] | undefined;
-  onEdit: EditTriggerFunc;
+  onEdit?: EditTriggerFunc;
   path: number[];
 }
 
@@ -31,10 +31,9 @@ export function DisplayNode({node, currentSelectedPath, displayConfig = tlhNodeD
 
   const classes = currentConfig?.styling ? currentConfig.styling(node, path, currentSelectedPath) : [];
 
-  const onClick = currentConfig?.edit
+  const onClick = currentConfig?.edit && onEdit
     ? () => onEdit(node, path)
-    : () => {
-    };
+    : () => void 0;
 
   return <span className={classNames(classes)} onClick={onClick}>{display}</span>;
 }
