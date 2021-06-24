@@ -8,7 +8,7 @@ import {
   stringifySelectedAnalysisOption
 } from './selectedAnalysisOption';
 import {useTranslation} from 'react-i18next';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {AnalysisOption, MorphologicalAnalysis, readMorphAnalysis} from '../model/morphologicalAnalysis';
 import {MorphAnalysisOption} from './MorphologicalAnalysisOption';
 import {DisplayNode} from './NodeDisplay';
@@ -26,6 +26,16 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
 
   const {t} = useTranslation('common');
   const [selectedMorphologies, setSelectedMorphologies] = useState<SelectedAnalysisOption[]>(initialSelectedMorphologies);
+
+  function handleKey(event: KeyboardEvent): void {
+    event.key === 'Enter' && handleUpdate();
+  }
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  });
+
 
   const morphologies: MorphologicalAnalysis[] = Object.entries(node.attributes)
     .map(([name, value]) => {
@@ -103,6 +113,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
             <button onClick={resetMorphAnalysis} className="button is-warning is-fullwidth">{t('resetMorphAnalysis')}</button>
           </div>
           <div className="column">
+            {/* FIXME: disable if not changed! */}
             <button onClick={handleUpdate} className="button is-link is-fullwidth">{t('updateMorphAnalysis')}</button>
           </div>
         </div>
