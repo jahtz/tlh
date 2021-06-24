@@ -47,15 +47,6 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
     })
     .filter((m): m is MorphologicalAnalysis => !!m);
 
-
-  function getMorphologicalAnalysisOption(identifier: SelectedAnalysisOption): string | AnalysisOption | undefined {
-    const morphAnalysis: MorphologicalAnalysis = morphologies.find(({number}) => number === identifier.num)!!;
-
-    return typeof morphAnalysis.analyses === 'string'
-      ? morphAnalysis.analyses
-      : morphAnalysis.analyses.find(({letter}) => identifier.letter === letter);
-  }
-
   function resetMorphAnalysis(): void {
     setSelectedMorphologies(initialSelectedMorphologies);
   }
@@ -98,9 +89,11 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
             })
             .map((selectedMorph) => {
 
-              const x: MorphologicalAnalysis = morphologies.find(({number}) => number === selectedMorph.num)!!;
+              const x: MorphologicalAnalysis = morphologies.find(({number}) => number === selectedMorph.num)!;
 
-              const analysis: string | AnalysisOption | undefined = getMorphologicalAnalysisOption(selectedMorph);
+              const analysis: string | AnalysisOption | undefined = typeof x.analyses === 'string'
+                ? x.analyses
+                : x.analyses.find(({letter}) => selectedMorph.letter === letter);
 
               return <p key={stringifySelectedAnalysisOption(selectedMorph)}>
                 {stringifySelectedAnalysisOption(selectedMorph)} - &nbsp;&nbsp;&nbsp;&nbsp; {x.translation} &nbsp; {typeof analysis === 'string' ? analysis : analysis?.analysis} &nbsp; {x.other}

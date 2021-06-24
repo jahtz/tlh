@@ -1,9 +1,9 @@
 import {GenericAttributes, XmlElementNode} from './xmlModel';
 import {Argument as ClassNamesArgument} from 'classnames';
 
-type ReplaceFunc = (node: XmlElementNode, renderedChildren: JSX.Element) => JSX.Element;
+type ReplaceFunc<A = GenericAttributes> = (node: XmlElementNode<A>, renderedChildren: JSX.Element) => JSX.Element;
 
-export type NodeStylingFunc<A = GenericAttributes> = (node: XmlElementNode<A>, path: number[], currentSelectedPath?: number[]) => ClassNamesArgument;
+type NodeStylingFunc<A = GenericAttributes> = (node: XmlElementNode<A>, path: number[], currentSelectedPath?: number[]) => ClassNamesArgument;
 
 type EditFunc<A = GenericAttributes> = (props: XmlEditableNodeIProps<A>) => JSX.Element;
 
@@ -21,7 +21,7 @@ export interface XmlEditableNodeIProps<A = GenericAttributes> {
 }
 
 
-export interface XmlSingleNodeConfig {
+interface XmlSingleNodeConfig {
   replace?: ReplaceFunc;
   styling?: NodeStylingFunc<any>;
   edit?: EditFunc<any>;

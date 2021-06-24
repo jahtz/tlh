@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {writeNode, XmlElementNode, XmlNode} from './xmlModel';
-import {EditTriggerFunc, UpdateNodeFunc, XmlNodeDisplayConfigObject, XmlSingleNodeConfig} from './xmlDisplayConfigs';
+import {EditTriggerFunc, UpdateNodeFunc, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 import {DisplayNode} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
@@ -80,8 +80,8 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
 
   const exportXml = () => download(writeNode(state.rootNode).join('\n'));
 
-  const editConfig: XmlSingleNodeConfig | undefined = state.editState
-    ? displayConfig[state.editState.node.tagName] as XmlSingleNodeConfig
+  const editConfig = state.editState
+    ? displayConfig[state.editState.node.tagName]
     : undefined;
 
   function jumpEditableNodes(tagName: string, forward: boolean): void {
@@ -119,7 +119,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
         <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>
       </div>
       <div className="column">
-        {state.editState && editConfig && editConfig.edit!!({...state.editState, updateNode, jumpEditableNodes})}
+        {state.editState && editConfig && editConfig.edit && editConfig.edit({...state.editState, updateNode, jumpEditableNodes})}
       </div>
     </div>
   );
