@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import {MorphologicalAnalysis} from '../model/morphologicalAnalysis';
+import {isSingleMorphologicalAnalysis, MorphologicalAnalysis} from '../model/morphologicalAnalysis';
 import React, {MouseEvent} from 'react';
 import {isSelected, SelectedAnalysisOption} from './selectedAnalysisOption';
 
@@ -29,25 +29,25 @@ interface MorphAnalysisOptionIProps {
 
 export function MorphAnalysisOption({ma, selectedOption, updateSelected}: MorphAnalysisOptionIProps): JSX.Element {
 
-  const {number, translation, transcription, analyses, other} = ma;
+  const {number, translation, transcription, other} = ma;
 
   return (
     <div className="my-3">
       <h2 className="subtitle is-5">{number}) {translation} ({transcription})</h2>
 
       <div className="columns is-multiline">
-        {typeof analyses === 'string'
+        {isSingleMorphologicalAnalysis(ma)
           ? <div className="column is-fullwidth">
-            <MorphAnalysisButton identifier={{num: number}} analysis={analyses} select={updateSelected} selectedOption={selectedOption}/>
+            <MorphAnalysisButton identifier={{num: number}} analysis={ma.analysis} select={updateSelected} selectedOption={selectedOption}/>
           </div>
-          : analyses.map(({letter, analysis}, index) =>
+          : ma.analyses.map(({letter, analysis}, index) =>
             <div key={index} className="column is-one-third-desktop">
               <MorphAnalysisButton identifier={{num: number, letter}} analysis={analysis} select={updateSelected} selectedOption={selectedOption}/>
             </div>
           )}
       </div>
 
-      <div className="box has-text-centered">{other.join(' @ ')}</div>
+      {other.length > 0 && <div className="box has-text-centered">{other.join(' @ ')}</div>}
     </div>
   );
 }
