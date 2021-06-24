@@ -1,7 +1,7 @@
 import {GenericAttributes, XmlElementNode} from './xmlModel';
 import {Argument as ClassNamesArgument} from 'classnames';
 
-type ReplaceFunc<A = GenericAttributes> = (node: XmlElementNode<A>, renderedChildren: JSX.Element) => JSX.Element;
+type ReplaceFunc<A = GenericAttributes> = (node: XmlElementNode<A>, renderedChildren: JSX.Element, path: number[], currentSelectedPath?: number[]) => JSX.Element;
 
 type NodeStylingFunc<A = GenericAttributes> = (node: XmlElementNode<A>, path: number[], currentSelectedPath?: number[]) => ClassNamesArgument;
 

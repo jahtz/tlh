@@ -26,7 +26,7 @@ export function DisplayNode({node, currentSelectedPath, displayConfig = tlhNodeD
   </>;
 
   const display = currentConfig?.replace
-    ? currentConfig.replace(node, renderedChildren)
+    ? currentConfig.replace(node, renderedChildren, path, currentSelectedPath)
     : renderedChildren;
 
   const classes = currentConfig?.styling ? currentConfig.styling(node, path, currentSelectedPath) : [];

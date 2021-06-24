@@ -1,7 +1,7 @@
 import React from 'react';
 import {XmlEditableNodeIProps, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {WordNodeEditor} from './WordNodeEditor';
-import {XmlElementNode, XmlWriteConfig} from './xmlModel';
+import {XmlWriteConfig} from './xmlModel';
 import classNames from 'classnames';
 
 
@@ -20,15 +20,14 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
 
   // Words
   w: {
-    replace: (node, renderedChildren) => {
-      const classes = classNames({'is-underlined': !!node.attributes.mrp0sel && node.attributes.mrp0sel.trim().length === 0});
+    replace: (node, renderedChildren, path, currentSelectedPath) => {
+      const classes = classNames(node.attributes.lg || '', {
+        'is-underlined': !!node.attributes.mrp0sel && node.attributes.mrp0sel.trim().length === 0,
+        'has-background-primary': !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.')
+      });
       return <><span className={classes}>{renderedChildren}</span>&nbsp;&nbsp;</>;
     },
-    edit: (props: XmlEditableNodeIProps<WordNodeAttributes>) => <WordNodeEditor props={props} key={props.path.join('.')}/>,
-    styling: (node: XmlElementNode<WordNodeAttributes>, path, currentSelectedPath) => [
-      ...(node.attributes.lg ? [node.attributes.lg] : []),
-      {'has-background-primary': !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.')}
-    ]
+    edit: (props: XmlEditableNodeIProps<WordNodeAttributes>) => <WordNodeEditor props={props} key={props.path.join('.')}/>
   },
 
   // Word contents
