@@ -64,16 +64,18 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
     });
   }
 
-  function selectAll(): void {
-    const allValues = morphologies.flatMap((m) => {
-      const num = m.number;
+  function selectAll(number?: number): void {
+    const allValues = morphologies
+      .filter((morph) => !number || morph.number === number)
+      .flatMap((m) => {
+        const num = m.number;
 
-      return isSingleMorphologicalAnalysis(m)
-        ? [{num}]
-        : m.analyses.map(({letter}) => {
-          return {num, letter};
-        });
-    });
+        return isSingleMorphologicalAnalysis(m)
+          ? [{num}]
+          : m.analyses.map(({letter}) => {
+            return {num, letter};
+          });
+      });
 
     setSelectedMorphologies(allValues.sort(compareSelectedAnalysisOptions));
   }
@@ -88,7 +90,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
       </div>
 
       {morphologies.map((m, index) =>
-        <MorphAnalysisOption key={index} ma={m} selectedOption={selectedMorphologies} updateSelected={updateSelected}/>
+        <MorphAnalysisOption key={index} ma={m} selectedOption={selectedMorphologies} updateSelected={updateSelected} selectAll={() => selectAll(m.number)}/>
       )}
 
       <hr/>
@@ -98,7 +100,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
           <button type="button" className="button is-fullwidth" disabled>{t('editContent')}</button>
         </div>
         <div className="column">
-          <button type="button" className="button is-fullwidth" onClick={selectAll}>{t('selectAllMorphologies')}</button>
+          <button type="button" className="button is-fullwidth" onClick={() => selectAll()}>{t('selectAllMorphologies')}</button>
         </div>
       </div>
 

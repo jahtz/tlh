@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import {isSingleMorphologicalAnalysis, MorphologicalAnalysis} from '../model/morphologicalAnalysis';
 import React, {MouseEvent} from 'react';
 import {isSelected, SelectedAnalysisOption} from './selectedAnalysisOption';
+import {useTranslation} from 'react-i18next';
 
 interface MorphAnalysisButtonIProps {
   identifier: SelectedAnalysisOption;
@@ -25,9 +26,12 @@ interface MorphAnalysisOptionIProps {
   ma: MorphologicalAnalysis;
   selectedOption: SelectedAnalysisOption[];
   updateSelected: (s: SelectedAnalysisOption, ctrl: boolean) => void;
+  selectAll: () => void;
 }
 
-export function MorphAnalysisOption({ma, selectedOption, updateSelected}: MorphAnalysisOptionIProps): JSX.Element {
+export function MorphAnalysisOption({ma, selectedOption, updateSelected, selectAll}: MorphAnalysisOptionIProps): JSX.Element {
+
+  const {t} = useTranslation('common');
 
   const {number, translation, transcription, other} = ma;
 
@@ -40,11 +44,17 @@ export function MorphAnalysisOption({ma, selectedOption, updateSelected}: MorphA
           ? <div className="column is-fullwidth">
             <MorphAnalysisButton identifier={{num: number}} analysis={ma.analysis} select={updateSelected} selectedOption={selectedOption}/>
           </div>
-          : ma.analyses.map(({letter, analysis}, index) =>
-            <div key={index} className="column is-one-third-desktop">
-              <MorphAnalysisButton identifier={{num: number, letter}} analysis={analysis} select={updateSelected} selectedOption={selectedOption}/>
+          : <>
+            {ma.analyses.map(({letter, analysis}, index) =>
+              <div key={index} className="column is-one-third-desktop">
+                <MorphAnalysisButton identifier={{num: number, letter}} analysis={analysis} select={updateSelected} selectedOption={selectedOption}/>
+              </div>
+            )}
+            <div className="column is-one-third-desktop">
+              <button type="button" className="button is-warning" onClick={selectAll}>{t('selectAllFromNumber')}</button>
             </div>
-          )}
+          </>
+        }
       </div>
 
       {other.length > 0 && <div className="box has-text-centered">{other.join(' @ ')}</div>}
