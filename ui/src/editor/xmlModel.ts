@@ -70,7 +70,7 @@ export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXml
         return `${name}="${writtenValue}"`;
       })
       .join(' ');
-   
+
     if (children.length === 0 && contractEmpty) {
       return [`<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}/>`];
     } else {
