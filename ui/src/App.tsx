@@ -1,6 +1,6 @@
 import React, {Dispatch} from 'react';
 import {Link, Route, Switch, useHistory} from 'react-router-dom';
-import {createManuscriptUrl, editDocumentUrl, homeUrl, loginUrl, registerUrl} from './urls';
+import {createManuscriptUrl, editDocumentUrl, homeUrl, loginUrl, registerUrl, xmlComparatorUrl} from './urls';
 import {Home} from './Home';
 import {RegisterForm} from './forms/RegisterForm';
 import {LoginForm} from './forms/LoginForm';
@@ -13,6 +13,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {activeUserSelector} from './store/store';
 import {StoreAction, userLoggedOutAction} from './store/actions';
 import {ManuscriptBase} from './manuscript/ManuscriptBase';
+import {XmlComparator} from './XmlComparator';
 
 // TODO: solve languages different?
 const languages: string[] = ['de', 'en'];
@@ -39,6 +40,7 @@ export function App(): JSX.Element {
           <div className="navbar-start">
             {user && <Link className="navbar-item" to={createManuscriptUrl}>{t('createManuscript')}</Link>}
             <Link className="navbar-item" to={editDocumentUrl}>{t('editDocument')}</Link>
+            <Link className="navbar-item" to={xmlComparatorUrl}>{t('xmlComparator')}</Link>
           </div>
 
           <div className="navbar-end">
@@ -71,6 +73,7 @@ export function App(): JSX.Element {
         <Route path={createManuscriptUrl} component={CreateManuscriptForm}/>
         <Route path={'/manuscripts/:mainIdentifier'} component={ManuscriptBase}/>
         <Route path={editDocumentUrl} component={DocumentEditorContainer}/>
+        <Route path={xmlComparatorUrl} component={XmlComparator}/>
         <Route component={NotFound}/>
       </Switch>
     </>
