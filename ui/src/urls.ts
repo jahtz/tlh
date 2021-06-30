@@ -12,3 +12,5 @@ export const registerUrl = '/registerForm';
 export const loginUrl = '/login';
 
 export const editDocumentUrl = '/editDocument';
+
+export const xmlComparatorUrl = '/xmlComparator';
