@@ -62,8 +62,15 @@ export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXml
 
     const contractEmpty = !!writeConfig && !!writeConfig.contractEmpty;
 
-    const writtenAttributes = Object.entries(attributes).map(([name, value]) => `${name}="${value}"`).join(' ');
-
+    const writtenAttributes = Object.entries(attributes)
+      .map(([name, value]) => {
+        const writtenValue = value
+          .replaceAll('<', '&lt;')
+          .replaceAll(/&(?!amp;)/g, '&amp;');
+        return `${name}="${writtenValue}"`;
+      })
+      .join(' ');
+   
     if (children.length === 0 && contractEmpty) {
       return [`<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}/>`];
     } else {
