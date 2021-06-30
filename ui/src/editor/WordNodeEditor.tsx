@@ -15,6 +15,8 @@ import {MorphAnalysisOption} from './MorphologicalAnalysisOption';
 import {DisplayNode} from './NodeDisplay';
 import {tlhNodeDisplayConfig, WordNodeAttributes} from './tlhNodeDisplayConfig';
 import {AnalysisOption} from '../model/analysisOptions';
+import {reconstructTransliteration} from './transliterationReconstruction';
+import {WordContentEditor} from './WordContentEditor';
 
 const morphologyAttributeNameRegex = /^mrp(\d+)$/;
 
@@ -29,6 +31,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
 
   const {t} = useTranslation('common');
   const [selectedMorphologies, setSelectedMorphologies] = useState<SelectedAnalysisOption[]>(initialSelectedMorphologies);
+  const [editContent, setEditContent] = useState<string>();
 
   const handleKey = (event: KeyboardEvent) => event.key === 'Enter' && handleUpdate();
 
@@ -78,8 +81,19 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
     setSelectedMorphologies(allValues.sort(compareSelectedAnalysisOptions));
   }
 
+  function editWord(): void {
+    const x = node.children.map(reconstructTransliteration).join('');
+    console.info(x);
+
+    setEditContent(x);
+  }
+
   // works only if initialSelectedMorphologies and selectedMorphologies are sorted!
   const morphologiesChanged = initialSelectedMorphologies.length !== selectedMorphologies.length || initialSelectedMorphologies.some((im, index) => !selectedAnalysisOptionEquals(im, selectedMorphologies[index]));
+
+  if (editContent) {
+    return <WordContentEditor initialTransliteration={editContent} cancelEdit={() => setEditContent(undefined)}/>;
+  }
 
   return (
     <div>
@@ -95,7 +109,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
 
       <div className="columns">
         <div className="column">
-          <button type="button" className="button is-fullwidth" disabled>{t('editContent')}</button>
+          <button type="button" className="button is-fullwidth" onClick={editWord}>{t('editContent')}</button>
         </div>
         <div className="column">
           <button type="button" className="button is-fullwidth" onClick={selectAll}>{t('selectAllMorphologies')}</button>

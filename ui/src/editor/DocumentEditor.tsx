@@ -33,7 +33,7 @@ export function DocumentEditorContainer(): JSX.Element {
   }
 
   return (
-    <div className="container">
+    <div className="container is-fluid">
       {state
         ? <NewDocumentEditor node={state.rootNode} download={download}/>
         : <FileLoader accept="text/xml" onLoad={readFile}/>}

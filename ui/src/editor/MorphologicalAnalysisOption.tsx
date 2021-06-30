@@ -41,7 +41,7 @@ export function MorphAnalysisOption({ma, selectedOption, updateSelected}: MorphA
             <MorphAnalysisButton identifier={{num: number}} analysis={ma.analysis} select={updateSelected} selectedOption={selectedOption}/>
           </div>
           : ma.analyses.map(({letter, analysis}, index) =>
-            <div key={index} className="column is-one-third-desktop">
+            <div key={index} className="column">
               <MorphAnalysisButton identifier={{num: number, letter}} analysis={analysis} select={updateSelected} selectedOption={selectedOption}/>
             </div>
           )}
