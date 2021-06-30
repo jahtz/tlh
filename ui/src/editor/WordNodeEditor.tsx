@@ -15,6 +15,8 @@ import {MorphAnalysisOption} from './MorphologicalAnalysisOption';
 import {DisplayNode} from './NodeDisplay';
 import {tlhNodeDisplayConfig, WordNodeAttributes} from './tlhNodeDisplayConfig';
 import {AnalysisOption} from '../model/analysisOptions';
+import {useSelector} from 'react-redux';
+import {editorConfigSelector} from '../store/store';
 
 const morphologyAttributeNameRegex = /^mrp(\d+)$/;
 
@@ -29,8 +31,9 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
 
   const {t} = useTranslation('common');
   const [selectedMorphologies, setSelectedMorphologies] = useState<SelectedAnalysisOption[]>(initialSelectedMorphologies);
+  const editorConfig = useSelector(editorConfigSelector);
 
-  const handleKey = (event: KeyboardEvent) => event.key === 'Enter' && handleUpdate();
+  const handleKey = (event: KeyboardEvent) => editorConfig.submitChangeKeys.includes(event.key) && handleUpdate();
 
   useEffect(() => {
     document.addEventListener('keydown', handleKey);

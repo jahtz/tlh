@@ -4,6 +4,8 @@ import {EditTriggerFunc, UpdateNodeFunc, XmlNodeDisplayConfigObject} from './xml
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 import {DisplayNode} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
+import {useSelector} from 'react-redux';
+import {editorConfigSelector} from '../store/store';
 
 interface IProps {
   node: XmlNode;
@@ -58,6 +60,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
 
   const {t} = useTranslation('common');
   const [state, setState] = useState<IState>({rootNode: initialNode});
+  const editorConfig = useSelector(editorConfigSelector);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKey);
@@ -101,9 +104,9 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
 
   function handleKey(event: KeyboardEvent): void {
     if (state.editState) {
-      if (event.key === 'w') {
+      if (editorConfig.nextEditableNodeKeys.includes(event.key)) {
         jumpEditableNodes(state.editState.node.tagName, true);
-      } else if (event.key === 'q') {
+      } else if (editorConfig.previousEditableNodeKeys.includes(event.key)) {
         jumpEditableNodes(state.editState.node.tagName, false);
       }
     }

@@ -1,5 +1,6 @@
 import {Action} from 'redux';
 import {LoggedInUserFragment} from '../generated/graphql';
+import {EditorConfig} from '../editor/editorConfig';
 
 // User logged in
 
@@ -23,10 +24,22 @@ export function userLoggedOutAction(): UserLoggedOutAction {
   return {type: USER_LOGGED_OUT};
 }
 
+// User updated preferences
+
+export const UPDATE_PREFERENCES = 'UPDATE_PREFERENCES';
+
+interface UpdatePreferencesAction extends Action<typeof UPDATE_PREFERENCES> {
+  newPreferences: EditorConfig;
+}
+
+export function updatePreferencesAction(newPreferences: EditorConfig): UpdatePreferencesAction {
+  return {type: UPDATE_PREFERENCES, newPreferences};
+}
+
 // all actions
 
 const reduxActionType = '@@redux';
 
 type InitAction = Action<typeof reduxActionType>;
 
-export type StoreAction = UserLoggedInAction | UserLoggedOutAction | InitAction;
+export type StoreAction = UserLoggedInAction | UserLoggedOutAction | UpdatePreferencesAction | InitAction;
