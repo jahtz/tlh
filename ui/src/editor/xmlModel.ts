@@ -52,7 +52,7 @@ export interface XmlWriteConfig {
   [tagName: string]: NodeWriteConfig;
 }
 
-export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXmlWriteConfig): string[] {
+export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXmlWriteConfig, parentInline = false): string[] {
   if (node.__type === 'XmlTextNode') {
     return [node.textContent];
   } else {
@@ -74,12 +74,14 @@ export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXml
     if (children.length === 0 && contractEmpty) {
       return [`<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}/>`];
     } else {
-      const writtenChildren = children.flatMap((n) => writeNode(n, xmlWriteConfig));
+      const inlineChildren = !!writeConfig?.inlineChildren || parentInline;
+
+      const writtenChildren = children.flatMap((n) => writeNode(n, xmlWriteConfig, inlineChildren));
 
       const startTag = `<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}>`;
       const endTag = `</${tagName}>`;
 
-      return !!writeConfig && !!writeConfig.inlineChildren
+      return inlineChildren
         ? [startTag + writtenChildren.join('') + endTag]
         : [startTag, ...writtenChildren.map(indent), endTag];
     }
