@@ -13,7 +13,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {activeUserSelector} from './store/store';
 import {StoreAction, userLoggedOutAction} from './store/actions';
 import {ManuscriptBase} from './manuscript/ManuscriptBase';
-import {XmlComparator} from './XmlComparator';
+import {XmlComparator} from './xmlComparator/XmlComparator';
 import {Preferences} from './Preferences';
 import {IoSettingsOutline} from 'react-icons/io5';
 

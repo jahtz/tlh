@@ -57,10 +57,6 @@ export interface SelectOption<T> {
   label: string;
 }
 
-export function selectOption<T>(value: T, label: string): SelectOption<T> {
-  return {value, label};
-}
-
 interface CustomSelectProps<T> {
   label: string;
   id: string;
@@ -70,6 +66,7 @@ interface CustomSelectProps<T> {
 }
 
 export function BulmaObjectSelect<T>({label, id, currentValue, options, onUpdate}: CustomSelectProps<T>): JSX.Element {
+  // FIXME: remove bulma stuff, make more generic!
 
   function onValueChange(event: ChangeEvent<HTMLSelectElement>) {
     onUpdate(options[event.target.selectedIndex].value);
