@@ -13,7 +13,7 @@ export interface AOLineBreak {
 }
 
 export const aoLineBreakFormat: XmlWriter<AOLineBreak> = {
-  write: ({textId, side, column, lineNumber, language, words}) =>
+  write: ({textId, /*side, column,*/ lineNumber, language, words}) =>
     [`<lb lg="${language}" lnr="${lineNumber}" txtid="${textId}"/>`, ...words.flatMap((w) => aoWordFormat.write(w))]
 };
 

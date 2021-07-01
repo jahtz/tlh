@@ -112,17 +112,19 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
       </div>
 
       <div className="box has-text-centered has-background-primary has-text-left has-text-weight-bold is-size-5">
-        {selectedMorphologies.sort(compareSelectedAnalysisOptions).map((selectedMorph) => {
-          const x: MorphologicalAnalysis = morphologies.find(({number}) => number === selectedMorph.num)!;
+        {selectedMorphologies
+          .sort(compareSelectedAnalysisOptions)
+          .map((selectedMorph) => {
+            const x: MorphologicalAnalysis = morphologies.find(({number}) => number === selectedMorph.num)!;
 
-          const analysis: string | AnalysisOption | undefined = isSingleMorphologicalAnalysis(x)
-            ? x.analysis
-            : x.analyses.find(({letter}) => selectedMorph.letter === letter);
+            const analysis: string | AnalysisOption | undefined = isSingleMorphologicalAnalysis(x)
+              ? x.analysis
+              : x.analyses.find(({letter}) => selectedMorph.letter === letter);
 
-          return <p key={stringifySelectedAnalysisOption(selectedMorph)}>
-            {stringifySelectedAnalysisOption(selectedMorph)} - &nbsp;&nbsp;&nbsp;&nbsp; {x.translation} &nbsp; {typeof analysis === 'string' ? analysis : analysis?.analysis} &nbsp; {x.other}
-          </p>;
-        })}
+            return <p key={stringifySelectedAnalysisOption(selectedMorph)}>
+              {stringifySelectedAnalysisOption(selectedMorph)} - &nbsp;&nbsp;&nbsp;&nbsp; {x.translation} &nbsp; {typeof analysis === 'string' ? analysis : analysis?.analysis} &nbsp; {x.other}
+            </p>;
+          })}
       </div>
 
       <div className="buttons">
