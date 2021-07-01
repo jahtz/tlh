@@ -11,7 +11,7 @@ import {
 import {useTranslation} from 'react-i18next';
 import React, {useEffect, useState} from 'react';
 import {isSingleMorphologicalAnalysis, MorphologicalAnalysis, readMorphAnalysis} from '../model/morphologicalAnalysis';
-import {MorphAnalysisOption} from './MorphologicalAnalysisOption';
+import {MorphAnalysisOption, Numerus} from './MorphologicalAnalysisOption';
 import {DisplayNode} from './NodeDisplay';
 import {tlhNodeDisplayConfig, WordNodeAttributes} from './tlhNodeDisplayConfig';
 import {AnalysisOption} from '../model/analysisOptions';
@@ -67,7 +67,8 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
     });
   }
 
-  function selectAll(number?: number): void {
+  function selectAll(number?: number, numerus?: Numerus): void {
+
     const allValues = morphologies
       .filter((morph) => !number || morph.number === number)
       .flatMap((m) => {
@@ -75,9 +76,11 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
 
         return isSingleMorphologicalAnalysis(m)
           ? [{num}]
-          : m.analyses.map(({letter}) => {
-            return {num, letter};
-          });
+          : m.analyses
+            .filter(({analysis}) => !numerus || analysis.includes(numerus))
+            .map(({letter}) => {
+              return {num, letter};
+            });
       });
 
     setSelectedMorphologies(allValues.sort(compareSelectedAnalysisOptions));
@@ -93,7 +96,8 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
       </div>
 
       {morphologies.map((m, index) =>
-        <MorphAnalysisOption key={index} ma={m} selectedOption={selectedMorphologies} updateSelected={updateSelected} selectAll={() => selectAll(m.number)}/>
+        <MorphAnalysisOption key={index} ma={m} selectedOption={selectedMorphologies} updateSelected={updateSelected}
+                             selectAll={(numerus) => selectAll(m.number, numerus)}/>
       )}
 
       <hr/>
