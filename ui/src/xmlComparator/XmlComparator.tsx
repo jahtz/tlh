@@ -26,7 +26,7 @@ export function XmlComparator(): JSX.Element {
   const {t} = useTranslation('common');
   const [state, setState] = useState<IState>({config: emptyXmlComparatorConfig});
 
-  function updateState(config: XmlComparatorConfig, firstFile: ReadFile | undefined, secondFile: ReadFile | undefined): IState {
+  function updateState({config, firstFile, secondFile}: IState): IState {
     if (!firstFile || !secondFile) {
       return {config, firstFile, secondFile};
     }
@@ -47,19 +47,19 @@ export function XmlComparator(): JSX.Element {
 
   async function setFirstFile(file: File): Promise<void> {
     const firstFile = await readFile(file);
-    setState(({config, secondFile}) => updateState(config, firstFile, secondFile));
+    setState((currentState) => updateState({...currentState, firstFile}));
   }
 
   async function setSecondFile(file: File): Promise<void> {
     const secondFile = await readFile(file);
-    setState(({config, firstFile}) => updateState(config, firstFile, secondFile));
+    setState((currentState) => updateState({...currentState, secondFile}));
+  }
+
+  function updateXmlConfigOption(config: XmlComparatorConfig): void {
+    setState((currentState) => updateState({...currentState, config}));
   }
 
   const xmlConfigOptions: SelectOption<XmlComparatorConfig>[] = allXmlComparatorConfig.map((option) => ({value: option, label: option.name}));
-
-  function updateXmlConfigOption(config: XmlComparatorConfig): void {
-    setState(({firstFile, secondFile}) => updateState(config, firstFile, secondFile));
-  }
 
   return (
     <div className="container is-fluid">
