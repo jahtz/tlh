@@ -16,7 +16,7 @@ function MorphAnalysisButton({identifier, analysis, selectedOption, select}: Mor
   const classes = classNames('button', 'is-fullwidth', 'button-text-left', {'is-link': isSelected(identifier, selectedOption)});
 
   function updateSelected(event: MouseEvent<HTMLButtonElement>): void {
-    select(identifier, event.ctrlKey);
+    select(identifier, event.ctrlKey || event.metaKey);
   }
 
   return <button onClick={updateSelected} className={classes}>{identifier.num}{identifier.letter} - {analysis}</button>;
