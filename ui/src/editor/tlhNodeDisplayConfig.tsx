@@ -47,6 +47,9 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
     replace: (node) => <span>{node.attributes.c}</span>
   },
 
+  parsep: {replace: () => <span>¬¬¬</span>},
+  parsep_dbl: {replace: () => <span>===</span>},
+
   corr: {
     styling: () => ['corr'],
     replace: (/*node*/) => <span>!</span>
