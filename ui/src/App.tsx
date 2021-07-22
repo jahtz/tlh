@@ -8,7 +8,7 @@ import {useTranslation} from 'react-i18next';
 import i18next from 'i18next';
 import {CreateManuscriptForm} from './CreateManuscriptForm';
 import {NotFound} from './NotFound';
-import {DocumentEditorContainer} from './editor/DocumentEditor';
+import {DocumentEditorContainer} from './editor/DocumentEditorContainer';
 import {useDispatch, useSelector} from 'react-redux';
 import {activeUserSelector} from './store/store';
 import {StoreAction, userLoggedOutAction} from './store/actions';

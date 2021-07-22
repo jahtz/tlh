@@ -61,6 +61,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
   const {t} = useTranslation('common');
   const [state, setState] = useState<IState>({rootNode: initialNode});
   const editorConfig = useSelector(editorConfigSelector);
+  const [keyHandlingEnabled, setKeyHandlingEnabled] = useState(true);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKey);
@@ -103,7 +104,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
   }
 
   function handleKey(event: KeyboardEvent): void {
-    if (state.editState) {
+    if (state.editState && keyHandlingEnabled) {
       if (editorConfig.nextEditableNodeKeys.includes(event.key)) {
         jumpEditableNodes(state.editState.node.tagName, true);
       } else if (editorConfig.previousEditableNodeKeys.includes(event.key)) {
@@ -122,7 +123,13 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
         <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>
       </div>
       <div className="column">
-        {state.editState && editConfig && editConfig.edit && editConfig.edit({...state.editState, updateNode, jumpEditableNodes})}
+        {state.editState && editConfig && editConfig.edit && editConfig.edit({
+          ...state.editState,
+          updateNode,
+          jumpEditableNodes,
+          keyHandlingEnabled,
+          setKeyHandlingEnabled
+        })}
       </div>
     </div>
   );

@@ -81,7 +81,7 @@ export function CreateManuscriptForm(): JSX.Element {
                     <div className="field">
                       <label className="label">{t('otherIdentifier_plural')}:</label>
                       <div>
-                        {values.otherIdentifiers!.map((otherIdentifier: ManuscriptIdentifierInput, index: number) =>
+                        {values.otherIdentifiers && values.otherIdentifiers.map((otherIdentifier: ManuscriptIdentifierInput, index: number) =>
                           <ManuscriptIdInputField
                             mainId={`otherIdentifiers.${index}`} key={index}
                             deleteFunc={() => arrayHelpers.remove(index)}

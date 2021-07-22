@@ -1,7 +1,7 @@
 import React from 'react';
 import {XmlEditableNodeIProps, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {WordNodeEditor} from './WordNodeEditor';
-import {XmlWriteConfig} from './xmlModel';
+import {GenericAttributes, XmlWriteConfig} from './xmlModel';
 import classNames from 'classnames';
 
 
@@ -27,7 +27,7 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
       });
       return <><span className={classes}>{renderedChildren}</span>&nbsp;&nbsp;</>;
     },
-    edit: (props: XmlEditableNodeIProps<WordNodeAttributes>) => <WordNodeEditor props={props} key={props.path.join('.')}/>
+    edit: (props: XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>) => <WordNodeEditor props={props} key={props.path.join('.')}/>
   },
 
   // Word contents
