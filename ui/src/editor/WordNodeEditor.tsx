@@ -77,7 +77,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
         return isSingleMorphologicalAnalysis(m)
           ? [{num}]
           : m.analyses
-            .filter(({analysis}) => !numerus || analysis.includes(numerus))
+            .filter(({analysis}) => !numerus || analysis.includes(numerus) || analysis.includes('ABL') || analysis.includes('INS'))
             .map(({letter}) => {
               return {num, letter};
             });
