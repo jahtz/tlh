@@ -1,4 +1,5 @@
 import {tlhXmlWriteConfig} from './tlhNodeDisplayConfig';
+import {letterHarmonization, localLetterCorrections, performCorrections} from './xmlLoader';
 
 export interface GenericAttributes {
   [name: string]: string;
@@ -20,9 +21,17 @@ export type XmlNode = XmlElementNode | XmlTextNode;
 
 // Read
 
+function createTextNode(baseTextContent: string): XmlTextNode {
+  const correctedText = performCorrections(baseTextContent, localLetterCorrections);
+
+  const textContent = performCorrections(correctedText, letterHarmonization);
+
+  return {__type: 'XmlTextNode', textContent};
+}
+
 export function loadNode(el: ChildNode): XmlNode {
   if (el instanceof Text) {
-    return {__type: 'XmlTextNode', textContent: el.textContent || ''};
+    return createTextNode(el.textContent || '');
   } else if (el instanceof Element) {
     return {
       __type: 'XmlElementNode',

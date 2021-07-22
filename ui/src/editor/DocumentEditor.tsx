@@ -1,16 +1,9 @@
 import React, {useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
-import {loadNode, XmlNode} from './xmlModel';
+import {XmlNode} from './xmlModel';
 import {NewDocumentEditor} from './NewDocumentEditor';
+import {loadNewXml} from './xmlLoader';
 
-
-async function loadNewXml(file: File): Promise<XmlNode> {
-  const content = await file.text();
-
-  const doc = new DOMParser().parseFromString(content, 'text/xml');
-
-  return loadNode(doc.children[0]);
-}
 
 function handleSaveToPC(data: string, filename: string): void {
   const blob = new Blob([data], {type: 'text/plain'});
