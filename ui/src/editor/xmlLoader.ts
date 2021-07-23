@@ -1,23 +1,50 @@
 import {loadNode, XmlNode} from './xmlModel';
 
-// Document elements
+export type LetterCorrection = {
+  [key: string]: string;
+}
 
-async function readDocumentFile(file: File): Promise<string> {
-  const fileReader = new FileReader();
+const globalLetterCorrections: LetterCorrection = {
+  '\xa0': ' ' // non breakable space to normal space
+};
 
-  return new Promise((resolve, reject) => {
-    fileReader.onloadend = () => resolve(fileReader.result as string);
+export const localLetterCorrections: LetterCorrection = {
+  'š': 'š', // kombi zu 161
+  'Š': 'Š', // kombi zu 160
 
-    fileReader.onerror = reject;
+  'ḫ̮': 'ḫ',
+  'Ḫ̮': 'Ḫ',
 
-    fileReader.readAsText(file);
-  });
+  'ḫ': 'ḫ',
+  'Ḫ': 'Ḫ',
+
+  'h': 'ḫ',
+  'H': 'Ḫ',
+
+  '̮': '', // Achtung, überzähliger Bogen unter Het! schlecht sichtbar
+
+  '〈': '〈', // U+3008 aus CJK zu  U+2329
+  '〉': '〉'
+};
+
+export const letterHarmonization: LetterCorrection = {
+  'á': 'á', 'à': 'à', 'â': 'â', 'ā': 'a',
+  'é': 'é', 'è': 'è', 'ê': 'ê', 'ē': 'e',
+  'í': 'í', 'ì': 'ì', 'î': 'î', 'ī': 'i',
+  'ú': 'ú', 'ù': 'ù', 'û': 'û', 'ū': 'u',
+  '=': '-'
+};
+
+export function performCorrections(text: string, corrections: LetterCorrection): string {
+  return Object.entries(corrections).reduce<string>((acc, [key, value]) => acc.replaceAll(key, value), text);
 }
 
 export async function loadNewXml(file: File): Promise<XmlNode> {
-  const content = await readDocumentFile(file);
+  const content = await file.text();
 
-  const doc = new DOMParser().parseFromString(content, 'text/xml');
+  const correctedText = performCorrections(content, globalLetterCorrections);
+
+  const doc = new DOMParser().parseFromString(correctedText, 'text/xml');
 
   return loadNode(doc.children[0]);
 }

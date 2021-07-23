@@ -2,6 +2,8 @@ use hpm;
 
 drop table if exists tlh_dig_transliterations;
 
+drop table if exists tlh_dig_transliteration_lines;
+
 drop table if exists tlh_dig_manuscript_other_identifiers;
 
 drop table if exists tlh_dig_manuscript_metadatas;
@@ -51,17 +53,32 @@ create table if not exists tlh_dig_manuscript_other_identifiers
 
 -- transliteration results
 
-create table if not exists tlh_dig_transliterations
+create table if not exists tlh_dig_transliteration_lines
 (
-    main_identifier varchar(20)
+    main_identifier         varchar(20)
         references tlh_dig_manuscript_metadatas (main_identifier)
             on update cascade on delete cascade,
-    side            varchar(30),
-    version         integer,
+    line_index              integer,
 
-    input           text not null,
-    result_xml      text not null,
-    result_json     json not null,
+    transliteration_input   varchar(255) not null,
+    result_line_number      integer,
+    result_line_is_absolute boolean,
 
-    primary key (main_identifier, side, version)
+    primary key (main_identifier, line_index)
+);
+
+
+create table if not exists tlh_dig_words
+(
+    main_identifier varchar(20),
+    line_index      integer,
+    word_index      integer,
+
+    word_input      varchar(100) not null,
+    content         json,
+
+    primary key (main_identifier, line_index, word_index),
+    foreign key (main_identifier, line_index)
+        references tlh_dig_transliteration_lines (main_identifier, line_index)
+        on update cascade on delete cascade
 );

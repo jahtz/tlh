@@ -4,7 +4,7 @@ import {allManuscriptLanguages, getNameForManuscriptLanguage, ManuscriptLanguage
 import {useTranslation} from 'react-i18next';
 import {parseTransliterationLine} from '../transliterationParser/parser';
 import {defaultSideBasics, SideBasics, SideParseResult} from '../model/sideParseResult';
-import {BulmaObjectSelect, SelectOption, selectOption} from '../forms/BulmaFields';
+import {BulmaObjectSelect, SelectOption} from '../forms/BulmaFields';
 import {Transliteration} from './TransliterationLineResult';
 import {transliterationLine, TransliterationLine, xmlifyTransliterationLine} from '../model/transliterationLine';
 import {ManuscriptSide, TransliterationInput} from '../generated/graphql';
@@ -66,18 +66,18 @@ export function TransliterationSideInput({mainIdentifier, onTransliterationUpdat
   const [state, setState] = useState<IState>({sideBasics: defaultSideBasics});
 
   const manuscriptSideOptions: SelectOption<ManuscriptSide>[] = manuscriptSides
-    .map((side) => selectOption(side, getNameForManuscriptSide(side, t)));
+    .map((side) => ({value: side, label: getNameForManuscriptSide(side, t)}));
 
   const languageOptions: SelectOption<ManuscriptLanguage>[] = allManuscriptLanguages
-    .map((language) => selectOption(language, getNameForManuscriptLanguage(language/*, t*/)));
+    .map((language) => ({value: language, label: getNameForManuscriptLanguage(language/*, t*/)}));
 
   const columnOptions: SelectOption<ManuscriptColumn>[] = manuscriptColumns
     // FIXME: label!
-    .map((column) => selectOption(column, column));
+    .map((column) => ({value: column, label: column}));
 
   const columnModifierOptions: SelectOption<ManuscriptColumnModifier>[] = manuscriptColumnModifiers
     // FIXME: label!
-    .map((columnModifier) => selectOption(columnModifier, columnModifier));
+    .map((columnModifier) => ({value: columnModifier, label: columnModifier}));
 
   function updateTransliteration(input: string): void {
     const language = state.sideBasics.language;

@@ -1,6 +1,6 @@
 import React, {Dispatch} from 'react';
 import {Link, Route, Switch, useHistory} from 'react-router-dom';
-import {createManuscriptUrl, editDocumentUrl, homeUrl, loginUrl, registerUrl, xmlComparatorUrl} from './urls';
+import {createManuscriptUrl, editDocumentUrl, homeUrl, loginUrl, preferencesUrl, registerUrl, xmlComparatorUrl} from './urls';
 import {Home} from './Home';
 import {RegisterForm} from './forms/RegisterForm';
 import {LoginForm} from './forms/LoginForm';
@@ -8,12 +8,14 @@ import {useTranslation} from 'react-i18next';
 import i18next from 'i18next';
 import {CreateManuscriptForm} from './CreateManuscriptForm';
 import {NotFound} from './NotFound';
-import {DocumentEditorContainer} from './editor/DocumentEditor';
+import {DocumentEditorContainer} from './editor/DocumentEditorContainer';
 import {useDispatch, useSelector} from 'react-redux';
 import {activeUserSelector} from './store/store';
 import {StoreAction, userLoggedOutAction} from './store/actions';
 import {ManuscriptBase} from './manuscript/ManuscriptBase';
-import {XmlComparator} from './XmlComparator';
+import {XmlComparator} from './xmlComparator/XmlComparator';
+import {Preferences} from './Preferences';
+import {IoSettingsOutline} from 'react-icons/io5';
 
 // TODO: solve languages different?
 const languages: string[] = ['de', 'en'];
@@ -44,6 +46,7 @@ export function App(): JSX.Element {
           </div>
 
           <div className="navbar-end">
+            <Link className="navbar-item" to={preferencesUrl}><IoSettingsOutline/>&nbsp;{t('preferences')}</Link>
             <div className="navbar-item has-dropdown is-hoverable">
               <div className="navbar-link">{t('language')}</div>
               <div className="navbar-dropdown">
@@ -74,6 +77,7 @@ export function App(): JSX.Element {
         <Route path={'/manuscripts/:mainIdentifier'} component={ManuscriptBase}/>
         <Route path={editDocumentUrl} component={DocumentEditorContainer}/>
         <Route path={xmlComparatorUrl} component={XmlComparator}/>
+        <Route path={preferencesUrl} component={Preferences}/>
         <Route component={NotFound}/>
       </Switch>
     </>

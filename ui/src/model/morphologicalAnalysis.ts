@@ -13,8 +13,13 @@ export interface LetteredMorphologicalAnalysis extends IMorphologicalAnalysis {
   analyses: AnalysisOption[];
 }
 
+export function writeLetteredMorphologicalAnalysisValue({transcription, translation, analyses, other}: LetteredMorphologicalAnalysis): string[] {
+  return [`${transcription} @ ${translation} @ `,
+    ...analyses.map(({letter, analysis}) => `{${letter} → ${analysis}}`),
+    ` @ ${other.join(' @ ')}`];
+}
 
-function writeLetteredMorphologicalAnalysis({number, transcription, translation, analyses, other}: LetteredMorphologicalAnalysis): string[] {
+export function writeLetteredMorphologicalAnalysis({number, transcription, translation, analyses, other}: LetteredMorphologicalAnalysis): string[] {
   return [
     `mrp${number}="${transcription} @ ${translation} @ `,
     ...analyses.map(({letter, analysis}) => `{${letter} → ${analysis}}`),
@@ -28,8 +33,12 @@ export interface SingleMorphologicalAnalysis extends IMorphologicalAnalysis {
   analysis: string;
 }
 
-export function writeSingleMorphologicalAnalysis({number, transcription, translation, analysis, other}: SingleMorphologicalAnalysis): string[] {
-  return [`mrp${number}="${transcription} @ ${translation} @ ${analysis} @ ${other.join(' @ ')}"`];
+export function writeSingleMorphologicalAnalysisValue({transcription, translation, analysis, other}: SingleMorphologicalAnalysis): string {
+  return `${transcription} @ ${translation} @ ${analysis} @ ${other.join(' @ ')}`;
+}
+
+export function writeSingleMorphologicalAnalysis(sma: SingleMorphologicalAnalysis): string[] {
+  return [`mrp${sma.number}="${writeSingleMorphologicalAnalysisValue(sma)}"`];
 }
 
 

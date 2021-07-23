@@ -6,9 +6,19 @@ body
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
 
-
 code
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace
+
+/* HPM fonts */
+@font-face
+  font-family: 'HPM'
+  src: url(./fonts/HPMLinBiolinumO.woff)
+
+@font-face
+  font-family: 'HPM-serif'
+  src: url(./fonts/HPMLinLibertineO.woff)
+
+/* special classes */
 
 .navbar
   margin-bottom: 20px
@@ -19,6 +29,13 @@ code
 .documentText
   max-height: 1000px
   overflow-y: scroll
+
+/* Load new font for editor */
+.font-hpm
+  font-family: HPM, monospace
+
+.font-hpm-serif
+  font-family: HPM-serif, monospace
 
 .button-text-left
   justify-content: flex-start

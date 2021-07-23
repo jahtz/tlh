@@ -18,6 +18,8 @@ export interface XmlEditableNodeIProps<A = GenericAttributes> {
   updateNode: UpdateNodeFunc<A>;
   path: number[];
   jumpEditableNodes: (tagName: string, forward: boolean) => void;
+  keyHandlingEnabled: boolean;
+  setKeyHandlingEnabled: (enabled: boolean) => void;
 }
 
 

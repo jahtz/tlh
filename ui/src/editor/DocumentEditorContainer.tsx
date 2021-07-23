@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
-import {loadNewXml} from './xmlLoader';
 import {XmlNode} from './xmlModel';
 import {NewDocumentEditor} from './NewDocumentEditor';
+import {loadNewXml} from './xmlLoader';
+
 
 function handleSaveToPC(data: string, filename: string): void {
   const blob = new Blob([data], {type: 'text/plain'});

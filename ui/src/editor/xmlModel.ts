@@ -1,4 +1,5 @@
 import {tlhXmlWriteConfig} from './tlhNodeDisplayConfig';
+import {letterHarmonization, localLetterCorrections, performCorrections} from './xmlLoader';
 
 export interface GenericAttributes {
   [name: string]: string;
@@ -20,9 +21,17 @@ export type XmlNode = XmlElementNode | XmlTextNode;
 
 // Read
 
+function createTextNode(baseTextContent: string): XmlTextNode {
+  const correctedText = performCorrections(baseTextContent, localLetterCorrections);
+
+  const textContent = performCorrections(correctedText, letterHarmonization);
+
+  return {__type: 'XmlTextNode', textContent};
+}
+
 export function loadNode(el: ChildNode): XmlNode {
   if (el instanceof Text) {
-    return {__type: 'XmlTextNode', textContent: el.textContent || ''};
+    return createTextNode(el.textContent || '');
   } else if (el instanceof Element) {
     return {
       __type: 'XmlElementNode',
@@ -52,7 +61,7 @@ export interface XmlWriteConfig {
   [tagName: string]: NodeWriteConfig;
 }
 
-export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXmlWriteConfig): string[] {
+export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXmlWriteConfig, parentInline = false): string[] {
   if (node.__type === 'XmlTextNode') {
     return [node.textContent];
   } else {
@@ -74,12 +83,14 @@ export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXml
     if (children.length === 0 && contractEmpty) {
       return [`<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}/>`];
     } else {
-      const writtenChildren = children.flatMap((n) => writeNode(n, xmlWriteConfig));
+      const inlineChildren = !!writeConfig?.inlineChildren || parentInline;
+
+      const writtenChildren = children.flatMap((n) => writeNode(n, xmlWriteConfig, inlineChildren));
 
       const startTag = `<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}>`;
       const endTag = `</${tagName}>`;
 
-      return !!writeConfig && !!writeConfig.inlineChildren
+      return inlineChildren
         ? [startTag + writtenChildren.join('') + endTag]
         : [startTag, ...writtenChildren.map(indent), endTag];
     }
