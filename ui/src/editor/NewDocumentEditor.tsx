@@ -6,6 +6,7 @@ import {DisplayNode} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
 import {editorConfigSelector} from '../store/store';
+import classNames from 'classnames';
 
 interface IProps {
   node: XmlNode;
@@ -59,9 +60,10 @@ function findElement(node: XmlElementNode, path: number[]): XmlElementNode {
 export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDisplayConfig, download}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
-  const [state, setState] = useState<IState>({rootNode: initialNode});
   const editorConfig = useSelector(editorConfigSelector);
+  const [state, setState] = useState<IState>({rootNode: initialNode});
   const [keyHandlingEnabled, setKeyHandlingEnabled] = useState(true);
+  const [useSerifFont, setUseSerifFont] = useState(false);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKey);
@@ -116,11 +118,21 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
   return (
     <div className="columns">
       <div className="column">
-        <div className="box documentText">
+        <div className={classNames('box', 'documentText', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
           <DisplayNode node={state.rootNode} currentSelectedPath={state.editState?.path} displayConfig={displayConfig} onEdit={onEdit} path={[]}/>
         </div>
 
-        <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>
+
+        <div className="columns">
+          <div className="column">
+            <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="button is-fullwidth">
+              {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
+            </button>
+          </div>
+          <div className="column">
+            <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>
+          </div>
+        </div>
       </div>
       <div className="column">
         {state.editState && editConfig && editConfig.edit && editConfig.edit({

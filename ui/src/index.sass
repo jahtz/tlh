@@ -12,7 +12,11 @@ code
 /* HPM fonts */
 @font-face
   font-family: 'HPM'
-  src: url(./fonts/HPMLinBiolinumO.woff) /* format('woff')*/
+  src: url(./fonts/HPMLinBiolinumO.woff)
+
+@font-face
+  font-family: 'HPM-serif'
+  src: url(./fonts/HPMLinLibertineO.woff)
 
 /* special classes */
 
@@ -25,8 +29,13 @@ code
 .documentText
   max-height: 1000px
   overflow-y: scroll
-  /* Load new font for editor */
+
+/* Load new font for editor */
+.font-hpm
   font-family: HPM, monospace
+
+.font-hpm-serif
+  font-family: HPM-serif, monospace
 
 .button-text-left
   justify-content: flex-start
