@@ -75,6 +75,75 @@
           >ši-pa-an-t<del_in/>i
             <del_fin/></w>
 
+            <w trans='DINGIR˽LÚaš' mrp0sel=' 1d '
+               mrp1=' DINGIR˽LÚ @ männliche Götter @
+		{ a → NOM.SG}
+		{ b → GEN.SG}
+		{ c → GEN.PL}
+		{ d → D/L.PL} @ 29.3.1 @ '
+               mrp2=' DINGIR˽LÚ @ männliche Götter @
+		{ a → NOM.SG(UNM)}
+		{ b → ACC.SG(UNM)}
+		{ c → NOM.PL(UNM)}
+		{ d → ACC.PL(UNM)}
+		{ e → GEN.SG(UNM)}
+		{ f → GEN.PL(UNM)}
+		{ g → D/L.SG(UNM)}
+		{ h → D/L.PL(UNM)}
+		{ i → ALL(UNM)}
+		{ j → ABL(UNM)}
+		{ k → INS(UNM)}
+		{ l → VOC.SG(UNM)}
+		{ m → VOC.PL(UNM)} @ 29.3.1
+		   += aš @
+		{ R → PPRO.3SG.C.NOM}
+		{ S → PPRO.3PL.C.ACC} @  @ '
+            ><sGr>DINGIR</sGr>˽<sGr>LÚ</sGr><d>MEŠ</d>-aš</w>
+
+            <w trans='paramaššan' mrp0sel=' 1 '
+               mrp1=' parā @ außerdem @  @ ADV
+		   += ma=ššan @ CNJctr=OBPs @  @ '
+               mrp2=' parā @ aus- @  @ PREV
+		   += ma=ššan @ CNJctr=OBPs @  @ '
+               mrp3=' parā @ heraus aus @  @ POSP
+		   += ma=ššan @ CNJctr=OBPs @  @ '
+               mrp4=' par=a- @ Luft @
+		{ a → VOC.SG}
+		{ b → ALL}
+		{ c → STF} @ 1.1
+		   += ma=ššan @ CNJctr=OBPs @  @ '
+               mrp5=' parā @ außerdem @  @ ADV
+		   += ma=an=ššan @ CNJctr=PPRO.3SG.C.ACC=OBPs @  @ '
+               mrp6=' parā @ aus- @  @ PREV
+		   += ma=an=ššan @ CNJctr=PPRO.3SG.C.ACC=OBPs @  @ '
+               mrp7=' parā @ heraus aus @  @ POSP
+		   += ma=an=ššan @ CNJctr=PPRO.3SG.C.ACC=OBPs @  @ '
+               mrp8=' par=a- @ Luft @
+		{ a → VOC.SG}
+		{ b → ALL}
+		{ c → STF} @ 1.1
+		   += ma=an=ššan @ CNJctr=PPRO.3SG.C.ACC=OBPs @  @ '
+               mrp9=' parā @ außerdem @  @ ADV
+		   += ma=aš=ššan @
+		{ R → CNJctr=PPRO.3SG.C.NOM=OBPs}
+		{ S → CNJctr=PPRO.3PL.C.ACC=OBPs} @  @ '
+               mrp10=' parā @ aus- @  @ PREV
+		   += ma=aš=ššan @
+		{ R → CNJctr=PPRO.3SG.C.NOM=OBPs}
+		{ S → CNJctr=PPRO.3PL.C.ACC=OBPs} @  @ '
+               mrp11=' parā @ heraus aus @  @ POSP
+		   += ma=aš=ššan @
+		{ R → CNJctr=PPRO.3SG.C.NOM=OBPs}
+		{ S → CNJctr=PPRO.3PL.C.ACC=OBPs} @  @ '
+               mrp12=' par=a- @ Luft @
+		{ a → VOC.SG}
+		{ b → ALL}
+		{ c → STF} @ 1.1
+		   += ma=aš=ššan @
+		{ R → CNJctr=PPRO.3SG.C.NOM=OBPs}
+		{ S → CNJctr=PPRO.3PL.C.ACC=OBPs} @  @ '
+            >pa-ra-a-ma-aš-ša-an</w>
+
           <lb txtid="KBo 4.9" lnr="Vs. I 3" lg="Hit"/>
 
           <w trans='našta' mrp0sel='  '

@@ -25,6 +25,8 @@ import {useSelector} from 'react-redux';
 import {editorConfigSelector} from '../store/store';
 import {GenericAttributes, XmlElementNode} from './xmlModel';
 import {MorphAnalysisEditor} from './morphAnalysisOption/MorphAnalysisEditor';
+import {reconstructTransliteration} from './transliterationReconstruction';
+import {WordContentEditor} from './WordContentEditor';
 
 const morphologyAttributeNameRegex = /^mrp(\d+)$/;
 
@@ -55,6 +57,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
 
   const {t} = useTranslation('common');
   const editorConfig = useSelector(editorConfigSelector);
+  const [editContent, setEditContent] = useState<string>();
 
   const [state, setState] = useState<IState>({
     morphologies: readMorphologiesFromNode(node),
@@ -116,6 +119,13 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
     });
   }
 
+  function editWord(): void {
+    const x = node.children.map(reconstructTransliteration).join('');
+    console.info(x);
+
+    setEditContent(x);
+  }
+
   function updateMorphology(newMa: MorphologicalAnalysis): void {
     setState(({morphologies, selectedMorphologies}) => {
       morphologies[newMa.number - 1] = newMa;
@@ -132,6 +142,10 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
     const number = Math.max(...state.morphologies.map(({number}) => number)) + 1;
 
     return {type: 'LetteredMorphologicalAnalysis', number, translation: '', transcription: '', other: [], analyses: []};
+  }
+
+  if (editContent) {
+    return <WordContentEditor initialTransliteration={editContent} cancelEdit={() => setEditContent(undefined)}/>;
   }
 
   return (
@@ -156,7 +170,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
           <button type="button" className="button is-fullwidth" onClick={toggleAddMorphology}>{t('addMorphology')}</button>
         </div>
         <div className="column">
-          <button type="button" className="button is-fullwidth" disabled>{t('editContent')}</button>
+          <button type="button" className="button is-fullwidth" onClick={editWord}>{t('editContent')}</button>
         </div>
         <div className="column">
           <button type="button" className="button is-fullwidth" onClick={() => selectAll()}>{t('selectAllMorphologies')}</button>

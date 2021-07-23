@@ -1,0 +1,90 @@
+<?xml-stylesheet href="HPMxml.css" type="text/css"?>
+<AOxml    xmlns:hpm="http://hethiter.net/ns/hpm/1.0" xmlns:AO="http://hethiter.net/ns/AO/1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" >
+<AOHeader>
+<docID>Bo 6871</docID>
+<meta><creation-date date='2016-02-10T12:47:52.643014513'/><kor2 date='2021-05-18T13:58:14'/><AOxml-creation date='2021-05-18T13:58:14' /><annotation> <annot editor='auto' date=''/> <annot editor='' date=''/></annotation></meta>
+</AOHeader><body> <div1 type='transliteration'> <text xml:lang='XXXlang'> <p> <s xml:lang='XXXlang'>
+<AO:Manuscripts><AO:InvNr>Bo 6871</AO:InvNr> </AO:Manuscripts>
+<lb txtid="Bo 6871" lnr="Vs. I 1′" lg="Hit"/> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-m<del_in/>a</w> 
+<lb txtid="Bo 6871" lnr="Vs. I 2′" lg="Hit"/> <w>da-a-i</w> <w>na-a<del_in/>t(-)</w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Vs. I 3′" lg="Hit"/> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-ma</w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 4′" lg="Hit"/> <w>na-at</w> <w><aGr>PA-NI</aGr></w> <w><del_in/></w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Vs. I 5′" lg="Hit"/> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-ma</w> <w><num>5</num><corr c='?'/></w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 6′" lg="Hit"/> <w>da-a-i</w> <w>na-a<del_in/>t(-)</w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Vs. I 7′" lg="Hit"/> <w><del_in/><sGr>E<del_fin/>GIR</sGr><aGr>-ŠU</aGr>-ma</w> <w><num>5</num><corr c='?'/></w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 8′" lg="Hit"/> <w>na-at</w> <w><aGr>PA-NI</aGr></w> <w><d>D</d>x<del_in/></w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Vs. I 9′" lg="Hit"/> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-ma</w> <w><laes_in/><num>n</num><laes_fin/></w> <w><sGr>NINDA.SIG</sGr><d>ME<del_in/>Š</d></w>  
+<lb txtid="Bo 6871" lnr="Vs. I 10′" lg="Hit"/> <w>na-at-<laes_in/>ša<laes_fin/>-an</w> <w>iš-x<del_in/></w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Vs. I 11′" lg="Hit"/> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-ma</w> <w><laes_in/><num>n</num><laes_fin/></w> <w><sGr>NINDA.SIG</sGr><d>MEŠ</d></w> <w>x<del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 12′" lg="Hit"/> <w>na-at</w> <w><aGr>PA-NI</aGr></w> <w><d>D</d>ḫé-pát</w> <w>x<del_in/></w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Vs. I 13′" lg="Hit"/> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-ma</w> <w><num>1</num><corr c='?'/></w> <w><sGr>NINDA.KU₇</sGr></w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 14′" lg="Hit"/> <w>na-aš-ša-an</w> <w><aGr>A-N<del_in/>A</aGr></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 15′" lg="Hit"/> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-ma</w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 16′" lg="Hit"/> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-ma</w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 17′" lg="Hit"/> <w>nu</w> <w><d>LÚ</d><sGr>SANGA</sGr></w> <w><num>1</num></w> <w>x<del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 18′" lg="Hit"/> <w><del_in/>nu<del_fin/></w> <w><laes_in/><d>LÚ</d><laes_fin/>pu-ra-a<del_in/>p-ši</w> 
+<lb txtid="Bo 6871" lnr="Vs. I 19′" lg="Hit"/> <w><del_in/><num>1</num></w> <w><sGr>NINDA<del_fin/>.KU₇</sGr>-i<del_in/>a</w> 
+<lb txtid="Bo 6871" lnr="Vs. I 20′" lg="Hit"/> <w><del_in/><num>1</num></w> <w><sGr>NINDA<del_fin/>.GUR₄.RA</sGr></w> <w><aGr>E<del_in/>M-ṢA</aGr></w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Vs. I 21′" lg="Hit"/> <w><del_in/></w> <w><del_fin/>-ma-kán</w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 22′" lg="Hit"/> <w><del_in/></w> <w><del_fin/>-ḫa-an-d<del_in/>a<corr c='?'/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 23′" lg="Hit"/> <w><del_in/></w> <w><del_fin/><laes_in/><d>D</d><laes_fin/>ta-ki-<del_in/>du</w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Vs. I 24′" lg="Hit"/> <w><del_in/><sGr>EG<del_fin/>IR</sGr><aGr>-ŠU</aGr>-ma</w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 25′" lg="Hit"/> <w><del_in/><sGr>E<del_fin/>GIR</sGr><aGr>-ŠU</aGr>-m<del_in/>a</w> 
+<lb txtid="Bo 6871" lnr="Vs. I 26′" lg="Hit"/> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-m<del_in/>a</w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Vs. I 27′" lg="Hit"/> <w><laes_in/>nu<laes_fin/></w> <w>ma-a-a<del_in/>n</w> 
+<lb txtid="Bo 6871" lnr="Vs. I 28′" lg="Hit"/> <w><aGr><laes_in/>IŠ<laes_fin/>-TU</aGr></w> <w>x<del_in/></w>  
+<lb txtid="Bo 6871" lnr="Vs. I 29′" lg="Hit"/> <w><laes_in/><num>n</num><laes_fin/></w> <w><d>NINDA</d>a-a-an</w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 30′" lg="Hit"/> <w><num>1</num><corr c='?'/></w> <w><sGr>DUG</sGr></w> <w><sGr>KAŠ</sGr></w> <w>x<del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 31′" lg="Hit"/> <w>nu</w> <w><d>D</d><sGr>IŠKUR</sGr></w> <w>ku<corr c='?'/>-<del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 32′" lg="Hit"/> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-ma</w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 33′" lg="Hit"/> <w><sGr>KI.MIN</sGr></w> <w><sGr>EG<del_in/>IR</sGr><aGr>-ŠU</aGr>-ma</w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Vs. I 34′" lg="Hit"/> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-<del_in/>ma</w> 
+<lb txtid="Bo 6871" lnr="Vs. I 35′" lg="Hit"/> <w><laes_in/><num>n</num><corr c='?'/><laes_fin/><num>+4</num></w> <w><sGr>NINDA</sGr></w> <w>x<del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 36′" lg="Hit"/> <w><num>n</num></w> <w><sGr>NINDA</sGr></w> <w>x<del_in/></w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Vs. I 37′" lg="Hit"/> <w>nam-ma</w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Vs. I 38′" lg="Hit"/> <w>x-x<del_in/></w> 
+<gap t="line" c="Vs. I bricht ab"/> 
+<lb txtid="Bo 6871" lnr="Rs. IV 1′" lg="Hit"/> <w><note  n='1'  c="&lt;P_f_Footnote&gt;&lt;SP_f_AO_3a_--italic&gt;s.&lt;/SP_f_AO_3a_--italic&gt; &lt;SP_f_AO_3a_-LIT&gt;Otten H. 1974c&lt;/SP_f_AO_3a_-LIT&gt;: 139-142.&lt;/P_f_Footnote&gt;"  /></w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 2′" lg="Hit"/>  
+<lb txtid="Bo 6871" lnr="Rs. IV 3′" lg="Hit"/> <w><del_in/><sGr>EGI<del_fin/>R</sGr><aGr>-ŠU</aGr>-ma</w> <w><d>D</d>ḫé-pát</w> <w>ša<del_in/>r-ru-ma</w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 4′" lg="Hit"/> <w><del_in/><sGr>EGI<del_fin/>R</sGr><aGr>-ŠU</aGr>-ma</w> <w><d>D</d>še-er-ri</w> <w><d>D</d><del_in/></w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Rs. IV 5′" lg="Hit"/> <w><laes_in/>nam<laes_fin/>-ma</w> <w><num>1</num></w> <w><d>NINDA</d>a-a-an</w> <w><sGr>BA.BA.ZA</sGr></w> <w><aGr>Š<del_in/>A</aGr></w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 6′" lg="Hit"/> <w><num>2</num></w> <w><aGr>UP-NI</aGr></w> <w><num>5</num></w> <w><sGr>NINDA.KU₇</sGr></w> <w><sGr>BA.BA.ZA</sGr></w> <w><aGr>ŠA</aGr></w> <w><num>1</num></w> <w><del_in/></w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Rs. IV 7′" lg="Hit"/> <w>nu</w> <w>ḫa-an-te-ez-zi</w> <w>pal-ši</w> <w><d>D</d><del_in/></w>  
+<lb txtid="Bo 6871" lnr="Rs. IV 8′" lg="Hit"/> <w>na-an</w> <w><aGr>PA-NI</aGr></w> <w><sGr>DINGIR</sGr><aGr>-LIM</aGr></w> <w>da-a-i</w> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-m<del_in/>a</w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 9′" lg="Hit"/> <w><d>D</d>ḫu-te-el-lu-u-ur-ra</w> <w><sGr>KI.MIN</sGr></w> <w>x<del_in/></w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 10′" lg="Hit"/> <w><d>LÚ</d><sGr>NAR</sGr></w> <w><sGr>SÌR</sGr><aGr>-RU</aGr></w> <w><num>1</num></w> <w><sGr>NINDA.GUR₄.RA</sGr></w> <w><aGr>EM-ṢA</aGr></w> <w><sGr>BABBAR</sGr></w> <w><del_in/></w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Rs. IV 11′" lg="Hit"/> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-ma</w> <w><d>D</d>le-el-lu-u-ri</w> <w><d>D</d>a-pa-a-ti</w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 12′" lg="Hit"/> <w>pár-ši-ia</w> <w>na-an</w> <w><aGr>PA-NI</aGr></w> <w><d>D</d>ḫé-pát</w> <w>da-a-i</w> <w><sGr>EGIR</sGr><aGr>-Š<del_in/>U</aGr>-ma</w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 13′" lg="Hit"/> <w>na-an</w> <w><aGr>PA-NI</aGr></w> <w><sGr>DINGIR</sGr><aGr>-LIM</aGr></w> <w>da-a-i</w> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-ma</w> <w><d>D</d>a-x<del_in/></w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 14′" lg="Hit"/> <w><d>LÚ</d><ras_in/><sGr>NAR</sGr><ras_fin/></w> <w><sGr>SÌR</sGr><aGr>-RU</aGr></w> <w><num>1</num></w> <w><sGr>NINDA.GUR₄.RA</sGr></w> <w><aGr>EM-ṢA</aGr></w> <w><sGr>BABBAR</sGr></w> <w><num>½</num></w> <w><aGr><laes_in/>UP<laes_fin/>-<del_in/>NI</aGr></w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Rs. IV 15′" lg="Hit"/> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-ma</w> <w><d>D</d>ḫé-pát</w> <w>e-ku-zi</w> <w><d>LÚ</d><sGr>NAR</sGr></w> <w><sGr>LÚ</sGr>˽<sGr>BA<del_in/>LAG.DI</sGr>-ia</w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 16′" lg="Hit"/> <w>e-ku-zi</w> <w><sGr>LÚ</sGr><d>MEŠ</d>˽<sGr>BALAG.DI</sGr></w> <w><sGr>SÌR</sGr><aGr>-RU</aGr></w> <w><num>1</num></w> <w><sGr>NINDA.GUR₄.RA</sGr></w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 17′" lg="Hit"/> <w>e-ku-zi</w> <w><sGr>LÚ</sGr><d>MEŠ</d>˽<sGr>BALAG.〈DI</sGr>〉</w> <w><sGr>SÌR</sGr><aGr>-RU</aGr></w> <w><num>1</num></w> <w><sGr>NINDA.GUR₄.R<del_in/>A</sGr></w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Rs. IV 18′" lg="Hit"/> <w>na-aš</w> <w><aGr>PA-NI</aGr></w> <w><d>D</d><sGr>10</sGr></w> <w>pa-iz-zi</w> <w><sGr>EGIR</sGr><aGr>-ŠU</aGr>-ma</w> <w><d>D</d>ḫ<del_in/>é-pát</w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 19′" lg="Hit"/> <w><del_in/><sGr>NI<del_fin/>NDA.GUR₄.RA</sGr></w> <w><aGr>EM-ṢA</aGr></w> <w><sGr>BABBAR</sGr></w> <w><num>1</num></w> <w><aGr>UP-NI</aGr></w> <w><num>½</num></w> <w>pár-ši-ia-an-na-<laes_in/>i<laes_fin/><del_in/></w> <w><space c="11"/></w> <w>le-e-li<del_fin/></w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 20′" lg="Hit"/> <w><del_in/>ḫ<del_fin/>a-ša-a-ri</w> <w>e-ku-zi</w> <w><num>1</num></w> <w><sGr>NINDA.GUR₄.RA</sGr></w> <w><aGr>EM-ṢA</aGr></w> <w><num>½</num></w> <w><aGr>U<del_in/>P-NI</aGr></w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 21′" lg="Hit"/> <w>e-ku-zi</w> <w><num>1</num></w> <w><sGr>NINDA.GUR₄.RA</sGr></w> <w><aGr>EM-ṢA</aGr></w> <w><num>½</num></w> <w><aGr>UP-NI</aGr></w> <w>pár-ši-i<del_in/>a</w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 22′" lg="Hit"/> <w>na-aš-ta</w> <w><aGr>PA-NI</aGr></w> <w><d>D</d><sGr>10</sGr></w> <w><num>2</num></w> <w><sGr>GAL</sGr></w> <w><sGr>KÙ.BABBAR</sGr></w> <w><sGr>GEŠTIN</sGr></w> <w>la-<laes_in/>a<laes_fin/>-<del_in/>ḫu-u-wa-an-zi</w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Rs. IV 23′" lg="Hit"/> <w>na-aš</w> <w><sGr>EGIR</sGr>-pa</w> <w><aGr>A-NA</aGr>˽<aGr>PA-NI</aGr></w> <w><d>D</d>ḫé-pát</w> <w>pa-iz-zi</w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 24′" lg="Hit"/> <w>iš-kán-zi</w> <w>nu</w> <w>le-e-li</w> <w>ḫa-a-ša-r<del_in/>i</w> <w>e-ku-zi</w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 25′" lg="Hit"/> <w><num>1</num></w> <w><sGr>NINDA.GUR₄.RA</sGr></w> <w><aGr>EM-ṢA</aGr></w> <w><sGr>BABBAR</sGr></w> <w><num>1</num></w> <w><aGr>UP-NI</aGr></w> <w>pár-ši-ia</w> <w>na-an</w> <w><aGr>PA-NI</aGr></w> <w><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 26′" lg="Hit"/> <w><num>2</num></w> <w><sGr>GAL</sGr></w> <w><sGr>KÙ.BABBAR</sGr></w> <w>la-a-ḫu-u-wa-an-zi</w> <w>nam-ma</w> <w><del_in/></w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Rs. IV 27′" lg="Hit"/> <w>nu</w> <w><sGr>DINGIR</sGr><d>MEŠ</d></w> <w>kar-pa-an-zi</w> <w>na-aš-ta</w> <w>ḫu-u-da-<del_in/>ak</w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 28′" lg="Hit"/> <w>ú-<laes_in/>e<laes_fin/>-te-na-az</w> <w>šu-up-pí-ia-aḫ-ḫa-an-<del_in/>zi</w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 29′" lg="Hit"/> <w>kar-ap-pa-an-zi</w> <w>na-an</w> <w>ma-aḫ-ḫa-<del_in/>an</w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 30′" lg="Hit"/> <w><aGr>UM-MA</aGr></w> <w><sGr>DINGIR</sGr><aGr>-LIM-MI</aGr></w> <w><aGr>A-NA</aGr></w> <w><sGr>LUGAL</sGr></w> <w>ku-wa-<del_in/></w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 31′" lg="Hit"/> <w>nu-wa-mu-za</w> <w><aGr>QA-DU</aGr></w> <w><sGr>ANŠE.KUR.RA</sGr><d>ḪI.A</d></w> <w><d>GIŠ</d><del_in/><sGr>GIGIR</sGr></w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 32′" lg="Hit"/> <w><laes_in/>ú<laes_fin/>-e-ek-<laes_in/>wa<laes_fin/>-za</w> <w><aGr>UM-MA</aGr></w> <w><sGr>LUGAL</sGr><aGr>-M<del_in/>A</aGr></w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 33′" lg="Hit"/> <w><del_in/>ta<del_fin/>r-ḫu-i-li-in-na</w> <w><d>GIŠ</d><sGr>TUKUL</sGr></w> <w>x<del_in/></w> </s></p><parsep/><p><s>  
+<lb txtid="Bo 6871" lnr="Rs. IV 34′" lg="Hit"/> <w><del_in/>nu<del_fin/></w> <w><d>GIŠ</d><sGr>IG</sGr></w> <w>ḫi-iš-ša-an-z<del_in/>i</w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 35′" lg="Hit"/> <w><del_in/><sGr>DINGIR</sGr><del_fin/><d>MEŠ</d>-ia</w> <w>ku-i-e-eš</w> <w>kar-p<del_in/>a-an-zi</w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 36′" lg="Hit"/> <w><del_in/></w> <w><space c="19"/></w> <w><del_fin/>x</w> <w>ar-ḫa</w> <w>x</w> <w><c type='sign'>AN</c><del_in/></w> 
+<lb txtid="Bo 6871" lnr="Rs. IV 37′" lg="Hit"/> <w><del_in/></w> <w><space c="21"/></w> <w><del_fin/>x-ma-kán</w> <w><del_in/></w> 
+<gap t="line" c="Rs. bricht ab"/> 
+<AO:Textline-Hit>
+<AO:ParagrNr c="Kolophon"/></AO:Textline-Hit>
+<lb txtid="Bo 6871" lnr="lk.Rd. 1" lg="Hit"/> <w><del_in/><sGr>DU<del_fin/>B</sGr></w> <w><num>4</num><d>KAM</d></w> <w><aGr>QA-TI</aGr></w> <w>ma-a-an-za</w> <w><sGr>LUGAL</sGr>-u<del_in/>š</w> <w><d>D</d><sGr>10</sGr><note  n='2'  c="&lt;P_f_Footnote&gt;Oder &lt;SP_f_AO_3a_Determ&gt;D&lt;/SP_f_AO_3a_Determ&gt;&lt;SP_f_AO_3a_SumGRAM&gt;IŠKUR.&lt;/SP_f_AO_3a_SumGRAM&gt;&lt;/P_f_Footnote&gt;"  /></w> <w><d>D</d>ḫé-pát</w> <w><aGr>I-N<del_fin/>A</aGr></w> <w><d>URU</d>ki-iz-z<del_in/>u-wa-at-ni</w> <w><d>DUG</d>ḫar-ši-ia-al-li-aš<corr c='?'/><del_fin/></w> 
+<lb txtid="Bo 6871" lnr="lk.Rd. 2" lg="Hit"/> <w><del_in/>k<del_fin/>i-nu-ma-an-zi</w> <w><aGr>I-N<del_in/>A</aGr></w> <w><space c="26"/></w> <w><sGr>G<del_fin/>IŠ</sGr><d>ḪI.A</d></w> <w><d>GIŠ</d><sGr>TÚG</sGr></w> <w><del_in/>ḫal-z<del_fin/>a-<laes_in/>a<laes_fin/>-<del_in/>i</w> <w><space c="5"/></w> <w><del_fin/></w> 
+
+</s></p></text></div1></body></AOxml>
