@@ -24,6 +24,7 @@ import {AnalysisOption} from '../model/analysisOptions';
 import {useSelector} from 'react-redux';
 import {editorConfigSelector} from '../store/store';
 import {GenericAttributes, XmlElementNode} from './xmlModel';
+import {MorphAnalysisEditor} from './morphAnalysisOption/MorphAnalysisEditor';
 
 const morphologyAttributeNameRegex = /^mrp(\d+)$/;
 
@@ -47,6 +48,7 @@ interface IState {
   morphologies: MorphologicalAnalysis[];
   selectedMorphologies: SelectedAnalysisOption[];
   changed: boolean;
+  addMorphology: boolean;
 }
 
 export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNodes, keyHandlingEnabled, setKeyHandlingEnabled}}: IProps): JSX.Element {
@@ -57,14 +59,9 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
   const [state, setState] = useState<IState>({
     morphologies: readMorphologiesFromNode(node),
     selectedMorphologies: readSelectedMorphology(node.attributes.mrp0sel?.trim() || ''),
-    changed: false
+    changed: false,
+    addMorphology: false
   });
-
-  /*
-  const [morphologies, setMorphologies] = useState(readMorphologiesFromNode(node));
-  const [selectedMorphologies, setSelectedMorphologies] = useState(initialSelectedMorphologies);
-  const [changed, setChanged] = useState(false);
-   */
 
   const handleKey = (event: KeyboardEvent) => editorConfig.submitChangeKeys.includes(event.key) && handleUpdate();
 
@@ -102,7 +99,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
 
   function selectAll(number?: number, numerus?: Numerus): void {
 
-    setState(({morphologies}) => {
+    setState(({morphologies, addMorphology}) => {
       const allValues = morphologies
         .filter((morph) => !number || morph.number === number)
         .flatMap((m) =>
@@ -115,14 +112,26 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
               })
         );
 
-      return {morphologies, selectedMorphologies: allValues.sort(compareSelectedAnalysisOptions), changed: true};
+      return {morphologies, selectedMorphologies: allValues.sort(compareSelectedAnalysisOptions), changed: true, addMorphology};
     });
   }
 
   function updateMorphology(newMa: MorphologicalAnalysis): void {
     setState(({morphologies, selectedMorphologies}) => {
-      return {selectedMorphologies, morphologies: morphologies.map((ma) => ma.number === newMa.number ? newMa : ma), changed: true};
+      morphologies[newMa.number - 1] = newMa;
+
+      return {selectedMorphologies, morphologies, changed: true, addMorphology: false};
     });
+  }
+
+  function toggleAddMorphology(): void {
+    setState(({addMorphology, ...rest}) => ({...rest, addMorphology: !addMorphology}));
+  }
+
+  function nextMorphAnalysis(): MorphologicalAnalysis {
+    const number = Math.max(...state.morphologies.map(({number}) => number)) + 1;
+
+    return {type: 'LetteredMorphologicalAnalysis', number, translation: '', transcription: '', other: [], analyses: []};
   }
 
   return (
@@ -137,9 +146,15 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
                              setKeyHandlingEnabled={setKeyHandlingEnabled}/>
       )}
 
+      {state.addMorphology && <MorphAnalysisEditor ma={nextMorphAnalysis()} update={updateMorphology} toggleUpdate={toggleAddMorphology}/>}
+
+
       <hr/>
 
       <div className="columns">
+        <div className="column">
+          <button type="button" className="button is-fullwidth" onClick={toggleAddMorphology}>{t('addMorphology')}</button>
+        </div>
         <div className="column">
           <button type="button" className="button is-fullwidth" disabled>{t('editContent')}</button>
         </div>

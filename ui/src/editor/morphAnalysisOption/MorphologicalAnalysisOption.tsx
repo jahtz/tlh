@@ -1,7 +1,6 @@
-import {isSingleMorphologicalAnalysis, MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
+import {MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import React, {useEffect, useState} from 'react';
 import {SelectedAnalysisOption} from '../selectedAnalysisOption';
-import {IoSettingsOutline} from 'react-icons/io5';
 import {MorphAnalysisOptionButtons} from './MorphAnalysisButtons';
 import {MorphAnalysisEditor} from './MorphAnalysisEditor';
 
@@ -23,8 +22,6 @@ export enum Numerus {
 
 export function MorphAnalysisOption({ma, selectedOption, updateSelected, selectAll, updateMorphology, setKeyHandlingEnabled}: IProps): JSX.Element {
 
-  const {number, translation, transcription} = ma;
-
   const [update, setIsUpdate] = useState(false);
 
   function toggleUpdate(): void {
@@ -44,14 +41,10 @@ export function MorphAnalysisOption({ma, selectedOption, updateSelected, selectA
 
   return (
     <div className="my-3">
-      <h2 className="subtitle is-5">
-        {number}) {translation} ({transcription})&nbsp;
-        {!isSingleMorphologicalAnalysis(ma) && <button className="button" onClick={toggleUpdate}><IoSettingsOutline/></button>}
-      </h2>
-
       {update
-        ? <MorphAnalysisEditor ma={ma} update={innerUpdateMorphology}/>
-        : <MorphAnalysisOptionButtons ma={ma} selectedOption={selectedOption} updateSelected={updateSelected} selectAll={selectAll}/>}
+        ? <MorphAnalysisEditor ma={ma} update={innerUpdateMorphology} toggleUpdate={toggleUpdate}/>
+        : <MorphAnalysisOptionButtons ma={ma} selectedOption={selectedOption} updateSelected={updateSelected} selectAll={selectAll}
+                                      toggleUpdate={toggleUpdate}/>}
     </div>
   );
 }

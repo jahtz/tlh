@@ -3,15 +3,17 @@ import React from 'react';
 import {isSingleMorphologicalAnalysis, LetteredMorphologicalAnalysis, MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {AnalysisOption} from '../../model/analysisOptions';
 import {useTranslation} from 'react-i18next';
+import {IoSettingsOutline} from 'react-icons/io5';
 
 interface IProps {
   ma: MorphologicalAnalysis;
   update: (newMa: MorphologicalAnalysis) => void;
+  toggleUpdate: () => void;
 }
 
 const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
-export function MorphAnalysisEditor({ma, update}: IProps): JSX.Element {
+export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -36,6 +38,21 @@ export function MorphAnalysisEditor({ma, update}: IProps): JSX.Element {
       <Formik initialValues={ma} onSubmit={update}>
         {({values}) =>
           <Form>
+            <div className="field has-addons">
+              <div className="control">
+                <button type="button" className="button is-static">{ma.number}</button>
+              </div>
+              <div className="control is-expanded">
+                <Field name="translation" className="input"/>
+              </div>
+              <div className="control is-expanded">
+                <Field name="transcription" className="input"/>
+              </div>
+              <div className="control">
+                <button type="button" className="button" onClick={toggleUpdate}><IoSettingsOutline/></button>
+              </div>
+            </div>
+
             <FieldArray name={'analyses'}>
               {(arrayHelpers) =>
                 <div>
