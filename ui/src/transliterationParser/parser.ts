@@ -1,4 +1,4 @@
-import {alt, createLanguage, end, oneOf, optWhitespace, Parser, regex, regexp, Result as ParsimmonResult, seq, string, TypedLanguage} from 'parsimmon';
+import {alt, createLanguage, end, oneOf, optWhitespace, Parser, regexp, Result as ParsimmonResult, seq, string, TypedLanguage} from 'parsimmon';
 import {lineParseResult, LineParseResult} from '../model/lineParseResult';
 import {AOSign, aoSign} from '../model/wordContent/sign';
 import {damageContent, DamageContent, DamageType} from '../model/wordContent/damages';
@@ -85,19 +85,13 @@ const lineParser: Parser<LinePreParseResult> = seq(
 ).map(([number, , , , content]) => newLinePreParseResult(number, content));
 
 export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<LanguageSpec>({
-  damages: () => alt(
-    string('[').result(DamageType.DeletionStart),
-    string(']').result(DamageType.DeletionEnd),
-    string('⸢').result(DamageType.LesionStart),
-    string('⸣').result(DamageType.LesionEnd),
+  damages: () => alt<DamageType>(
+    string('[').result('del_in'),
+    string(']').result('del_fin'),
+    string('⸢').result('laes_in'),
+    string('⸣').result('laes_fin'),
     // FIXME: rasure has start and end!
-    string('*').result(DamageType.RasureStart),
-    regexp(/[〈<]{2}/).result(DamageType.SurplusStart),
-    regexp(/[〉>]{2}/).result(DamageType.SurplusEnd),
-    regexp(/[〈<]/).result(DamageType.SupplementStart),
-    regex(/[〉>]/).result(DamageType.SupplementEnd),
-    string('(').result(DamageType.UnknownDamageStart),
-    string(')').result(DamageType.UnknownDamageEnd),
+    string('*').result('ras_in'),
   ).map(damageContent),
 
   corrections: () => alt(
@@ -114,7 +108,7 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
   ellipsis: () => alt(string('…'), string('...')).result(aoEllipsis),
 
   basicText: () => alt(
-    regexp(lowerTextRegex),
+    regexp(/[\p{Ll}()〈<〉>˽]+/u),
     string('-').notFollowedBy(string('-')),
     oneOf('×ₓ')
   ).atLeast(1).tie().map(aoBasicText),

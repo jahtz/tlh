@@ -1,8 +1,8 @@
-import {indent, XmlWriter} from '../../editor/xmlModel';
-import {AOWordContent, aoWordContentFormat} from '../wordContent/wordContent';
+import {GenericAttributes, indent, XmlElementNode, XmlWriter} from '../../editor/xmlModel';
+import {AOWordContent, aoWordContentFormat, xmlifyAoWordContent} from '../wordContent/wordContent';
 import {MorphologicalAnalysis, writeMorphAnalysisAttribute} from '../morphologicalAnalysis';
-import {AOSentenceContent} from '../sentence';
 import {aoBasicText} from '../wordContent/basicText';
+import {WordNodeAttributes} from '../../editor/tlhNodeDisplayConfig';
 
 export interface AOWord {
   type: 'AOWord';
@@ -16,18 +16,40 @@ export interface AOWord {
 export const aoWordFormat: XmlWriter<AOWord> = {
   write: ({content, mrp0sel, transliteration, morphologies, language}) =>
     [
-      `<w trans="${transliteration}"`,
-      indent(`mrp0sel="${mrp0sel || ''}"`),
+      '<w' + (transliteration ? ` trans="${transliteration}"` : '') + ` mrp0sel="${mrp0sel || ''}"`,
       ...(language ? [indent(`lg="${language}"`)] : []),
       ...(morphologies || []).flatMap(writeMorphAnalysisAttribute).map(indent),
       `>${content.map(aoWordContentFormat.write).join('')}</w>`
     ]
 };
 
-export function parsedWord(...content: (AOWordContent | string)[]): AOWord {
-  return {type: 'AOWord', content: content.map((c) => typeof c === 'string' ? aoBasicText(c) : c)};
+export function xmlifyAoWord({transliteration, content, language, mrp0sel, morphologies}: AOWord): XmlElementNode<WordNodeAttributes & GenericAttributes> {
+
+  const attributes: WordNodeAttributes & GenericAttributes = {
+    mrp0sel: mrp0sel || ''
+  };
+
+  if (transliteration) {
+    attributes.transliteration = transliteration;
+  }
+
+  if (language) {
+    attributes.lng = language;
+  }
+
+  if (morphologies) {
+    for (const morph of morphologies) {
+      attributes[`mrp${morph.number}`] = 'TODO!';
+    }
+  }
+
+  return {
+    tagName: 'w',
+    attributes,
+    children: content.map(xmlifyAoWordContent)
+  };
 }
 
-export function isAOWord(c: AOSentenceContent): c is AOWord {
-  return c.type === 'AOWord';
+export function parsedWord(...content: (AOWordContent | string)[]): AOWord {
+  return {type: 'AOWord', content: content.map((c) => typeof c === 'string' ? aoBasicText(c) : c)};
 }

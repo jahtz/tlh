@@ -41,22 +41,22 @@ function renderSimpleWordContent(content: AOSimpleWordContent): JSX.Element {
   }
 }
 
-function renderWordContent(content: AOWordContent): JSX.Element {
+export function WordContentDisplay({content}: { content: AOWordContent }): JSX.Element {
   if (isAkkadogramm(content)) {
     return <span className="akkadogramm">
-      {content.contents.map((c, index) => <span key={index}>{renderWordContent(c)}</span>)}
+      {content.contents.map((c, index) => <WordContentDisplay content={c} key={index}/>)}
     </span>;
   } else if (isSumerogramm(content)) {
     return <span className="sumerogramm">
-      {content.contents.map((c, index) => <span key={index}>{renderWordContent(c)}</span>)}
+      {content.contents.map((c, index) => <WordContentDisplay content={c} key={index}/>)}
     </span>;
   } else if (isDeterminativ(content)) {
     return <span className="determinativ">
-      {content.content.map((c, index) => <span key={index}>{renderWordContent(c)}</span>)}
+      {content.content.map((c, index) => <WordContentDisplay content={c} key={index}/>)}
     </span>;
   } else if (isNumeralContent(content)) {
     return <span className="numberal">
-      {content.content.map((c, index) => <span key={index}>{renderWordContent(c)}</span>)}
+      {content.content.map((c, index) => <WordContentDisplay content={c} key={index}/>)}
     </span>;
   } else if (isIllegibleContent(content)) {
     return <span>x</span>;
@@ -75,7 +75,7 @@ interface WordComponentIProps {
 export function WordComponent({word: {transliteration, content}, onClick}: WordComponentIProps): JSX.Element {
   return <span onClick={onClick}>
     {content.length > 0
-      ? content.map((c, i) => <span className="hittite" key={i}>{renderWordContent(c)}</span>)
+      ? content.map((c, i) => <WordContentDisplay content={c} key={i}/>)
       : <span className="has-text-danger">{transliteration}</span>}
   </span>;
 }

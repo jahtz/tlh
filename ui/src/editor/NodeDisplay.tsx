@@ -1,4 +1,4 @@
-import {XmlNode} from './xmlModel';
+import {isXmlTextNode, XmlNode} from './xmlModel';
 import {EditTriggerFunc, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 import classNames from 'classnames';
@@ -13,7 +13,7 @@ interface NodeDisplayIProps {
 }
 
 export function DisplayNode({node, currentSelectedPath, displayConfig = tlhNodeDisplayConfig, onEdit, path}: NodeDisplayIProps): JSX.Element {
-  if (node.__type === 'XmlTextNode') {
+  if (isXmlTextNode(node)) {
     return <span>{node.textContent}</span>;
   }
 

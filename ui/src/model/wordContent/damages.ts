@@ -14,79 +14,24 @@ export function isDamageContent(c: AOWordContent): c is DamageContent {
 }
 
 export function xmlifyDamageContent({damageType}: DamageContent): string[] {
-  return [xmlifyDamage(damageType)];
+  return [`<${damageType}/>`];
 }
 
-export enum DamageType {
-  DeletionStart = 'DeletionStart',
-  DeletionEnd = 'DeletionEnd',
-  LesionStart = 'LesionStart',
-  LesionEnd = 'LesionEnd',
-  RasureStart = 'RasureStart',
-  RasureEnd = 'RasureEnd',
-  // TODO: not defined in dtd?
-  SurplusStart = 'SurplusStart',
-  SurplusEnd = 'SurplusEnd',
-  SupplementStart = 'SupplementStart',
-  SupplementEnd = 'SupplementEnd',
-  UnknownDamageStart = 'UnknownDamageStart',
-  UnknownDamageEnd = 'UnknownDamageEnd'
-}
-
-function xmlifyDamage(damageType: DamageType): string {
-  switch (damageType) {
-  case DamageType.DeletionEnd:
-    return '<del_fin/>';
-  case DamageType.DeletionStart:
-    return '<del_in/>';
-  case DamageType.LesionEnd:
-    return '<laes_fin/>';
-  case DamageType.LesionStart:
-    return '<laes_in/>';
-  case DamageType.RasureEnd:
-    return '<ras_fin/>';
-  case DamageType.RasureStart:
-    return '<ras_in/>';
-  case DamageType.SupplementEnd:
-    return '<sup_fin/>';
-  case DamageType.SupplementStart:
-    return '<sup_in/>';
-  case DamageType.SurplusEnd:
-    return '<sur_fin/>';
-  case DamageType.SurplusStart:
-    return '<sur_in/>';
-  case DamageType.UnknownDamageEnd:
-    return '<ub_fin/>';
-  case DamageType.UnknownDamageStart:
-    return '<ub_in/>';
-  }
-}
+export type DamageType = 'del_in' | 'del_fin' | 'laes_in' | 'laes_fin' | 'ras_in' | 'ras_fin';
 
 export function getSymbolForDamageType(damageType: DamageType): string {
   switch (damageType) {
-  case DamageType.DeletionEnd:
-    return ']';
-  case DamageType.DeletionStart:
+  case 'del_in':
     return '[';
-  case DamageType.LesionEnd:
-    return '⸣';
-  case DamageType.LesionStart:
+  case 'del_fin':
+    return ']';
+  case 'laes_in':
     return '⸢';
-  case DamageType.RasureStart:
-  case  DamageType.RasureEnd:
+  case 'laes_fin':
+    return '⸣';
+  case 'ras_in':
+  case  'ras_fin':
     return '*';
-  case DamageType.SupplementEnd:
-    return '〉';
-  case DamageType.SupplementStart:
-    return '〈';
-  case DamageType.SurplusEnd:
-    return '〉〉';
-  case DamageType.SurplusStart:
-    return '〈〈';
-  case DamageType.UnknownDamageEnd:
-    return ')';
-  case DamageType.UnknownDamageStart:
-    return '(';
   }
 }
 

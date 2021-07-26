@@ -10,7 +10,7 @@ import {AOFootNote, aoNoteFormat, isAoFootNote} from './footNote';
 import {AOKolonMark, aoKolonMarkFormat, isAoKolonMark} from './kolonMark';
 import {AOIllegibleContent} from './illegible';
 import {AOSpace, aoSpaceFormat, isSpace} from './space';
-import {XmlWriter} from '../../editor/xmlModel';
+import {XmlNode, XmlWriter} from '../../editor/xmlModel';
 import {InscribedLetter, inscribedLetterFormat, isInscribedLetter} from './inscribedLetter';
 import {Ellipsis, ellipsisFormat, isEllipsis} from './ellipsis';
 import {BasicText, isBasicText} from './basicText';
@@ -38,6 +38,28 @@ export type AOWordContent =
   | AODeterminativ
   | AONumeralContent
   | AOIllegibleContent;
+
+export function xmlifyAoWordContent(c: AOWordContent): XmlNode {
+  if (isBasicText(c)) {
+    return {textContent: c.content};
+  } else if (isAkkadogramm(c)) {
+    return {tagName: 'aGr', attributes: {}, children: c.contents.map(xmlifyAoWordContent)};
+  } else if (isSumerogramm(c)) {
+    return {tagName: 'sGr', attributes: {}, children: c.contents.map(xmlifyAoWordContent)};
+  } else if (isDeterminativ(c)) {
+    return {tagName: 'd', attributes: {}, children: c.content.map(xmlifyAoWordContent)};
+  } else if (isCorrectionContent(c)) {
+    return {tagName: 'corr', attributes: {c: c.c}, children: []};
+  } else if (isSpace(c)) {
+    return {tagName: 'space', attributes: {c: c.c}, children: []};
+  } else if (isDamageContent(c)) {
+    return {tagName: c.damageType, attributes: {}, children: []};
+  } else {
+    // FIXME: implement rest!
+    console.error(c.type);
+    throw new Error('TODO: implement!');
+  }
+}
 
 export const aoWordContentFormat: XmlWriter<AOWordContent> = {
   write: (c) => {
@@ -76,22 +98,3 @@ export const aoWordContentFormat: XmlWriter<AOWordContent> = {
     }
   }
 };
-
-export function getContent(c: AOWordContent): string {
-  if (isBasicText(c)) {
-    return c.content;
-  } else if (isAkkadogramm(c)) {
-    return c.contents.map(getContent).join('');
-  } else if (isSumerogramm(c)) {
-    return c.contents.map(getContent).join('');
-  } else if (isNumeralContent(c)) {
-    return c.content.map(getContent).join('');
-  } else if (isDeterminativ(c)) {
-    return c.content.map(getContent).join('');
-  } else if (isMaterLectionis(c)) {
-    return c.content;
-  } else {
-    // FIXME: implement?!
-    return '';
-  }
-}

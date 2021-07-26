@@ -6,15 +6,21 @@ export interface GenericAttributes {
 }
 
 export interface XmlElementNode<A = GenericAttributes> {
-  __type: 'XmlElementNode';
   tagName: string;
   attributes: A;
   children: XmlNode[];
 }
 
+export function isXmlElementNode(node: XmlNode): node is XmlElementNode {
+  return 'tagName' in node;
+}
+
 export interface XmlTextNode {
-  __type: 'XmlTextNode';
   textContent: string;
+}
+
+export function isXmlTextNode(node: XmlNode): node is XmlTextNode {
+  return 'textContent' in node;
 }
 
 export type XmlNode = XmlElementNode | XmlTextNode;
@@ -26,7 +32,7 @@ function createTextNode(baseTextContent: string): XmlTextNode {
 
   const textContent = performCorrections(correctedText, letterHarmonization);
 
-  return {__type: 'XmlTextNode', textContent};
+  return {textContent};
 }
 
 export function loadNode(el: ChildNode): XmlNode {
@@ -34,7 +40,6 @@ export function loadNode(el: ChildNode): XmlNode {
     return createTextNode(el.textContent || '');
   } else if (el instanceof Element) {
     return {
-      __type: 'XmlElementNode',
       tagName: el.tagName,
       attributes: Array.from(el.attributes)
         .reduce<GenericAttributes>((acc, {name, value}) => {
@@ -43,7 +48,7 @@ export function loadNode(el: ChildNode): XmlNode {
       children: Array.from(el.childNodes)
         .map(loadNode)
         // Filter out empty text nodes
-        .filter((node) => node.__type === 'XmlElementNode' || node.textContent.trim().length > 0)
+        .filter((node) => isXmlElementNode(node) || node.textContent.trim().length > 0)
     };
   } else {
     throw new Error(`unexpected element: ${el.nodeType}`);
@@ -62,7 +67,7 @@ export interface XmlWriteConfig {
 }
 
 export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXmlWriteConfig, parentInline = false): string[] {
-  if (node.__type === 'XmlTextNode') {
+  if (isXmlTextNode(node)) {
     return [node.textContent];
   } else {
     const {tagName, attributes, children} = node;

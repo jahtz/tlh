@@ -1,17 +1,17 @@
-import {XmlNode} from './xmlModel';
+import {isXmlTextNode, XmlNode} from './xmlModel';
 
-export function reconstructTransliteration(node: XmlNode): string {
-  if (node.__type === 'XmlTextNode') {
+export function reconstructTransliteration(node: XmlNode, isFirstChild = false): string {
+  if (isXmlTextNode(node)) {
     return node.textContent;
   }
 
-  const innerContent = node.children.map(reconstructTransliteration).join('');
+  const innerContent = node.children.map((c) => reconstructTransliteration(c)).join('');
 
   switch (node.tagName) {
   case 'aGr':
-    return '_' + innerContent;
+    return (isFirstChild ? '_' : '--') + innerContent;
   case 'sGr':
-    return innerContent;
+    return (isFirstChild ? '' : '-') + innerContent;
   case 'd':
     return '°' + innerContent + '°';
   case 'del_in':

@@ -75,17 +75,24 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
 
   function handleUpdate(): void {
     if (keyHandlingEnabled) {
-      node.attributes.mrp0sel = writeSelectedMorphologies(state.selectedMorphologies);
+      const newNode = {...node};
 
-      // FIXME: update morphologies!
+      newNode.attributes.mrp0sel = writeSelectedMorphologies(state.selectedMorphologies);
+
       for (const ma of state.morphologies) {
-        node.attributes[`mrp${ma.number}`] = isSingleMorphologicalAnalysis(ma) ? writeSingleMorphologicalAnalysisValue(ma) : writeLetteredMorphologicalAnalysisValue(ma).join('\n');
+        newNode.attributes[`mrp${ma.number}`] = isSingleMorphologicalAnalysis(ma) ? writeSingleMorphologicalAnalysisValue(ma) : writeLetteredMorphologicalAnalysisValue(ma).join('\n');
       }
 
-      updateNode(node, path);
+      updateNode(newNode, path);
 
       setState((state) => ({...state, changed: false}));
     }
+  }
+
+  function handleEditUpdate(node: XmlElementNode<WordNodeAttributes & GenericAttributes>): void {
+    updateNode(node, path);
+    // FIXME: reload morphological analyses!
+    setEditContent(undefined);
   }
 
   function updateSelected(newValue: SelectedAnalysisOption, ctrl: boolean): void {
@@ -120,10 +127,9 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
   }
 
   function editWord(): void {
-    const x = node.children.map(reconstructTransliteration).join('');
-    console.info(x);
+    const transliteration = node.children.map((c, index) => reconstructTransliteration(c, index === 0)).join('');
 
-    setEditContent(x);
+    setEditContent(transliteration);
   }
 
   function updateMorphology(newMa: MorphologicalAnalysis): void {
@@ -145,11 +151,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
   }
 
   if (editContent) {
-    return <WordContentEditor initialTransliteration={editContent} cancelEdit={() => setEditContent(undefined)}/>;
-  }
-
-  if (editContent) {
-    return <WordContentEditor initialTransliteration={editContent} cancelEdit={() => setEditContent(undefined)}/>;
+    return <WordContentEditor initialTransliteration={editContent} cancelEdit={() => setEditContent(undefined)} updateNode={handleEditUpdate}/>;
   }
 
   return (
@@ -158,11 +160,13 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
         {node.children.map((c, i) => <DisplayNode key={i} path={[]} currentSelectedPath={undefined} node={c} displayConfig={tlhNodeDisplayConfig}/>)}
       </div>
 
-      {state.morphologies.map((m) =>
-        <MorphAnalysisOption key={m.number} ma={m} selectedOption={state.selectedMorphologies} updateSelected={updateSelected}
-                             updateMorphology={updateMorphology} selectAll={(numerus) => selectAll(m.number, numerus)}
-                             setKeyHandlingEnabled={setKeyHandlingEnabled}/>
-      )}
+      {state.morphologies.length === 0
+        ? <div className="notification is-warning has-text-centered">{t('noMorphologicalAnalysesFound')}</div>
+        : state.morphologies.map((m) =>
+          <MorphAnalysisOption key={m.number} ma={m} selectedOption={state.selectedMorphologies} updateSelected={updateSelected}
+                               updateMorphology={updateMorphology} selectAll={(numerus) => selectAll(m.number, numerus)}
+                               setKeyHandlingEnabled={setKeyHandlingEnabled}/>
+        )}
 
       {state.addMorphology && <MorphAnalysisEditor ma={nextMorphAnalysis()} update={updateMorphology} toggleUpdate={toggleAddMorphology}/>}
 

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {writeNode, XmlElementNode, XmlNode} from './xmlModel';
+import {isXmlElementNode, writeNode, XmlElementNode, XmlNode} from './xmlModel';
 import {EditTriggerFunc, UpdateNodeFunc, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 import {DisplayNode} from './NodeDisplay';
@@ -43,7 +43,7 @@ function searchEditableNode(tagName: string, rootNode: XmlElementNode, currentPa
 
     const pathRest = i === pathHead ? pathTail : [];
 
-    const foundChild = child.__type === 'XmlElementNode'
+    const foundChild = isXmlElementNode(child)
       ? searchEditableNode(tagName, child, pathRest, forward)
       : undefined;
 
@@ -70,19 +70,13 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
     return () => document.removeEventListener('keydown', handleKey);
   });
 
-  const onEdit: EditTriggerFunc = (node, path) => setState(({rootNode}) => {
-    return {rootNode, editState: {node, path}};
+  const onEdit: EditTriggerFunc = (node, path) => setState(({rootNode}) => ({rootNode, editState: {node, path}}));
+
+  const updateNode: UpdateNodeFunc = (node, path) => setState(({rootNode, editState}) => {
+    findElement(rootNode as XmlElementNode, path.slice(0, -1)).children[path[path.length - 1]] = node;
+
+    return {rootNode, editState};
   });
-
-  const updateNode: UpdateNodeFunc = (node, path) => {
-    setState(({rootNode, editState}) => {
-      const nodeToUpdate: XmlElementNode = findElement(rootNode as XmlElementNode, path.slice(0, -1));
-
-      nodeToUpdate.children[path[path.length]] = node;
-
-      return {rootNode, editState};
-    });
-  };
 
   const exportXml = () => download(writeNode(state.rootNode).join('\n'));
 
