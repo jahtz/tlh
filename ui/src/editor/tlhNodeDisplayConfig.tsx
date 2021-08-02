@@ -44,7 +44,10 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
 
   gap: {
     styling: () => ['gap'],
-    replace: (node) => <span>{node.attributes.c}</span>
+    replace: (node) => <>
+      {'t' in node.attributes && node.attributes.t === 'line' && <br/>}
+      <span>{node.attributes.c}</span>
+    </>
   },
 
   parsep: {replace: () => <span>¬¬¬</span>},
