@@ -26,7 +26,13 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
         'is-underlined': !!node.attributes.mrp0sel && node.attributes.mrp0sel.trim().length === 0,
         'has-background-primary': !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.')
       });
-      return <><span className={classes}>{renderedChildren}</span>&nbsp;&nbsp;</>;
+
+      return node.children.length === 0
+        ? <span className="has-text-danger">&#10008;</span>
+        : <>
+          <span className={classes}>{renderedChildren}</span>
+          &nbsp;&nbsp;
+        </>;
     },
     edit: (props: XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>) => <WordNodeEditor props={props} key={props.path.join('.')}/>
   },
