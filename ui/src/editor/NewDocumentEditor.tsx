@@ -10,13 +10,14 @@ import classNames from 'classnames';
 
 interface IProps {
   node: XmlNode;
+  filename: string;
   displayConfig?: XmlNodeDisplayConfigObject;
   download: (content: string) => void;
 }
 
 interface IEditState {
   node: XmlElementNode;
-  path: number[]
+  path: number[];
 }
 
 interface IState {
@@ -57,7 +58,7 @@ function findElement(node: XmlElementNode, path: number[]): XmlElementNode {
   return path.reduce<XmlElementNode>((nodeToUpdate, pathContent) => nodeToUpdate.children[pathContent] as XmlElementNode, node);
 }
 
-export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDisplayConfig, download}: IProps): JSX.Element {
+export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDisplayConfig, download, filename}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorConfig = useSelector(editorConfigSelector);
@@ -112,12 +113,19 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
   return (
     <div className="columns">
       <div className="column">
-        <div className={classNames('box', 'documentText', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
-          <DisplayNode node={state.rootNode} currentSelectedPath={state.editState?.path} displayConfig={displayConfig} onEdit={onEdit} path={[]}/>
+
+        <div className="card">
+          <header className="card-header">
+            <p className="card-header-title">{filename}</p>
+          </header>
+          <div className="card-content">
+            <div className={classNames(/*'box',*/ 'documentText', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
+              <DisplayNode node={state.rootNode} currentSelectedPath={state.editState?.path} displayConfig={displayConfig} onEdit={onEdit} path={[]}/>
+            </div>
+          </div>
         </div>
 
-
-        <div className="columns">
+        <div className="columns my-3">
           <div className="column">
             <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="button is-fullwidth">
               {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}

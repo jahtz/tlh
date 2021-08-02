@@ -14,6 +14,7 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
   docID: {replace: () => <span/>},
   'AO:Manuscripts': {replace: () => <span/>},
   lb: {
+    // TODO: only render <br/> if not first linebreak!
     replace: (node) => <><br style={{marginTop: '10px'}}/>{node.attributes.lnr}:&nbsp;&nbsp;&nbsp;</>,
     styling: () => ['lb']
   },
