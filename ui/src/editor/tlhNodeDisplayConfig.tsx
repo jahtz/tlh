@@ -69,27 +69,7 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
 export const tlhXmlWriteConfig: XmlWriteConfig = {
   docID: {inlineChildren: true},
 
-  'creation-date': {contractEmpty: true},
-  kor2: {contractEmpty: true},
-  annot: {contractEmpty: true},
-
   'AO:TxtPubl': {inlineChildren: true},
 
-  parsep: {contractEmpty: true},
-  parsep_dbl: {contractEmpty: true},
-
-  lb: {contractEmpty: true},
-
-  w: {contractEmpty: false, inlineChildren: true},
-
-  aGr: {inlineChildren: true},
-  sGr: {inlineChildren: true},
-  d: {inlineChildren: true},
-
-  del_in: {contractEmpty: true},
-  del_fin: {contractEmpty: true},
-  ras_in: {contractEmpty: true},
-  ras_fin: {contractEmpty: true},
-  laes_in: {contractEmpty: true},
-  laes_fin: {contractEmpty: true}
+  w: {inlineChildren: true},
 };

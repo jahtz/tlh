@@ -58,7 +58,6 @@ export function loadNode(el: ChildNode): XmlNode {
 // Write
 
 interface NodeWriteConfig {
-  contractEmpty?: boolean;
   inlineChildren?: boolean;
 }
 
@@ -74,8 +73,6 @@ export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXml
 
     const writeConfig: NodeWriteConfig | undefined = xmlWriteConfig[tagName] || undefined;
 
-    const contractEmpty = !!writeConfig && !!writeConfig.contractEmpty;
-
     const writtenAttributes = Object.entries(attributes)
       .map(([name, value]) => {
         const writtenValue = value
@@ -85,7 +82,7 @@ export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXml
       })
       .join(' ');
 
-    if (children.length === 0 && contractEmpty) {
+    if (children.length === 0) {
       return [`<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}/>`];
     } else {
       const inlineChildren = !!writeConfig?.inlineChildren || parentInline;
