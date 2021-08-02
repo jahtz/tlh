@@ -27,6 +27,7 @@ import {GenericAttributes, XmlElementNode} from './xmlModel';
 import {MorphAnalysisEditor} from './morphAnalysisOption/MorphAnalysisEditor';
 import {reconstructTransliteration} from './transliterationReconstruction';
 import {WordContentEditor} from './WordContentEditor';
+import classNames from 'classnames';
 
 const morphologyAttributeNameRegex = /^mrp(\d+)$/;
 
@@ -170,7 +171,6 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
 
       {state.addMorphology && <MorphAnalysisEditor ma={nextMorphAnalysis()} update={updateMorphology} toggleUpdate={toggleAddMorphology}/>}
 
-
       <hr/>
 
       <div className="columns">
@@ -185,20 +185,28 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
         </div>
       </div>
 
-      <div className="box has-text-centered has-background-primary has-text-left has-text-weight-bold is-size-5">
-        {state.selectedMorphologies
-          .sort(compareSelectedAnalysisOptions)
-          .map((selectedMorph) => {
-            const x: MorphologicalAnalysis = state.morphologies.find(({number}) => number === selectedMorph.num)!;
+      <div className={classNames('message', 'is-primary', 'has-text-weight-bold', {'is-size-5': false})}>
+        <div className="message-body">
+          {state.selectedMorphologies
+            .sort(compareSelectedAnalysisOptions)
+            .map((selectedMorph) => {
+              const morphology = state.morphologies.find(({number}) => number === selectedMorph.num);
 
-            const analysis: string | AnalysisOption | undefined = isSingleMorphologicalAnalysis(x)
-              ? x.analysis
-              : x.analyses.find(({letter}) => selectedMorph.letter === letter);
+              const stringified = stringifySelectedAnalysisOption(selectedMorph);
 
-            return <p key={stringifySelectedAnalysisOption(selectedMorph)}>
-              {stringifySelectedAnalysisOption(selectedMorph)} - &nbsp;&nbsp;&nbsp;&nbsp; {x.translation} &nbsp; {typeof analysis === 'string' ? analysis : analysis?.analysis} &nbsp; {x.other}
-            </p>;
-          })}
+              if (morphology) {
+                const analysis: string | AnalysisOption | undefined = isSingleMorphologicalAnalysis(morphology)
+                  ? morphology.analysis
+                  : morphology.analyses.find(({letter}) => selectedMorph.letter === letter);
+
+                return <p key={stringified}>
+                  {stringified} - &nbsp;&nbsp;&nbsp;&nbsp; {morphology.translation} &nbsp; {typeof analysis === 'string' ? analysis : analysis?.analysis} &nbsp; {morphology.other}
+                </p>;
+              } else {
+                return <span className="has-text-danger">{t('selectedMorphologyNotExisting')}: {stringified}</span>;
+              }
+            })}
+        </div>
       </div>
 
       <div className="buttons">
