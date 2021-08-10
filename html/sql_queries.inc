@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../mysqliconn.php';
+require_once __DIR__ . '/mysqliconn.inc';
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
