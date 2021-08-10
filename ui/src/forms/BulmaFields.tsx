@@ -30,26 +30,6 @@ export function BulmaField({label, id, asTextArea, field, form, ...props}: Custo
   );
 }
 
-export function BulmaSelect({label, id, field, ...props}: CustomFieldProps): JSX.Element {
-  const classes = classNames('select', 'is-fullwidth',
-    {
-      'is-success': props.form.touched[field.name] && !props.form.errors[field.name],
-      'is-danger': props.form.touched[field.name] && !!props.form.errors[field.name],
-    });
-
-  return (
-    <div className="field">
-      <label htmlFor={id} className="label">{label}:</label>
-      <div className="control">
-        <div className={classes}>
-          <Field as="select" {...props} {...field} id={id} placeholder={label}/>
-        </div>
-      </div>
-      <ErrorMessage name={field.name}>{msg => <p className="help is-danger">{msg}</p>}</ErrorMessage>
-    </div>
-  );
-}
-
 // Object Select
 
 export interface SelectOption<T> {
@@ -72,7 +52,7 @@ export function BulmaObjectSelect<T>({label, id, currentValue, options, onUpdate
     onUpdate(options[event.target.selectedIndex].value);
   }
 
-  const currentValueLabel = options.find(({value}) => value === currentValue)!.label;
+  const currentValueLabel = options.find(({value}) => value === currentValue)?.label;
 
   return <div className="field">
     <label htmlFor={id} className="label">{label}:</label>
