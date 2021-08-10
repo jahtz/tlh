@@ -5,6 +5,7 @@
   "homepage": "./",
   "dependencies": {
     "@apollo/client": "^3.3.15",
+    "@graphql-codegen/introspection": "^2.0.0",
     "@testing-library/jest-dom": "^5.11.10",
     "@testing-library/react": "^12.0.0",
     "@testing-library/user-event": "^13.1.8",
@@ -26,11 +27,11 @@
     "yup": "^0.32.9"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^1.21.3",
-    "@graphql-codegen/schema-ast": "^1.18.1",
-    "@graphql-codegen/typescript": "^1.20.2",
-    "@graphql-codegen/typescript-operations": "^1.17.14",
-    "@graphql-codegen/typescript-react-apollo": "^2.2.3",
+    "@graphql-codegen/cli": "^2.0.1",
+    "@graphql-codegen/schema-ast": "^2.0.0",
+    "@graphql-codegen/typescript": "^2.0.0",
+    "@graphql-codegen/typescript-operations": "^2.0.1",
+    "@graphql-codegen/typescript-react-apollo": "^3.0.0",
     "@types/jest": "^26.0.22",
     "@types/node": "^16.0.0",
     "@types/parsimmon": "^1.10.6",
