@@ -76,8 +76,8 @@ export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXml
     const writtenAttributes = Object.entries(attributes)
       .map(([name, value]) => {
         const writtenValue = value
-          .replaceAll('<', '&lt;')
-          .replaceAll(/&(?!amp;)/g, '&amp;');
+          .replaceAll(/&(?!amp;)/g, '&amp;')
+          .replaceAll('<', '&lt;');
         return `${name}="${writtenValue}"`;
       })
       .join(' ');
