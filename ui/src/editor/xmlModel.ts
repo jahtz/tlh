@@ -84,6 +84,8 @@ export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXml
 
     if (children.length === 0) {
       return [`<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}/>`];
+    } else if (children.length === 1 && isXmlTextNode(children[0])) {
+      return [`<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}>${children[0].textContent}</${tagName}>`];
     } else {
       const inlineChildren = !!writeConfig?.inlineChildren || parentInline;
 
