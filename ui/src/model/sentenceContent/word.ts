@@ -5,7 +5,6 @@ import {aoBasicText} from '../wordContent/basicText';
 import {WordNodeAttributes} from '../../editor/tlhNodeDisplayConfig';
 
 export interface AOWord {
-  type: 'AOWord';
   content: AOWordContent[];
   language?: string;
   mrp0sel?: string;
@@ -16,7 +15,7 @@ export interface AOWord {
 export const aoWordFormat: XmlWriter<AOWord> = {
   write: ({content, mrp0sel, transliteration, morphologies, language}) =>
     [
-      '<w' + (transliteration ? ` trans="${transliteration}"` : '') + ` mrp0sel="${mrp0sel || ''}"`,
+      '<w' + (transliteration ? ` trans="${transliteration}"` : '') + (mrp0sel ? ` mrp0sel="${mrp0sel || ''}"` : ''),
       ...(language ? [indent(`lg="${language}"`)] : []),
       ...(morphologies || []).flatMap(writeMorphAnalysisAttribute).map(indent),
       `>${content.map(aoWordContentFormat.write).join('')}</w>`
@@ -25,9 +24,11 @@ export const aoWordFormat: XmlWriter<AOWord> = {
 
 export function xmlifyAoWord({transliteration, content, language, mrp0sel, morphologies}: AOWord): XmlElementNode<WordNodeAttributes & GenericAttributes> {
 
-  const attributes: WordNodeAttributes & GenericAttributes = {
-    mrp0sel: mrp0sel || ''
-  };
+  const attributes: WordNodeAttributes & GenericAttributes = {};
+
+  if (mrp0sel) {
+    attributes.mrp0sel = mrp0sel;
+  }
 
   if (transliteration) {
     attributes.transliteration = transliteration;
@@ -51,5 +52,5 @@ export function xmlifyAoWord({transliteration, content, language, mrp0sel, morph
 }
 
 export function parsedWord(...content: (AOWordContent | string)[]): AOWord {
-  return {type: 'AOWord', content: content.map((c) => typeof c === 'string' ? aoBasicText(c) : c)};
+  return {content: content.map((c) => typeof c === 'string' ? aoBasicText(c) : c)};
 }

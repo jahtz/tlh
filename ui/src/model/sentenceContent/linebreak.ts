@@ -1,5 +1,4 @@
 import {XmlWriter} from '../../editor/xmlModel';
-import {AOSentenceContent} from '../sentence';
 import {AOWord, aoWordFormat} from './word';
 
 export interface AOLineBreak {
@@ -9,7 +8,7 @@ export interface AOLineBreak {
   column: string;
   lineNumber: string;
   language: string;
-  words: AOWord[]
+  words: AOWord[];
 }
 
 export const aoLineBreakFormat: XmlWriter<AOLineBreak> = {
@@ -22,8 +21,4 @@ export function aoLineBreak(textId: string, lnr: string, language: string, words
   const [lineNumber, column, side] = lnr.split(' ').reverse();
 
   return {type: 'AOLineBreak', side, column, language, lineNumber, textId, words};
-}
-
-export function isAOLineBreak(c: AOSentenceContent): c is AOLineBreak {
-  return c.type === 'AOLineBreak';
 }

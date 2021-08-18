@@ -29,7 +29,7 @@ import {reconstructTransliteration} from './transliterationReconstruction';
 import {WordContentEditor} from './WordContentEditor';
 import classNames from 'classnames';
 
-const morphologyAttributeNameRegex = /^mrp(\d+)$/;
+export const morphologyAttributeNameRegex = /^mrp(\d+)$/;
 
 interface IProps {
   props: XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>;

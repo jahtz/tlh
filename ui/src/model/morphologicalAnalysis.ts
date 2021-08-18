@@ -1,4 +1,7 @@
 import {AnalysisOption, parseAnalysis} from './analysisOptions';
+import {tlhAnalyzerUrl} from '../urls';
+import {isXmlElementNode, loadNode} from '../editor/xmlModel';
+import {WordNode} from '../editor/WordContentEditor';
 
 interface IMorphologicalAnalysis {
   number: number;
@@ -75,4 +78,24 @@ export function writeMorphAnalysisAttribute(ma: MorphologicalAnalysis): string[]
   return isSingleMorphologicalAnalysis(ma)
     ? writeSingleMorphologicalAnalysis(ma)
     : writeLetteredMorphologicalAnalysis(ma);
+}
+
+export function fetchMorphologicalAnalyses(w: string, tl = 'Hit'): Promise<WordNode | undefined> {
+  // FIXME: set language!
+  const formData = new FormData();
+  formData.append('w', w);
+  formData.append('tl', tl);
+
+  return fetch(tlhAnalyzerUrl, {method: 'POST', body: formData})
+    .then((res) => res.text())
+    .then((resText) => {
+
+      const wTag: ChildNode = new DOMParser().parseFromString(resText, 'text/xml').childNodes[0];
+
+      const loadedTag = loadNode(wTag);
+
+      return isXmlElementNode(loadedTag)
+        ? loadedTag as WordNode
+        : undefined;
+    });
 }
