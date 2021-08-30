@@ -6,6 +6,8 @@ TODO!
 
 ### PHP Extensions
 
+These php extensions have to be activated:
+
 * mysql
 
 ### Installing server dependencies
@@ -20,4 +22,16 @@ php7 /usr/bin/composer install
 cd ui
 
 npm i
+```
+
+### Starting the server
+
+```bash
+php7 -S 0.0.0.0:8066 -t html router.php
+```
+
+### Starting the ui
+
+```bash
+npm run start
 ```
