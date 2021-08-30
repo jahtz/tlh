@@ -4,11 +4,12 @@ import {transliteration as transliterationLanguage} from '../transliterationPars
 import {AOWordContent} from '../model/wordContent/wordContent';
 import {xmlifyAoWord} from '../model/sentenceContent/word';
 import {Result} from 'parsimmon';
-import {GenericAttributes, writeNode, XmlElementNode} from './xmlModel';
+import {GenericAttributes, XmlElementNode} from './xmlModel/xmlModel';
 import {WordNodeAttributes} from './tlhNodeDisplayConfig';
 import classNames from 'classnames';
 import {fetchMorphologicalAnalyses} from '../model/morphologicalAnalysis';
 import {DisplayNode} from './NodeDisplay';
+import {writeNode} from './xmlModel/xmlWriting';
 
 export type WordNode = XmlElementNode<WordNodeAttributes & GenericAttributes>;
 

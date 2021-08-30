@@ -1,4 +1,4 @@
-import {GenericAttributes, XmlElementNode} from './xmlModel';
+import {GenericAttributes, XmlElementNode} from './xmlModel/xmlModel';
 import {Argument as ClassNamesArgument} from 'classnames';
 
 type ReplaceFunc<A = GenericAttributes> = (node: XmlElementNode<A>, renderedChildren: JSX.Element, path: number[], currentSelectedPath?: number[]) => JSX.Element;

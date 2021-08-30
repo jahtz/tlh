@@ -1,4 +1,4 @@
-import {isXmlTextNode, XmlNode} from './xmlModel';
+import {isXmlTextNode, XmlNode} from './xmlModel/xmlModel';
 import {EditTriggerFunc, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 import classNames from 'classnames';

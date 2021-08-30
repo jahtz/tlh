@@ -1,7 +1,8 @@
 import {AnalysisOption, parseAnalysis} from './analysisOptions';
 import {tlhAnalyzerUrl} from '../urls';
-import {isXmlElementNode, loadNode} from '../editor/xmlModel';
+import {isXmlElementNode} from '../editor/xmlModel/xmlModel';
 import {WordNode} from '../editor/WordContentEditor';
+import {loadNode, tlhXmlReadConfig} from '../editor/xmlModel/xmlReading';
 
 interface IMorphologicalAnalysis {
   number: number;
@@ -92,7 +93,7 @@ export function fetchMorphologicalAnalyses(w: string, tl = 'Hit'): Promise<WordN
 
       const wTag: ChildNode = new DOMParser().parseFromString(resText, 'text/xml').childNodes[0];
 
-      const loadedTag = loadNode(wTag);
+      const loadedTag = loadNode(wTag, tlhXmlReadConfig);
 
       return isXmlElementNode(loadedTag)
         ? loadedTag as WordNode

@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
-import {XmlNode} from './xmlModel';
+import {XmlNode} from './xmlModel/xmlModel';
 import {NewDocumentEditor} from './NewDocumentEditor';
-import {loadNewXml} from './xmlLoader';
+import {loadNewXml} from './xmlModel/xmlLoader';
 
 
 function handleSaveToPC(data: string, filename: string): void {

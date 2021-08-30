@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {isXmlElementNode, writeNode, XmlElementNode, XmlNode} from './xmlModel';
+import {isXmlElementNode, XmlElementNode, XmlNode} from './xmlModel/xmlModel';
 import {EditTriggerFunc, UpdateNodeFunc, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 import {DisplayNode} from './NodeDisplay';
@@ -7,6 +7,7 @@ import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
 import {editorConfigSelector} from '../store/store';
 import classNames from 'classnames';
+import {writeNode} from './xmlModel/xmlWriting';
 
 interface IProps {
   node: XmlNode;

@@ -23,7 +23,7 @@ import {tlhNodeDisplayConfig, WordNodeAttributes} from './tlhNodeDisplayConfig';
 import {AnalysisOption} from '../model/analysisOptions';
 import {useSelector} from 'react-redux';
 import {editorConfigSelector} from '../store/store';
-import {GenericAttributes, XmlElementNode} from './xmlModel';
+import {GenericAttributes, XmlElementNode} from './xmlModel/xmlModel';
 import {MorphAnalysisEditor} from './morphAnalysisOption/MorphAnalysisEditor';
 import {reconstructTransliteration} from './transliterationReconstruction';
 import {WordContentEditor} from './WordContentEditor';

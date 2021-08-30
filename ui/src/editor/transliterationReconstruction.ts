@@ -1,4 +1,4 @@
-import {isXmlTextNode, XmlNode} from './xmlModel';
+import {isXmlTextNode, XmlNode} from './xmlModel/xmlModel';
 
 export function reconstructTransliteration(node: XmlNode, isFirstChild = false): string {
   if (isXmlTextNode(node)) {

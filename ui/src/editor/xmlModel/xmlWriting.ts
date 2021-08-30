@@ -1,61 +1,4 @@
-import {tlhXmlWriteConfig} from './tlhNodeDisplayConfig';
-import {letterHarmonization, localLetterCorrections, performCorrections} from './xmlLoader';
-
-export interface GenericAttributes {
-  [name: string]: string;
-}
-
-export interface XmlElementNode<A = GenericAttributes> {
-  tagName: string;
-  attributes: A;
-  children: XmlNode[];
-}
-
-export function isXmlElementNode(node: XmlNode): node is XmlElementNode {
-  return 'tagName' in node;
-}
-
-export interface XmlTextNode {
-  textContent: string;
-}
-
-export function isXmlTextNode(node: XmlNode): node is XmlTextNode {
-  return 'textContent' in node;
-}
-
-export type XmlNode = XmlElementNode | XmlTextNode;
-
-// Read
-
-function createTextNode(baseTextContent: string): XmlTextNode {
-  const correctedText = performCorrections(baseTextContent, localLetterCorrections);
-
-  const textContent = performCorrections(correctedText, letterHarmonization);
-
-  return {textContent};
-}
-
-export function loadNode(el: ChildNode): XmlNode {
-  if (el instanceof Text) {
-    return createTextNode(el.textContent || '');
-  } else if (el instanceof Element) {
-    return {
-      tagName: el.tagName,
-      attributes: Array.from(el.attributes)
-        .reduce<GenericAttributes>((acc, {name, value}) => {
-          return {...acc, [name]: value};
-        }, {}),
-      children: Array.from(el.childNodes)
-        .map(loadNode)
-        // Filter out empty text nodes
-        .filter((node) => isXmlElementNode(node) || node.textContent.trim().length > 0)
-    };
-  } else {
-    throw new Error(`unexpected element: ${el.nodeType}`);
-  }
-}
-
-// Write
+import {isXmlTextNode, XmlNode} from './xmlModel';
 
 interface NodeWriteConfig {
   inlineChildren?: boolean;
@@ -64,6 +7,14 @@ interface NodeWriteConfig {
 export interface XmlWriteConfig {
   [tagName: string]: NodeWriteConfig;
 }
+
+export const tlhXmlWriteConfig: XmlWriteConfig = {
+  docID: {inlineChildren: true},
+
+  'AO:TxtPubl': {inlineChildren: true},
+
+  w: {inlineChildren: true},
+};
 
 export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXmlWriteConfig, parentInline = false): string[] {
   if (isXmlTextNode(node)) {

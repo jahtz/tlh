@@ -1,9 +1,8 @@
 import React from 'react';
 import {XmlEditableNodeIProps, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {WordNodeEditor} from './WordNodeEditor';
-import {GenericAttributes, XmlWriteConfig} from './xmlModel';
+import {GenericAttributes} from './xmlModel/xmlModel';
 import classNames from 'classnames';
-
 
 export interface WordNodeAttributes {
   lg?: 'Sum' | 'Akk' | 'Hit' | 'Hur' | 'Luw' | 'Hat';
@@ -64,12 +63,4 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
     styling: () => ['corr'],
     replace: (/*node*/) => <span>!</span>
   }
-};
-
-export const tlhXmlWriteConfig: XmlWriteConfig = {
-  docID: {inlineChildren: true},
-
-  'AO:TxtPubl': {inlineChildren: true},
-
-  w: {inlineChildren: true},
 };

@@ -1,4 +1,4 @@
-import {XmlWriter} from '../../editor/xmlModel';
+import {XmlWriter} from '../../editor/xmlModel/xmlWriting';
 import {AOWord, aoWordFormat} from './word';
 
 export interface AOLineBreak {

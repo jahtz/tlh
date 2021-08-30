@@ -1,7 +1,7 @@
 // Akadogramm: automatisch für Zeichen in VERSALIEN, denen ein `-` oder `_` vorausgeht
 
 import {AOWordContent} from './wordContent';
-import {XmlWriter} from '../../editor/xmlModel';
+import {XmlWriter} from '../../editor/xmlModel/xmlWriting';
 import {clearUpperMultiStringContent, UpperMultiStringContent, writeMultiWordContent} from './multiStringContent';
 
 export interface AOAkkadogramm {
