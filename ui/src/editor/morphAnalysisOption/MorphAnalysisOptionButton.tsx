@@ -9,7 +9,7 @@ interface IProps {
   select: (s: SelectedAnalysisOption, ctrl: boolean) => void;
 }
 
-export function MorphAnalysisButton({identifier, analysis, selectedOption, select}: IProps): JSX.Element {
+export function MorphAnalysisOptionButton({identifier, analysis, selectedOption, select}: IProps): JSX.Element {
 
   const classes = classNames('button', 'is-fullwidth', 'button-text-left', {'is-link': isSelected(identifier, selectedOption)});
 

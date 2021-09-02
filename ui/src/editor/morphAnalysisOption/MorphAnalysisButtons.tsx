@@ -1,9 +1,9 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {isSingleMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
-import {MorphAnalysisButton} from './MorphAnalysisButton';
+import {MorphAnalysisOptionButton} from './MorphAnalysisOptionButton';
 import {MorphAnalysisOptionIProps, Numerus} from './MorphologicalAnalysisOption';
 import {IoSettingsOutline} from 'react-icons/io5';
+import {EncliticsAnalysisOptionButton} from './EncliticsAnalysisOptionButton';
 
 interface IProps extends MorphAnalysisOptionIProps {
   toggleUpdate: () => void;
@@ -13,24 +13,26 @@ export function MorphAnalysisOptionButtons({ma, selectedOption, selectAll, updat
 
   const {t} = useTranslation('common');
 
-  const {number, translation, transcription} = ma;
+  const {number, translation, referenceWord, analysis, paradigmClass, encliticsAnalysis, determinativ} = ma;
+
+  const isSingleAnalysisOption = typeof analysis === 'string';
 
   return (
     <>
       <h2 className="subtitle is-5">
-        {number}) {translation} ({transcription})&nbsp;
-        {!isSingleMorphologicalAnalysis(ma) && <button className="button" onClick={toggleUpdate}><IoSettingsOutline/></button>}
+        {number}) {translation} ({referenceWord})&nbsp;
+        {!isSingleAnalysisOption && <button className="button" onClick={toggleUpdate}><IoSettingsOutline/></button>}
       </h2>
 
-      {isSingleMorphologicalAnalysis(ma)
+      {isSingleAnalysisOption
         ? <div className="my-3">
-          <MorphAnalysisButton identifier={{num: number}} analysis={ma.analysis} select={updateSelected} selectedOption={selectedOption}/>
+          <MorphAnalysisOptionButton identifier={{num: number}} analysis={analysis} select={updateSelected} selectedOption={selectedOption}/>
         </div>
         : <>
           <div className="columns is-multiline">
-            {ma.analyses.map(({letter, analysis}, index) =>
+            {analysis.map(({letter, analysis}, index) =>
               <div key={index} className="column is-one-third-desktop">
-                <MorphAnalysisButton identifier={{num: number, letter}} analysis={analysis} select={updateSelected} selectedOption={selectedOption}/>
+                <MorphAnalysisOptionButton identifier={{num: number, letter}} analysis={analysis} select={updateSelected} selectedOption={selectedOption}/>
               </div>
             )}
           </div>
@@ -50,8 +52,23 @@ export function MorphAnalysisOptionButtons({ma, selectedOption, selectAll, updat
         </>
       }
 
-      {ma.other.length > 0 && <div className="box has-text-centered">{ma.other.join(' @ ')}</div>}
+      {encliticsAnalysis && typeof encliticsAnalysis.analysis !== 'string' && <div className="columns">
+        {encliticsAnalysis.analysis.map(({letter, analysis}) =>
+          <div className="column" key={letter}>
+            <EncliticsAnalysisOptionButton identifier={letter} analysis={analysis}/>
+          </div>
+        )}
+      </div>}
 
+      <div className="box has-text-centered">
+        {t('paradigmClass')}: <code>{paradigmClass}</code>
+
+        {determinativ && <span>, {t('determinativ')}: <code>{determinativ}</code></span>}
+
+        {encliticsAnalysis && typeof encliticsAnalysis.analysis === 'string' &&
+        <span>, {t('encliticsAnalysis')}: <code>{encliticsAnalysis.enclitics}</code> @ <code>{encliticsAnalysis.analysis}</code></span>
+        }
+      </div>
     </>
   );
 }

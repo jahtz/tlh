@@ -1,14 +1,14 @@
-import {parseTransliterationLine} from "./parser";
-import {lineParseResult} from "../model/lineParseResult";
-import {parsedWord as w} from "../model/sentenceContent/word";
-import {sumerogramm as sg} from "../model/wordContent/sumerogramm";
-import {determinativ as d} from "../model/wordContent/determinativ";
-import {akkadogramm as ag} from "../model/wordContent/akkadogramm";
-import {numeralContent as nc} from "../model/wordContent/numeralContent";
-import {aoIllegibleContent as illeg} from "../model/wordContent/illegible";
+import {parseTransliterationLine} from './parser';
+import {lineParseResult} from '../model/lineParseResult';
+import {parsedWord as w} from '../model/sentenceContent/word';
+import {sumerogramm as sg} from '../model/wordContent/sumerogramm';
+import {determinativ as d} from '../model/wordContent/determinativ';
+import {akkadogramm as ag} from '../model/wordContent/akkadogramm';
+import {numeralContent as nc} from '../model/wordContent/numeralContent';
+import {aoIllegibleContent as illeg} from '../model/wordContent/illegible';
 import {de, ds, le, ls, ue, us} from './testHelpers';
-import {paragraphSeparator} from "../model/paragraphSeparators";
-import {indexDigit} from "../model/wordContent/indexDigit";
+import {indexDigit} from '../model/wordContent/indexDigit';
+import { paragraphSeparator } from '../model/paragraph';
 
 const completeInput = `
 $Publikationsnummer: KBo 71.53, Grabungsnummer: Bo 2018/6, Paläographische Klassifizierung: junghethitisch
@@ -46,7 +46,7 @@ $Publikationsnummer: KBo 71.53, Grabungsnummer: Bo 2018/6, Paläographische Klas
 9' # {S:KALxBAD} \\ @s a-la-ad \\ @a še-e-du \\ @h tar-pí-iš
 10' # {S:NIM} \\ @s ni-im \\ @a ša-qú-ú \\ @h pár-ku-uš
 {G:Hier endet der frei erfundene Text}
-`
+`;
 
 const completeResult = `
 <?xml-stylesheet href="HPMxml.css" type="text/css"?>
@@ -83,7 +83,7 @@ const completeResult = `
 <lb txtid="KBo 71.53" lnr="Rs. V 9′" lg="Hit"/> <w><c type='sign'>NIM</c></w> <tabsep/> <w lg='Sum'>ni-im</w> <tabsep/> <w lg='Akk'>ša-qú-ú</w> <tabsep/> <w>pár-ku-uš</w>  
 <gap t="line" c="Hier endet der frei erfundene Text"/> 
 </s></p></text></div1></body></AOxml>
-`
+`;
 
 describe('DocumentParser', () => {
 

@@ -10,17 +10,11 @@ import {
 } from './selectedAnalysisOption';
 import {useTranslation} from 'react-i18next';
 import React, {useEffect, useState} from 'react';
-import {
-  isSingleMorphologicalAnalysis,
-  MorphologicalAnalysis,
-  readMorphAnalysis,
-  writeLetteredMorphologicalAnalysisValue,
-  writeSingleMorphologicalAnalysisValue
-} from '../model/morphologicalAnalysis';
+import {MorphologicalAnalysis, readMorphologicalAnalysis, writeMorphAnalysisValue} from '../model/morphologicalAnalysis';
 import {MorphAnalysisOption, Numerus} from './morphAnalysisOption/MorphologicalAnalysisOption';
 import {DisplayNode} from './NodeDisplay';
 import {tlhNodeDisplayConfig, WordNodeAttributes} from './tlhNodeDisplayConfig';
-import {AnalysisOption} from '../model/analysisOptions';
+import {LetteredAnalysisOption} from '../model/analysisOptions';
 import {useSelector} from 'react-redux';
 import {editorConfigSelector} from '../store/store';
 import {GenericAttributes, XmlElementNode} from './xmlModel/xmlModel';
@@ -41,7 +35,7 @@ function readMorphologiesFromNode(node: XmlElementNode<WordNodeAttributes>): Mor
       const match = name.trim().match(morphologyAttributeNameRegex);
 
       if (match) {
-        return readMorphAnalysis(parseInt(match[1]), value);
+        return readMorphologicalAnalysis(parseInt(match[1]), value);
       }
     })
     .filter((m): m is MorphologicalAnalysis => !!m);
@@ -81,7 +75,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
       newNode.attributes.mrp0sel = writeSelectedMorphologies(state.selectedMorphologies);
 
       for (const ma of state.morphologies) {
-        newNode.attributes[`mrp${ma.number}`] = isSingleMorphologicalAnalysis(ma) ? writeSingleMorphologicalAnalysisValue(ma) : writeLetteredMorphologicalAnalysisValue(ma).join('\n');
+        newNode.attributes[`mrp${ma.number}`] = writeMorphAnalysisValue(ma);
       }
 
       updateNode(newNode, path);
@@ -92,7 +86,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
 
   function handleEditUpdate(node: XmlElementNode<WordNodeAttributes & GenericAttributes>): void {
     updateNode(node, path);
-    // FIXME: reload morphological analyses!
+    // FIXME: reload morphological analysis!
     setEditContent(undefined);
   }
 
@@ -114,9 +108,9 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
       const allValues = morphologies
         .filter((morph) => !number || morph.number === number)
         .flatMap((m) =>
-          isSingleMorphologicalAnalysis(m)
+          typeof m.analysis === 'string'
             ? [{num: m.number}]
-            : m.analyses
+            : m.analysis
               .filter(({analysis}) => !numerus || analysis.includes(numerus) || analysis.includes('ABL') || analysis.includes('INS'))
               .map(({letter}) => {
                 return {num: m.number, letter};
@@ -148,7 +142,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
   function nextMorphAnalysis(): MorphologicalAnalysis {
     const number = Math.max(...state.morphologies.map(({number}) => number)) + 1;
 
-    return {type: 'LetteredMorphologicalAnalysis', number, translation: '', transcription: '', other: [], analyses: []};
+    return {number, translation: '', referenceWord: '', analysis: [], paradigmClass: ''};
   }
 
   if (editContent) {
@@ -195,12 +189,16 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
               const stringified = stringifySelectedAnalysisOption(selectedMorph);
 
               if (morphology) {
-                const analysis: string | AnalysisOption | undefined = isSingleMorphologicalAnalysis(morphology)
+                const analysis: string | LetteredAnalysisOption | undefined = typeof morphology.analysis === 'string'
                   ? morphology.analysis
-                  : morphology.analyses.find(({letter}) => selectedMorph.letter === letter);
+                  : morphology.analysis.find(({letter}) => selectedMorph.letter === letter);
+
+                const enc = morphology.encliticsAnalysis
+                  ? morphology.encliticsAnalysis.enclitics + ' @ ' + morphology.encliticsAnalysis.analysis
+                  : '';
 
                 return <p key={stringified}>
-                  {stringified} - &nbsp;&nbsp;&nbsp;&nbsp; {morphology.translation} &nbsp; {typeof analysis === 'string' ? analysis : analysis?.analysis} &nbsp; {morphology.other}
+                  {stringified} - &nbsp;&nbsp;&nbsp;&nbsp; {morphology.translation} &nbsp; {typeof analysis === 'string' ? analysis : analysis?.analysis} &nbsp; {enc}
                 </p>;
               } else {
                 return <span className="has-text-danger">{t('selectedMorphologyNotExisting')}: {stringified}</span>;

@@ -1,9 +1,9 @@
-import {transliteration} from "./parser";
-import {akkadogramm} from "../model/wordContent/akkadogramm";
-import {sumerogramm} from "../model/wordContent/sumerogramm";
-import {inscribedLetter} from "../model/wordContent/inscribedLetter";
-import {AOWordContent} from "../model/wordContent/wordContent";
-import {Parser} from "parsimmon";
+import {transliteration} from './parser';
+import {akkadogramm} from '../model/wordContent/akkadogramm';
+import {sumerogramm} from '../model/wordContent/sumerogramm';
+import {inscribedLetter} from '../model/wordContent/inscribedLetter';
+import {AOWordContent} from '../model/wordContent/wordContent';
+import {Parser} from 'parsimmon';
 import {
   testParseCorrections,
   testParseDamages,
@@ -14,8 +14,8 @@ import {
   testParseMaterLectionis,
   testParseNumeralContent,
   testParseSignContent
-} from "./singleParsers.spec";
-import {indexDigit} from "../model/wordContent/indexDigit";
+} from './singleParsers.spec';
+import {indexDigit} from '../model/wordContent/indexDigit';
 
 function testParseContentOfMultiContent(parser: Parser<AOWordContent>): void {
   // testParseHittite(parser);

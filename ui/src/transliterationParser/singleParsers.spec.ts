@@ -3,7 +3,6 @@ import {determinativ} from '../model/wordContent/determinativ';
 import {materLectionis} from '../model/wordContent/materLectionis';
 import {damageContent, DamageType} from '../model/wordContent/damages';
 import {aoCorr} from '../model/wordContent/corrections';
-import {paragraphSeparator, paragraphSeparatorDouble} from '../model/paragraphSeparators';
 import {aoEllipsis} from '../model/wordContent/ellipsis';
 import {aoSign} from '../model/wordContent/sign';
 import {aoKolonMark} from '../model/wordContent/kolonMark';
@@ -13,9 +12,9 @@ import {aoIllegibleContent} from '../model/wordContent/illegible';
 import {Parser} from 'parsimmon';
 import {AOWordContent} from '../model/wordContent/wordContent';
 import {numeralContent} from '../model/wordContent/numeralContent';
-import {AOTextContent} from '../editor/documentBody';
 import {aoBasicText} from '../model/wordContent/basicText';
 import {AOSentenceContent} from '../model/sentence';
+import {AOTextContent, paragraphSeparator, paragraphSeparatorDouble} from '../model/paragraph';
 
 const determinativSpecialGenusCases: [string][] = [['m'], ['f']];
 const determinativSpecialDeityCases: [string][] = [['m.D'], ['f.D']];
@@ -25,13 +24,9 @@ const materLectionisCases: [string][] = [['abc'], ['xyz']];
 const curlyBraceCases: [string][] = [['AN'], ['Anderer Text!'], ['Text : mit : Doppel:punkten']];
 
 export function testParseDamages(parser: Parser<AOWordContent>): void {
-  test.each`
-  toParse | expected
-  ${'['}  | ${DamageType.DeletionStart}
-  ${']'}  |  ${DamageType.DeletionEnd}
-  ${'⸢'}  | ${DamageType.LesionStart}
-  ${'⸣'}  | ${DamageType.LesionEnd}
-  ${'<<'} | ${DamageType.SurplusStart}
+
+ /*
+   ${'<<'} | ${DamageType.SurplusStart}
   ${'>>'} | ${DamageType.SurplusEnd}
   ${'〈〈'} | ${DamageType.SurplusStart}
   ${'〉〉'} | ${DamageType.SurplusEnd}
@@ -40,7 +35,15 @@ export function testParseDamages(parser: Parser<AOWordContent>): void {
   ${'〈'}  | ${DamageType.SupplementStart}
   ${'〉'}  | ${DamageType.SupplementEnd}
   ${'('}  | ${DamageType.UnknownDamageStart}
-  ${')'}  | ${DamageType.UnknownDamageEnd}`(
+  ${')'}  | ${DamageType.UnknownDamageEnd}
+  */
+
+  test.each`
+  toParse | expected
+  ${'['}  | ${'del_in'}
+  ${']'}  | ${'del_fin'}
+  ${'⸢'}  | ${'les_in'}
+  ${'⸣'}  | ${'les_fin'}`(
     'should parse $toParse as Damage Content with Damage Type $expected',
     ({toParse, expected}) => expect(parser.tryParse(toParse)).toEqual(damageContent(expected))
   );

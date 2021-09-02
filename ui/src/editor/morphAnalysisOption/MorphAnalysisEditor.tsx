@@ -1,7 +1,7 @@
 import {Field, FieldArray, Form, Formik} from 'formik';
 import React from 'react';
-import {isSingleMorphologicalAnalysis, LetteredMorphologicalAnalysis, MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
-import {AnalysisOption} from '../../model/analysisOptions';
+import {MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
+import {LetteredAnalysisOption} from '../../model/analysisOptions';
 import {useTranslation} from 'react-i18next';
 import {IoSettingsOutline} from 'react-icons/io5';
 
@@ -17,8 +17,13 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
 
   const {t} = useTranslation('common');
 
-  function nextAnalysisOption(lma: LetteredMorphologicalAnalysis): AnalysisOption {
-    const usedLetters = lma.analyses.map(({letter}) => letter);
+  function nextAnalysisOption(lma: MorphologicalAnalysis): LetteredAnalysisOption {
+
+    if (typeof lma.analysis === 'string') {
+      throw new Error('TODO!');
+    }
+
+    const usedLetters = lma.analysis.map(({letter}) => letter);
 
     const letter = alphabet.find((l) => !usedLetters.includes(l));
 
@@ -26,52 +31,52 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
       throw new Error('All letters are used!');
     }
 
-    return {type: 'AnalysisOption', letter, analysis: ''};
+    return {letter, analysis: ''};
   }
 
-  if (isSingleMorphologicalAnalysis(ma)) {
+  if (typeof ma.analysis === 'string') {
     // TODO: disabled until further notice...
     return <div className="notification is-warning has-text-centered">This should be disabled and not selectable...</div>;
-  } else {
+  }
 
-    return (
-      <Formik initialValues={ma} onSubmit={update}>
-        {({values}) =>
-          <Form>
-            <div className="field has-addons">
-              <div className="control">
-                <button type="button" className="button is-static">{ma.number}</button>
-              </div>
-              <div className="control is-expanded">
-                <Field name="translation" className="input"/>
-              </div>
-              <div className="control is-expanded">
-                <Field name="transcription" className="input"/>
-              </div>
-              <div className="control">
-                <button type="button" className="button" onClick={toggleUpdate}><IoSettingsOutline/></button>
-              </div>
+  return (
+    <Formik initialValues={ma} onSubmit={update}>
+      {({values}) =>
+        <Form>
+          <div className="field has-addons">
+            <div className="control">
+              <button type="button" className="button is-static">{ma.number}</button>
             </div>
+            <div className="control is-expanded">
+              <Field name="translation" className="input"/>
+            </div>
+            <div className="control is-expanded">
+              <Field name="transcription" className="input"/>
+            </div>
+            <div className="control">
+              <button type="button" className="button" onClick={toggleUpdate}><IoSettingsOutline/></button>
+            </div>
+          </div>
 
-            <FieldArray name={'analyses'}>
-              {(arrayHelpers) =>
-                <div>
+          <FieldArray name={'analyses'}>
+            {(arrayHelpers) =>
+              <div>
 
-                  {values.analyses.map(({letter}, index) =>
-                    <div className="field has-addons" key={letter}>
-                      <div className="control">
-                        <button className="button is-static">{letter}</button>
-                      </div>
-                      <div className="control is-expanded">
-                        <Field name={`analyses.${index}.analysis`} className="input"/>
-                      </div>
-                      <div className="control">
-                        <button type="button" className="button is-danger" onClick={() => arrayHelpers.remove(index)}>-</button>
-                      </div>
+                {(values.analysis as LetteredAnalysisOption[]).map(({letter}, index) =>
+                  <div className="field has-addons" key={letter}>
+                    <div className="control">
+                      <button className="button is-static">{letter}</button>
                     </div>
-                  )}
+                    <div className="control is-expanded">
+                      <Field name={`analyses.${index}.analysis`} className="input"/>
+                    </div>
+                    <div className="control">
+                      <button type="button" className="button is-danger" onClick={() => arrayHelpers.remove(index)}>-</button>
+                    </div>
+                  </div>
+                )}
 
-                  {/* TODO: edit other content of Morphological Analysis, too...
+                {/* TODO: edit other content of Morphological Analysis, too...
                 <div className="field has-addons">
                   <div className="control">
                     <button className="button is-static">+</button>
@@ -82,17 +87,16 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
                 </div>
                 */}
 
-                  <div className="buttons">
-                    <button type="button" className="button is-link" onClick={() => arrayHelpers.push(nextAnalysisOption(values))}>+</button>
-                    <button type="submit" className="button">{t('updateAnalyses')}</button>
-                  </div>
+                <div className="buttons">
+                  <button type="button" className="button is-link" onClick={() => arrayHelpers.push(nextAnalysisOption(values))}>+</button>
+                  <button type="submit" className="button">{t('updateAnalyses')}</button>
                 </div>
-              }
+              </div>
+            }
 
-            </FieldArray>
-          </Form>
-        }
-      </Formik>
-    );
-  }
+          </FieldArray>
+        </Form>
+      }
+    </Formik>
+  );
 }
