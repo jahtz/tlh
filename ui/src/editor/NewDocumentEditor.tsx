@@ -14,6 +14,7 @@ interface IProps {
   filename: string;
   displayConfig?: XmlNodeDisplayConfigObject;
   download: (content: string) => void;
+  closeFile: () => void;
 }
 
 interface IEditState {
@@ -59,7 +60,7 @@ function findElement(node: XmlElementNode, path: number[]): XmlElementNode {
   return path.reduce<XmlElementNode>((nodeToUpdate, pathContent) => nodeToUpdate.children[pathContent] as XmlElementNode, node);
 }
 
-export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDisplayConfig, download, filename}: IProps): JSX.Element {
+export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDisplayConfig, download, filename, closeFile}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorConfig = useSelector(editorConfigSelector);
@@ -131,6 +132,9 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
             <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="button is-fullwidth">
               {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
             </button>
+          </div>
+          <div className="column">
+            <button className="button is-fullwidth" onClick={closeFile} >{t('closeFile')}</button>
           </div>
           <div className="column">
             <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>

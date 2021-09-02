@@ -33,10 +33,14 @@ export function DocumentEditorContainer(): JSX.Element {
     state && handleSaveToPC(content, state.filename);
   }
 
+  function closeFile(): void {
+    setState(undefined);
+  }
+
   return (
     <div className="container is-fluid">
       {state
-        ? <NewDocumentEditor node={state.rootNode} download={download} filename={state.filename}/>
+        ? <NewDocumentEditor node={state.rootNode} download={download} filename={state.filename} closeFile={closeFile}/>
         : <FileLoader accept="text/xml" onLoad={readFile}/>}
     </div>
   );
