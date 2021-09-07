@@ -10,7 +10,7 @@ import {
 } from './selectedAnalysisOption';
 import {useTranslation} from 'react-i18next';
 import React, {useEffect, useState} from 'react';
-import {MorphologicalAnalysis, readMorphologicalAnalysis, writeMorphAnalysisValue} from '../model/morphologicalAnalysis';
+import {MorphologicalAnalysis, readMorphologicalAnalysis, writeEncliticsAnalysis, writeMorphAnalysisValue} from '../model/morphologicalAnalysis';
 import {MorphAnalysisOption, Numerus} from './morphAnalysisOption/MorphologicalAnalysisOption';
 import {DisplayNode} from './NodeDisplay';
 import {tlhNodeDisplayConfig, WordNodeAttributes} from './tlhNodeDisplayConfig';
@@ -90,9 +90,9 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
     setEditContent(undefined);
   }
 
-  function updateSelected(newValue: SelectedAnalysisOption, ctrl: boolean): void {
+  function updateSelected(newValue: SelectedAnalysisOption, multipleChoice: boolean): void {
     setState(({selectedMorphologies: currentSelection, ...rest}) => {
-      const newValues = ctrl
+      const newValues = multipleChoice
         ? (isSelected(newValue, currentSelection)
           ? currentSelection.filter((v) => !selectedAnalysisOptionEquals(v, newValue))
           : [...currentSelection, newValue])
@@ -105,16 +105,14 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
   function selectAll(number?: number, numerus?: Numerus): void {
 
     setState(({morphologies, addMorphology}) => {
-      const allValues = morphologies
+      const allValues: SelectedAnalysisOption[] = morphologies
         .filter((morph) => !number || morph.number === number)
-        .flatMap((m) =>
-          typeof m.analysis === 'string'
-            ? [{num: m.number}]
-            : m.analysis
+        .flatMap((morphologicalAnalysis) =>
+          'analysis' in morphologicalAnalysis
+            ? [{number: morphologicalAnalysis.number, selected: false}]
+            : morphologicalAnalysis.analysisOptions
               .filter(({analysis}) => !numerus || analysis.includes(numerus) || analysis.includes('ABL') || analysis.includes('INS'))
-              .map(({letter}) => {
-                return {num: m.number, letter};
-              })
+              .map(({letter}) => ({number: morphologicalAnalysis.number, letter, selected: false}))
         );
 
       return {morphologies, selectedMorphologies: allValues.sort(compareSelectedAnalysisOptions), changed: true, addMorphology};
@@ -142,7 +140,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
   function nextMorphAnalysis(): MorphologicalAnalysis {
     const number = Math.max(...state.morphologies.map(({number}) => number)) + 1;
 
-    return {number, translation: '', referenceWord: '', analysis: [], paradigmClass: ''};
+    return {number, translation: '', referenceWord: '', analysisOptions: [], paradigmClass: ''};
   }
 
   if (editContent) {
@@ -158,7 +156,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
       {state.morphologies.length === 0
         ? <div className="notification is-warning has-text-centered">{t('noMorphologicalAnalysesFound')}</div>
         : state.morphologies.map((m) =>
-          <MorphAnalysisOption key={m.number} ma={m} selectedOption={state.selectedMorphologies} updateSelected={updateSelected}
+          <MorphAnalysisOption key={m.number} morphologicalAnalysis={m} selectedOptions={state.selectedMorphologies} updateSelected={updateSelected}
                                updateMorphology={updateMorphology} selectAll={(numerus) => selectAll(m.number, numerus)}
                                setKeyHandlingEnabled={setKeyHandlingEnabled}/>
         )}
@@ -179,22 +177,22 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
         </div>
       </div>
 
-      <div className={classNames('message', 'is-primary', 'has-text-weight-bold', {'is-size-5': false})}>
+      <div className={classNames('message', 'is-primary', 'has-text-weight-bold')}>
         <div className="message-body">
           {state.selectedMorphologies
             .sort(compareSelectedAnalysisOptions)
             .map((selectedMorph) => {
-              const morphology = state.morphologies.find(({number}) => number === selectedMorph.num);
+              const morphology = state.morphologies.find(({number}) => number === selectedMorph.number);
 
               const stringified = stringifySelectedAnalysisOption(selectedMorph);
 
               if (morphology) {
-                const analysis: string | LetteredAnalysisOption | undefined = typeof morphology.analysis === 'string'
+                const analysis: string | LetteredAnalysisOption | undefined = 'analysis' in morphology
                   ? morphology.analysis
-                  : morphology.analysis.find(({letter}) => selectedMorph.letter === letter);
+                  : morphology.analysisOptions.find(({letter}) => selectedMorph.letter === letter);
 
                 const enc = morphology.encliticsAnalysis
-                  ? morphology.encliticsAnalysis.enclitics + ' @ ' + morphology.encliticsAnalysis.analysis
+                  ? writeEncliticsAnalysis(morphology.encliticsAnalysis)
                   : '';
 
                 return <p key={stringified}>

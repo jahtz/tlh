@@ -1,74 +1,119 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {MorphAnalysisOptionButton} from './MorphAnalysisOptionButton';
 import {MorphAnalysisOptionIProps, Numerus} from './MorphologicalAnalysisOption';
 import {IoSettingsOutline} from 'react-icons/io5';
-import {EncliticsAnalysisOptionButton} from './EncliticsAnalysisOptionButton';
+import {LetteredAnalysisOptionButton} from './LetteredAnalysisOptionButton';
+import classNames from 'classnames';
+import {toggleStringValue} from '../../toggleValue';
+
+
+interface MorphAnalysisButtonIProps {
+  number: number;
+  letter?: string;
+  analysis: string;
+  isSelected: boolean;
+  select: (multipleChoice: boolean) => void;
+}
+
+function MorphAnalysisOptionButton({number, letter, analysis, isSelected, select}: MorphAnalysisButtonIProps): JSX.Element {
+  return (
+    <button type="button" onClick={(event) => select(event.ctrlKey || event.metaKey)}
+            className={classNames('button', 'is-fullwidth', 'button-text-left', {'is-link': isSelected})}>
+      {number}{letter} - {analysis}
+    </button>
+  );
+}
+
 
 interface IProps extends MorphAnalysisOptionIProps {
   toggleUpdate: () => void;
 }
 
-export function MorphAnalysisOptionButtons({ma, selectedOption, selectAll, updateSelected, toggleUpdate}: IProps): JSX.Element {
+export function MorphAnalysisOptionButtons({morphologicalAnalysis, selectedOptions, selectAll, updateSelected: up, toggleUpdate}: IProps): JSX.Element {
+
+  const {number, translation, referenceWord, paradigmClass, encliticsAnalysis, determinativ} = morphologicalAnalysis;
 
   const {t} = useTranslation('common');
+  const [selectedEncliticLetters, setSelectedEncliticLetters] = useState<string[]>([]);
 
-  const {number, translation, referenceWord, analysis, paradigmClass, encliticsAnalysis, determinativ} = ma;
+  const isSingleAnalysisOption = 'analysis' in morphologicalAnalysis;
 
-  const isSingleAnalysisOption = typeof analysis === 'string';
+  const needsEncliticsChoice = !!encliticsAnalysis && 'analysisOptions' in encliticsAnalysis;
+
+  function updateSelectedEncliticsAnalysis(letter: string, multipleChoice: boolean): void {
+    setSelectedEncliticLetters((oldEncliticLetters) => toggleStringValue(oldEncliticLetters, letter, multipleChoice));
+  }
+
+  function updateSelectedAnalysis(letter: string | undefined, isMultipleChoice: boolean): void {
+    if (!needsEncliticsChoice) {
+      up({number, letter}, isMultipleChoice);
+    } else if (selectedEncliticLetters.length > 0) {
+      // only single analysis
+      up({number, letter, enclitics: selectedEncliticLetters}, isMultipleChoice);
+    }
+  }
+
+  // selectedOptions.forEach((x) => console.info(number + ' :: ' + JSON.stringify(x)));
+
+  const selectedEnclitics = selectedOptions.length > 0
+    ? (selectedOptions[0].enclitics || []) :
+    [];
 
   return (
-    <>
-      <h2 className="subtitle is-5">
-        {number}) {translation} ({referenceWord})&nbsp;
+    <div className="my-5">
+      <h2 className="is-size-5 my-3">
+        {number}) {translation} ({referenceWord}, {t('paradigmClass')}: <code>{paradigmClass}</code>
+        {determinativ && <span>, {t('determinativ')}: <code>{determinativ}</code></span>})&nbsp;
         {!isSingleAnalysisOption && <button className="button" onClick={toggleUpdate}><IoSettingsOutline/></button>}
       </h2>
 
       {isSingleAnalysisOption
         ? <div className="my-3">
-          <MorphAnalysisOptionButton identifier={{num: number}} analysis={analysis} select={updateSelected} selectedOption={selectedOption}/>
+          <MorphAnalysisOptionButton number={number} analysis={morphologicalAnalysis.analysis} isSelected={selectedOptions.length > 0}
+                                     select={(mc) => updateSelectedAnalysis(undefined, mc)}/>
         </div>
-        : <>
-          <div className="columns is-multiline">
-            {analysis.map(({letter, analysis}, index) =>
-              <div key={index} className="column is-one-third-desktop">
-                <MorphAnalysisOptionButton identifier={{num: number, letter}} analysis={analysis} select={updateSelected} selectedOption={selectedOption}/>
-              </div>
-            )}
-          </div>
-          <div className="columns">
-            <div className="column is-one-third-desktop">
-              <button type="button" className="button is-warning is-fullwidth" onClick={() => selectAll()}>{t('selectAllFromNumber')}</button>
+        : <div className="columns is-multiline">
+          {morphologicalAnalysis.analysisOptions.map(({letter, analysis}, index) =>
+            <div key={index} className="column is-one-third-desktop">
+              <MorphAnalysisOptionButton number={number} letter={letter} analysis={analysis} isSelected={!!selectedOptions.find(({letter: l}) => letter === l)}
+                                         select={(mc) => updateSelectedAnalysis(letter, mc)}/>
             </div>
-            <div className="column is-one-third-desktop">
-              <button type="button" className="button is-warning is-fullwidth"
-                      onClick={() => selectAll(Numerus.Singular)}>{t('selectAllSingularFromNumber')}</button>
-            </div>
-            <div className="column is-one-third-desktop">
-              <button type="button" className="button is-warning is-fullwidth"
-                      onClick={() => selectAll(Numerus.Plural)}>{t('selectAllPluralFromNumber')}</button>
-            </div>
-          </div>
-        </>
+          )}
+        </div>
       }
 
-      {encliticsAnalysis && typeof encliticsAnalysis.analysis !== 'string' && <div className="columns">
-        {encliticsAnalysis.analysis.map(({letter, analysis}) =>
+      {encliticsAnalysis && 'analysisOptions' in encliticsAnalysis && <div className="columns">
+        {encliticsAnalysis.analysisOptions.map(({letter, analysis}) =>
           <div className="column" key={letter}>
-            <EncliticsAnalysisOptionButton identifier={letter} analysis={analysis}/>
+            <LetteredAnalysisOptionButton
+              letter={letter} analysis={analysis}
+              isPreSelected={selectedEncliticLetters.includes(letter)}
+              isSelected={/* TODO! */selectedEnclitics.includes(letter)}
+              select={(multipleChoice) => updateSelectedEncliticsAnalysis(letter, multipleChoice)}/>
           </div>
         )}
       </div>}
 
-      <div className="box has-text-centered">
-        {t('paradigmClass')}: <code>{paradigmClass}</code>
+      {!isSingleAnalysisOption && <div className="columns">
+        <div className="column is-one-third-desktop">
+          <button type="button" className="button is-warning is-fullwidth" onClick={() => selectAll()}>{t('selectAllFromNumber')}</button>
+        </div>
+        <div className="column is-one-third-desktop">
+          <button type="button" className="button is-warning is-fullwidth" onClick={() => selectAll(Numerus.Singular)}>
+            {t('selectAllSingularFromNumber')}
+          </button>
+        </div>
+        <div className="column is-one-third-desktop">
+          <button type="button" className="button is-warning is-fullwidth" onClick={() => selectAll(Numerus.Plural)}>
+            {t('selectAllPluralFromNumber')}
+          </button>
+        </div>
+      </div>}
 
-        {determinativ && <span>, {t('determinativ')}: <code>{determinativ}</code></span>}
-
-        {encliticsAnalysis && typeof encliticsAnalysis.analysis === 'string' &&
-        <span>, {t('encliticsAnalysis')}: <code>{encliticsAnalysis.enclitics}</code> @ <code>{encliticsAnalysis.analysis}</code></span>
+      {encliticsAnalysis && 'analysis' in encliticsAnalysis && <div className="box has-text-centered">
+        {encliticsAnalysis && <span>{t('encliticsAnalysis')}: <code>{encliticsAnalysis.enclitics}</code> @ <code>{encliticsAnalysis.analysis}</code></span>
         }
-      </div>
-    </>
+      </div>}
+    </div>
   );
 }

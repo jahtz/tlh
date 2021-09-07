@@ -1,6 +1,6 @@
 import {Field, FieldArray, Form, Formik} from 'formik';
 import React from 'react';
-import {MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
+import {MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {LetteredAnalysisOption} from '../../model/analysisOptions';
 import {useTranslation} from 'react-i18next';
 import {IoSettingsOutline} from 'react-icons/io5';
@@ -17,13 +17,8 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
 
   const {t} = useTranslation('common');
 
-  function nextAnalysisOption(lma: MorphologicalAnalysis): LetteredAnalysisOption {
-
-    if (typeof lma.analysis === 'string') {
-      throw new Error('TODO!');
-    }
-
-    const usedLetters = lma.analysis.map(({letter}) => letter);
+  function nextAnalysisOption(lma: MultiMorphologicalAnalysis): LetteredAnalysisOption {
+    const usedLetters = lma.analysisOptions.map(({letter}) => letter);
 
     const letter = alphabet.find((l) => !usedLetters.includes(l));
 
@@ -31,10 +26,10 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
       throw new Error('All letters are used!');
     }
 
-    return {letter, analysis: ''};
+    return {letter, analysis: '', selected: false};
   }
 
-  if (typeof ma.analysis === 'string') {
+  if ('analysis' in ma) {
     // TODO: disabled until further notice...
     return <div className="notification is-warning has-text-centered">This should be disabled and not selectable...</div>;
   }
@@ -62,7 +57,7 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
             {(arrayHelpers) =>
               <div>
 
-                {(values.analysis as LetteredAnalysisOption[]).map(({letter}, index) =>
+                {(values.analysisOptions as LetteredAnalysisOption[]).map(({letter}, index) =>
                   <div className="field has-addons" key={letter}>
                     <div className="control">
                       <button className="button is-static">{letter}</button>

@@ -1,37 +1,62 @@
-import {LetteredAnalysisOption, parseAnalysisString} from './analysisOptions';
+import {LetteredAnalysisOption, parseMultiAnalysisString} from './analysisOptions';
 import {tlhAnalyzerUrl} from '../urls';
 import {isXmlElementNode} from '../editor/xmlModel/xmlModel';
 import {WordNode} from '../editor/WordContentEditor';
 import {loadNode, tlhXmlReadConfig} from '../editor/xmlModel/xmlReading';
 
-interface EncliticsAnalysis {
+interface IEncliticsAnalysis {
   enclitics: string;
-  analysis: string | LetteredAnalysisOption[];
+
 }
 
-function writeEncliticsAnalysis({enclitics, analysis}: EncliticsAnalysis) {
-  return enclitics + ' @ ' + analysis;
+interface SingleEncliticsAnalysis extends IEncliticsAnalysis {
+  analysis: string;
+  selected: boolean;
 }
 
-export interface MorphologicalAnalysis {
+interface MultiEncliticsAnalysis extends IEncliticsAnalysis {
+  analysisOptions: LetteredAnalysisOption[];
+}
+
+type EncliticsAnalysis = SingleEncliticsAnalysis | MultiEncliticsAnalysis;
+
+export function writeEncliticsAnalysis(encliticsAnalysis: EncliticsAnalysis) {
+  return 'analysis' in encliticsAnalysis
+    ? encliticsAnalysis.enclitics + ' @ ' + encliticsAnalysis.analysis
+    : encliticsAnalysis.enclitics + ' @ ' + encliticsAnalysis.analysisOptions.map(({letter}) => letter).join('');
+}
+
+interface IMorphologicalAnalysis {
   number: number;
   referenceWord: string;
   translation: string;
-  analysis: string | LetteredAnalysisOption[];
   paradigmClass: string;
   encliticsAnalysis?: EncliticsAnalysis;
   determinativ?: string;
+  selected?: boolean;
 }
 
-export function writeMorphAnalysisValue(
-  {referenceWord, translation, analysis, paradigmClass, encliticsAnalysis, determinativ}: MorphologicalAnalysis
-): string {
+export interface SingleMorphologicalAnalysis extends IMorphologicalAnalysis {
+  analysis: string;
+  selected: boolean;
+}
+
+export interface MultiMorphologicalAnalysis extends IMorphologicalAnalysis {
+  analysisOptions: LetteredAnalysisOption[];
+}
+
+export type MorphologicalAnalysis = SingleMorphologicalAnalysis | MultiMorphologicalAnalysis;
+
+
+export function writeMorphAnalysisValue(morphologicalAnalysis: MorphologicalAnalysis): string {
+
+  const {referenceWord, translation, paradigmClass, encliticsAnalysis, determinativ} = morphologicalAnalysis;
 
   const enc = encliticsAnalysis ? writeEncliticsAnalysis(encliticsAnalysis) : '';
 
-  const analysisString = typeof analysis === 'string'
-    ? analysis
-    : analysis.map(({letter, analysis}) => `{${letter} → ${analysis}}`).join(' ');
+  const analysisString = 'analysis' in morphologicalAnalysis
+    ? morphologicalAnalysis.analysis
+    : morphologicalAnalysis.analysisOptions.map(({letter, analysis}) => `{${letter} → ${analysis}}`).join(' ');
 
 
   return `${referenceWord} @ ${translation} @ ${analysisString} @ ${paradigmClass} @ ${enc} @ ${determinativ}`;
@@ -48,11 +73,22 @@ function splitAtSingle(value: string, splitString: string, splitAtLast = false):
     : value.indexOf(splitString);
 
   return splitIndex >= 0
-    ? [
-      value.substring(0, splitIndex).trim(),
-      value.substring(splitIndex + splitString.length).trim()
-    ]
+    ? [value.substring(0, splitIndex).trim(), value.substring(splitIndex + splitString.length).trim()]
     : [value, undefined];
+}
+
+function readEncliticsChain(encliticsChain: string): EncliticsAnalysis | undefined {
+  const splitEncliticsChain = encliticsChain.split('@').map((s) => s.trim());
+
+  if (!splitEncliticsChain || splitEncliticsChain.length < 2) {
+    return undefined;
+  }
+
+  const [enclitics, analysesString] = splitEncliticsChain;
+
+  return analysesString.includes('{')
+    ? {enclitics, analysisOptions: parseMultiAnalysisString(splitEncliticsChain[1])}
+    : {enclitics, analysis: analysesString, selected: false};
 }
 
 export function readMorphologicalAnalysis(number: number, content: string | null): MorphologicalAnalysis | undefined {
@@ -86,17 +122,11 @@ export function readMorphologicalAnalysis(number: number, content: string | null
 
   const [paradigmClass, encliticsChain] = splitAtSingle(otherString, '+=');
 
-  const splitEncliticsChain = encliticsChain
-    ? encliticsChain.split('@').map((s) => s.trim())
-    : undefined;
+  const encliticsAnalysis = encliticsChain ? readEncliticsChain(encliticsChain) : undefined;
 
-  const encliticsAnalysis: EncliticsAnalysis | undefined = splitEncliticsChain && splitEncliticsChain.length > 1
-    ? {enclitics: splitEncliticsChain[0], analysis: parseAnalysisString(splitEncliticsChain[1])}
-    : undefined;
-
-  const analysis: LetteredAnalysisOption[] | string = parseAnalysisString(analysesString);
-
-  return {number, translation, referenceWord, analysis, paradigmClass, encliticsAnalysis, determinativ};
+  return analysesString.includes('{')
+    ? {number, translation, referenceWord, analysisOptions: parseMultiAnalysisString(analysesString), paradigmClass, encliticsAnalysis, determinativ}
+    : {number, translation, referenceWord, analysis: analysesString, paradigmClass, encliticsAnalysis, determinativ, selected: false};
 }
 
 

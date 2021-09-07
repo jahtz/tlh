@@ -4,6 +4,7 @@ const letteredAnalysesSplitRegex = /\s+(?={)/;
 export interface LetteredAnalysisOption {
   letter: string;
   analysis: string;
+  selected: boolean;
 }
 
 function parseAnalysisOption(as: string): LetteredAnalysisOption {
@@ -13,11 +14,11 @@ function parseAnalysisOption(as: string): LetteredAnalysisOption {
     .split('→')
     .map((s) => s.trim());
 
-  return {letter, analysis};
+  return {letter, analysis, selected: false};
 }
 
-export function parseAnalysisString(as: string): LetteredAnalysisOption[] | string {
-  return as.includes('{')
-    ? as.split(letteredAnalysesSplitRegex).map(parseAnalysisOption)
-    : as;
+export function parseMultiAnalysisString(as: string): LetteredAnalysisOption[] {
+  return as.split(letteredAnalysesSplitRegex).map(parseAnalysisOption);
 }
+
+
