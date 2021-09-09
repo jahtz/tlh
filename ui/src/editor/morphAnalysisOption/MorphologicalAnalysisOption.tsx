@@ -1,17 +1,14 @@
 import {MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import React, {useEffect, useState} from 'react';
-import {SelectedAnalysisOption} from '../selectedAnalysisOption';
 import {MorphAnalysisOptionButtons} from './MorphAnalysisButtons';
 import {MorphAnalysisEditor} from './MorphAnalysisEditor';
 
-export interface MorphAnalysisOptionIProps {
+interface IProps {
   morphologicalAnalysis: MorphologicalAnalysis;
-  selectedOptions: SelectedAnalysisOption[];
-  updateSelected: (s: SelectedAnalysisOption, ctrl: boolean) => void;
-  selectAll: (numerus?: Numerus) => void;
-}
 
-interface IProps extends MorphAnalysisOptionIProps {
+  toggleOrSetAnalysisSelection: (letter?: string, value?: boolean) => void;
+  toggleEncliticsSelection: (letter: string) => void;
+
   setKeyHandlingEnabled: (b: boolean) => void;
   updateMorphology: (newMa: MorphologicalAnalysis) => void;
 }
@@ -20,9 +17,9 @@ export enum Numerus {
   Singular = 'SG', Plural = 'PL'
 }
 
-export function MorphAnalysisOption(
-  {morphologicalAnalysis, selectedOptions, updateSelected, selectAll, updateMorphology, setKeyHandlingEnabled}: IProps
-): JSX.Element {
+export function MorphAnalysisOption(iProps: IProps): JSX.Element {
+
+  const {morphologicalAnalysis, updateMorphology, setKeyHandlingEnabled, toggleOrSetAnalysisSelection, toggleEncliticsSelection} = iProps;
 
   const [update, setIsUpdate] = useState(false);
 
@@ -41,15 +38,18 @@ export function MorphAnalysisOption(
     updateMorphology(newMa);
   }
 
-  const selectedOptionsForNumber = selectedOptions.filter(({number}) => morphologicalAnalysis.number === number);
-
   return (
     <div className="my-3">
       {update
         ? <MorphAnalysisEditor ma={morphologicalAnalysis} update={innerUpdateMorphology} toggleUpdate={toggleUpdate}/>
-        : <MorphAnalysisOptionButtons morphologicalAnalysis={morphologicalAnalysis} selectedOptions={selectedOptionsForNumber} updateSelected={updateSelected}
-                                      selectAll={selectAll}
-                                      toggleUpdate={toggleUpdate}/>}
+        : <>
+          <MorphAnalysisOptionButtons
+            morphologicalAnalysis={morphologicalAnalysis}
+            toggleOrSetAnalysisSelection={toggleOrSetAnalysisSelection}
+            toggleEncliticsSelection={toggleEncliticsSelection}
+            toggleUpdate={toggleUpdate}/>
+        </>
+      }
     </div>
   );
 }

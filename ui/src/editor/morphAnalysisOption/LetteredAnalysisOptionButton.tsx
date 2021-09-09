@@ -1,21 +1,15 @@
 import React from 'react';
 import classNames from 'classnames';
+import {LetteredAnalysisOption} from '../../model/analysisOptions';
 
 interface IProps {
-  letter: string;
-  analysis: string;
-  isSelected: boolean;
-  isPreSelected?: boolean;
-  select: (multipleChoice: boolean) => void;
+  ao: LetteredAnalysisOption;
+  select: () => void;
 }
 
-export function LetteredAnalysisOptionButton({letter, analysis, isSelected, isPreSelected, select}: IProps): JSX.Element {
+export function LetteredAnalysisOptionButton({ao: {letter, analysis, selected}, select}: IProps): JSX.Element {
   return (
-    <button type="button" onClick={(event) => select(event.metaKey || event.ctrlKey)}
-            className={classNames('button', 'is-fullwidth', 'button-text-left', {
-              'is-link': isPreSelected || isSelected,
-              'is-light': isPreSelected && !isSelected
-            })}>
+    <button type="button" className={classNames('button', 'is-fullwidth', 'button-text-left', {'is-link': selected})} onClick={select}>
       {letter} - {analysis}
     </button>
   );

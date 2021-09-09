@@ -41,7 +41,7 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
     state.parseResult.status && updateNode(state.parseResult.value);
   }
 
-  function updateMorhpologies(): void {
+  function updateMorphologies(): void {
     if (state.parseResult.status) {
       fetchMorphologicalAnalyses(writeNode(state.parseResult.value).join(''), 'Hit')
         .then((res) => {
@@ -83,7 +83,7 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
       </div>
 
       {state.parseResult.status && <>
-        <button type="button" className="button is-link is-fullwidth" onClick={updateMorhpologies}>{t('fetchMorphologicalAnalyses')}</button>
+        <button type="button" className="button is-link is-fullwidth" onClick={updateMorphologies}>{t('fetchMorphologicalAnalyses')}</button>
       </>}
 
       <div className="columns my-3">

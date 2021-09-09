@@ -69,17 +69,19 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
   const [useSerifFont, setUseSerifFont] = useState(false);
 
   useEffect(() => {
-    document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
+    document.addEventListener('keydown', handleJumpKey);
+    return () => document.removeEventListener('keydown', handleJumpKey);
   });
 
   const onEdit: EditTriggerFunc = (node, path) => setState(({rootNode}) => ({rootNode, editState: {node, path}}));
 
-  const updateNode: UpdateNodeFunc = (node, path) => setState(({rootNode, editState}) => {
-    findElement(rootNode as XmlElementNode, path.slice(0, -1)).children[path[path.length - 1]] = node;
+  const updateNode: UpdateNodeFunc = (node, path) =>
+    setState(({rootNode, editState}) => {
+      // TODO: component loses focus, key handler not triggered anymore?
+      findElement(rootNode as XmlElementNode, path.slice(0, -1)).children[path[path.length - 1]] = node;
 
-    return {rootNode, editState};
-  });
+      return {rootNode, editState};
+    });
 
   const exportXml = () => download(writeNode(state.rootNode).join('\n'));
 
@@ -102,7 +104,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
     }
   }
 
-  function handleKey(event: KeyboardEvent): void {
+  function handleJumpKey(event: KeyboardEvent): void {
     if (state.editState && keyHandlingEnabled) {
       if (editorConfig.nextEditableNodeKeys.includes(event.key)) {
         jumpEditableNodes(state.editState.node.tagName, true);
@@ -134,7 +136,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
             </button>
           </div>
           <div className="column">
-            <button className="button is-fullwidth" onClick={closeFile} >{t('closeFile')}</button>
+            <button className="button is-fullwidth" onClick={closeFile}>{t('closeFile')}</button>
           </div>
           <div className="column">
             <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>
