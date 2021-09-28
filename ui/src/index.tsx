@@ -41,11 +41,25 @@ const apolloAuthMiddleware = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
+const versionModifier = window.location.href.includes('stable')
+  ? '/stable'
+  : window.location.href.includes('release')
+    ? '/release'
+    : '';
+
+console.info(versionModifier);
+
+const apolloUri = `${serverUrl}${versionModifier}/graphql.php`;
+
+console.info(apolloUri);
 
 const apolloClient = new ApolloClient({
   // TODO: remove serverUrl!
   cache: new InMemoryCache(),
-  link: concat(apolloAuthMiddleware, new HttpLink({uri: `${serverUrl}/graphql.php`})),
+  link: concat(
+    apolloAuthMiddleware,
+    new HttpLink({uri: apolloUri})
+  ),
   defaultOptions: {
     query: {fetchPolicy: 'no-cache'},
     watchQuery: {fetchPolicy: 'no-cache'},

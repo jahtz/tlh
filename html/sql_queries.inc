@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/mysqliconn.inc';
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 require_once __DIR__ . '/model/ManuscriptMetaData.inc';
 require_once __DIR__ . '/model/Transliteration.inc';

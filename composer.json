@@ -9,6 +9,7 @@
     "ext-mbstring": "*"
   },
   "config": {
+    "vendor-dir": "html/vendor",
     "platform": {
       "php": "7.4"
     }

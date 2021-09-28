@@ -3,6 +3,7 @@
 app/
 
 vendor/
+!vendor/.htaccess
 
 uploads/*
 !uploads/.gitkeep
