@@ -34,6 +34,7 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
     return <div className="notification is-warning has-text-centered">This should be disabled and not selectable...</div>;
   }
 
+
   return (
     <Formik initialValues={ma} onSubmit={update}>
       {({values}) =>
@@ -46,14 +47,14 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
               <Field name="translation" className="input"/>
             </div>
             <div className="control is-expanded">
-              <Field name="transcription" className="input"/>
+              <Field name="referenceWord" className="input"/>
             </div>
             <div className="control">
               <button type="button" className="button" onClick={toggleUpdate}><IoSettingsOutline/></button>
             </div>
           </div>
 
-          <FieldArray name={'analyses'}>
+          <FieldArray name={'analysisOptions'}>
             {(arrayHelpers) =>
               <div>
 
@@ -63,7 +64,7 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
                       <button className="button is-static">{letter}</button>
                     </div>
                     <div className="control is-expanded">
-                      <Field name={`analyses.${index}.analysis`} className="input"/>
+                      <Field name={`analysisOptions.${index}.analysis`} className="input"/>
                     </div>
                     <div className="control">
                       <button type="button" className="button is-danger" onClick={() => arrayHelpers.remove(index)}>-</button>
@@ -83,8 +84,8 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
                 */}
 
                 <div className="buttons">
-                  <button type="button" className="button is-link" onClick={() => arrayHelpers.push(nextAnalysisOption(values))}>+</button>
-                  <button type="submit" className="button">{t('updateAnalyses')}</button>
+                  <button type="button" className="button is-primary" onClick={() => arrayHelpers.push(nextAnalysisOption(values))}>+</button>
+                  <button type="submit" className="button is-link">{t('updateAnalyses')}</button>
                 </div>
               </div>
             }
