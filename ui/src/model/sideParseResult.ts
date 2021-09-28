@@ -1,7 +1,7 @@
 import {ManuscriptColumn, ManuscriptColumnModifier} from './manuscriptProperties/manuscriptProperties';
 import {ManuscriptLanguage} from './manuscriptProperties/manuscriptLanugage';
 import {TransliterationLine} from './transliterationLine';
-import {ManuscriptSide} from '../generated/graphql';
+import {ManuscriptSide} from '../graphql';
 
 export interface SideBasics {
   side: ManuscriptSide;

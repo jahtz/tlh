@@ -28,7 +28,7 @@ export function App(): JSX.Element {
   const user = useSelector(activeUserSelector);
 
   function logout() {
-    dispatch(userLoggedOutAction());
+    dispatch(userLoggedOutAction);
     history.push(loginUrl);
   }
 

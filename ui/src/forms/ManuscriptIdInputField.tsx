@@ -1,6 +1,6 @@
 import React from 'react';
 import {ErrorMessage, Field, FormikErrors, FormikTouched} from 'formik';
-import {ManuscriptIdentifierInput, ManuscriptIdentifierType} from '../generated/graphql';
+import {ManuscriptIdentifierInput, ManuscriptIdentifierType} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import classnames from 'classnames';
 
@@ -46,12 +46,8 @@ export function ManuscriptIdInputField({mainId, deleteFunc, errors, touched}: IP
           <button className="button is-danger" type="button" onClick={deleteFunc}>-</button>
         </div>}
       </div>
-      <ErrorMessage name={`${mainId}.identifier`}>
-        {msg => <p className="help is-danger">{msg}</p>}
-      </ErrorMessage>
-      <ErrorMessage name={`${mainId}.identifierType`}>
-        {msg => <p className="help is-danger">{msg}</p>}
-      </ErrorMessage>
+      <ErrorMessage name={`${mainId}.identifier`}>{msg => <p className="help is-danger">{msg}</p>}</ErrorMessage>
+      <ErrorMessage name={`${mainId}.identifierType`}>{msg => <p className="help is-danger">{msg}</p>}</ErrorMessage>
     </>
   );
 }

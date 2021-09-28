@@ -7,7 +7,7 @@ import {
   ManuscriptMetaDataInput,
   PalaeographicClassification,
   useCreateManuscriptMutation
-} from './generated/graphql';
+} from './graphql';
 import {ErrorMessage, Field, FieldArray, FieldArrayRenderProps, Form, Formik, FormikErrors} from 'formik';
 import {manuscriptSchema} from './forms/schemas';
 import classNames from 'classnames';

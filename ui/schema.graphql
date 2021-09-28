@@ -1,8 +1,8 @@
 type LoggedInUser {
-  username: String!
-  name: String!
   affiliation: String
   jwt: String!
+  name: String!
+  username: String!
 }
 
 type LoggedInUserMutations {
@@ -11,43 +11,43 @@ type LoggedInUserMutations {
 }
 
 type ManuscriptIdentifier {
-  identifierType: ManuscriptIdentifierType!
   identifier: String!
+  identifierType: ManuscriptIdentifierType!
 }
 
 input ManuscriptIdentifierInput {
-  identifierType: ManuscriptIdentifierType!
   identifier: String!
+  identifierType: ManuscriptIdentifierType!
 }
 
 enum ManuscriptIdentifierType {
-  ExcavationNumber
   CollectionNumber
+  ExcavationNumber
   PublicationShortReference
 }
 
 type ManuscriptMetaData {
-  mainIdentifier: ManuscriptIdentifier!
-  provenance: String
-  cthClassification: Int
   bibliography: String
   creatorUsername: String!
+  cthClassification: Int
+  mainIdentifier: ManuscriptIdentifier!
+  otherIdentifiers: [ManuscriptIdentifier!]!
   palaeographicClassification: PalaeographicClassification!
   palaeographicClassificationSure: Boolean!
-  status: ManuscriptStatus
-  otherIdentifiers: [ManuscriptIdentifier!]!
   pictureUrls: [String!]!
+  provenance: String
+  status: ManuscriptStatus
   transliterations: [Transliteration!]
 }
 
 input ManuscriptMetaDataInput {
+  bibliography: String
+  cthClassification: Int
   mainIdentifier: ManuscriptIdentifierInput!
   otherIdentifiers: [ManuscriptIdentifierInput!]!
   palaeographicClassification: PalaeographicClassification!
   palaeographicClassificationSure: Boolean!
   provenance: String
-  cthClassification: Int
-  bibliography: String
 }
 
 type ManuscriptMutations {
@@ -55,73 +55,73 @@ type ManuscriptMutations {
 }
 
 enum ManuscriptSide {
+  InscriptionNumber
+  LeftEdge
+  LowerEdge
   NotIdentifiable
   Obverse
   Reverse
-  LowerEdge
-  UpperEdge
-  LeftEdge
   RightEdge
+  SealInscription
   SideA
   SideB
-  InscriptionNumber
-  SealInscription
+  UpperEdge
 }
 
 enum ManuscriptStatus {
-  InCreation
-  Created
-  Reviewed
-  ReviewMerged
-  ExecutiveReviewed
-  ExecutiveReviewMerged
   Approved
+  Created
+  ExecutiveReviewMerged
+  ExecutiveReviewed
+  InCreation
+  ReviewMerged
+  Reviewed
 }
 
 type Mutation {
-  register(userInput: UserInput!): String
-  login(username: String!, password: String!): LoggedInUser
+  login(password: String!, username: String!): LoggedInUser
   me: LoggedInUserMutations
+  register(userInput: UserInput!): String
 }
 
 enum PalaeographicClassification {
-  OldScript
+  AssyroMittanianScript
+  LateNewScript
+  MiddleAssyrianScript
+  MiddleBabylonianScript
   MiddleScript
   NewScript
-  LateNewScript
   OldAssyrianScript
-  MiddleBabylonianScript
-  MiddleAssyrianScript
-  AssyroMittanianScript
+  OldScript
   Unclassified
 }
 
 type Query {
-  manuscriptCount: Int!
-  allManuscripts(paginationSize: Int!, page: Int!): [ManuscriptMetaData!]!
+  allManuscripts(page: Int!, paginationSize: Int!): [ManuscriptMetaData!]!
   manuscript(mainIdentifier: String!): ManuscriptMetaData
+  manuscriptCount: Int!
 }
 
 type Transliteration {
+  input: String!
+  resultJson: String!
+  resultXml: String!
   side: ManuscriptSide!
   version: Int!
-  input: String!
-  resultXml: String!
-  resultJson: String!
 }
 
 input TransliterationInput {
-  side: ManuscriptSide!
   input: String!
-  resultXml: String!
   resultJson: String!
+  resultXml: String!
+  side: ManuscriptSide!
 }
 
 input UserInput {
-  username: String!
-  password: String!
-  passwordRepeat: String!
-  name: String!
   affiliation: String
   email: String!
+  name: String!
+  password: String!
+  passwordRepeat: String!
+  username: String!
 }

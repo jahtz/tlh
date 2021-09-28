@@ -1,5 +1,5 @@
 import React, {Dispatch, useState} from 'react';
-import {LoginMutationVariables, useLoginMutation} from '../generated/graphql';
+import {LoginMutationVariables, useLoginMutation} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
 import {BulmaField} from './BulmaFields';
@@ -11,6 +11,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {StoreAction, userLoggedInAction} from '../store/actions';
 import {activeUserSelector} from '../store/store';
 
+const initialValues: LoginMutationVariables = {username: '', password: ''};
+
 export function LoginForm(): JSX.Element {
 
   const {t} = useTranslation('common');
@@ -18,12 +20,9 @@ export function LoginForm(): JSX.Element {
   const [invalidLoginTry, setInvalidLoginTry] = useState(false);
   const [login, {loading, error}] = useLoginMutation();
 
-  if (useSelector(activeUserSelector)) {
-    // User is already logged in
+  if (useSelector(activeUserSelector)) { // User is already logged in
     return <Redirect to={homeUrl}/>;
   }
-
-  const initialValues: LoginMutationVariables = {username: '', password: ''};
 
   function handleSubmit(values: LoginMutationVariables): void {
     login({variables: values})
@@ -46,26 +45,23 @@ export function LoginForm(): JSX.Element {
       <h1 className="title is-3 has-text-centered">{t('login')}</h1>
 
       <Formik initialValues={initialValues} validationSchema={loginSchema} onSubmit={handleSubmit}>
-        {() =>
+        <Form>
+          <Field name="username" id="username" label={t('username')} component={BulmaField}/>
 
-          <Form>
-            <Field name="username" id="username" label={t('username')} component={BulmaField}/>
+          <Field type="password" name="password" id="password" label={t('password')} component={BulmaField}/>
 
-            <Field type="password" name="password" id="password" label={t('password')} component={BulmaField}/>
+          {invalidLoginTry && <div className="notification is-warning has-text-centered">
+            {t('invalidUsernamePasswordCombination')}.
+          </div>}
 
-            {invalidLoginTry && <div className="notification is-warning has-text-centered">
-              {t('invalidUsernamePasswordCombination')}.
-            </div>}
+          {error && <div className="notification is-danger has-text-centered">{error.message}</div>}
 
-            {error && <div className="notification is-danger has-text-centered">{error.message}</div>}
-
-            <div className="field">
-              <button type="submit" disabled={loading} className={classnames('button', 'is-link', 'is-fullwidth', {'is-loading': loading})}>
-                {t('login')}
-              </button>
-            </div>
-          </Form>
-        }
+          <div className="field">
+            <button type="submit" disabled={loading} className={classnames('button', 'is-link', 'is-fullwidth', {'is-loading': loading})}>
+              {t('login')}
+            </button>
+          </div>
+        </Form>
       </Formik>
     </div>
   );

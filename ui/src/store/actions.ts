@@ -1,5 +1,5 @@
 import {Action} from 'redux';
-import {LoggedInUserFragment} from '../generated/graphql';
+import {LoggedInUserFragment} from '../graphql';
 import {EditorConfig} from '../editor/editorConfig';
 
 // User logged in
@@ -20,9 +20,7 @@ export const USER_LOGGED_OUT = 'USER_LOGGED_OUT';
 
 type UserLoggedOutAction = Action<typeof USER_LOGGED_OUT>;
 
-export function userLoggedOutAction(): UserLoggedOutAction {
-  return {type: USER_LOGGED_OUT};
-}
+export const userLoggedOutAction: UserLoggedOutAction = {type: USER_LOGGED_OUT};
 
 // User updated preferences
 

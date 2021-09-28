@@ -9,7 +9,7 @@ generates:
     plugins:
       - "schema-ast"
 
-  src/generated/graphql.ts:
+  src/graphql.ts:
     plugins:
       - "typescript"
       - "typescript-operations"

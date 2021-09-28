@@ -1,6 +1,6 @@
 import {createStore} from 'redux';
 import {StoreAction, UPDATE_PREFERENCES, USER_LOGGED_IN, USER_LOGGED_OUT} from './actions';
-import {LoggedInUserFragment} from '../generated/graphql';
+import {LoggedInUserFragment} from '../graphql';
 import {defaultEditorConfig, EditorConfig} from '../editor/editorConfig';
 
 const localStorageUserKey = 'userId';
@@ -11,19 +11,18 @@ interface StoreState {
   editorConfig?: EditorConfig;
 }
 
-
 function rootReducer(store: StoreState = {}, action: StoreAction): StoreState {
   switch (action.type) {
-  case USER_LOGGED_IN:
-    localStorage.setItem(localStorageUserKey, JSON.stringify(action.user));
-    return {...store, currentUser: action.user};
-  case USER_LOGGED_OUT:
-    localStorage.removeItem(localStorageUserKey);
-    return {...store, currentUser: undefined};
-  case UPDATE_PREFERENCES:
-    return {...store, editorConfig: action.newPreferences};
-  default:
-    return store;
+    case USER_LOGGED_IN:
+      localStorage.setItem(localStorageUserKey, JSON.stringify(action.user));
+      return {...store, currentUser: action.user};
+    case USER_LOGGED_OUT:
+      localStorage.removeItem(localStorageUserKey);
+      return {...store, currentUser: undefined};
+    case UPDATE_PREFERENCES:
+      return {...store, editorConfig: action.newPreferences};
+    default:
+      return store;
   }
 }
 

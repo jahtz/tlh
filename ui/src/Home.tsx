@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {IndexQuery, useIndexLazyQuery} from './generated/graphql';
+import {IndexQuery, useIndexLazyQuery} from './graphql';
 import {Link} from 'react-router-dom';
 import {WithQuery} from './WithQuery';
 import {createManuscriptUrl} from './urls';

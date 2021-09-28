@@ -1,4 +1,4 @@
 src/reportWebVitals.tsx
-src/generated/graphql.ts
+src/graphql.ts
 src/reportWebVitals.ts
 src/serviceWorker.ts

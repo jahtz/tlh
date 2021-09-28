@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 import {activeUserSelector} from '../store/store';
 import {homeUrl} from '../urls';
 import {Redirect} from 'react-router-dom';
-import {TransliterationInput as TI, useUploadTransliterationMutation} from '../generated/graphql';
+import {TransliterationInput as TI, useUploadTransliterationMutation} from '../graphql';
 import {ManuscriptBaseIProps} from './ManuscriptBase';
 import {TransliterationSideInput} from './TransliterationSideInput';
 

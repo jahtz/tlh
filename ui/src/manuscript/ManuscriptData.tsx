@@ -1,7 +1,7 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
-import {LoggedInUserFragment, ManuscriptIdentifierFragment} from '../generated/graphql';
+import {LoggedInUserFragment, ManuscriptIdentifierFragment} from '../graphql';
 import {useSelector} from 'react-redux';
 import {activeUserSelector} from '../store/store';
 import {getNameForPalaeoClassification} from '../palaeoClassification';

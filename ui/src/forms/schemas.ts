@@ -6,7 +6,7 @@ import {
   ManuscriptIdentifierType,
   PalaeographicClassification,
   UserInput
-} from '../generated/graphql';
+} from '../graphql';
 
 export const registerSchema: yup.SchemaOf<UserInput> = yup.object()
   .shape({

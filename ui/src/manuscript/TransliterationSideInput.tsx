@@ -7,7 +7,7 @@ import {defaultSideBasics, SideBasics, SideParseResult} from '../model/sideParse
 import {BulmaObjectSelect, SelectOption} from '../forms/BulmaFields';
 import {Transliteration} from './TransliterationLineResult';
 import {transliterationLine, TransliterationLine, xmlifyTransliterationLine} from '../model/transliterationLine';
-import {ManuscriptSide, TransliterationInput} from '../generated/graphql';
+import {ManuscriptSide, TransliterationInput} from '../graphql';
 import {BulmaTabs, Tabs} from '../BulmaTabs';
 import {getNameForManuscriptSide, manuscriptSides} from '../model/manuscriptProperties/manuscriptSide';
 import {LineParseResult} from '../model/lineParseResult';
