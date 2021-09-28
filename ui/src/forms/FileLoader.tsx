@@ -1,30 +1,33 @@
-import React, {ChangeEvent} from 'react';
+import React, {ChangeEvent, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import classNames from 'classnames';
 
 interface IProps {
   accept?: string;
-  onLoad: (f: File) => void;
+  onLoad: (f: File) => Promise<void>;
 }
 
 export function FileLoader({accept, onLoad}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
+  const fileInput = useRef<HTMLInputElement | null>(null);
+  const [loading, setIsLoading] = useState(false);
 
   function handleFile(event: ChangeEvent<HTMLInputElement>): void {
-    if (event.target.files && event.target.files.length > 0) {
-      onLoad(event.target.files[0]);
+    if (event.target.files && event.target.files.length === 1) {
+      setIsLoading(true);
+      onLoad(event.target.files[0]).then(() => setIsLoading(false));
     }
   }
 
   return (
-    <div className="file">
-      <label className="file-label">
-        <input className="file-input" type="file" onChange={(event) => handleFile(event)} accept={accept}/>
-        <div className="file-cta">
-          <div className="file-icon"><i className="fas fa-upload"/></div>
-          <div className="file-label">{t('chooseFile')}</div>
-        </div>
-      </label>
-    </div>
+    <>
+      <button type="button" className={classNames('button', 'is-fullwidth', {'is-loading': loading})}
+              onClick={() => fileInput.current && fileInput.current.click()} disabled={loading}>
+        {t('chooseFile')}
+      </button>
+
+      <input type="file" onChange={handleFile} accept={accept} ref={fileInput} hidden/>
+    </>
   );
 }

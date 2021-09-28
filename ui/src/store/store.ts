@@ -38,12 +38,12 @@ export function editorConfigSelector(store: StoreState): EditorConfig {
 
 function initialState(): StoreState {
   const localStorageUser = localStorage.getItem(localStorageUserKey);
-  const currentUser = localStorageUser ? JSON.parse(localStorageUser) : undefined;
-
   const localStoragePreferences = localStorage.getItem(localStoragePreferencesKey);
-  const editorConfig = localStoragePreferences ? JSON.parse(localStoragePreferences) : undefined;
 
-  return {currentUser, editorConfig};
+  return {
+    currentUser: localStorageUser ? JSON.parse(localStorageUser) : undefined,
+    editorConfig: localStoragePreferences ? JSON.parse(localStoragePreferences) : undefined
+  };
 }
 
 export const store = createStore(rootReducer, initialState());
