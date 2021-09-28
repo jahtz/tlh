@@ -15,9 +15,10 @@ use GraphQL\Error\{DebugFlag, FormattedError};
 use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
-use ReallySimpleJWT\Token;
-use tlh_dig\graphql\{InvalidTokenException, LoggedInUser, MySafeGraphQLException};
+use tlh_dig\graphql\{LoggedInUser, MySafeGraphQLException};
 use tlh_dig\model\{ManuscriptMetaData, Transliteration, User};
+use function tlh_dig\graphql\register;
+use function tlh_dig\graphql\resolveUser;
 use function tlh_dig\graphql\verifyUser;
 
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
@@ -133,21 +134,7 @@ $mutationType = new ObjectType([
         'userInput' => Type::nonNull(User::$graphQLInputObjectType)
       ],
       'type' => Type::string(),
-      'resolve' => function ($rootValue, array $args): string {
-        $user = User::fromGraphQLInput($args['userInput']);
-
-        if ($user === null) {
-          throw new MySafeGraphQLException("Could not read input!");
-        }
-
-        $inserted = insertUserIntoDatabase($user);
-
-        if ($inserted) {
-          return $user->username;
-        } else {
-          throw new MySafeGraphQLException("Could not insert user into database!");
-        }
-      }
+      'resolve' => fn($rootValue, array $args) => register($args)
     ],
     'login' => [
       'args' => [
@@ -159,19 +146,7 @@ $mutationType = new ObjectType([
     ],
     'me' => [
       'type' => $loggedInUserMutationsType,
-      'resolve' => function ($rootValue, array $args, ?string $jwt): ?string {
-        global $jwtSecret;
-
-        if (!Token::validate($jwt, $jwtSecret)) {
-          throw new InvalidTokenException('Invalid login information. Maybe your login is expired? Try logging out and logging back in again.');
-        }
-
-        try {
-          return Token::getPayload($jwt, $jwtSecret)['user_id'];
-        } catch (Exception $e) {
-          throw new InvalidTokenException('Invalid login information. Maybe your login is expired? Try logging out and logging back in again.');
-        }
-      }
+      'resolve' => fn($rootValue, array $args) => resolveUser()
     ]
   ]
 ]);

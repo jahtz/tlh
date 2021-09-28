@@ -2,8 +2,10 @@
 
 namespace tlh_dig\graphql;
 
+use Exception;
 use GraphQL\Type\Definition\{ObjectType, Type};
 use ReallySimpleJWT\Token;
+use tlh_dig\model\User;
 
 class LoggedInUser
 {
@@ -52,5 +54,45 @@ function verifyUser(string $username, string $password): ?LoggedInUser {
     );
   } else {
     return null;
+  }
+}
+
+/**
+ * @throws MySafeGraphQLException
+ */
+function register(array $args): string {
+  $user = User::fromGraphQLInput($args['userInput']);
+
+  if ($user === null) {
+    throw new MySafeGraphQLException("Could not read input!");
+  }
+
+  $inserted = insertUserIntoDatabase($user);
+
+  if ($inserted) {
+    return $user->username;
+  } else {
+    throw new MySafeGraphQLException("Could not insert user into database!");
+  }
+}
+
+/**
+ * @throws InvalidTokenException
+ */
+function resolveUser(): ?string {
+  $jwt = $_SERVER['HTTP_AUTHORIZATION'];
+
+  global $jwtSecret;
+
+  error_log(">>" . $jwt . "<<");
+
+  if (!Token::validate($jwt, $jwtSecret)) {
+    throw new InvalidTokenException('Invalid login information. Maybe your login is expired? Try logging out and logging back in again.');
+  }
+
+  try {
+    return Token::getPayload($jwt, $jwtSecret)['user_id'];
+  } catch (Exception $e) {
+    throw new InvalidTokenException('Invalid login information. Maybe your login is expired? Try logging out and logging back in again.');
   }
 }
