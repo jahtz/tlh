@@ -25,8 +25,8 @@ export interface XmlEditableNodeIProps<A = GenericAttributes> {
 
 interface XmlSingleNodeConfig {
   replace?: ReplaceFunc;
-  styling?: NodeStylingFunc<any>;
-  edit?: EditFunc<any>;
+  styling?: NodeStylingFunc<never>;
+  edit?: EditFunc<never>;
 }
 
 
