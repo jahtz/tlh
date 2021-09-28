@@ -21,9 +21,17 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
   // Words
   w: {
     replace: (node, renderedChildren, path, currentSelectedPath) => {
+
+      const needsMorphology = !!node.attributes.mrp0sel;
+      const hasNoMorphologySelected = needsMorphology && node.attributes.mrp0sel.trim().length === 0;
+      const hasMorphAnalyses = Object.keys(node.attributes)
+        .filter((name) => name.startsWith('mrp') && !name.startsWith('mrp0'))
+        .length > 0;
+
       const classes = classNames(node.attributes.lg || '', {
-        'is-underlined': !!node.attributes.mrp0sel && node.attributes.mrp0sel.trim().length === 0,
-        'has-background-primary': !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.')
+        'is-underlined': hasNoMorphologySelected,
+        'has-background-primary': !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.'),
+        'has-background-warning': needsMorphology && !hasMorphAnalyses
       });
 
       return node.children.length === 0
@@ -54,6 +62,11 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
       {'t' in node.attributes && node.attributes.t === 'line' && <br/>}
       <span>{node.attributes.c}</span>
     </>
+  },
+
+  space: {
+    replace: (node) => <>{Array.from({length: parseInt(node.attributes.c) || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}</>,
+    styling: () => ['has-background-light']
   },
 
   parsep: {replace: () => <span>¬¬¬</span>},
