@@ -27,6 +27,16 @@ function newManuscriptIdentifier(): ManuscriptIdentifierInput {
   };
 }
 
+const initialValues: ManuscriptMetaDataInput = {
+  mainIdentifier: newManuscriptIdentifier(),
+  otherIdentifiers: [],
+  palaeographicClassification: PalaeographicClassification.Unclassified,
+  palaeographicClassificationSure: false,
+  bibliography: '',
+  provenance: '',
+  cthClassification: undefined
+};
+
 export function CreateManuscriptForm(): JSX.Element {
 
   const {t} = useTranslation('common');
@@ -42,16 +52,6 @@ export function CreateManuscriptForm(): JSX.Element {
   if (createdManuscript) {
     return <Redirect to={`./manuscripts/${encodeURIComponent(createdManuscript)}/data`}/>;
   }
-
-  const initialValues: ManuscriptMetaDataInput = {
-    mainIdentifier: newManuscriptIdentifier(),
-    otherIdentifiers: [],
-    palaeographicClassification: PalaeographicClassification.Unclassified,
-    palaeographicClassificationSure: false,
-    bibliography: '',
-    provenance: '',
-    cthClassification: undefined
-  };
 
   function handleSubmit(manuscriptMetaData: ManuscriptMetaDataInput): void {
     createManuscript({variables: {manuscriptMetaData}})
@@ -92,9 +92,7 @@ export function CreateManuscriptForm(): JSX.Element {
                     </div>
 
                     <div className="field">
-                      <button className="button is-link" type="button"
-                              onClick={() => arrayHelpers.push(newManuscriptIdentifier())}>+
-                      </button>
+                      <button className="button is-link" type="button" onClick={() => arrayHelpers.push(newManuscriptIdentifier())}>+</button>
                     </div>
                   </>
 

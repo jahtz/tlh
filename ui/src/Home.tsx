@@ -6,13 +6,13 @@ import {WithQuery} from './WithQuery';
 import {createManuscriptUrl} from './urls';
 import {Pagination} from './Pagination';
 
+const paginationSize = 10;
+
 export function Home(): JSX.Element {
 
   const {t} = useTranslation('common');
   const [getIndexQuery, indexQuery] = useIndexLazyQuery();
-
   const [page, setPage] = useState(0);
-  const [paginationSize/*, setPaginationSize*/] = useState(10);
 
   if (!indexQuery.called) {
     getIndexQuery({variables: {page, paginationSize}});
