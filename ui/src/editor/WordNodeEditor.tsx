@@ -4,7 +4,7 @@ import {useTranslation} from 'react-i18next';
 import React, {Fragment, useEffect, useState} from 'react';
 import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue} from '../model/morphologicalAnalysis';
 import {MorphAnalysisOption, Numerus} from './morphAnalysisOption/MorphologicalAnalysisOption';
-import {DisplayNode} from './NodeDisplay';
+import {NodeDisplay} from './NodeDisplay';
 import {tlhNodeDisplayConfig, WordNodeAttributes} from './tlhNodeDisplayConfig';
 import {getSelectedLetters, LetteredAnalysisOption} from '../model/analysisOptions';
 import {useSelector} from 'react-redux';
@@ -168,7 +168,7 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
   return (
     <div>
       <div className="box has-text-centered">
-        {node.children.map((c, i) => <DisplayNode key={i} path={[]} currentSelectedPath={undefined} node={c} displayConfig={tlhNodeDisplayConfig}/>)}
+        {node.children.map((c, i) => <NodeDisplay key={i} currentSelectedPath={undefined} node={c} displayConfig={tlhNodeDisplayConfig}/>)}
       </div>
 
       {state.morphologies.length === 0

@@ -8,7 +8,7 @@ import {GenericAttributes, XmlElementNode} from './xmlModel/xmlModel';
 import {WordNodeAttributes} from './tlhNodeDisplayConfig';
 import classNames from 'classnames';
 import {fetchMorphologicalAnalyses} from '../model/morphologicalAnalysis';
-import {DisplayNode} from './NodeDisplay';
+import {NodeDisplay} from './NodeDisplay';
 import {writeNode} from './xmlModel/xmlWriting';
 
 export type WordNode = XmlElementNode<WordNodeAttributes & GenericAttributes>;
@@ -73,7 +73,7 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
           {state.parseResult.status
             ? <>
               <div className="box">
-                <DisplayNode node={state.parseResult.value} currentSelectedPath={undefined} path={[]}/>
+                <NodeDisplay node={state.parseResult.value} currentSelectedPath={undefined}/>
               </div>
               <div className="box">{writeNode(state.parseResult.value).join('')}</div>
             </>

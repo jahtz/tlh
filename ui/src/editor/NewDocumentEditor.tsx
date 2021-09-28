@@ -2,12 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {isXmlElementNode, XmlElementNode, XmlNode} from './xmlModel/xmlModel';
 import {EditTriggerFunc, UpdateNodeFunc, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
-import {DisplayNode} from './NodeDisplay';
+import {NodeDisplay} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
 import {editorConfigSelector} from '../store/store';
 import classNames from 'classnames';
 import {writeNode} from './xmlModel/xmlWriting';
+import {BulmaCard} from '../bulmaHelpers/BulmaCard';
 
 interface IProps {
   node: XmlNode;
@@ -116,18 +117,14 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
 
   return (
     <div className="columns">
+
       <div className="column">
 
-        <div className="card">
-          <header className="card-header">
-            <p className="card-header-title">{filename}</p>
-          </header>
-          <div className="card-content">
-            <div className={classNames(/*'box',*/ 'documentText', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
-              <DisplayNode node={state.rootNode} currentSelectedPath={state.editState?.path} displayConfig={displayConfig} onEdit={onEdit} path={[]}/>
-            </div>
+        <BulmaCard title={filename}>
+          <div className={classNames('documentText', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
+            <NodeDisplay node={state.rootNode} currentSelectedPath={state.editState?.path} displayConfig={displayConfig} onEdit={onEdit}/>
           </div>
-        </div>
+        </BulmaCard>
 
         <div className="columns my-3">
           <div className="column">
@@ -142,7 +139,9 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
             <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>
           </div>
         </div>
+
       </div>
+
       <div className="column">
         {state.editState && editConfig && editConfig.edit && editConfig.edit({
           ...state.editState,

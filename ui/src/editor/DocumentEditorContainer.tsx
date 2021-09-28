@@ -3,15 +3,14 @@ import {FileLoader} from '../forms/FileLoader';
 import {XmlNode} from './xmlModel/xmlModel';
 import {NewDocumentEditor} from './NewDocumentEditor';
 import {loadNewXml} from './xmlModel/xmlLoader';
-
+import classNames from 'classnames';
 
 function handleSaveToPC(data: string, filename: string): void {
-  const blob = new Blob([data], {type: 'text/plain'});
-  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-
   link.download = filename;
-  link.href = url;
+  link.href = URL.createObjectURL(
+    new Blob([data], {type: 'text/plain'})
+  );
   link.click();
 }
 
@@ -33,14 +32,10 @@ export function DocumentEditorContainer(): JSX.Element {
     state && handleSaveToPC(content, state.filename);
   }
 
-  function closeFile(): void {
-    setState(undefined);
-  }
-
   return (
-    <div className="container is-fluid">
+    <div className={classNames('container', {'is-fluid': state})}>
       {state
-        ? <NewDocumentEditor node={state.rootNode} download={download} filename={state.filename} closeFile={closeFile}/>
+        ? <NewDocumentEditor node={state.rootNode} download={download} filename={state.filename} closeFile={() => setState(undefined)}/>
         : <FileLoader accept="text/xml" onLoad={readFile}/>}
     </div>
   );

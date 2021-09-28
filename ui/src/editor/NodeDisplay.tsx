@@ -9,10 +9,10 @@ interface NodeDisplayIProps {
   displayConfig?: XmlNodeDisplayConfigObject;
   currentSelectedPath: number[] | undefined;
   onEdit?: EditTriggerFunc;
-  path: number[];
+  path?: number[];
 }
 
-export function DisplayNode({node, currentSelectedPath, displayConfig = tlhNodeDisplayConfig, onEdit, path}: NodeDisplayIProps): JSX.Element {
+export function NodeDisplay({node, currentSelectedPath, displayConfig = tlhNodeDisplayConfig, onEdit, path = []}: NodeDisplayIProps): JSX.Element {
   if (isXmlTextNode(node)) {
     return <span>{node.textContent}</span>;
   }
@@ -21,7 +21,7 @@ export function DisplayNode({node, currentSelectedPath, displayConfig = tlhNodeD
 
   const renderedChildren = <>
     {node.children.map((c, i) =>
-      <DisplayNode key={i} node={c} displayConfig={displayConfig} currentSelectedPath={currentSelectedPath} onEdit={onEdit} path={[...path, i]}/>
+      <NodeDisplay key={i} node={c} displayConfig={displayConfig} currentSelectedPath={currentSelectedPath} onEdit={onEdit} path={[...path, i]}/>
     )}
   </>;
 
