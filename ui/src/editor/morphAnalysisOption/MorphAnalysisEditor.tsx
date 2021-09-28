@@ -34,6 +34,7 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
     return <div className="notification is-warning has-text-centered">This should be disabled and not selectable...</div>;
   }
 
+  // FIXME: validationSchema for morphological analysis?!
 
   return (
     <Formik initialValues={ma} onSubmit={update}>
@@ -44,10 +45,13 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
               <button type="button" className="button is-static">{ma.number}</button>
             </div>
             <div className="control is-expanded">
-              <Field name="translation" className="input"/>
+              <Field name="translation" className="input" placeholder={t('translation')}/>
             </div>
             <div className="control is-expanded">
-              <Field name="referenceWord" className="input"/>
+              <Field name="referenceWord" className="input" placeholder={t('referenceWord')}/>
+            </div>
+            <div className="control ">
+              <Field name="paradigmClass" className="input" placeholder={t('paradigmClass')}/>
             </div>
             <div className="control">
               <button type="button" className="button" onClick={toggleUpdate}><IoSettingsOutline/></button>
@@ -64,7 +68,7 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
                       <button className="button is-static">{letter}</button>
                     </div>
                     <div className="control is-expanded">
-                      <Field name={`analysisOptions.${index}.analysis`} className="input"/>
+                      <Field name={`analysisOptions.${index}.analysis`} className="input" placeholder={t('analysis')}/>
                     </div>
                     <div className="control">
                       <button type="button" className="button is-danger" onClick={() => arrayHelpers.remove(index)}>-</button>
@@ -72,19 +76,9 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
                   </div>
                 )}
 
-                {/* TODO: edit other content of Morphological Analysis, too...
-                <div className="field has-addons">
-                  <div className="control">
-                    <button className="button is-static">+</button>
-                  </div>
-                  <div className="control is-expanded">
-                    <Field className="input" name="other"/>
-                  </div>
-                </div>
-                */}
-
                 <div className="buttons">
                   <button type="button" className="button is-primary" onClick={() => arrayHelpers.push(nextAnalysisOption(values))}>+</button>
+                  <button type="button" className="button is-warning" onClick={toggleUpdate}>{t('cancelEdit')}</button>
                   <button type="submit" className="button is-link">{t('updateAnalyses')}</button>
                 </div>
               </div>

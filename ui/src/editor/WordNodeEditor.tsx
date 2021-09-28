@@ -14,6 +14,7 @@ import {MorphAnalysisEditor} from './morphAnalysisOption/MorphAnalysisEditor';
 import {reconstructTransliteration} from './transliterationReconstruction';
 import {WordContentEditor} from './WordContentEditor';
 import {SelectedAnalysisResult} from './SelectedAnalysisResult';
+import update from 'immutability-helper';
 
 export const morphologyAttributeNameRegex = /^mrp(\d+)$/;
 
@@ -152,11 +153,12 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
   }
 
   function toggleAddMorphology(): void {
-    setState(({addMorphology, ...rest}) => ({...rest, addMorphology: !addMorphology}));
+    setState((state) => update(state, {$toggle: ['addMorphology']}));
+    // setState(({addMorphology, ...rest}) => ({...rest, addMorphology: !addMorphology}));
   }
 
   function nextMorphAnalysis(): MorphologicalAnalysis {
-    const number = Math.max(...state.morphologies.map(({number}) => number)) + 1;
+    const number = Math.max(0, ...state.morphologies.map(({number}) => number)) + 1;
 
     return {number, translation: '', referenceWord: '', analysisOptions: [], paradigmClass: ''};
   }
