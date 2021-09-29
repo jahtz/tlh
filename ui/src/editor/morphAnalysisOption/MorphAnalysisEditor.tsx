@@ -50,7 +50,10 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
             <div className="control is-expanded">
               <Field name="referenceWord" className="input" placeholder={t('referenceWord')}/>
             </div>
-            <div className="control ">
+            <div className="control">
+              <Field name="determinativ" className="input" placeholder={t('determinativ')}/>
+            </div>
+            <div className="control">
               <Field name="paradigmClass" className="input" placeholder={t('paradigmClass')}/>
             </div>
             <div className="control">
