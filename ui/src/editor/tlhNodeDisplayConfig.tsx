@@ -9,6 +9,13 @@ export interface WordNodeAttributes {
   mrp0sel?: string;
 }
 
+const foreignLanguageColors: { [key: string]: string } = {
+  HURR: 'Hur',
+  HATT: 'Hat',
+  // PAL: '',
+  LUW: 'Luw'
+};
+
 export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
   docID: {replace: () => <span/>},
   'AO:Manuscripts': {replace: () => <span/>},
@@ -22,16 +29,24 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
   w: {
     replace: (node, renderedChildren, path, currentSelectedPath) => {
 
+      const notMarked = node.attributes.mrp0sel === 'DEL';
+
+      const isForeignLanguage = Object.keys(foreignLanguageColors).includes(node.attributes.mrp0sel);
+
       const needsMorphology = !!node.attributes.mrp0sel;
-      const hasNoMorphologySelected = needsMorphology && node.attributes.mrp0sel.trim().length === 0;
+      const hasNoMorphologySelected = needsMorphology && node.attributes.mrp0sel.trim().length === 0 || node.attributes.mrp0sel === '???';
+
+
       const hasMorphAnalyses = Object.keys(node.attributes)
         .filter((name) => name.startsWith('mrp') && !name.startsWith('mrp0'))
         .length > 0;
 
       const classes = classNames(node.attributes.lg || '', {
-        'is-underlined': hasNoMorphologySelected,
-        'has-background-primary': !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.'),
-        'has-background-warning': needsMorphology && !hasMorphAnalyses
+        'is-underlined': !notMarked && hasNoMorphologySelected,
+        'has-background-primary': !notMarked && !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.'),
+        'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
+        [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,
+        'has-text-weight-bold': isForeignLanguage
       });
 
       return node.children.length === 0
