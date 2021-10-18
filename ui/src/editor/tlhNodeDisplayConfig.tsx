@@ -1,12 +1,19 @@
 import React from 'react';
 import {XmlEditableNodeIProps, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {WordNodeEditor} from './WordNodeEditor';
+import {LineBreakEditor} from './LineBreakEditor';
 import {GenericAttributes} from './xmlModel/xmlModel';
 import classNames from 'classnames';
 
 export interface WordNodeAttributes {
   lg?: 'Sum' | 'Akk' | 'Hit' | 'Hur' | 'Luw' | 'Hat';
   mrp0sel?: string;
+}
+
+export interface LinebreakNodeAttributes {
+  txtid: string;
+  lnr: string;
+  lg?: string;
 }
 
 const foreignLanguageColors: { [key: string]: string } = {
@@ -21,8 +28,18 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
   'AO:Manuscripts': {replace: () => <span/>},
   lb: {
     // TODO: only render <br/> if not first linebreak!
-    replace: (node) => <><br style={{marginTop: '10px'}}/>{node.attributes.lnr}:&nbsp;&nbsp;&nbsp;</>,
-    styling: () => ['lb']
+    replace: (node, renderedChildren, path, currentSelectedPath) => {
+
+      const className = classNames('lb', {'has-background-primary': !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.')});
+
+      return (
+        <>
+          <span className={className}><br style={{marginTop: '10px'}}/>{node.attributes.lnr}:</span>
+          &nbsp;&nbsp;&nbsp;
+        </>
+      );
+    },
+    edit: (props: XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>) => <LineBreakEditor props={props} key={props.path.join('.')}/>
   },
 
   // Words
@@ -35,7 +52,6 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
 
       const needsMorphology = !!node.attributes.mrp0sel;
       const hasNoMorphologySelected = needsMorphology && node.attributes.mrp0sel.trim().length === 0 || node.attributes.mrp0sel === '???';
-
 
       const hasMorphAnalyses = Object.keys(node.attributes)
         .filter((name) => name.startsWith('mrp') && !name.startsWith('mrp0'))
