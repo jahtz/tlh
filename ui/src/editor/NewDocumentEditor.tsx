@@ -9,6 +9,7 @@ import {editorConfigSelector} from '../store/store';
 import classNames from 'classnames';
 import {writeNode} from './xmlModel/xmlWriting';
 import {BulmaCard} from '../bulmaHelpers/BulmaCard';
+import update, {Spec} from 'immutability-helper';
 
 interface IProps {
   node: XmlNode;
@@ -115,6 +116,19 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
     }
   }
 
+  function deleteNode(path: number[]): void {
+    setState((state) => update(state, {
+        rootNode: path
+          .slice(0, -1)
+          .reduceRight<Spec<XmlNode>>(
+            (acc, index) => ({children: {[index]: acc}}),
+            {children: {$splice: [[path[path.length - 1], 1]]}}
+          ),
+        editState: {$set: undefined}
+      })
+    );
+  }
+
   return (
     <div className="columns">
 
@@ -146,6 +160,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
         {state.editState && editConfig && editConfig.edit && editConfig.edit({
           ...state.editState,
           updateNode,
+          deleteNode: () => deleteNode(state.editState!.path),
           jumpEditableNodes,
           keyHandlingEnabled,
           setKeyHandlingEnabled

@@ -16,6 +16,7 @@ export type UpdateNodeFunc<A = GenericAttributes> = (node: XmlElementNode<A>, pa
 export interface XmlEditableNodeIProps<A = GenericAttributes> {
   node: XmlElementNode<A>;
   updateNode: UpdateNodeFunc<A>;
+  deleteNode: () => void;
   path: number[];
   jumpEditableNodes: (tagName: string, forward: boolean) => void;
   keyHandlingEnabled: boolean;

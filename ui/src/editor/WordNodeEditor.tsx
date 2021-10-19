@@ -40,7 +40,7 @@ export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean
   return analysis.includes(numerus) || analysis.includes('ABL') || analysis.includes('INS');
 }
 
-export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNodes, keyHandlingEnabled, setKeyHandlingEnabled}}: IProps): JSX.Element {
+export function WordNodeEditor({props: {node, updateNode, deleteNode, path, jumpEditableNodes, keyHandlingEnabled, setKeyHandlingEnabled}}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorConfig = useSelector(editorConfigSelector);
@@ -208,8 +208,13 @@ export function WordNodeEditor({props: {node, updateNode, path, jumpEditableNode
         </div>
       </div>
 
-      <div className="buttons">
+      <div className="columns">
+        <div className="column">
+          <button onClick={deleteNode} className="button is-danger is-fullwidth">{t('deleteNode')}</button>
+        </div>
+        <div className="column">
         <button onClick={handleUpdate} className="button is-link is-fullwidth" disabled={!state.changed}>{t('updateMorphAnalysis')}</button>
+        </div>
       </div>
 
       <div className="columns">
