@@ -75,21 +75,17 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
     return () => document.removeEventListener('keydown', handleJumpKey);
   });
 
-  const onEdit: EditTriggerFunc = (node, path) => setState(({rootNode}) => ({rootNode, editState: {node, path}}));
+  const onEdit: EditTriggerFunc = (node, path) => setState((state) => update(state, {editState: {$set: {node, path}}}));
 
-  const updateNode: UpdateNodeFunc = (node, path) =>
-    setState(({rootNode, editState}) => {
-      // TODO: component loses focus, key handler not triggered anymore?
-      findElement(rootNode as XmlElementNode, path.slice(0, -1)).children[path[path.length - 1]] = node;
-
-      return {rootNode, editState};
-    });
+  const updateNode: UpdateNodeFunc = (node, path) => setState((state) => update(state, {
+      rootNode: path.reduceRight<Spec<XmlNode>>(
+        (acc, index) => ({children: {[index]: acc}}),
+        {$set: node}
+      )
+    })
+  );
 
   const exportXml = () => download(writeNode(state.rootNode).join('\n'));
-
-  const editConfig = state.editState
-    ? displayConfig[state.editState.node.tagName]
-    : undefined;
 
   function jumpEditableNodes(tagName: string, forward: boolean): void {
     if (state.editState) {
@@ -118,15 +114,31 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
 
   function deleteNode(path: number[]): void {
     setState((state) => update(state, {
-        rootNode: path
-          .slice(0, -1)
-          .reduceRight<Spec<XmlNode>>(
-            (acc, index) => ({children: {[index]: acc}}),
-            {children: {$splice: [[path[path.length - 1], 1]]}}
-          ),
+        rootNode: path.slice(0, -1).reduceRight<Spec<XmlNode>>(
+          (acc, index) => ({children: {[index]: acc}}),
+          {children: {$splice: [[path[path.length - 1], 1]]}}
+        ),
         editState: {$set: undefined}
       })
     );
+  }
+
+  function rightSide(): JSX.Element | undefined {
+    if (state.editState) {
+      const editState = state.editState;
+
+      const editConfig = displayConfig[editState.node.tagName];
+
+
+      return editConfig && editConfig.edit && editConfig.edit({
+        ...editState,
+        updateNode: (node) => updateNode(node, editState.path),
+        deleteNode: () => deleteNode(editState.path),
+        jumpEditableNodes,
+        keyHandlingEnabled,
+        setKeyHandlingEnabled
+      });
+    }
   }
 
   return (
@@ -157,14 +169,15 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
       </div>
 
       <div className="column">
-        {state.editState && editConfig && editConfig.edit && editConfig.edit({
+        {rightSide()}
+        {/*state.editState && editConfig && editConfig.edit && editConfig.edit({
           ...state.editState,
           updateNode,
           deleteNode: () => deleteNode(state.editState!.path),
           jumpEditableNodes,
           keyHandlingEnabled,
           setKeyHandlingEnabled
-        })}
+        })*/}
       </div>
     </div>
   );
