@@ -39,7 +39,11 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
         </>
       );
     },
-    edit: (props: XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>) => <LineBreakEditor props={props} key={props.path.join('.')}/>
+    edit: (props: XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>) => <LineBreakEditor props={props} key={props.path.join('.')}/>,
+    insertablePositions: {
+      beforeElement: ['lb'],
+      asLastChildOf: ['div1']
+    }
   },
 
   // Words
@@ -72,7 +76,11 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
           &nbsp;&nbsp;
         </>;
     },
-    edit: (props: XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>) => <WordNodeEditor props={props} key={props.path.join('.')}/>
+    edit: (props: XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>) => <WordNodeEditor props={props} key={props.path.join('.')}/>,
+    insertablePositions: {
+      afterElement: ['lb'],
+      asLastChildOf: ['div1']
+    }
   },
 
   // Word contents

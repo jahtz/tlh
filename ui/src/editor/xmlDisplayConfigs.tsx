@@ -24,10 +24,18 @@ export interface XmlEditableNodeIProps<A = GenericAttributes> {
 }
 
 
+interface InsertablePositions {
+  asFirstChildOf?: string[];
+  beforeElement?: string[];
+  afterElement?: string[];
+  asLastChildOf?: string[];
+}
+
 interface XmlSingleNodeConfig {
   replace?: ReplaceFunc;
   styling?: NodeStylingFunc<any>;
   edit?: EditFunc<any>;
+  insertablePositions?: InsertablePositions;
 }
 
 

@@ -5,13 +5,11 @@ import {LinebreakNodeAttributes} from './tlhNodeDisplayConfig';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
 
-
 interface IProps {
   props: XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>;
 }
 
-
-export function LineBreakEditor({props: {node, updateNode, deleteNode, path,/* jumpEditableNodes, keyHandlingEnabled,*/ setKeyHandlingEnabled}}: IProps): JSX.Element {
+export function LineBreakEditor({props: {node, updateNode, deleteNode, path, jumpEditableNodes, setKeyHandlingEnabled}}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -50,6 +48,15 @@ export function LineBreakEditor({props: {node, updateNode, deleteNode, path,/* j
           </div>
           <div className="column">
             <button type="submit" className="button is-link is-fullwidth">{t('update')}</button>
+          </div>
+        </div>
+
+        <div className="columns">
+          <div className="column">
+            <button className="button is-fullwidth" onClick={() => jumpEditableNodes(node.tagName, false)}>{t('previousEditable')}</button>
+          </div>
+          <div className="column">
+            <button className="button is-fullwidth" onClick={() => jumpEditableNodes(node.tagName, true)}>{t('nextEditable')}</button>
           </div>
         </div>
 
