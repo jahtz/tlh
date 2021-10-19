@@ -11,7 +11,7 @@ interface IProps {
 }
 
 
-export function LineBreakEditor({props: {node, updateNode, path,/* jumpEditableNodes, keyHandlingEnabled,*/ setKeyHandlingEnabled}}: IProps): JSX.Element {
+export function LineBreakEditor({props: {node, updateNode, deleteNode, path,/* jumpEditableNodes, keyHandlingEnabled,*/ setKeyHandlingEnabled}}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -44,8 +44,13 @@ export function LineBreakEditor({props: {node, updateNode, path,/* jumpEditableN
           </div>
         </div>
 
-        <div className="buttons">
-          <button type="submit" className="button is-link">{t('update')}</button>
+        <div className="columns">
+          <div className="column">
+            <button type="button" className="button is-danger is-fullwidth" onClick={deleteNode}>{t('delete')}</button>
+          </div>
+          <div className="column">
+            <button type="submit" className="button is-link is-fullwidth">{t('update')}</button>
+          </div>
         </div>
 
       </Form>
