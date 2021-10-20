@@ -113,7 +113,7 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
 
   corr: {
     styling: () => ['corr'],
-    replace: (/*node*/) => <span>!</span>
+    replace: (node) => <span>{node.attributes.c}</span>
   },
   note: {
     replace: (node) => <sup title={node.attributes.c} className="has-text-weight-bold">x</sup>
