@@ -1,6 +1,6 @@
-import React, {Fragment} from 'react';
-import {MorphologicalAnalysis, SingleMorphologicalAnalysis} from '../model/morphologicalAnalysis';
-import {getSelectedLetters, LetteredAnalysisOption} from '../model/analysisOptions';
+// import React from 'react';
+import {MorphologicalAnalysis} from '../model/morphologicalAnalysis';
+import {getSelectedLetters} from '../model/analysisOptions';
 
 export function getSelectedEnclitics(ma: MorphologicalAnalysis): string {
   const selectedEncliticLetteredOptions = ma.encliticsAnalysis
@@ -11,6 +11,7 @@ export function getSelectedEnclitics(ma: MorphologicalAnalysis): string {
 
 }
 
+/*
 function SingleMorphAnalysisSelection({ma}: { ma: SingleMorphologicalAnalysis }): JSX.Element {
   if (!ma.selected) {
     return <Fragment/>;
@@ -38,3 +39,4 @@ function SingleMorphAnalysisSelection({ma}: { ma: SingleMorphologicalAnalysis })
     </tr>
   );
 }
+ */
