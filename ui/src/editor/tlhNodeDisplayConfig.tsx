@@ -30,11 +30,11 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
     // TODO: only render <br/> if not first linebreak!
     replace: (node, renderedChildren, path, currentSelectedPath) => {
 
-      const className = classNames('lb', {'has-background-primary': !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.')});
-
+      const isSelected = !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.');
+     
       return (
         <>
-          <span className={className}><br style={{marginTop: '10px'}}/>{node.attributes.lnr}:</span>
+          <span className={classNames('lb', {'has-background-primary': isSelected})}><br/>{node.attributes.lnr}:</span>
           &nbsp;&nbsp;&nbsp;
         </>
       );
