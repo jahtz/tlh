@@ -4,8 +4,9 @@ import {isXmlElementNode, XmlElementNode} from '../editor/xmlModel/xmlModel';
 import {WordNode} from '../editor/WordContentEditor';
 import {loadNode, tlhXmlReadConfig} from '../editor/xmlModel/xmlReading';
 import {WordNodeAttributes} from '../editor/tlhNodeDisplayConfig';
-import {morphologyAttributeNameRegex} from '../editor/WordNodeEditor';
 import {SelectedAnalysisOption} from '../editor/selectedAnalysisOption';
+
+const morphologyAttributeNameRegex = /^mrp(\d+)$/;
 
 interface IEncliticsAnalysis {
   enclitics: string;

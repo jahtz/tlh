@@ -141,7 +141,6 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
 
       const editConfig = displayConfig[editState.node.tagName];
 
-
       return editConfig && editConfig.edit && editConfig.edit({
         ...editState,
         updateNode: (node) => updateNode(node, editState.path),
@@ -157,9 +156,8 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
     <div className="columns">
 
       <div className="column">
-
         <BulmaCard title={filename}>
-          <div className={classNames('documentText', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
+          <div className={classNames('scrollable', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
             <NodeDisplay node={state.rootNode} currentSelectedPath={state.editState?.path} displayConfig={displayConfig} onEdit={onEdit}/>
           </div>
         </BulmaCard>
@@ -182,14 +180,6 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
 
       <div className="column">
         {rightSide()}
-        {/*state.editState && editConfig && editConfig.edit && editConfig.edit({
-          ...state.editState,
-          updateNode,
-          deleteNode: () => deleteNode(state.editState!.path),
-          jumpEditableNodes,
-          keyHandlingEnabled,
-          setKeyHandlingEnabled
-        })*/}
       </div>
     </div>
   );

@@ -31,7 +31,7 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
     replace: (node, renderedChildren, path, currentSelectedPath) => {
 
       const isSelected = !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.');
-     
+
       return (
         <>
           <span className={classNames('lb', {'has-background-primary': isSelected})}><br/>{node.attributes.lnr}:</span>
@@ -39,7 +39,7 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
         </>
       );
     },
-    edit: (props: XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>) => <LineBreakEditor props={props} key={props.path.join('.')}/>,
+    edit: (props: XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>) => <LineBreakEditor key={props.path.join('.')} {...props} />,
     insertablePositions: {
       beforeElement: ['lb'],
       asLastChildOf: ['div1']
@@ -76,7 +76,7 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
           &nbsp;&nbsp;
         </>;
     },
-    edit: (props: XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>) => <WordNodeEditor props={props} key={props.path.join('.')}/>,
+    edit: (props: XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>) => <WordNodeEditor key={props.path.join('.')} {...props}/>,
     insertablePositions: {
       afterElement: ['lb'],
       asLastChildOf: ['div1']

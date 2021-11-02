@@ -5,11 +5,9 @@ import {LinebreakNodeAttributes} from './tlhNodeDisplayConfig';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
 
-interface IProps {
-  props: XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>;
-}
+type IProps = XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>;
 
-export function LineBreakEditor({props: {node, updateNode, deleteNode, path, jumpEditableNodes, setKeyHandlingEnabled}}: IProps): JSX.Element {
+export function LineBreakEditor({node, updateNode, deleteNode, path, jumpEditableNodes, setKeyHandlingEnabled}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 

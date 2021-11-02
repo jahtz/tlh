@@ -42,13 +42,11 @@ export function MorphAnalysisOption(iProps: IProps): JSX.Element {
     <div className="my-3">
       {update
         ? <MorphAnalysisEditor ma={morphologicalAnalysis} update={innerUpdateMorphology} toggleUpdate={toggleUpdate}/>
-        : <>
-          <MorphAnalysisOptionButtons
-            morphologicalAnalysis={morphologicalAnalysis}
-            toggleOrSetAnalysisSelection={toggleOrSetAnalysisSelection}
-            toggleEncliticsSelection={toggleEncliticsSelection}
-            toggleUpdate={toggleUpdate}/>
-        </>
+        : <MorphAnalysisOptionButtons
+          morphologicalAnalysis={morphologicalAnalysis}
+          toggleOrSetAnalysisSelection={toggleOrSetAnalysisSelection}
+          toggleEncliticsSelection={toggleEncliticsSelection}
+          initiateUpdate={toggleUpdate}/>
       }
     </div>
   );

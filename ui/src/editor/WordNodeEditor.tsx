@@ -16,11 +16,9 @@ import {WordContentEditor} from './WordContentEditor';
 import {SelectedAnalysisResult} from './SelectedAnalysisResult';
 import update from 'immutability-helper';
 
-export const morphologyAttributeNameRegex = /^mrp(\d+)$/;
 
-interface IProps {
-  props: XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>;
-}
+
+type IProps = XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>;
 
 interface IState {
   morphologies: MorphologicalAnalysis[];
@@ -40,7 +38,7 @@ export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean
   return analysis.includes(numerus) || analysis.includes('ABL') || analysis.includes('INS');
 }
 
-export function WordNodeEditor({props: {node, updateNode, deleteNode, path, jumpEditableNodes, keyHandlingEnabled, setKeyHandlingEnabled}}: IProps): JSX.Element {
+export function WordNodeEditor({node, updateNode, deleteNode, path, jumpEditableNodes, keyHandlingEnabled, setKeyHandlingEnabled}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorConfig = useSelector(editorConfigSelector);
@@ -168,24 +166,26 @@ export function WordNodeEditor({props: {node, updateNode, deleteNode, path, jump
   }
 
   return (
-    <div>
+    <>
       <div className="box has-text-centered">
         {node.children.map((c, i) => <NodeDisplay key={i} currentSelectedPath={undefined} node={c} displayConfig={tlhNodeDisplayConfig}/>)}
       </div>
 
-      {state.morphologies.length === 0
-        ? <div className="notification is-warning has-text-centered">{t('noMorphologicalAnalysesFound')}</div>
-        : state.morphologies.map((m) => <Fragment key={m.number}>
-            <MorphAnalysisOption
-              morphologicalAnalysis={m}
-              toggleOrSetAnalysisSelection={(letter, value) => toggleOrSetAnalysisSelection(m.number, letter, value)}
-              toggleEncliticsSelection={(letter) => toggleEncliticsSelection(m.number, letter)}
-              updateMorphology={updateMorphology}
-              setKeyHandlingEnabled={setKeyHandlingEnabled}/>
-          </Fragment>
-        )}
+      <div className="scrollable">
+        {state.morphologies.length === 0
+          ? <div className="notification is-warning has-text-centered">{t('noMorphologicalAnalysesFound')}</div>
+          : state.morphologies.map((m) => <Fragment key={m.number}>
+              <MorphAnalysisOption
+                morphologicalAnalysis={m}
+                toggleOrSetAnalysisSelection={(letter, value) => toggleOrSetAnalysisSelection(m.number, letter, value)}
+                toggleEncliticsSelection={(letter) => toggleEncliticsSelection(m.number, letter)}
+                updateMorphology={updateMorphology}
+                setKeyHandlingEnabled={setKeyHandlingEnabled}/>
+            </Fragment>
+          )}
 
-      {state.addMorphology && <MorphAnalysisEditor ma={nextMorphAnalysis()} update={updateMorphology} toggleUpdate={toggleAddMorphology}/>}
+        {state.addMorphology && <MorphAnalysisEditor ma={nextMorphAnalysis()} update={updateMorphology} toggleUpdate={toggleAddMorphology}/>}
+      </div>
 
       <hr/>
 
@@ -213,7 +213,7 @@ export function WordNodeEditor({props: {node, updateNode, deleteNode, path, jump
           <button onClick={deleteNode} className="button is-danger is-fullwidth">{t('deleteNode')}</button>
         </div>
         <div className="column">
-        <button onClick={handleUpdate} className="button is-link is-fullwidth" disabled={!state.changed}>{t('updateMorphAnalysis')}</button>
+          <button onClick={handleUpdate} className="button is-link is-fullwidth" disabled={!state.changed}>{t('updateMorphAnalysis')}</button>
         </div>
       </div>
 
@@ -226,7 +226,7 @@ export function WordNodeEditor({props: {node, updateNode, deleteNode, path, jump
         </div>
       </div>
 
-    </div>
+    </>
   );
 }
 
