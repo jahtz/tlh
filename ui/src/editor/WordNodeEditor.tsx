@@ -15,7 +15,7 @@ import {reconstructTransliteration} from './transliterationReconstruction';
 import {WordContentEditor} from './WordContentEditor';
 import {SelectedAnalysisResult} from './SelectedAnalysisResult';
 import update from 'immutability-helper';
-
+import {UpdatePrevNextButtons} from './morphAnalysisOption/UpdatePrevNextButtons';
 
 
 type IProps = XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>;
@@ -38,7 +38,9 @@ export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean
   return analysis.includes(numerus) || analysis.includes('ABL') || analysis.includes('INS');
 }
 
-export function WordNodeEditor({node, updateNode, deleteNode, path, jumpEditableNodes, keyHandlingEnabled, setKeyHandlingEnabled}: IProps): JSX.Element {
+export function WordNodeEditor(
+  {node, updateNode, deleteNode, path, jumpEditableNodes, keyHandlingEnabled, setKeyHandlingEnabled, initiateJumpElement}: IProps
+): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorConfig = useSelector(editorConfigSelector);
@@ -180,7 +182,8 @@ export function WordNodeEditor({node, updateNode, deleteNode, path, jumpEditable
                 toggleOrSetAnalysisSelection={(letter, value) => toggleOrSetAnalysisSelection(m.number, letter, value)}
                 toggleEncliticsSelection={(letter) => toggleEncliticsSelection(m.number, letter)}
                 updateMorphology={updateMorphology}
-                setKeyHandlingEnabled={setKeyHandlingEnabled}/>
+                setKeyHandlingEnabled={setKeyHandlingEnabled}
+                initiateJumpElement={initiateJumpElement}/>
             </Fragment>
           )}
 
@@ -208,15 +211,13 @@ export function WordNodeEditor({node, updateNode, deleteNode, path, jumpEditable
         </div>
       </div>
 
-      <div className="columns">
-        <div className="column">
-          <button onClick={deleteNode} className="button is-danger is-fullwidth">{t('deleteNode')}</button>
-        </div>
-        <div className="column">
-          <button onClick={handleUpdate} className="button is-link is-fullwidth" disabled={!state.changed}>{t('updateMorphAnalysis')}</button>
-        </div>
+      <div className="my-1">
+        <button onClick={deleteNode} className="button is-danger is-fullwidth">{t('deleteNode')}</button>
       </div>
 
+      <UpdatePrevNextButtons initiateUpdate={handleUpdate} initiateJumpElement={(forward) => jumpEditableNodes(node.tagName, forward)}/>
+
+      {/*
       <div className="columns">
         <div className="column">
           <button className="button is-fullwidth" onClick={() => jumpEditableNodes(node.tagName, false)}>{t('previousEditable')}</button>
@@ -225,6 +226,7 @@ export function WordNodeEditor({node, updateNode, deleteNode, path, jumpEditable
           <button className="button is-fullwidth" onClick={() => jumpEditableNodes(node.tagName, true)}>{t('nextEditable')}</button>
         </div>
       </div>
+      */}
 
     </>
   );

@@ -8,8 +8,7 @@ import {UpdatePrevNextButtons, UpdatePrevNextButtonsProps} from './UpdatePrevNex
 
 interface IProps extends UpdatePrevNextButtonsProps {
   morphAnalysis: MultiMorphologicalAnalysis;
-
-  toggleAnalysisSelection: (letter?: string, value?: boolean) => void;
+  toggleAnalysisSelection: (letter: string) => void;
 }
 
 export function MultiMorphAnalysisOptionButtons({morphAnalysis, toggleAnalysisSelection, initiateUpdate, initiateJumpElement}: IProps): JSX.Element {
@@ -21,7 +20,7 @@ export function MultiMorphAnalysisOptionButtons({morphAnalysis, toggleAnalysisSe
       .analysisOptions
       .filter(({analysis}) => !numerus || analysisIsInNumerus(analysis, numerus))
       .map(({letter}) => letter)
-      .forEach((letter) => toggleAnalysisSelection(letter, true));
+      .forEach((letter) => toggleAnalysisSelection(letter));
   }
 
   return (

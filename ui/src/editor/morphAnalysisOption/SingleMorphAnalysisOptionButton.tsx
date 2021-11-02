@@ -6,21 +6,23 @@ import {UpdatePrevNextButtons, UpdatePrevNextButtonsProps} from './UpdatePrevNex
 interface IProps extends UpdatePrevNextButtonsProps {
   morphAnalysis: SingleMorphologicalAnalysis;
 
-  toggleAnalysisSelection: (letter?: string, value?: boolean) => void;
+  toggleAnalysisSelection: () => void;
 }
 
 export function SingleMorphAnalysisOptionButton({morphAnalysis, toggleAnalysisSelection, initiateUpdate, initiateJumpElement}: IProps): JSX.Element {
 
   return (
-    <>
-      <button className={classNames('button', 'is-fullwidth', 'button-text-left', {'is-link': morphAnalysis.selected})}
-              onClick={() => toggleAnalysisSelection()}>
-        {morphAnalysis.number} - {morphAnalysis.analysis}
-      </button>
+    <div className="columns">
+      <div className="column is-two-thirds">
+        <button className={classNames('button', 'is-fullwidth', 'button-text-left', {'is-link': morphAnalysis.selected})}
+                onClick={toggleAnalysisSelection}>
+          {morphAnalysis.number} - {morphAnalysis.analysis}
+        </button>
+      </div>
 
-      <div className="mt-2">
+      <div className="column">
         <UpdatePrevNextButtons initiateUpdate={initiateUpdate} initiateJumpElement={initiateJumpElement}/>
       </div>
-    </>
+    </div>
   );
 }

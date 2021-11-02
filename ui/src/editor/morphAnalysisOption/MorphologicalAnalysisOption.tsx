@@ -11,6 +11,8 @@ interface IProps {
 
   setKeyHandlingEnabled: (b: boolean) => void;
   updateMorphology: (newMa: MorphologicalAnalysis) => void;
+
+  initiateJumpElement: (forward: boolean) => void;
 }
 
 export enum Numerus {
@@ -19,11 +21,11 @@ export enum Numerus {
 
 export function MorphAnalysisOption(iProps: IProps): JSX.Element {
 
-  const {morphologicalAnalysis, updateMorphology, setKeyHandlingEnabled, toggleOrSetAnalysisSelection, toggleEncliticsSelection} = iProps;
+  const {morphologicalAnalysis, updateMorphology, setKeyHandlingEnabled, toggleOrSetAnalysisSelection, toggleEncliticsSelection, initiateJumpElement} = iProps;
 
   const [update, setIsUpdate] = useState(false);
 
-  function toggleUpdate(): void {
+  function initiateUpdate(): void {
     setKeyHandlingEnabled(update);
     setIsUpdate(!update);
   }
@@ -34,19 +36,20 @@ export function MorphAnalysisOption(iProps: IProps): JSX.Element {
   });
 
   function innerUpdateMorphology(newMa: MorphologicalAnalysis): void {
-    toggleUpdate();
+    initiateUpdate();
     updateMorphology(newMa);
   }
 
   return (
     <div className="my-3">
       {update
-        ? <MorphAnalysisEditor ma={morphologicalAnalysis} update={innerUpdateMorphology} toggleUpdate={toggleUpdate}/>
+        ? <MorphAnalysisEditor ma={morphologicalAnalysis} update={innerUpdateMorphology} toggleUpdate={initiateUpdate}/>
         : <MorphAnalysisOptionButtons
           morphologicalAnalysis={morphologicalAnalysis}
           toggleOrSetAnalysisSelection={toggleOrSetAnalysisSelection}
           toggleEncliticsSelection={toggleEncliticsSelection}
-          initiateUpdate={toggleUpdate}/>
+          initiateUpdate={initiateUpdate}
+          initiateJumpElement={initiateJumpElement}/>
       }
     </div>
   );

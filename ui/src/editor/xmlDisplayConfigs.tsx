@@ -21,6 +21,7 @@ export interface XmlEditableNodeIProps<A = GenericAttributes> {
   jumpEditableNodes: (tagName: string, forward: boolean) => void;
   keyHandlingEnabled: boolean;
   setKeyHandlingEnabled: (enabled: boolean) => void;
+  initiateJumpElement: (forward: boolean) => void;
 }
 
 

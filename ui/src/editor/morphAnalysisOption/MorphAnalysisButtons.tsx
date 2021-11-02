@@ -5,19 +5,18 @@ import {LetteredAnalysisOptionButton} from './LetteredAnalysisOptionButton';
 import {MultiMorphAnalysisOptionButtons} from './MultiMorphAnalysisOptionButton';
 import {SingleMorphAnalysisOptionButton} from './SingleMorphAnalysisOptionButton';
 import {MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
+import {UpdatePrevNextButtonsProps} from './UpdatePrevNextButtons';
 
 
-interface IProps {
+interface IProps extends UpdatePrevNextButtonsProps {
   morphologicalAnalysis: MorphologicalAnalysis;
 
   toggleOrSetAnalysisSelection: (letter?: string, value?: boolean) => void;
   toggleEncliticsSelection: (letter: string) => void;
-
-  initiateUpdate: () => void;
 }
 
 export function MorphAnalysisOptionButtons(
-  {morphologicalAnalysis, toggleOrSetAnalysisSelection, toggleEncliticsSelection, initiateUpdate}: IProps
+  {morphologicalAnalysis, toggleOrSetAnalysisSelection, toggleEncliticsSelection, initiateUpdate, initiateJumpElement}: IProps
 ): JSX.Element {
 
   const {number, translation, referenceWord, paradigmClass, encliticsAnalysis, determinativ} = morphologicalAnalysis;
@@ -35,10 +34,12 @@ export function MorphAnalysisOptionButtons(
       </h2>
 
       {isSingleAnalysisOption
-        ? <SingleMorphAnalysisOptionButton morphAnalysis={morphologicalAnalysis} toggleAnalysisSelection={toggleOrSetAnalysisSelection}
-                                           initiateUpdate={initiateUpdate} initiateJumpElement={(forward) => void 0}/>
-        : <MultiMorphAnalysisOptionButtons morphAnalysis={morphologicalAnalysis} toggleAnalysisSelection={toggleOrSetAnalysisSelection}
-                                           initiateUpdate={initiateUpdate} initiateJumpElement={(forward) => void 0}/>
+        ? <SingleMorphAnalysisOptionButton morphAnalysis={morphologicalAnalysis}
+                                           toggleAnalysisSelection={() => toggleOrSetAnalysisSelection(undefined, undefined)}
+                                           initiateUpdate={initiateUpdate} initiateJumpElement={initiateJumpElement}/>
+        : <MultiMorphAnalysisOptionButtons morphAnalysis={morphologicalAnalysis}
+                                           toggleAnalysisSelection={(letter) => toggleOrSetAnalysisSelection(letter, true)}
+                                           initiateUpdate={initiateUpdate} initiateJumpElement={initiateJumpElement}/>
       }
 
       {encliticsAnalysis && 'analysisOptions' in encliticsAnalysis && <div className="columns">

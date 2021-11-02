@@ -147,7 +147,8 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
         deleteNode: () => deleteNode(editState.path),
         jumpEditableNodes,
         keyHandlingEnabled,
-        setKeyHandlingEnabled
+        setKeyHandlingEnabled,
+        initiateJumpElement: (forward) => jumpEditableNodes(editState.node.tagName, forward)
       });
     }
   }
