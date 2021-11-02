@@ -1,53 +1,52 @@
 import React from 'react';
 import {MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
-import {useTranslation} from 'react-i18next';
-import {Numerus} from './MorphologicalAnalysisOption';
-import {analysisIsInNumerus} from '../WordNodeEditor';
 import {LetteredAnalysisOptionButton} from './LetteredAnalysisOptionButton';
-import {UpdatePrevNextButtons, UpdatePrevNextButtonsProps} from './UpdatePrevNextButtons';
+import {getSelectedEnclitics} from '../SelectedAnalysisResult';
+import {LetteredAnalysisOption} from '../../model/analysisOptions';
 
-interface IProps extends UpdatePrevNextButtonsProps {
-  morphAnalysis: MultiMorphologicalAnalysis;
+interface IProps {
+  analysisOptions: LetteredAnalysisOption[];
   toggleAnalysisSelection: (letter: string) => void;
 }
 
-export function MultiMorphAnalysisOptionButtons({morphAnalysis, toggleAnalysisSelection, initiateUpdate, initiateJumpElement}: IProps): JSX.Element {
+export function MultiMorphAnalysisSelection({ma}: { ma: MultiMorphologicalAnalysis }): JSX.Element | null {
 
-  const {t} = useTranslation('common');
+  const selectedAnalyses = ma.analysisOptions
+    .filter(({selected}) => selected);
 
-  function selectAll(numerus?: Numerus): void {
-    morphAnalysis
-      .analysisOptions
-      .filter(({analysis}) => !numerus || analysisIsInNumerus(analysis, numerus))
-      .map(({letter}) => letter)
-      .forEach((letter) => toggleAnalysisSelection(letter));
+  if (selectedAnalyses.length === 0) {
+    return null;
   }
 
+  const encliticsLetters = getSelectedEnclitics(ma);
+
   return (
-    <div className="columns">
-      <div className="column is-one-third-desktop">
-        {morphAnalysis.analysisOptions.map((ao, index) =>
-          <div key={index} className="mb-1">
-            <LetteredAnalysisOptionButton ao={ao} select={() => toggleAnalysisSelection(ao.letter)}/>
-          </div>
-        )}
-      </div>
+    <table className="table is-fullwidth has-background-primary-light">
+      <tbody>
+        {selectedAnalyses
+          .map((ao) => <tr key={ao.letter}>
+            <td>{ma.number}{ao.letter}{encliticsLetters}</td>
+            <td>{ma.translation}</td>
+            <td>{ao.analysis}</td>
+            {(ma.encliticsAnalysis && 'analysis' in ma.encliticsAnalysis)
+              ? <td>{ma.encliticsAnalysis.enclitics} @ {ma.encliticsAnalysis.analysis}</td>
+              : <td/>}
+          </tr>)}
+      </tbody>
+    </table>
+  );
+}
 
-      <div className="column is-one-third-desktop">
-        <div className="mb-1">
-          <button type="button" className="button is-warning is-fullwidth" onClick={() => selectAll()}>{t('selectAll')}</button>
-        </div>
-        <div className="mb-1">
-          <button type="button" className="button is-warning is-fullwidth" onClick={() => selectAll(Numerus.Singular)}>{t('selectAllSingular')}</button>
-        </div>
-        <div className="mb-1">
-          <button type="button" className="button is-warning is-fullwidth" onClick={() => selectAll(Numerus.Plural)}>{t('selectAllPlural')}</button>
-        </div>
-      </div>
 
-      <div className="column">
-        <UpdatePrevNextButtons initiateUpdate={initiateUpdate} initiateJumpElement={initiateJumpElement}/>
-      </div>
-    </div>
+export function MultiMorphAnalysisOptionButtons({analysisOptions, toggleAnalysisSelection}: IProps): JSX.Element {
+
+  return (
+    <>
+      {analysisOptions.map((ao, index) =>
+        <div key={index} className="mb-1">
+          <LetteredAnalysisOptionButton ao={ao} select={() => toggleAnalysisSelection(ao.letter)}/>
+        </div>
+      )}
+    </>
   );
 }

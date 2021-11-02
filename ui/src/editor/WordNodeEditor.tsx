@@ -13,9 +13,9 @@ import {GenericAttributes, XmlElementNode} from './xmlModel/xmlModel';
 import {MorphAnalysisEditor} from './morphAnalysisOption/MorphAnalysisEditor';
 import {reconstructTransliteration} from './transliterationReconstruction';
 import {WordContentEditor} from './WordContentEditor';
-import {SelectedAnalysisResult} from './SelectedAnalysisResult';
 import update from 'immutability-helper';
 import {UpdatePrevNextButtons} from './morphAnalysisOption/UpdatePrevNextButtons';
+import {IoAddOutline, IoSettingsOutline} from 'react-icons/io5';
 
 
 type IProps = XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>;
@@ -47,8 +47,6 @@ export function WordNodeEditor(
   const [editContent, setEditContent] = useState<string>();
 
   const initialSelectedMorphologies = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
-
-  // FIXME: set initially selected morphologies!
 
   const [state, setState] = useState<IState>({
     morphologies: readMorphologiesFromNode(node, initialSelectedMorphologies), changed: false, addMorphology: false
@@ -88,7 +86,7 @@ export function WordNodeEditor(
 
       updateNode(newNode, path);
 
-      setState((state) => ({...state, changed: false}));
+      setState((state) => update(state, {changed: {$set: false}}));
     }
   }
 
@@ -98,44 +96,48 @@ export function WordNodeEditor(
     setEditContent(undefined);
   }
 
-  function toggleOrSetAnalysisSelection(number: number, letter?: string, value?: boolean): void {
-    setState(({morphologies: oldMorphologies, ...rest}) => {
-      const morphologies = oldMorphologies.map((m) => {
-        if (number !== m.number) {
-          return m;
-        }
+  function toggleAnalysisSelection(number: number, letter?: string): void {
+    setState((state) => update(state, {
+        morphologies: {
+          $apply: (oldMorphologies: MorphologicalAnalysis[]) => oldMorphologies.map((m) => {
+            if (number !== m.number) {
+              return m;
+            }
 
-        if ('analysis' in m) {
-          return !letter
-            ? {...m, selected: value === undefined ? !m.selected : value}
-            : m /* error! */;
-        } else {
-          return letter
-            ? {...m, analysisOptions: toggleLetteredAnalysisOptions(m.analysisOptions, letter, value)}
-            : m; /* error! */
-        }
-      });
+            if ('analysis' in m) {
+              return !letter
+                ? {...m, selected: !m.selected}
+                : m /* error! */;
+            } else {
+              return letter
+                ? {...m, analysisOptions: toggleLetteredAnalysisOptions(m.analysisOptions, letter)}
+                : m; /* error! */
+            }
 
-      return {...rest, changed: true, morphologies};
-    });
+          })
+        },
+        changed: {$set: true}
+      }
+    ));
   }
 
   function toggleEncliticsSelection(number: number, letter: string): void {
-    setState(({morphologies: oldMorphologies, ...rest}) => {
-      const morphologies = oldMorphologies.map((m) => {
-        if (number !== m.number) {
-          return m;
-        }
+    setState((state) => update(state, {
+      morphologies: {
+        $apply: (oldMorphologies: MorphologicalAnalysis[]) => oldMorphologies.map((m) => {
+          if (number !== m.number) {
+            return m;
+          }
 
-        const encliticsAnalysis = m.encliticsAnalysis && ('analysisOptions' in m.encliticsAnalysis)
-          ? {...m.encliticsAnalysis, analysisOptions: toggleLetteredAnalysisOptions(m.encliticsAnalysis.analysisOptions, letter)}
-          : m.encliticsAnalysis;
+          const encliticsAnalysis = m.encliticsAnalysis && ('analysisOptions' in m.encliticsAnalysis)
+            ? {...m.encliticsAnalysis, analysisOptions: toggleLetteredAnalysisOptions(m.encliticsAnalysis.analysisOptions, letter)}
+            : m.encliticsAnalysis;
 
-        return {...m, encliticsAnalysis};
-      });
-
-      return {...rest, changed: true, morphologies};
-    });
+          return {...m, encliticsAnalysis};
+        })
+      },
+      changed: {$set: true}
+    }));
   }
 
   function editWord(): void {
@@ -145,6 +147,7 @@ export function WordNodeEditor(
   }
 
   function updateMorphology(newMa: MorphologicalAnalysis): void {
+    // FIXME: check if always working, use update synctax!!
     setState(({morphologies}) => {
       morphologies[newMa.number - 1] = newMa;
 
@@ -179,7 +182,7 @@ export function WordNodeEditor(
           : state.morphologies.map((m) => <Fragment key={m.number}>
               <MorphAnalysisOption
                 morphologicalAnalysis={m}
-                toggleOrSetAnalysisSelection={(letter, value) => toggleOrSetAnalysisSelection(m.number, letter, value)}
+                toggleAnalysisSelection={(letter) => toggleAnalysisSelection(m.number, letter)}
                 toggleEncliticsSelection={(letter) => toggleEncliticsSelection(m.number, letter)}
                 updateMorphology={updateMorphology}
                 setKeyHandlingEnabled={setKeyHandlingEnabled}
@@ -190,24 +193,12 @@ export function WordNodeEditor(
         {state.addMorphology && <MorphAnalysisEditor ma={nextMorphAnalysis()} update={updateMorphology} toggleUpdate={toggleAddMorphology}/>}
       </div>
 
-      <hr/>
-
-      <div className="columns">
-        <div className="column">
-          <button type="button" className="button is-fullwidth" onClick={toggleAddMorphology}>{t('addMorphology')}</button>
+      <div className="field has-addons mt-2">
+        <div className="control is-expanded">
+          <button type="button" className="button is-fullwidth" onClick={toggleAddMorphology}><IoAddOutline/>&nbsp;{t('addMorphology')}</button>
         </div>
-        <div className="column">
-          <button type="button" className="button is-fullwidth" onClick={editWord}>{t('editContent')}</button>
-        </div>
-      </div>
-
-      <div className="message is-primary has-text-weight-bold">
-        <div className="message-body">
-          <table className="table is-fullwidth">
-            <tbody>
-              {state.morphologies.map((ma) => <SelectedAnalysisResult key={ma.number} ma={ma}/>)}
-            </tbody>
-          </table>
+        <div className="control is-expanded">
+          <button type="button" className="button is-fullwidth" onClick={editWord}><IoSettingsOutline/>&nbsp;{t('editContent')}</button>
         </div>
       </div>
 
@@ -216,18 +207,6 @@ export function WordNodeEditor(
       </div>
 
       <UpdatePrevNextButtons initiateUpdate={handleUpdate} initiateJumpElement={(forward) => jumpEditableNodes(node.tagName, forward)}/>
-
-      {/*
-      <div className="columns">
-        <div className="column">
-          <button className="button is-fullwidth" onClick={() => jumpEditableNodes(node.tagName, false)}>{t('previousEditable')}</button>
-        </div>
-        <div className="column">
-          <button className="button is-fullwidth" onClick={() => jumpEditableNodes(node.tagName, true)}>{t('nextEditable')}</button>
-        </div>
-      </div>
-      */}
-
     </>
   );
 }
