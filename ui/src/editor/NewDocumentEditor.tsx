@@ -85,7 +85,19 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
     })
   );
 
-  const exportXml = () => download(writeNode(state.rootNode).join('\n'));
+  function exportXml(): void {
+    download(
+      writeNode(state.rootNode)
+        .join('\n')
+        .replaceAll('®', '\n\t')
+        .replaceAll('{', '\n\t\t{')
+        .replaceAll('+=', '\n\t\t   += ')
+        .replaceAll('<w', '\n <w')
+        .replaceAll('<lb', '\n\n<lb')
+        .replaceAll(' mrp', '\n\tmrp')
+        .replaceAll('@', ' @ ')
+    );
+  }
 
   function jumpEditableNodes(tagName: string, forward: boolean): void {
     if (state.editState) {
