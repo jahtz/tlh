@@ -181,11 +181,13 @@ export function WordNodeEditor(
           ? <div className="notification is-warning has-text-centered">{t('noMorphologicalAnalysesFound')}</div>
           : state.morphologies.map((m) => <Fragment key={m.number}>
               <MorphAnalysisOption
+                changed={state.changed}
                 morphologicalAnalysis={m}
                 toggleAnalysisSelection={(letter) => toggleAnalysisSelection(m.number, letter)}
                 toggleEncliticsSelection={(letter) => toggleEncliticsSelection(m.number, letter)}
                 updateMorphology={updateMorphology}
                 setKeyHandlingEnabled={setKeyHandlingEnabled}
+                initateUpdate={handleUpdate}
                 initiateJumpElement={initiateJumpElement}/>
             </Fragment>
           )}
@@ -206,7 +208,7 @@ export function WordNodeEditor(
         <button onClick={deleteNode} className="button is-danger is-fullwidth">{t('deleteNode')}</button>
       </div>
 
-      <UpdatePrevNextButtons initiateUpdate={handleUpdate} initiateJumpElement={(forward) => jumpEditableNodes(node.tagName, forward)}/>
+      <UpdatePrevNextButtons changed={state.changed} initiateUpdate={handleUpdate} initiateJumpElement={(forward) => jumpEditableNodes(node.tagName, forward)}/>
     </>
   );
 }
