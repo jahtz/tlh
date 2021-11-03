@@ -92,7 +92,13 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
   }
 
   function onEdit(node: XmlElementNode, path: number[]): void {
-    setState((state) => update(state, {editState: {$set: {node, path}}}));
+    setState((state) => update(state, {
+      editState: {
+        $apply: (editState) => editState && editState.path.join('.') === path.join('.') ?
+          undefined
+          : {node, path}
+      }
+    }));
   }
 
   function updateNode(node: XmlElementNode, path: number[]): void {
