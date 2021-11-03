@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {isXmlElementNode, XmlElementNode, XmlNode} from './xmlModel/xmlModel';
-import {EditTriggerFunc, UpdateNodeFunc, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
+import {XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
 import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
 import {NodeDisplay} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
@@ -10,6 +10,7 @@ import classNames from 'classnames';
 import {writeNode} from './xmlModel/xmlWriting';
 import {BulmaCard} from '../bulmaHelpers/BulmaCard';
 import update, {Spec} from 'immutability-helper';
+import {Prompt} from 'react-router-dom';
 
 interface IProps {
   node: XmlNode;
@@ -27,6 +28,7 @@ interface IEditState {
 interface IState {
   rootNode: XmlNode;
   editState?: IEditState;
+  changed: boolean;
 }
 
 function searchEditableNode(tagName: string, rootNode: XmlElementNode, currentPath: number[], forward: boolean): number[] | undefined {
@@ -66,7 +68,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
 
   const {t} = useTranslation('common');
   const editorConfig = useSelector(editorConfigSelector);
-  const [state, setState] = useState<IState>({rootNode: initialNode});
+  const [state, setState] = useState<IState>({rootNode: initialNode, changed: false});
   const [keyHandlingEnabled, setKeyHandlingEnabled] = useState(true);
   const [useSerifFont, setUseSerifFont] = useState(false);
 
@@ -74,16 +76,6 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
     document.addEventListener('keydown', handleJumpKey);
     return () => document.removeEventListener('keydown', handleJumpKey);
   });
-
-  const onEdit: EditTriggerFunc = (node, path) => setState((state) => update(state, {editState: {$set: {node, path}}}));
-
-  const updateNode: UpdateNodeFunc = (node, path) => setState((state) => update(state, {
-      rootNode: path.reduceRight<Spec<XmlNode>>(
-        (acc, index) => ({children: {[index]: acc}}),
-        {$set: node}
-      )
-    })
-  );
 
   function exportXml(): void {
     download(
@@ -99,6 +91,21 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
     );
   }
 
+  function onEdit(node: XmlElementNode, path: number[]): void {
+    setState((state) => update(state, {editState: {$set: {node, path}}}));
+  }
+
+  function updateNode(node: XmlElementNode, path: number[]): void {
+    setState((state) => update(state, {
+        rootNode: path.reduceRight<Spec<XmlNode>>(
+          (acc, index) => ({children: {[index]: acc}}),
+          {$set: node}
+        ),
+        changed:  {$set: true}
+      })
+    );
+  }
+
   function jumpEditableNodes(tagName: string, forward: boolean): void {
     if (state.editState) {
       const currentPath = state.editState.path;
@@ -107,8 +114,8 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
       if (path) {
         const node = findElement(state.rootNode as XmlElementNode, path);
 
-        setState(({rootNode}) => {
-          return {rootNode, editState: {node, path}};
+        setState(({rootNode, changed}) => {
+          return {rootNode, editState: {node, path}, changed};
         });
       }
     }
@@ -126,11 +133,12 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
 
   function deleteNode(path: number[]): void {
     setState((state) => update(state, {
-        rootNode: path.slice(0, -1).reduceRight<Spec<XmlNode>>(
+        rootNode:  path.slice(0, -1).reduceRight<Spec<XmlNode>>(
           (acc, index) => ({children: {[index]: acc}}),
           {children: {$splice: [[path[path.length - 1], 1]]}}
         ),
-        editState: {$set: undefined}
+        editState: {$set: undefined},
+        changed:   {$set: true}
       })
     );
   }
@@ -143,8 +151,8 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
 
       return editConfig && editConfig.edit && editConfig.edit({
         ...editState,
-        updateNode: (node) => updateNode(node, editState.path),
-        deleteNode: () => deleteNode(editState.path),
+        updateNode:          (node) => updateNode(node, editState.path),
+        deleteNode:          () => deleteNode(editState.path),
         jumpEditableNodes,
         keyHandlingEnabled,
         setKeyHandlingEnabled,
@@ -154,34 +162,38 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
   }
 
   return (
-    <div className="columns">
+    <>
+      <Prompt when={state.changed} message={t('leaveUnfinishedChangesMessage')}/>
 
-      <div className="column">
-        <BulmaCard title={filename}>
-          <div className={classNames('scrollable', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
-            <NodeDisplay node={state.rootNode} currentSelectedPath={state.editState?.path} displayConfig={displayConfig} onEdit={onEdit}/>
-          </div>
-        </BulmaCard>
+      <div className="columns">
 
-        <div className="columns my-3">
-          <div className="column">
-            <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="button is-fullwidth">
-              {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
-            </button>
+        <div className="column">
+          <BulmaCard title={filename}>
+            <div className={classNames('scrollable', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
+              <NodeDisplay node={state.rootNode} currentSelectedPath={state.editState?.path} displayConfig={displayConfig} onEdit={onEdit}/>
+            </div>
+          </BulmaCard>
+
+          <div className="columns my-3">
+            <div className="column">
+              <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="button is-fullwidth">
+                {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
+              </button>
+            </div>
+            <div className="column">
+              <button className="button is-fullwidth" onClick={closeFile}>{t('closeFile')}</button>
+            </div>
+            <div className="column">
+              <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>
+            </div>
           </div>
-          <div className="column">
-            <button className="button is-fullwidth" onClick={closeFile}>{t('closeFile')}</button>
-          </div>
-          <div className="column">
-            <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>
-          </div>
+
         </div>
 
+        <div className="column">
+          {rightSide()}
+        </div>
       </div>
-
-      <div className="column">
-        {rightSide()}
-      </div>
-    </div>
+    </>
   );
 }

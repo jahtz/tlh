@@ -78,7 +78,9 @@ export function WordNodeEditor(
         }
       });
 
-      newNode.attributes.mrp0sel = writeSelectedMorphologies(selectedAnalysisOptions);
+      newNode.attributes.mrp0sel = selectedAnalysisOptions.length > 0
+        ? writeSelectedMorphologies(selectedAnalysisOptions)
+        : ' ';
 
       for (const ma of state.morphologies) {
         newNode.attributes[`mrp${ma.number}`] = writeMorphAnalysisValue(ma);
@@ -116,7 +118,7 @@ export function WordNodeEditor(
 
           })
         },
-        changed: {$set: true}
+        changed:      {$set: true}
       }
     ));
   }
@@ -136,7 +138,7 @@ export function WordNodeEditor(
           return {...m, encliticsAnalysis};
         })
       },
-      changed: {$set: true}
+      changed:      {$set: true}
     }));
   }
 
