@@ -91,7 +91,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
     );
   }
 
-  function onEdit(node: XmlElementNode, path: number[]): void {
+  function onNodeSelect(node: XmlElementNode, path: number[]): void {
     setState((state) => update(state, {
       editState: {
         $apply: (editState) => editState && editState.path.join('.') === path.join('.') ?
@@ -176,7 +176,7 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
         <div className="column">
           <BulmaCard title={filename}>
             <div className={classNames('scrollable', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
-              <NodeDisplay node={state.rootNode} currentSelectedPath={state.editState?.path} displayConfig={displayConfig} onEdit={onEdit}/>
+              <NodeDisplay node={state.rootNode} currentSelectedPath={state.editState?.path} displayConfig={displayConfig} onSelect={onNodeSelect}/>
             </div>
           </BulmaCard>
 

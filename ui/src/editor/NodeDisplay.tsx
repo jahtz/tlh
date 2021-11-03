@@ -8,11 +8,11 @@ interface NodeDisplayIProps {
   node: XmlNode;
   displayConfig?: XmlNodeDisplayConfigObject;
   currentSelectedPath: number[] | undefined;
-  onEdit?: EditTriggerFunc;
+  onSelect?: EditTriggerFunc;
   path?: number[];
 }
 
-export function NodeDisplay({node, currentSelectedPath, displayConfig = tlhNodeDisplayConfig, onEdit, path = []}: NodeDisplayIProps): JSX.Element {
+export function NodeDisplay({node, currentSelectedPath, displayConfig = tlhNodeDisplayConfig, onSelect, path = []}: NodeDisplayIProps): JSX.Element {
   if (isXmlTextNode(node)) {
     return <span>{node.textContent}</span>;
   }
@@ -21,7 +21,7 @@ export function NodeDisplay({node, currentSelectedPath, displayConfig = tlhNodeD
 
   const renderedChildren = <>
     {node.children.map((c, i) =>
-      <NodeDisplay key={i} node={c} displayConfig={displayConfig} currentSelectedPath={currentSelectedPath} onEdit={onEdit} path={[...path, i]}/>
+      <NodeDisplay key={i} node={c} displayConfig={displayConfig} currentSelectedPath={currentSelectedPath} onSelect={onSelect} path={[...path, i]}/>
     )}
   </>;
 
@@ -31,8 +31,8 @@ export function NodeDisplay({node, currentSelectedPath, displayConfig = tlhNodeD
 
   const classes = currentConfig?.styling ? currentConfig.styling(node, path, currentSelectedPath) : [];
 
-  const onClick = currentConfig?.edit && onEdit
-    ? () => onEdit(node, path)
+  const onClick = currentConfig?.edit && onSelect
+    ? () => onSelect(node, path)
     : () => void 0;
 
   return <span className={classNames(classes)} onClick={onClick}>{display}</span>;
