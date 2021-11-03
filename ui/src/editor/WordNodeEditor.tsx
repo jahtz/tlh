@@ -46,6 +46,8 @@ export function WordNodeEditor(
   const editorConfig = useSelector(editorKeyConfigSelector);
   const [editContent, setEditContent] = useState<string>();
 
+  console.info(editContent);
+
   const initialSelectedMorphologies = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
 
   const [state, setState] = useState<IState>({
@@ -168,14 +170,14 @@ export function WordNodeEditor(
     return {number, translation: '', referenceWord: '', analysisOptions: [], paradigmClass: ''};
   }
 
-  if (editContent) {
+  if (editContent || typeof editContent === 'string') {
     return <WordContentEditor initialTransliteration={editContent} cancelEdit={() => setEditContent(undefined)} updateNode={handleEditUpdate}/>;
   }
 
   return (
     <>
       <div className="box has-text-centered">
-        {node.children.map((c, i) => <NodeDisplay key={i} node={c} editorConfig={tlhEditorConfig}/>)}
+        <NodeDisplay node={node} editorConfig={tlhEditorConfig}/>
       </div>
 
       <div className="scrollable">

@@ -23,17 +23,17 @@ interface IState {
   parseResult: Result<WordNode>;
 }
 
+function readTransliteration(transliteration: string): IState {
+  const parseResult: Result<AOWordContent[]> = transliterationLanguage.wordContents.parse(transliteration);
+
+  return parseResult.status
+    ? {parseResult: {status: true, value: xmlifyAoWord({content: parseResult.value})}}
+    : {parseResult};
+}
+
 export function WordContentEditor({initialTransliteration, cancelEdit, updateNode}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
-
-  function readTransliteration(transliteration: string): IState {
-    const parseResult: Result<AOWordContent[]> = transliterationLanguage.wordContents.parse(transliteration);
-
-    return parseResult.status
-      ? {parseResult: {status: true, value: xmlifyAoWord({content: parseResult.value})}}
-      : {parseResult};
-  }
 
   const [state, setState] = useState<IState>(readTransliteration(initialTransliteration));
 
@@ -60,7 +60,7 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
       <div className="field">
         <label htmlFor="newTransliteration" className="label">{t('newTransliteration')}:</label>
         <div className="control">
-          <input defaultValue={initialTransliteration} className="input" id="newTransliteration"
+          <input defaultValue={initialTransliteration} className="input" id="newTransliteration" placeholder={t('newTransliteration')}
                  onChange={(event) => setState(readTransliteration(event.target.value))}/>
         </div>
       </div>
@@ -73,7 +73,7 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
           {state.parseResult.status
             ? <>
               <div className="box">
-                <NodeDisplay node={state.parseResult.value} currentSelectedPath={undefined} />
+                <NodeDisplay node={state.parseResult.value} currentSelectedPath={undefined}/>
               </div>
               <div className="box">{writeNode(state.parseResult.value).join('')}</div>
             </>
