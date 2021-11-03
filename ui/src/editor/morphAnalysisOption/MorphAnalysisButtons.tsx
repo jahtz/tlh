@@ -15,6 +15,7 @@ interface IProps extends UpdatePrevNextButtonsProps {
 
   toggleAnalysisSelection: (letter?: string) => void;
   toggleEncliticsSelection: (letter: string) => void;
+  toggleEdit: () => void;
 }
 
 const buttonClasses = 'button is-outlined is-primary is-fullwidth';
@@ -25,7 +26,8 @@ export function MorphAnalysisOptionButtons({
   toggleAnalysisSelection,
   toggleEncliticsSelection,
   initiateUpdate,
-  initiateJumpElement
+  initiateJumpElement,
+  toggleEdit
 }: IProps): JSX.Element {
 
   const {number, translation, referenceWord, paradigmClass, encliticsAnalysis, determinativ} = morphologicalAnalysis;
@@ -60,7 +62,7 @@ export function MorphAnalysisOptionButtons({
             </button>
           </div>
           {!isSingleAnalysisOption && <div className="control">
-            <button className="button" onClick={initiateUpdate}><IoSettingsOutline/></button>
+            <button className="button" onClick={toggleEdit}><IoSettingsOutline/></button>
           </div>}
         </div>
       </div>

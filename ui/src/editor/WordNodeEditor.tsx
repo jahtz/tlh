@@ -1,7 +1,7 @@
 import {XmlEditableNodeIProps} from './xmlDisplayConfigs';
 import {readSelectedMorphology, SelectedAnalysisOption, writeSelectedMorphologies} from './selectedAnalysisOption';
 import {useTranslation} from 'react-i18next';
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue} from '../model/morphologicalAnalysis';
 import {MorphAnalysisOption, Numerus} from './morphAnalysisOption/MorphologicalAnalysisOption';
 import {NodeDisplay} from './NodeDisplay';
@@ -181,17 +181,16 @@ export function WordNodeEditor(
       <div className="scrollable">
         {state.morphologies.length === 0
           ? <div className="notification is-warning has-text-centered">{t('noMorphologicalAnalysesFound')}</div>
-          : state.morphologies.map((m) => <Fragment key={m.number}>
-              <MorphAnalysisOption
-                changed={state.changed}
-                morphologicalAnalysis={m}
-                toggleAnalysisSelection={(letter) => toggleAnalysisSelection(m.number, letter)}
-                toggleEncliticsSelection={(letter) => toggleEncliticsSelection(m.number, letter)}
-                updateMorphology={updateMorphology}
-                setKeyHandlingEnabled={setKeyHandlingEnabled}
-                initiateUpdate={handleUpdate}
-                initiateJumpElement={initiateJumpElement}/>
-            </Fragment>
+          : state.morphologies.map((m) => <MorphAnalysisOption
+            key={m.number}
+            changed={state.changed}
+            morphologicalAnalysis={m}
+            toggleAnalysisSelection={(letter) => toggleAnalysisSelection(m.number, letter)}
+            toggleEncliticsSelection={(letter) => toggleEncliticsSelection(m.number, letter)}
+            updateMorphology={updateMorphology}
+            setKeyHandlingEnabled={setKeyHandlingEnabled}
+            initiateUpdate={handleUpdate}
+            initiateJumpElement={initiateJumpElement}/>
           )}
 
         {state.addMorphology && <MorphAnalysisEditor ma={nextMorphAnalysis()} update={updateMorphology} toggleUpdate={toggleAddMorphology}/>}

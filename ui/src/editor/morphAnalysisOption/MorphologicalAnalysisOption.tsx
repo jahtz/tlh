@@ -33,7 +33,7 @@ export function MorphAnalysisOption({
 
   function toggleUpdateMode(): void {
     setKeyHandlingEnabled(update);
-    setIsUpdate(!update);
+    setIsUpdate((value) => !value);
   }
 
   useEffect(() => {
@@ -54,5 +54,6 @@ export function MorphAnalysisOption({
       toggleAnalysisSelection={toggleAnalysisSelection}
       toggleEncliticsSelection={toggleEncliticsSelection}
       initiateUpdate={initiateUpdate}
-      initiateJumpElement={initiateJumpElement}/>;
+      initiateJumpElement={initiateJumpElement}
+      toggleEdit={toggleUpdateMode}/>;
 }
