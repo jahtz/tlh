@@ -61,7 +61,7 @@ export function NodeDisplay({
       {insertStuff && insertStuff.insertablePaths.includes(path.join('.')) && <span>
         &nbsp;
         <button onClick={() => insertStuff.initiateInsert(path)}><IoAddOutline/></button>
-        &nbsp;
+        &nbsp;&nbsp;
       </span>}
       <span className={classNames(classes)} onClick={onClick}>{display}</span>
     </>

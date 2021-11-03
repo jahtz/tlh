@@ -4,6 +4,7 @@ import {WordNodeEditor} from './WordNodeEditor';
 import {LineBreakEditor} from './LineBreakEditor';
 import {GenericAttributes} from './xmlModel/xmlModel';
 import classNames from 'classnames';
+import {IoCloseSharp} from 'react-icons/io5';
 
 export interface WordNodeAttributes {
   lg?: 'Sum' | 'Akk' | 'Hit' | 'Hur' | 'Luw' | 'Hat';
@@ -67,15 +68,16 @@ export const tlhEditorConfig: XmlEditorConfig = {
         'has-background-primary': !notMarked && !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.'),
         'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
         [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,
-        'has-text-weight-bold': isForeignLanguage
+        'has-text-weight-bold': isForeignLanguage,
+        'has-text-danger': node.children.length === 0
       });
 
-      return node.children.length === 0
-        ? <span className="has-text-danger">&#10008;</span>
-        : <>
-          <span className={classes}>{renderedChildren}</span>
-          &nbsp;&nbsp;
-        </>;
+      return <>
+        <span className={classes}>
+          {node.children.length === 0 ? <IoCloseSharp/> : renderedChildren}
+        </span>
+        &nbsp;&nbsp;
+      </>;
     },
     edit: (props: XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>) => <WordNodeEditor key={props.path.join('.')} {...props}/>,
     insertablePositions: {

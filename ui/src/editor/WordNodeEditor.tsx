@@ -46,8 +46,6 @@ export function WordNodeEditor(
   const editorConfig = useSelector(editorKeyConfigSelector);
   const [editContent, setEditContent] = useState<string>();
 
-  console.info(editContent);
-
   const initialSelectedMorphologies = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
 
   const [state, setState] = useState<IState>({
