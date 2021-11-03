@@ -5,10 +5,10 @@ import React, {Fragment, useEffect, useState} from 'react';
 import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue} from '../model/morphologicalAnalysis';
 import {MorphAnalysisOption, Numerus} from './morphAnalysisOption/MorphologicalAnalysisOption';
 import {NodeDisplay} from './NodeDisplay';
-import {tlhNodeDisplayConfig, WordNodeAttributes} from './tlhNodeDisplayConfig';
+import {tlhEditorConfig, WordNodeAttributes} from './tlhEditorConfig';
 import {getSelectedLetters, LetteredAnalysisOption} from '../model/analysisOptions';
 import {useSelector} from 'react-redux';
-import {editorConfigSelector} from '../store/store';
+import {editorKeyConfigSelector} from '../store/store';
 import {GenericAttributes, XmlElementNode} from './xmlModel/xmlModel';
 import {MorphAnalysisEditor} from './morphAnalysisOption/MorphAnalysisEditor';
 import {reconstructTransliteration} from './transliterationReconstruction';
@@ -43,7 +43,7 @@ export function WordNodeEditor(
 ): JSX.Element {
 
   const {t} = useTranslation('common');
-  const editorConfig = useSelector(editorConfigSelector);
+  const editorConfig = useSelector(editorKeyConfigSelector);
   const [editContent, setEditContent] = useState<string>();
 
   const initialSelectedMorphologies = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
@@ -118,7 +118,7 @@ export function WordNodeEditor(
 
           })
         },
-        changed:      {$set: true}
+        changed: {$set: true}
       }
     ));
   }
@@ -138,7 +138,7 @@ export function WordNodeEditor(
           return {...m, encliticsAnalysis};
         })
       },
-      changed:      {$set: true}
+      changed: {$set: true}
     }));
   }
 
@@ -175,7 +175,7 @@ export function WordNodeEditor(
   return (
     <>
       <div className="box has-text-centered">
-        {node.children.map((c, i) => <NodeDisplay key={i} currentSelectedPath={undefined} node={c} displayConfig={tlhNodeDisplayConfig}/>)}
+        {node.children.map((c, i) => <NodeDisplay key={i} node={c} editorConfig={tlhEditorConfig}/>)}
       </div>
 
       <div className="scrollable">

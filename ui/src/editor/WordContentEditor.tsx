@@ -5,7 +5,7 @@ import {AOWordContent} from '../model/wordContent/wordContent';
 import {xmlifyAoWord} from '../model/sentenceContent/word';
 import {Result} from 'parsimmon';
 import {GenericAttributes, XmlElementNode} from './xmlModel/xmlModel';
-import {WordNodeAttributes} from './tlhNodeDisplayConfig';
+import {WordNodeAttributes} from './tlhEditorConfig';
 import classNames from 'classnames';
 import {fetchMorphologicalAnalyses} from '../model/morphologicalAnalysis';
 import {NodeDisplay} from './NodeDisplay';
@@ -73,7 +73,7 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
           {state.parseResult.status
             ? <>
               <div className="box">
-                <NodeDisplay node={state.parseResult.value} currentSelectedPath={undefined}/>
+                <NodeDisplay node={state.parseResult.value} currentSelectedPath={undefined} />
               </div>
               <div className="box">{writeNode(state.parseResult.value).join('')}</div>
             </>

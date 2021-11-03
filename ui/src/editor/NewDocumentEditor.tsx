@@ -1,33 +1,41 @@
 import React, {useEffect, useState} from 'react';
 import {isXmlElementNode, XmlElementNode, XmlNode} from './xmlModel/xmlModel';
-import {XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
-import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
-import {NodeDisplay} from './NodeDisplay';
+import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './xmlDisplayConfigs';
+import {tlhEditorConfig} from './tlhEditorConfig';
 import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
-import {editorConfigSelector} from '../store/store';
-import classNames from 'classnames';
+import {editorKeyConfigSelector} from '../store/store';
 import {writeNode} from './xmlModel/xmlWriting';
-import {BulmaCard} from '../bulmaHelpers/BulmaCard';
 import update, {Spec} from 'immutability-helper';
 import {Prompt} from 'react-router-dom';
+import {EditorLeftSide} from './EditorLeftSide';
+import {EditorEmptyRightSide} from './EditorEmptyRightSide';
+import {calculateInsertablePositions, InsertablePositions, NodePath} from './insertablePositions';
+import {InsertStuff} from './NodeDisplay';
 
 interface IProps {
   node: XmlNode;
   filename: string;
-  displayConfig?: XmlNodeDisplayConfigObject;
+  editorConfig?: XmlEditorConfig;
   download: (content: string) => void;
   closeFile: () => void;
 }
 
-interface IEditState {
+interface IEditNodeState {
   node: XmlElementNode;
   path: number[];
 }
 
+interface IAddNodeState {
+  tagName: string;
+  insertablePositions: InsertablePositions;
+}
+
+type EditorState = IEditNodeState | IAddNodeState;
+
 interface IState {
   rootNode: XmlNode;
-  editState?: IEditState;
+  editorState?: EditorState;
   changed: boolean;
 }
 
@@ -64,13 +72,13 @@ function findElement(node: XmlElementNode, path: number[]): XmlElementNode {
   return path.reduce<XmlElementNode>((nodeToUpdate, pathContent) => nodeToUpdate.children[pathContent] as XmlElementNode, node);
 }
 
-export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDisplayConfig, download, filename, closeFile}: IProps): JSX.Element {
+export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorConfig, download, filename, closeFile}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
-  const editorConfig = useSelector(editorConfigSelector);
+  const editorKeyConfig = useSelector(editorKeyConfigSelector);
   const [state, setState] = useState<IState>({rootNode: initialNode, changed: false});
   const [keyHandlingEnabled, setKeyHandlingEnabled] = useState(true);
-  const [useSerifFont, setUseSerifFont] = useState(false);
+
 
   useEffect(() => {
     document.addEventListener('keydown', handleJumpKey);
@@ -93,8 +101,8 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
 
   function onNodeSelect(node: XmlElementNode, path: number[]): void {
     setState((state) => update(state, {
-      editState: {
-        $apply: (editState) => editState && editState.path.join('.') === path.join('.') ?
+      editorState: {
+        $apply: (editorState) => editorState && 'path' in editorState && editorState.path.join('.') === path.join('.') ?
           undefined
           : {node, path}
       }
@@ -107,65 +115,103 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
           (acc, index) => ({children: {[index]: acc}}),
           {$set: node}
         ),
-        changed:  {$set: true}
+        changed: {$set: true}
       })
     );
   }
 
   function jumpEditableNodes(tagName: string, forward: boolean): void {
-    if (state.editState) {
-      const currentPath = state.editState.path;
+    if (state.editorState && 'path' in state.editorState) {
+      const currentPath = state.editorState.path;
 
       const path = searchEditableNode(tagName, state.rootNode as XmlElementNode, currentPath, forward);
       if (path) {
         const node = findElement(state.rootNode as XmlElementNode, path);
 
         setState(({rootNode, changed}) => {
-          return {rootNode, editState: {node, path}, changed};
+          return {rootNode, editorState: {node, path}, changed};
         });
       }
     }
   }
 
   function handleJumpKey(event: KeyboardEvent): void {
-    if (state.editState && keyHandlingEnabled) {
-      if (editorConfig.nextEditableNodeKeys.includes(event.key)) {
-        jumpEditableNodes(state.editState.node.tagName, true);
-      } else if (editorConfig.previousEditableNodeKeys.includes(event.key)) {
-        jumpEditableNodes(state.editState.node.tagName, false);
+    if (state.editorState && 'path' in state.editorState && keyHandlingEnabled) {
+      if (editorKeyConfig.nextEditableNodeKeys.includes(event.key)) {
+        jumpEditableNodes(state.editorState.node.tagName, true);
+      } else if (editorKeyConfig.previousEditableNodeKeys.includes(event.key)) {
+        jumpEditableNodes(state.editorState.node.tagName, false);
       }
     }
   }
 
   function deleteNode(path: number[]): void {
     setState((state) => update(state, {
-        rootNode:  path.slice(0, -1).reduceRight<Spec<XmlNode>>(
+        rootNode: path.slice(0, -1).reduceRight<Spec<XmlNode>>(
           (acc, index) => ({children: {[index]: acc}}),
           {children: {$splice: [[path[path.length - 1], 1]]}}
         ),
-        editState: {$set: undefined},
-        changed:   {$set: true}
+        editorState: {$set: undefined},
+        changed: {$set: true}
       })
     );
   }
 
-  function rightSide(): JSX.Element | undefined {
-    if (state.editState) {
-      const editState = state.editState;
+  function NodeEditor({editState}: { editState: IEditNodeState }): JSX.Element {
+    return (editorConfig[editState.node.tagName] as XmlSingleEditableNodeConfig).edit({
+      ...editState,
+      updateNode: (node) => updateNode(node, editState.path),
+      deleteNode: () => deleteNode(editState.path),
+      initiateJumpElement: (forward) => jumpEditableNodes(editState.node.tagName, forward),
+      jumpEditableNodes, keyHandlingEnabled, setKeyHandlingEnabled,
+    });
+  }
 
-      const editConfig = displayConfig[editState.node.tagName];
-
-      return editConfig && editConfig.edit && editConfig.edit({
-        ...editState,
-        updateNode:          (node) => updateNode(node, editState.path),
-        deleteNode:          () => deleteNode(editState.path),
-        jumpEditableNodes,
-        keyHandlingEnabled,
-        setKeyHandlingEnabled,
-        initiateJumpElement: (forward) => jumpEditableNodes(editState.node.tagName, forward)
-      });
+  function onCloseFile(): void {
+    if (!state.changed || confirm(t('closeFileOnUnfinishedChangesMessage'))) {
+      closeFile();
     }
   }
+
+  function toggleElementInsert(tagName: string, insertablePositions: InsertablePositions): void {
+    setState((state) => {
+        if (!state.editorState) {
+          return update(state, {editorState: {$set: {tagName, insertablePositions}}});
+        } else if (state.editorState && 'path' in state.editorState) {
+          return state;
+        } else {
+          return update(state, {editorState: {$set: state.editorState.tagName !== tagName ? {tagName, insertablePositions} : undefined}});
+        }
+      }
+    );
+  }
+
+  function initiateInsert(path: NodePath): void {
+    if (state.editorState && 'tagName' in state.editorState) {
+      const node: XmlElementNode = {tagName: state.editorState.tagName, attributes: {}, children: []};
+
+      setState((state) => update(state, {
+        rootNode: path.slice(0, -1).reduceRight<Spec<XmlNode>>(
+          (acc, index) => ({children: {[index]: acc}}),
+          {children: {$splice: [[path[path.length - 1], 0, node]]}}
+        ),
+        editorState: {$set: {path, node}},
+        changed: {$set: true}
+      }));
+    }
+  }
+
+  const currentSelectedPath = state.editorState && 'path' in state.editorState
+    ? state.editorState.path
+    : undefined;
+
+  const currentInsertedElement = state.editorState && 'tagName' in state.editorState
+    ? state.editorState.tagName
+    : undefined;
+
+  const insertStuff: InsertStuff | undefined = state.editorState && 'tagName' in state.editorState
+    ? {insertablePaths: Array.from(new Set(calculateInsertablePositions(state.editorState.insertablePositions, state.rootNode))), initiateInsert}
+    : undefined;
 
   return (
     <>
@@ -174,30 +220,14 @@ export function NewDocumentEditor({node: initialNode, displayConfig = tlhNodeDis
       <div className="columns">
 
         <div className="column">
-          <BulmaCard title={filename}>
-            <div className={classNames('scrollable', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
-              <NodeDisplay node={state.rootNode} currentSelectedPath={state.editState?.path} displayConfig={displayConfig} onSelect={onNodeSelect}/>
-            </div>
-          </BulmaCard>
-
-          <div className="columns my-3">
-            <div className="column">
-              <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="button is-fullwidth">
-                {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
-              </button>
-            </div>
-            <div className="column">
-              <button className="button is-fullwidth" onClick={closeFile}>{t('closeFile')}</button>
-            </div>
-            <div className="column">
-              <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>
-            </div>
-          </div>
-
+          <EditorLeftSide filename={filename} node={state.rootNode} currentSelectedPath={currentSelectedPath} editorConfig={editorConfig}
+                          onNodeSelect={onNodeSelect} closeFile={onCloseFile} exportXml={exportXml} insertStuff={insertStuff}/>
         </div>
 
         <div className="column">
-          {rightSide()}
+          {state.editorState && 'path' in state.editorState
+            ? <NodeEditor editState={state.editorState}/>
+            : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}/>}
         </div>
       </div>
     </>

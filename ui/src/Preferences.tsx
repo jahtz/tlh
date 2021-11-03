@@ -1,9 +1,9 @@
 import {Field, Form, Formik} from 'formik';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {EditorConfig} from './editor/editorConfig';
+import {EditorKeyConfig} from './editor/editorKeyConfig';
 import {useDispatch, useSelector} from 'react-redux';
-import {editorConfigSelector} from './store/store';
+import {editorKeyConfigSelector} from './store/store';
 import {updatePreferencesAction} from './store/actions';
 
 const splitKey = ',';
@@ -22,7 +22,7 @@ export function Preferences(): JSX.Element {
 
   const {t} = useTranslation('common');
   const dispatch = useDispatch();
-  const currentEditorConfig: EditorConfig = useSelector(editorConfigSelector);
+  const currentEditorConfig: EditorKeyConfig = useSelector(editorKeyConfigSelector);
 
   const initialValues: FormValues = {
     nextNodeKeys: currentEditorConfig.nextEditableNodeKeys.join(splitKey),
@@ -39,7 +39,7 @@ export function Preferences(): JSX.Element {
 
     // TODO: change for intersections between sets!
 
-    const newEditorConfig: EditorConfig = {nextEditableNodeKeys, previousEditableNodeKeys, submitChangeKeys};
+    const newEditorConfig: EditorKeyConfig = {nextEditableNodeKeys, previousEditableNodeKeys, submitChangeKeys};
 
     dispatch(updatePreferencesAction(newEditorConfig));
   }

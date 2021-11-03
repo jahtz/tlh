@@ -1,7 +1,7 @@
 import React from 'react';
 import {XmlEditableNodeIProps} from './xmlDisplayConfigs';
 import {GenericAttributes} from './xmlModel/xmlModel';
-import {LinebreakNodeAttributes} from './tlhNodeDisplayConfig';
+import {LinebreakNodeAttributes} from './tlhEditorConfig';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
 

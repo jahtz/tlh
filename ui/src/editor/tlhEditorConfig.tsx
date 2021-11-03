@@ -1,5 +1,5 @@
 import React from 'react';
-import {XmlEditableNodeIProps, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
+import {XmlEditableNodeIProps, XmlEditorConfig} from './xmlDisplayConfigs';
 import {WordNodeEditor} from './WordNodeEditor';
 import {LineBreakEditor} from './LineBreakEditor';
 import {GenericAttributes} from './xmlModel/xmlModel';
@@ -23,7 +23,7 @@ const foreignLanguageColors: { [key: string]: string } = {
   LUW: 'Luw'
 };
 
-export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
+export const tlhEditorConfig: XmlEditorConfig = {
   docID: {replace: () => <span/>},
   'AO:Manuscripts': {replace: () => <span/>},
   lb: {
@@ -39,7 +39,8 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
         </>
       );
     },
-    edit: (props: XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>) => <LineBreakEditor key={props.path.join('.')} {...props} />,
+    edit: (props: XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>) => <LineBreakEditor
+      key={props.path.join('.')} {...props} />,
     insertablePositions: {
       beforeElement: ['lb'],
       asLastChildOf: ['div1']
@@ -78,7 +79,8 @@ export const tlhNodeDisplayConfig: XmlNodeDisplayConfigObject = {
     },
     edit: (props: XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>) => <WordNodeEditor key={props.path.join('.')} {...props}/>,
     insertablePositions: {
-      afterElement: ['lb'],
+      beforeElement: ['w'],
+      afterElement: ['lb', 'w'],
       asLastChildOf: ['div1']
     }
   },

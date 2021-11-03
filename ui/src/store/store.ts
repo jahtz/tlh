@@ -1,14 +1,14 @@
 import {createStore} from 'redux';
 import {StoreAction, UPDATE_PREFERENCES, USER_LOGGED_IN, USER_LOGGED_OUT} from './actions';
 import {LoggedInUserFragment} from '../graphql';
-import {defaultEditorConfig, EditorConfig} from '../editor/editorConfig';
+import {defaultEditorKeyConfig, EditorKeyConfig} from '../editor/editorKeyConfig';
 
 const localStorageUserKey = 'userId';
 const localStoragePreferencesKey = 'preferences';
 
 interface StoreState {
   currentUser?: LoggedInUserFragment;
-  editorConfig?: EditorConfig;
+  editorKeyConfig?: EditorKeyConfig;
 }
 
 function rootReducer(store: StoreState = {}, action: StoreAction): StoreState {
@@ -20,7 +20,7 @@ function rootReducer(store: StoreState = {}, action: StoreAction): StoreState {
       localStorage.removeItem(localStorageUserKey);
       return {...store, currentUser: undefined};
     case UPDATE_PREFERENCES:
-      return {...store, editorConfig: action.newPreferences};
+      return {...store, editorKeyConfig: action.newPreferences};
     default:
       return store;
   }
@@ -31,8 +31,8 @@ export function activeUserSelector(store: StoreState): LoggedInUserFragment | un
   return store.currentUser;
 }
 
-export function editorConfigSelector(store: StoreState): EditorConfig {
-  return store.editorConfig || defaultEditorConfig;
+export function editorKeyConfigSelector(store: StoreState): EditorKeyConfig {
+  return store.editorKeyConfig || defaultEditorKeyConfig;
 }
 
 
@@ -41,8 +41,8 @@ function initialState(): StoreState {
   const localStoragePreferences = localStorage.getItem(localStoragePreferencesKey);
 
   return {
-    currentUser: localStorageUser ? JSON.parse(localStorageUser) : undefined,
-    editorConfig: localStoragePreferences ? JSON.parse(localStoragePreferences) : undefined
+    currentUser:     localStorageUser ? JSON.parse(localStorageUser) : undefined,
+    editorKeyConfig: localStoragePreferences ? JSON.parse(localStoragePreferences) : undefined
   };
 }
 

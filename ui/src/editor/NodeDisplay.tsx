@@ -1,39 +1,69 @@
 import {isXmlTextNode, XmlNode} from './xmlModel/xmlModel';
-import {EditTriggerFunc, XmlNodeDisplayConfigObject} from './xmlDisplayConfigs';
-import {tlhNodeDisplayConfig} from './tlhNodeDisplayConfig';
+import {EditTriggerFunc, XmlEditorConfig} from './xmlDisplayConfigs';
+import {tlhEditorConfig} from './tlhEditorConfig';
 import classNames from 'classnames';
 import React from 'react';
+import {NodePath} from './insertablePositions';
+import {IoAddOutline} from 'react-icons/io5';
 
-interface NodeDisplayIProps {
-  node: XmlNode;
-  displayConfig?: XmlNodeDisplayConfigObject;
-  currentSelectedPath: number[] | undefined;
-  onSelect?: EditTriggerFunc;
-  path?: number[];
+export interface InsertStuff {
+  insertablePaths: string[];
+  initiateInsert: (path: NodePath) => void;
 }
 
-export function NodeDisplay({node, currentSelectedPath, displayConfig = tlhNodeDisplayConfig, onSelect, path = []}: NodeDisplayIProps): JSX.Element {
+export interface NodeDisplayIProps {
+  node: XmlNode;
+  currentSelectedPath?: NodePath;
+  editorConfig?: XmlEditorConfig;
+  onSelect?: EditTriggerFunc;
+  path?: NodePath;
+  insertStuff?: InsertStuff;
+}
+
+export function NodeDisplay({
+  node,
+  currentSelectedPath,
+  editorConfig = tlhEditorConfig,
+  onSelect,
+  path = [],
+  insertStuff,
+}: NodeDisplayIProps): JSX.Element {
   if (isXmlTextNode(node)) {
     return <span>{node.textContent}</span>;
   }
 
-  const currentConfig = displayConfig[node.tagName];
+  const currentConfig = editorConfig[node.tagName];
 
   const renderedChildren = <>
     {node.children.map((c, i) =>
-      <NodeDisplay key={i} node={c} displayConfig={displayConfig} currentSelectedPath={currentSelectedPath} onSelect={onSelect} path={[...path, i]}/>
+      <NodeDisplay key={i} node={c} editorConfig={editorConfig} currentSelectedPath={currentSelectedPath} onSelect={onSelect} path={[...path, i]}
+                   insertStuff={insertStuff}/>
     )}
   </>;
 
-  const display = currentConfig?.replace
+  const display = currentConfig && currentConfig.replace
     ? currentConfig.replace(node, renderedChildren, path, currentSelectedPath)
     : renderedChildren;
 
-  const classes = currentConfig?.styling ? currentConfig.styling(node, path, currentSelectedPath) : [];
+  const classes = currentConfig && currentConfig.styling
+    ? currentConfig.styling(node, path, currentSelectedPath)
+    : [];
 
-  const onClick = currentConfig?.edit && onSelect
+  const onClick = currentConfig && 'edit' in currentConfig && onSelect
     ? () => onSelect(node, path)
     : () => void 0;
 
-  return <span className={classNames(classes)} onClick={onClick}>{display}</span>;
+
+  // FIXME: display addon buttons!
+
+  return (
+    <>
+      {insertStuff && insertStuff.insertablePaths.includes(path.join('.')) && <span>
+        &nbsp;
+        <button onClick={() => insertStuff.initiateInsert(path)}><IoAddOutline/></button>
+        &nbsp;
+      </span>}
+      <span className={classNames(classes)} onClick={onClick}>{display}</span>
+    </>
+  );
 }

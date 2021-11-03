@@ -1,6 +1,6 @@
 import {Action} from 'redux';
 import {LoggedInUserFragment} from '../graphql';
-import {EditorConfig} from '../editor/editorConfig';
+import {EditorKeyConfig} from '../editor/editorKeyConfig';
 
 // User logged in
 
@@ -27,10 +27,10 @@ export const userLoggedOutAction: UserLoggedOutAction = {type: USER_LOGGED_OUT};
 export const UPDATE_PREFERENCES = 'UPDATE_PREFERENCES';
 
 interface UpdatePreferencesAction extends Action<typeof UPDATE_PREFERENCES> {
-  newPreferences: EditorConfig;
+  newPreferences: EditorKeyConfig;
 }
 
-export function updatePreferencesAction(newPreferences: EditorConfig): UpdatePreferencesAction {
+export function updatePreferencesAction(newPreferences: EditorKeyConfig): UpdatePreferencesAction {
   return {type: UPDATE_PREFERENCES, newPreferences};
 }
 

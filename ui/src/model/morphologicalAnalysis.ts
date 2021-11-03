@@ -3,7 +3,7 @@ import {tlhAnalyzerUrl} from '../urls';
 import {isXmlElementNode, XmlElementNode} from '../editor/xmlModel/xmlModel';
 import {WordNode} from '../editor/WordContentEditor';
 import {loadNode, tlhXmlReadConfig} from '../editor/xmlModel/xmlReading';
-import {WordNodeAttributes} from '../editor/tlhNodeDisplayConfig';
+import {WordNodeAttributes} from '../editor/tlhEditorConfig';
 import {SelectedAnalysisOption} from '../editor/selectedAnalysisOption';
 
 const morphologyAttributeNameRegex = /^mrp(\d+)$/;
