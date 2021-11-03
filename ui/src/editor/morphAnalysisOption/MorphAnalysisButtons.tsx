@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {IoChevronDown, IoChevronForward, IoSettingsOutline} from 'react-icons/io5';
-import {MultiMorphAnalysisOptionButtons, MultiMorphAnalysisSelection} from './MultiMorphAnalysisOptionButton';
+import {MultiMorphAnalysisSelection} from './MultiMorphAnalysisSelection';
 import {SingleMorphAnalysisOptionButton} from './SingleMorphAnalysisOptionButton';
 import {MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {UpdatePrevNextButtons, UpdatePrevNextButtonsProps} from './UpdatePrevNextButtons';
 import {Numerus} from './MorphologicalAnalysisOption';
 import {analysisIsInNumerus} from '../WordNodeEditor';
+import {LetteredAnalysisOptionButtons} from './LetteredAnalysisOptionButtons';
 
 
 interface IProps extends UpdatePrevNextButtonsProps {
@@ -16,9 +17,16 @@ interface IProps extends UpdatePrevNextButtonsProps {
   toggleEncliticsSelection: (letter: string) => void;
 }
 
-export function MorphAnalysisOptionButtons(
-  {changed, morphologicalAnalysis, toggleAnalysisSelection, toggleEncliticsSelection, initiateUpdate, initiateJumpElement}: IProps
-): JSX.Element {
+const buttonClasses = 'button is-outlined is-primary is-fullwidth';
+
+export function MorphAnalysisOptionButtons({
+  changed,
+  morphologicalAnalysis,
+  toggleAnalysisSelection,
+  toggleEncliticsSelection,
+  initiateUpdate,
+  initiateJumpElement
+}: IProps): JSX.Element {
 
   const {number, translation, referenceWord, paradigmClass, encliticsAnalysis, determinativ} = morphologicalAnalysis;
 
@@ -34,7 +42,6 @@ export function MorphAnalysisOptionButtons(
       .map(({letter}) => letter)
       .forEach((letter) => toggleAnalysisSelection(letter));
   }
-
 
   return (
     <>
@@ -58,7 +65,6 @@ export function MorphAnalysisOptionButtons(
         </div>
       </div>
 
-
       {!isReduced && <>
         {!isSingleAnalysisOption && <MultiMorphAnalysisSelection ma={morphologicalAnalysis}/>}
 
@@ -66,31 +72,31 @@ export function MorphAnalysisOptionButtons(
           <div className="column">
             {isSingleAnalysisOption
               ? <SingleMorphAnalysisOptionButton morphAnalysis={morphologicalAnalysis} toggleAnalysisSelection={() => toggleAnalysisSelection(undefined)}/>
-              : <MultiMorphAnalysisOptionButtons analysisOptions={morphologicalAnalysis.analysisOptions} toggleAnalysisSelection={toggleAnalysisSelection}/>
+              : <LetteredAnalysisOptionButtons analysisOptions={morphologicalAnalysis.analysisOptions} toggleAnalysisSelection={toggleAnalysisSelection}/>
             }
 
           </div>
+
           {encliticsAnalysis && 'analysisOptions' in encliticsAnalysis && <div className="column">
-            <MultiMorphAnalysisOptionButtons analysisOptions={encliticsAnalysis.analysisOptions} toggleAnalysisSelection={toggleEncliticsSelection}/>
+            <LetteredAnalysisOptionButtons analysisOptions={encliticsAnalysis.analysisOptions} toggleAnalysisSelection={toggleEncliticsSelection}/>
           </div>}
+
           <div className="column is-one-third">
             <UpdatePrevNextButtons changed={changed} initiateUpdate={initiateUpdate} initiateJumpElement={initiateJumpElement}/>
 
             {!isSingleAnalysisOption && <>
               <div className="mb-1">
-                <button type="button" className="button is-outlined is-primary is-fullwidth" onClick={() => selectAll(morphologicalAnalysis)} tabIndex={-1}>
+                <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis)} tabIndex={-1}>
                   {t('selectAll')}
                 </button>
               </div>
               <div className="mb-1">
-                <button type="button" className="button is-outlined is-primary is-fullwidth" onClick={() => selectAll(morphologicalAnalysis, Numerus.Singular)}
-                        tabIndex={-1}>
+                <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis, Numerus.Singular)} tabIndex={-1}>
                   {t('selectAllSingular')}
                 </button>
               </div>
               <div className="mb-1">
-                <button type="button" className="button is-outlined is-primary is-fullwidth" onClick={() => selectAll(morphologicalAnalysis, Numerus.Plural)}
-                        tabIndex={-1}>
+                <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis, Numerus.Plural)} tabIndex={-1}>
                   {t('selectAllPlural')}
                 </button>
               </div>

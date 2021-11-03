@@ -2,9 +2,9 @@ import {MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import React, {useEffect, useState} from 'react';
 import {MorphAnalysisOptionButtons} from './MorphAnalysisButtons';
 import {MorphAnalysisEditor} from './MorphAnalysisEditor';
+import {UpdatePrevNextButtonsProps} from './UpdatePrevNextButtons';
 
-interface IProps {
-  changed: boolean;
+interface IProps extends UpdatePrevNextButtonsProps {
   morphologicalAnalysis: MorphologicalAnalysis;
 
   toggleAnalysisSelection: (letter?: string) => void;
@@ -12,31 +12,26 @@ interface IProps {
 
   setKeyHandlingEnabled: (b: boolean) => void;
   updateMorphology: (newMa: MorphologicalAnalysis) => void;
-
-  initateUpdate: () => void;
-  initiateJumpElement: (forward: boolean) => void;
 }
 
 export enum Numerus {
   Singular = 'SG', Plural = 'PL'
 }
 
-export function MorphAnalysisOption(iProps: IProps): JSX.Element {
-
-  const {
-    changed,
-    morphologicalAnalysis,
-    updateMorphology,
-    setKeyHandlingEnabled,
-    toggleAnalysisSelection,
-    toggleEncliticsSelection,
-    initateUpdate,
-    initiateJumpElement
-  } = iProps;
+export function MorphAnalysisOption({
+  changed,
+  morphologicalAnalysis,
+  updateMorphology,
+  setKeyHandlingEnabled,
+  toggleAnalysisSelection,
+  toggleEncliticsSelection,
+  initiateUpdate,
+  initiateJumpElement
+}: IProps): JSX.Element {
 
   const [update, setIsUpdate] = useState(false);
 
-  function initiateUpdate(): void {
+  function toggleUpdateMode(): void {
     setKeyHandlingEnabled(update);
     setIsUpdate(!update);
   }
@@ -47,17 +42,17 @@ export function MorphAnalysisOption(iProps: IProps): JSX.Element {
   });
 
   function innerUpdateMorphology(newMa: MorphologicalAnalysis): void {
-    initiateUpdate();
+    toggleUpdateMode();
     updateMorphology(newMa);
   }
 
   return update
-    ? <MorphAnalysisEditor ma={morphologicalAnalysis} update={innerUpdateMorphology} toggleUpdate={initiateUpdate}/>
+    ? <MorphAnalysisEditor ma={morphologicalAnalysis} update={innerUpdateMorphology} toggleUpdate={toggleUpdateMode}/>
     : <MorphAnalysisOptionButtons
       changed={changed}
       morphologicalAnalysis={morphologicalAnalysis}
       toggleAnalysisSelection={toggleAnalysisSelection}
       toggleEncliticsSelection={toggleEncliticsSelection}
-      initiateUpdate={initateUpdate}
+      initiateUpdate={initiateUpdate}
       initiateJumpElement={initiateJumpElement}/>;
 }

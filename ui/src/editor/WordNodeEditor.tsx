@@ -187,7 +187,7 @@ export function WordNodeEditor(
                 toggleEncliticsSelection={(letter) => toggleEncliticsSelection(m.number, letter)}
                 updateMorphology={updateMorphology}
                 setKeyHandlingEnabled={setKeyHandlingEnabled}
-                initateUpdate={handleUpdate}
+                initiateUpdate={handleUpdate}
                 initiateJumpElement={initiateJumpElement}/>
             </Fragment>
           )}
