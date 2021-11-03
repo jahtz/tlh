@@ -83,7 +83,7 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
       </div>
 
       {state.parseResult.status && <>
-        <button type="button" className="button is-link is-fullwidth" onClick={updateMorphologies}>{t('fetchMorphologicalAnalyses')}</button>
+        <button type="button" className="button is-link is-fullwidth" onClick={updateMorphologies} disabled>{t('fetchMorphologicalAnalyses')}</button>
       </>}
 
       <div className="columns my-3">
