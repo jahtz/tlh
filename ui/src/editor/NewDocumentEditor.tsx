@@ -76,7 +76,6 @@ function findElement(node: XmlElementNode, path: number[]): XmlElementNode {
 
 function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode {
 
-  // FIXME: find element `annotation`
   const annotationNode = findFirstXmlElementByTagName(rootNode, 'annotation');
 
   if (!annotationNode) {
