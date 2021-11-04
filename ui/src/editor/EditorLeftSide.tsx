@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import {BulmaCard} from '../bulmaHelpers/BulmaCard';
 import classNames from 'classnames';
 import {NodeDisplay, NodeDisplayIProps} from './NodeDisplay';
@@ -30,8 +30,7 @@ export function EditorLeftSide({
     <>
       <BulmaCard title={filename}>
         <div className={classNames('scrollable', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
-          <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} editorConfig={editorConfig} onSelect={onNodeSelect}
-                       insertStuff={insertStuff}/>
+          <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} editorConfig={editorConfig} onSelect={onNodeSelect} insertStuff={insertStuff}/>
         </div>
       </BulmaCard>
 
