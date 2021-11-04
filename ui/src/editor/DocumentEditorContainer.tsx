@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
 import {XmlNode} from './xmlModel/xmlModel';
 import {NewDocumentEditor} from './NewDocumentEditor';
@@ -24,8 +24,7 @@ export function DocumentEditorContainer(): JSX.Element {
   const [state, setState] = useState<IState | undefined>();
 
   async function readFile(file: File): Promise<void> {
-    const newXmlResult = await loadNewXml(file);
-    setState({rootNode: newXmlResult, filename: file.name});
+    setState({rootNode: await loadNewXml(file), filename: file.name});
   }
 
   function download(content: string): void {

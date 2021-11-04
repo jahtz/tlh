@@ -1,4 +1,4 @@
-import { ChangeEvent, useRef, useState } from 'react';
+import {ChangeEvent, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import classNames from 'classnames';
 
@@ -16,7 +16,9 @@ export function FileLoader({accept, onLoad}: IProps): JSX.Element {
   function handleFile(event: ChangeEvent<HTMLInputElement>): void {
     if (event.target.files && event.target.files.length === 1) {
       setIsLoading(true);
-      onLoad(event.target.files[0]).then(() => setIsLoading(false));
+
+      onLoad(event.target.files[0])
+        .then(() => setIsLoading(false));
     }
   }
 

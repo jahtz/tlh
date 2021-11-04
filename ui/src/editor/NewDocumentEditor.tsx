@@ -218,7 +218,6 @@ export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorCo
       <Prompt when={state.changed} message={t('leaveUnfinishedChangesMessage')}/>
 
       <div className="columns">
-
         <div className="column">
           <EditorLeftSide filename={filename} node={state.rootNode} currentSelectedPath={currentSelectedPath} editorConfig={editorConfig}
                           onNodeSelect={onNodeSelect} closeFile={onCloseFile} exportXml={exportXml} insertStuff={insertStuff}/>
