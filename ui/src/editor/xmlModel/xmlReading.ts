@@ -1,12 +1,21 @@
-import {LetterCorrection, performCorrections} from './xmlLoader';
 import {GenericAttributes, isXmlElementNode, XmlNode, XmlTextNode} from './xmlModel';
+
+type LetterCorrection = {
+  [key: string]: string;
+}
+
 
 interface NodeReadConfig {
   letterCorrections: LetterCorrection;
+  keepSpaces?: boolean;
 }
 
 export interface XmlReadConfig {
   [tagName: string]: NodeReadConfig;
+}
+
+function performCorrections(text: string, corrections: LetterCorrection): string {
+  return Object.entries(corrections).reduce<string>((acc, [key, value]) => acc.replaceAll(key, value), text);
 }
 
 const localLetterCorrections: LetterCorrection = {
@@ -37,7 +46,10 @@ const letterHarmonization: LetterCorrection = {
 };
 
 export const tlhXmlReadConfig: XmlReadConfig = {
-  w: {letterCorrections: {...localLetterCorrections, ...letterHarmonization}}
+  w: {
+    letterCorrections: {...localLetterCorrections, ...letterHarmonization},
+    keepSpaces: true
+  }
 };
 
 function createTextNode(baseTextContent: string, letterCorrections?: LetterCorrection): XmlTextNode {
@@ -62,7 +74,7 @@ export function loadNode(el: ChildNode, xmlReadConfig: XmlReadConfig, parentLett
       children: Array.from(el.childNodes)
         .map((c) => loadNode(c, xmlReadConfig, nodeReadConfig?.letterCorrections))
         // Filter out empty text nodes
-        .filter((node) => isXmlElementNode(node) || node.textContent.trim().length > 0)
+        .filter((node) => isXmlElementNode(node) || (!!nodeReadConfig?.keepSpaces || node.textContent.trim().length > 0))
     };
   } else {
     throw new Error(`unexpected element: ${el.nodeType}`);

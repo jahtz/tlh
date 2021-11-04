@@ -28,7 +28,7 @@ export const tlhEditorConfig: XmlEditorConfig = {
   'AO:Manuscripts': {replace: () => <span/>},
   lb: {
     // TODO: only render <br/> if not first linebreak!
-    replace: (node, renderedChildren, path, currentSelectedPath) => {
+    replace: (node, _renderedChildren, path, currentSelectedPath) => {
 
       const isSelected = !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.');
 
@@ -70,6 +70,8 @@ export const tlhEditorConfig: XmlEditorConfig = {
         'has-text-weight-bold': isForeignLanguage,
         'has-text-danger': node.children.length === 0
       });
+
+      console.info(JSON.stringify(node.children, null, 2));
 
       return <>
         <span className={classes}>

@@ -1,4 +1,4 @@
-import { StrictMode } from 'react';
+import {StrictMode} from 'react';
 import {render} from 'react-dom';
 import './index.sass';
 import {App} from './App';
@@ -41,17 +41,14 @@ const apolloAuthMiddleware = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
+// FIXME: solve differently?
 const versionModifier = window.location.href.includes('stable')
   ? '/stable'
   : window.location.href.includes('release')
     ? '/release'
     : '';
 
-console.info(versionModifier);
-
 const apolloUri = `${serverUrl}${versionModifier}/graphql.php`;
-
-console.info(apolloUri);
 
 const apolloClient = new ApolloClient({
   // TODO: remove serverUrl!
