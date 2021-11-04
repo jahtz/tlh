@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface IProps {
   title: string;
   children: JSX.Element;

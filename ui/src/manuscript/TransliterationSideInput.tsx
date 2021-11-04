@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import { useState } from 'react';
 import {ManuscriptColumn, ManuscriptColumnModifier, manuscriptColumnModifiers, manuscriptColumns,} from '../model/manuscriptProperties/manuscriptProperties';
 import {allManuscriptLanguages, getNameForManuscriptLanguage, ManuscriptLanguage} from '../model/manuscriptProperties/manuscriptLanugage';
 import {useTranslation} from 'react-i18next';

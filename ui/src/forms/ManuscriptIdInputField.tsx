@@ -1,4 +1,3 @@
-import React from 'react';
 import {ErrorMessage, Field, FormikErrors, FormikTouched} from 'formik';
 import {ManuscriptIdentifierInput, ManuscriptIdentifierType} from '../graphql';
 import {useTranslation} from 'react-i18next';

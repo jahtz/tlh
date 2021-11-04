@@ -1,4 +1,3 @@
-import React from 'react';
 import {XmlEditableNodeIProps} from './xmlDisplayConfigs';
 import {GenericAttributes} from './xmlModel/xmlModel';
 import {LinebreakNodeAttributes} from './tlhEditorConfig';

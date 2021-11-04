@@ -1,4 +1,3 @@
-import React from 'react';
 import {XmlEditableNodeIProps, XmlEditorConfig} from './xmlDisplayConfigs';
 import {WordNodeEditor} from './WordNodeEditor';
 import {LineBreakEditor} from './LineBreakEditor';

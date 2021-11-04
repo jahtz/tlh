@@ -1,5 +1,4 @@
 import {Field, FieldArray, Form, Formik} from 'formik';
-import React from 'react';
 import {MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {LetteredAnalysisOption} from '../../model/analysisOptions';
 import {useTranslation} from 'react-i18next';

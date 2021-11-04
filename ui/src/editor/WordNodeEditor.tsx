@@ -1,7 +1,7 @@
 import {XmlEditableNodeIProps} from './xmlDisplayConfigs';
 import {readSelectedMorphology, SelectedAnalysisOption, writeSelectedMorphologies} from './selectedAnalysisOption';
 import {useTranslation} from 'react-i18next';
-import React, {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue} from '../model/morphologicalAnalysis';
 import {MorphAnalysisOption, Numerus} from './morphAnalysisOption/MorphologicalAnalysisOption';
 import {NodeDisplay} from './NodeDisplay';

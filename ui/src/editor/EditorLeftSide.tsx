@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import { useState } from 'react';
 import {BulmaCard} from '../bulmaHelpers/BulmaCard';
 import classNames from 'classnames';
 import {NodeDisplay, NodeDisplayIProps} from './NodeDisplay';

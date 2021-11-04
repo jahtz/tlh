@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import { useState } from 'react';
 import {useTranslation} from 'react-i18next';
 import {transliteration as transliterationLanguage} from '../transliterationParser/parser';
 import {AOWordContent} from '../model/wordContent/wordContent';

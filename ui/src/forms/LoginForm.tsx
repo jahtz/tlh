@@ -1,4 +1,4 @@
-import React, {Dispatch, useState} from 'react';
+import { Dispatch, useState } from 'react';
 import {LoginMutationVariables, useLoginMutation} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';

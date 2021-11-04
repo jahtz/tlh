@@ -1,4 +1,3 @@
-import React from 'react';
 import {Redirect, Route, Switch, useRouteMatch} from 'react-router-dom';
 import {ManuscriptData} from './ManuscriptData';
 import {ManuscriptMetaDataFragment, ManuscriptQuery, useManuscriptQuery} from '../graphql';

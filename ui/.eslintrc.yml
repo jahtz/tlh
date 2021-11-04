@@ -25,3 +25,4 @@ rules:
   react/display-name: [ 'off' ]
   '@typescript-eslint/no-extra-non-null-assertion': [ 'warn' ]
   '@typescript-eslint/no-empty-function': [ 'warn' ]
+  'react/react-in-jsx-scope': [ 'off' ]

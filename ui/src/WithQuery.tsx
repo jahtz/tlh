@@ -1,6 +1,5 @@
 import {MutationResult, QueryResult} from '@apollo/client';
 import classNames from 'classnames';
-import React from 'react';
 import {useTranslation} from 'react-i18next';
 
 interface IProps<T> {

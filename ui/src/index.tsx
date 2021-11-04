@@ -1,4 +1,4 @@
-import React from 'react';
+import { StrictMode } from 'react';
 import {render} from 'react-dom';
 import './index.sass';
 import {App} from './App';
@@ -68,7 +68,7 @@ const apolloClient = new ApolloClient({
 });
 
 render(
-  <React.StrictMode>
+  <StrictMode>
     <I18nextProvider i18n={i18n}>
       <ApolloProvider client={apolloClient}>
         <Provider store={store}>
@@ -78,7 +78,7 @@ render(
         </Provider>
       </ApolloProvider>
     </I18nextProvider>
-  </React.StrictMode>,
+  </StrictMode>,
   document.getElementById('root')
 );
 

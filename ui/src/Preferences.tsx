@@ -1,5 +1,4 @@
 import {Field, Form, Formik} from 'formik';
-import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {EditorKeyConfig} from './editor/editorKeyConfig';
 import {useDispatch, useSelector} from 'react-redux';

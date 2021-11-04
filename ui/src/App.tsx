@@ -1,4 +1,4 @@
-import React, {Dispatch} from 'react';
+import { Dispatch } from 'react';
 import {Link, Route, Switch, useHistory} from 'react-router-dom';
 import {createManuscriptUrl, editDocumentUrl, homeUrl, loginUrl, preferencesUrl, registerUrl, xmlComparatorUrl} from './urls';
 import {Home} from './Home';

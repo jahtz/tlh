@@ -1,4 +1,3 @@
-import React from 'react';
 import {isDeterminativ} from '../model/wordContent/determinativ';
 import {TransliterationLine} from '../model/transliterationLine';
 import {isAoSign} from '../model/wordContent/sign';

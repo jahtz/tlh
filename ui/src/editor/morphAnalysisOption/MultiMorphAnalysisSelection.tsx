@@ -1,4 +1,3 @@
-import React from 'react';
 import {MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {getSelectedEnclitics} from '../SelectedAnalysisResult';
 

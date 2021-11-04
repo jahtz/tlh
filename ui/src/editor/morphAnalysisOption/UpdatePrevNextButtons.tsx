@@ -1,4 +1,3 @@
-import React from 'react';
 import {IoArrowBack, IoArrowForward} from 'react-icons/io5';
 import {useTranslation} from 'react-i18next';
 import classNames from 'classnames';
