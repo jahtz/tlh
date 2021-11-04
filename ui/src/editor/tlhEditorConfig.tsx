@@ -39,8 +39,7 @@ export const tlhEditorConfig: XmlEditorConfig = {
         </>
       );
     },
-    edit: (props: XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>) => <LineBreakEditor
-      key={props.path.join('.')} {...props} />,
+    edit: (props: XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>) => <LineBreakEditor key={props.path.join('.')} {...props} />,
     insertablePositions: {
       beforeElement: ['lb'],
       asLastChildOf: ['div1']
@@ -70,7 +69,7 @@ export const tlhEditorConfig: XmlEditorConfig = {
         'has-text-weight-bold': isForeignLanguage,
         'has-text-danger': node.children.length === 0
       });
-     
+
       return <>
         <span className={classes}>
           {node.children.length === 0 ? <IoCloseSharp/> : renderedChildren}

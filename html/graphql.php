@@ -9,6 +9,7 @@ require_once 'graphql/MyGraphQLExceptions.inc';
 require_once 'graphql/LoggedInUser.inc';
 
 require_once 'model/ManuscriptMetaData.inc';
+require_once 'model/ManuscriptLanguages.inc';
 require_once 'model/User.inc';
 
 use GraphQL\Error\{DebugFlag, FormattedError};
@@ -16,10 +17,11 @@ use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
 use tlh_dig\graphql\{LoggedInUser, MySafeGraphQLException};
-use tlh_dig\model\{ManuscriptMetaData, Transliteration, User};
+use tlh_dig\model\{ManuscriptLanguage, ManuscriptMetaData, Transliteration, User};
 use function tlh_dig\graphql\register;
 use function tlh_dig\graphql\resolveUser;
 use function tlh_dig\graphql\verifyUser;
+use function tlh_dig\model\allManuscriptLanguages;
 
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
 $jwtSecret = '1234%ASDf_0aosd';
@@ -29,6 +31,10 @@ $jwtValidityTime = 24 * 60 * 60; // 24 h
 $queryType = new ObjectType([
   'name' => 'Query',
   'fields' => [
+    'manuscriptLanguages' => [
+      'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptLanguage::$graphQLType))),
+      'resolve' => fn() => allManuscriptLanguages()
+    ],
     'manuscriptCount' => [
       'type' => Type::nonNull(Type::int()),
       'resolve' => fn() => allManuscriptsCount()

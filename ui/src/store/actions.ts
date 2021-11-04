@@ -1,5 +1,5 @@
 import {Action} from 'redux';
-import {LoggedInUserFragment} from '../graphql';
+import {LoggedInUserFragment, ManuscriptLanguageFragment} from '../graphql';
 import {EditorKeyConfig} from '../editor/editorKeyConfig';
 
 // User logged in
@@ -34,10 +34,23 @@ export function updatePreferencesAction(newPreferences: EditorKeyConfig): Update
   return {type: UPDATE_PREFERENCES, newPreferences};
 }
 
+// New languages
+
+export const NEW_LANGUAGES = 'NEW_LANGUAGES';
+
+interface NewLanguagesAction extends Action<typeof NEW_LANGUAGES> {
+  languages: ManuscriptLanguageFragment[];
+}
+
+export function newLanguagesAction(languages: ManuscriptLanguageFragment[]): NewLanguagesAction {
+  return {type: NEW_LANGUAGES, languages};
+}
+
+
 // all actions
 
 const reduxActionType = '@@redux';
 
 type InitAction = Action<typeof reduxActionType>;
 
-export type StoreAction = UserLoggedInAction | UserLoggedOutAction | UpdatePreferencesAction | InitAction;
+export type StoreAction = UserLoggedInAction | UserLoggedOutAction | UpdatePreferencesAction | NewLanguagesAction | InitAction;

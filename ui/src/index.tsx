@@ -13,6 +13,8 @@ import {I18nextProvider, initReactI18next} from 'react-i18next';
 
 import common_de from './locales/de/common.json';
 import common_en from './locales/en/common.json';
+import {AllManuscriptLanguagesDocument, AllManuscriptLanguagesQuery} from './graphql';
+import {newLanguagesAction} from './store/actions';
 
 
 // noinspection JSIgnoredPromiseFromCall
@@ -63,6 +65,9 @@ const apolloClient = new ApolloClient({
     mutate: {fetchPolicy: 'no-cache'}
   }
 });
+
+apolloClient.query<AllManuscriptLanguagesQuery>({query: AllManuscriptLanguagesDocument})
+  .then(({data}) => store.dispatch(newLanguagesAction(data.manuscriptLanguages)));
 
 render(
   <StrictMode>

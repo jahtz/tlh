@@ -27,7 +27,7 @@ export function EditorLeftSide({
 
   return (
     <>
-      <div className="box">{filename}</div>
+      <div className="box has-text-centered">{filename}<sup>&nbsp;</sup><sub>&nbsp;</sub></div>
 
       <div className={classNames('box', 'scrollable', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
         <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} editorConfig={editorConfig} onSelect={onNodeSelect} insertStuff={insertStuff}/>

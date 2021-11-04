@@ -4,6 +4,19 @@ fragment ManuscriptIdentifier on ManuscriptIdentifier {
   identifier
 }
 
+# /xmlEditor
+
+fragment ManuscriptLanguage on ManuscriptLanguage {
+  name
+  abbreviation
+}
+
+query AllManuscriptLanguages {
+  manuscriptLanguages {
+    ...ManuscriptLanguage
+  }
+}
+
 # /register
 mutation Register($userInput: UserInput!) {
   register(userInput: $userInput)

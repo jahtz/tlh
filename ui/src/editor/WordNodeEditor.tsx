@@ -8,7 +8,7 @@ import {NodeDisplay} from './NodeDisplay';
 import {tlhEditorConfig, WordNodeAttributes} from './tlhEditorConfig';
 import {getSelectedLetters, LetteredAnalysisOption} from '../model/analysisOptions';
 import {useSelector} from 'react-redux';
-import {editorKeyConfigSelector} from '../store/store';
+import {allManuscriptLanguagesSelector, editorKeyConfigSelector} from '../store/store';
 import {GenericAttributes, XmlElementNode} from './xmlModel/xmlModel';
 import {MorphAnalysisEditor} from './morphAnalysisOption/MorphAnalysisEditor';
 import {reconstructTransliteration} from './transliterationReconstruction';
@@ -44,6 +44,7 @@ export function WordNodeEditor(
 
   const {t} = useTranslation('common');
   const editorConfig = useSelector(editorKeyConfigSelector);
+  const allManuscriptLanguages = useSelector(allManuscriptLanguagesSelector);
   const [editContent, setEditContent] = useState<string>();
 
   const initialSelectedMorphologies = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
@@ -149,7 +150,7 @@ export function WordNodeEditor(
   }
 
   function updateMorphology(newMa: MorphologicalAnalysis): void {
-    // FIXME: check if always working, use update synctax!!
+    // FIXME: check if always working, use update syntax!!
     setState(({morphologies}) => {
       morphologies[newMa.number - 1] = newMa;
 
@@ -172,13 +173,31 @@ export function WordNodeEditor(
     return <WordContentEditor initialTransliteration={editContent} cancelEdit={() => setEditContent(undefined)} updateNode={handleEditUpdate}/>;
   }
 
+  function updateLanguage(lg: string): void {
+    console.error(lg);
+  }
+
   return (
     <>
       <div className="box has-text-centered">
         <NodeDisplay node={node} editorConfig={tlhEditorConfig}/>
+        <sup>&nbsp;</sup><sub>&nbsp;</sub>
       </div>
 
       <div className="box scrollable">
+
+        {/* TODO: edit language... */}
+        <div className="field">
+          <div className="control">
+            <input defaultValue={node.attributes.lg} className="input" placeholder={t('language')} list="languages"
+                   onBlur={(event) => updateLanguage(event.target.value)}/>
+          </div>
+
+          <datalist id="languages">
+            {allManuscriptLanguages.map(({abbreviation}) => <option key={abbreviation}>{abbreviation}</option>)}
+          </datalist>
+        </div>
+
         {state.morphologies.length === 0
           ? <div className="notification is-warning has-text-centered">{t('noMorphologicalAnalysesFound')}</div>
           : state.morphologies.map((m) => <MorphAnalysisOption

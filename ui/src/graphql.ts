@@ -55,6 +55,12 @@ export enum ManuscriptIdentifierType {
   PublicationShortReference = 'PublicationShortReference'
 }
 
+export type ManuscriptLanguage = {
+  __typename?: 'ManuscriptLanguage';
+  abbreviation: Scalars['String'];
+  name: Scalars['String'];
+};
+
 export type ManuscriptMetaData = {
   __typename?: 'ManuscriptMetaData';
   bibliography?: Maybe<Scalars['String']>;
@@ -149,6 +155,7 @@ export type Query = {
   allManuscripts: Array<ManuscriptMetaData>;
   manuscript?: Maybe<ManuscriptMetaData>;
   manuscriptCount: Scalars['Int'];
+  manuscriptLanguages: Array<ManuscriptLanguage>;
 };
 
 
@@ -189,14 +196,21 @@ export type UserInput = {
 
 export type ManuscriptIdentifierFragment = { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string };
 
+export type ManuscriptLanguageFragment = { __typename?: 'ManuscriptLanguage', name: string, abbreviation: string };
+
+export type AllManuscriptLanguagesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AllManuscriptLanguagesQuery = { __typename?: 'Query', manuscriptLanguages: Array<{ __typename?: 'ManuscriptLanguage', name: string, abbreviation: string }> };
+
 export type RegisterMutationVariables = Exact<{
   userInput: UserInput;
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register?: Maybe<string> };
+export type RegisterMutation = { __typename?: 'Mutation', register?: string | null | undefined };
 
-export type LoggedInUserFragment = { __typename?: 'LoggedInUser', username: string, name: string, jwt: string, affiliation?: Maybe<string> };
+export type LoggedInUserFragment = { __typename?: 'LoggedInUser', username: string, name: string, jwt: string, affiliation?: string | null | undefined };
 
 export type LoginMutationVariables = Exact<{
   username: Scalars['String'];
@@ -204,9 +218,9 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login?: Maybe<{ __typename?: 'LoggedInUser', username: string, name: string, jwt: string, affiliation?: Maybe<string> }> };
+export type LoginMutation = { __typename?: 'Mutation', login?: { __typename?: 'LoggedInUser', username: string, name: string, jwt: string, affiliation?: string | null | undefined } | null | undefined };
 
-export type ManuscriptBasicDataFragment = { __typename?: 'ManuscriptMetaData', status?: Maybe<ManuscriptStatus>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
+export type ManuscriptBasicDataFragment = { __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null | undefined, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
 export type IndexQueryVariables = Exact<{
   paginationSize?: Scalars['Int'];
@@ -214,23 +228,23 @@ export type IndexQueryVariables = Exact<{
 }>;
 
 
-export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', status?: Maybe<ManuscriptStatus>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }> };
+export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null | undefined, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }> };
 
 export type CreateManuscriptMutationVariables = Exact<{
   manuscriptMetaData?: Maybe<ManuscriptMetaDataInput>;
 }>;
 
 
-export type CreateManuscriptMutation = { __typename?: 'Mutation', me?: Maybe<{ __typename?: 'LoggedInUserMutations', createManuscript?: Maybe<string> }> };
+export type CreateManuscriptMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', createManuscript?: string | null | undefined } | null | undefined };
 
-export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', bibliography?: Maybe<string>, cthClassification?: Maybe<number>, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: Maybe<string>, creatorUsername: string, pictureUrls: Array<string>, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }>, transliterations?: Maybe<Array<{ __typename?: 'Transliteration', side: ManuscriptSide, version: number, input: string, resultXml: string, resultJson: string }>> };
+export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', bibliography?: string | null | undefined, cthClassification?: number | null | undefined, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null | undefined, creatorUsername: string, pictureUrls: Array<string>, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }>, transliterations?: Array<{ __typename?: 'Transliteration', side: ManuscriptSide, version: number, input: string, resultXml: string, resultJson: string }> | null | undefined };
 
 export type ManuscriptQueryVariables = Exact<{
   mainIdentifier: Scalars['String'];
 }>;
 
 
-export type ManuscriptQuery = { __typename?: 'Query', manuscript?: Maybe<{ __typename?: 'ManuscriptMetaData', bibliography?: Maybe<string>, cthClassification?: Maybe<number>, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: Maybe<string>, creatorUsername: string, pictureUrls: Array<string>, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }>, transliterations?: Maybe<Array<{ __typename?: 'Transliteration', side: ManuscriptSide, version: number, input: string, resultXml: string, resultJson: string }>> }> };
+export type ManuscriptQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', bibliography?: string | null | undefined, cthClassification?: number | null | undefined, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null | undefined, creatorUsername: string, pictureUrls: Array<string>, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }>, transliterations?: Array<{ __typename?: 'Transliteration', side: ManuscriptSide, version: number, input: string, resultXml: string, resultJson: string }> | null | undefined } | null | undefined };
 
 export type ManuscriptIdentWithCreatorFragment = { __typename?: 'ManuscriptMetaData', pictureUrls: Array<string>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
@@ -239,14 +253,14 @@ export type UploadPicturesQueryVariables = Exact<{
 }>;
 
 
-export type UploadPicturesQuery = { __typename?: 'Query', manuscript?: Maybe<{ __typename?: 'ManuscriptMetaData', pictureUrls: Array<string>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }> };
+export type UploadPicturesQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', pictureUrls: Array<string>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } } | null | undefined };
 
 export type TransliterationInputQueryVariables = Exact<{
   mainIdentifier: Scalars['String'];
 }>;
 
 
-export type TransliterationInputQuery = { __typename?: 'Query', manuscript?: Maybe<{ __typename?: 'ManuscriptMetaData', mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }> };
+export type TransliterationInputQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } } | null | undefined };
 
 export type UploadTransliterationMutationVariables = Exact<{
   mainIdentifier: Scalars['String'];
@@ -254,8 +268,14 @@ export type UploadTransliterationMutationVariables = Exact<{
 }>;
 
 
-export type UploadTransliterationMutation = { __typename?: 'Mutation', me?: Maybe<{ __typename?: 'LoggedInUserMutations', manuscript?: Maybe<{ __typename?: 'ManuscriptMutations', updateTransliteration: boolean }> }> };
+export type UploadTransliterationMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', manuscript?: { __typename?: 'ManuscriptMutations', updateTransliteration: boolean } | null | undefined } | null | undefined };
 
+export const ManuscriptLanguageFragmentDoc = gql`
+    fragment ManuscriptLanguage on ManuscriptLanguage {
+  name
+  abbreviation
+}
+    `;
 export const LoggedInUserFragmentDoc = gql`
     fragment LoggedInUser on LoggedInUser {
   username
@@ -312,6 +332,40 @@ export const ManuscriptIdentWithCreatorFragmentDoc = gql`
   creatorUsername
 }
     ${ManuscriptIdentifierFragmentDoc}`;
+export const AllManuscriptLanguagesDocument = gql`
+    query AllManuscriptLanguages {
+  manuscriptLanguages {
+    ...ManuscriptLanguage
+  }
+}
+    ${ManuscriptLanguageFragmentDoc}`;
+
+/**
+ * __useAllManuscriptLanguagesQuery__
+ *
+ * To run a query within a React component, call `useAllManuscriptLanguagesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllManuscriptLanguagesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAllManuscriptLanguagesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAllManuscriptLanguagesQuery(baseOptions?: Apollo.QueryHookOptions<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>(AllManuscriptLanguagesDocument, options);
+      }
+export function useAllManuscriptLanguagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>(AllManuscriptLanguagesDocument, options);
+        }
+export type AllManuscriptLanguagesQueryHookResult = ReturnType<typeof useAllManuscriptLanguagesQuery>;
+export type AllManuscriptLanguagesLazyQueryHookResult = ReturnType<typeof useAllManuscriptLanguagesLazyQuery>;
+export type AllManuscriptLanguagesQueryResult = Apollo.QueryResult<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>;
 export const RegisterDocument = gql`
     mutation Register($userInput: UserInput!) {
   register(userInput: $userInput)

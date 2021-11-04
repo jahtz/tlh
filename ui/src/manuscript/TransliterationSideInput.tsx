@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import {ManuscriptColumn, ManuscriptColumnModifier, manuscriptColumnModifiers, manuscriptColumns,} from '../model/manuscriptProperties/manuscriptProperties';
-import {allManuscriptLanguages, getNameForManuscriptLanguage, ManuscriptLanguage} from '../model/manuscriptProperties/manuscriptLanugage';
+import {allManuscriptLanguages, ManuscriptLanguage} from '../model/manuscriptProperties/manuscriptLanugage';
 import {useTranslation} from 'react-i18next';
 import {parseTransliterationLine} from '../transliterationParser/parser';
 import {defaultSideBasics, SideBasics, SideParseResult} from '../model/sideParseResult';
@@ -69,7 +69,7 @@ export function TransliterationSideInput({mainIdentifier, onTransliterationUpdat
     .map((side) => ({value: side, label: getNameForManuscriptSide(side, t)}));
 
   const languageOptions: SelectOption<ManuscriptLanguage>[] = allManuscriptLanguages
-    .map((language) => ({value: language, label: getNameForManuscriptLanguage(language/*, t*/)}));
+    .map((language) => ({value: language, label: language.toString()}));
 
   const columnOptions: SelectOption<ManuscriptColumn>[] = manuscriptColumns
     // FIXME: label!
