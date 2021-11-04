@@ -21,6 +21,7 @@ import {IoAddOutline, IoSettingsOutline} from 'react-icons/io5';
 type IProps = XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>;
 
 interface IState {
+  lg: string | undefined;
   morphologies: MorphologicalAnalysis[];
   changed: boolean;
   addMorphology: boolean;
@@ -50,7 +51,7 @@ export function WordNodeEditor(
   const initialSelectedMorphologies = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
 
   const [state, setState] = useState<IState>({
-    morphologies: readMorphologiesFromNode(node, initialSelectedMorphologies), changed: false, addMorphology: false
+    lg: node.attributes.lg, morphologies: readMorphologiesFromNode(node, initialSelectedMorphologies), changed: false, addMorphology: false
   });
 
   const handleKey = (event: KeyboardEvent) => editorConfig.submitChangeKeys.includes(event.key) && handleUpdate();
@@ -63,6 +64,8 @@ export function WordNodeEditor(
   function handleUpdate(): void {
     if (keyHandlingEnabled) {
       const newNode = {...node};
+
+      newNode.attributes.lg = state.lg;
 
       const selectedAnalysisOptions: SelectedAnalysisOption[] = state.morphologies.flatMap((ma) => {
 
@@ -150,17 +153,17 @@ export function WordNodeEditor(
   }
 
   function updateMorphology(newMa: MorphologicalAnalysis): void {
-    // FIXME: check if always working, use update syntax!!
-    setState(({morphologies}) => {
-      morphologies[newMa.number - 1] = newMa;
 
-      return {morphologies, changed: true, addMorphology: false};
-    });
+    setState((state) => update(state, {
+      // FIXME: check if always working -> index can be wrong!
+      morphologies: {[newMa.number - 1]: {$set: newMa}},
+      changed: {$set: true},
+      addMorphology: {$set: false}
+    }));
   }
 
   function toggleAddMorphology(): void {
     setState((state) => update(state, {$toggle: ['addMorphology']}));
-    // setState(({addMorphology, ...rest}) => ({...rest, addMorphology: !addMorphology}));
   }
 
   function nextMorphAnalysis(): MorphologicalAnalysis {
@@ -173,8 +176,9 @@ export function WordNodeEditor(
     return <WordContentEditor initialTransliteration={editContent} cancelEdit={() => setEditContent(undefined)} updateNode={handleEditUpdate}/>;
   }
 
-  function updateLanguage(lg: string): void {
-    console.error(lg);
+  function updateLanguage(value: string): void {
+    const lg = value.trim();
+    setState((state) => update(state, {lg: {$set: lg.length === 0 ? undefined : lg}, changed: {$set: true}}));
   }
 
   return (

@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import {IoCloseSharp} from 'react-icons/io5';
 
 export interface WordNodeAttributes {
-  lg?: 'Sum' | 'Akk' | 'Hit' | 'Hur' | 'Luw' | 'Hat';
+  lg?: string;
   mrp0sel?: string;
 }
 
