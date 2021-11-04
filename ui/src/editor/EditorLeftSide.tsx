@@ -1,5 +1,4 @@
 import {useState} from 'react';
-import {BulmaCard} from '../bulmaHelpers/BulmaCard';
 import classNames from 'classnames';
 import {NodeDisplay, NodeDisplayIProps} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
@@ -28,13 +27,13 @@ export function EditorLeftSide({
 
   return (
     <>
-      <BulmaCard title={filename}>
-        <div className={classNames('scrollable', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
-          <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} editorConfig={editorConfig} onSelect={onNodeSelect} insertStuff={insertStuff}/>
-        </div>
-      </BulmaCard>
+      <div className="box">{filename}</div>
 
-      <div className="columns my-3">
+      <div className={classNames('box', 'scrollable', useSerifFont ? 'font-hpm-serif' : 'font-hpm')}>
+        <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} editorConfig={editorConfig} onSelect={onNodeSelect} insertStuff={insertStuff}/>
+      </div>
+
+      <div className="columns mt-2">
         <div className="column">
           <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="button is-fullwidth">
             {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}

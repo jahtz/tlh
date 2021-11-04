@@ -70,9 +70,7 @@ export const tlhEditorConfig: XmlEditorConfig = {
         'has-text-weight-bold': isForeignLanguage,
         'has-text-danger': node.children.length === 0
       });
-
-      console.info(JSON.stringify(node.children, null, 2));
-
+     
       return <>
         <span className={classes}>
           {node.children.length === 0 ? <IoCloseSharp/> : renderedChildren}

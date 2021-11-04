@@ -1,7 +1,7 @@
 import {XmlEditableNodeIProps} from './xmlDisplayConfigs';
 import {readSelectedMorphology, SelectedAnalysisOption, writeSelectedMorphologies} from './selectedAnalysisOption';
 import {useTranslation} from 'react-i18next';
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue} from '../model/morphologicalAnalysis';
 import {MorphAnalysisOption, Numerus} from './morphAnalysisOption/MorphologicalAnalysisOption';
 import {NodeDisplay} from './NodeDisplay';
@@ -178,7 +178,7 @@ export function WordNodeEditor(
         <NodeDisplay node={node} editorConfig={tlhEditorConfig}/>
       </div>
 
-      <div className="scrollable">
+      <div className="box scrollable">
         {state.morphologies.length === 0
           ? <div className="notification is-warning has-text-centered">{t('noMorphologicalAnalysesFound')}</div>
           : state.morphologies.map((m) => <MorphAnalysisOption
@@ -196,17 +196,16 @@ export function WordNodeEditor(
         {state.addMorphology && <MorphAnalysisEditor ma={nextMorphAnalysis()} update={updateMorphology} toggleUpdate={toggleAddMorphology}/>}
       </div>
 
-      <div className="field has-addons mt-2">
-        <div className="control is-expanded">
+      <div className="columns mt-2">
+        <div className="column">
           <button type="button" className="button is-fullwidth" onClick={toggleAddMorphology}><IoAddOutline/>&nbsp;{t('addMorphology')}</button>
         </div>
-        <div className="control is-expanded">
+        <div className="column">
+          <button onClick={deleteNode} className="button is-danger is-fullwidth">{t('deleteNode')}</button>
+        </div>
+        <div className="column">
           <button type="button" className="button is-fullwidth" onClick={editWord}><IoSettingsOutline/>&nbsp;{t('editContent')}</button>
         </div>
-      </div>
-
-      <div className="my-1">
-        <button onClick={deleteNode} className="button is-danger is-fullwidth">{t('deleteNode')}</button>
       </div>
 
       <UpdatePrevNextButtons changed={state.changed} initiateUpdate={handleUpdate} initiateJumpElement={(forward) => jumpEditableNodes(node.tagName, forward)}/>

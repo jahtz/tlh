@@ -14,18 +14,18 @@ export function UpdatePrevNextButtons({changed, initiateUpdate, initiateJumpElem
 
   return (
     <>
-      <div className="mb-1">
-        <button type="button" className={classNames('button', 'is-fullwidth', {'is-link': changed})} onClick={initiateUpdate} tabIndex={-1}>
-          {t('update')}
-        </button>
-      </div>
-
       <div className="field has-addons">
         <div className="control is-expanded">
           <button type="button" className="button is-fullwidth" onClick={() => initiateJumpElement(false)} tabIndex={-1}>
             <IoArrowBack/>
           </button>
         </div>
+        <div className="control is-expanded">
+          <button type="button" className={classNames('button', 'is-fullwidth', {'is-link': changed})} onClick={initiateUpdate} tabIndex={-1}>
+            {t('update')}
+          </button>
+        </div>
+
         <div className="control is-expanded">
           <button type="button" className="button is-fullwidth" onClick={() => initiateJumpElement(true)} tabIndex={-1}>
             <IoArrowForward/>

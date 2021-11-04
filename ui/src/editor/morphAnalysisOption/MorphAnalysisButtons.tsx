@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {IoChevronDown, IoChevronForward, IoSettingsOutline} from 'react-icons/io5';
 import {MultiMorphAnalysisSelection} from './MultiMorphAnalysisSelection';
