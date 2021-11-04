@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {isXmlElementNode, XmlElementNode, XmlNode} from './xmlModel/xmlModel';
+import {findFirstXmlElementByTagName, isXmlElementNode, XmlElementNode, XmlNode} from './xmlModel/xmlModel';
 import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './xmlDisplayConfigs';
 import {tlhEditorConfig} from './tlhEditorConfig';
 import {useTranslation} from 'react-i18next';
@@ -37,6 +37,8 @@ interface IState {
   rootNode: XmlNode;
   editorState?: EditorState;
   changed: boolean;
+  keyHandlingEnabled: boolean;
+  author?: string;
 }
 
 function searchEditableNode(tagName: string, rootNode: XmlElementNode, currentPath: number[], forward: boolean): number[] | undefined {
@@ -72,12 +74,31 @@ function findElement(node: XmlElementNode, path: number[]): XmlElementNode {
   return path.reduce<XmlElementNode>((nodeToUpdate, pathContent) => nodeToUpdate.children[pathContent] as XmlElementNode, node);
 }
 
+function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode {
+
+  // FIXME: find element `annotation`
+  const annotationNode = findFirstXmlElementByTagName(rootNode, 'annotation');
+
+  if (!annotationNode) {
+    throw new Error('No annotation node found!');
+  }
+
+  annotationNode.children.push({
+    tagName: 'annot',
+    attributes: {
+      editor, data: (new Date).toISOString()
+    },
+    children: []
+  });
+
+  return rootNode;
+}
+
 export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorConfig, download, filename, closeFile}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);
-  const [state, setState] = useState<IState>({rootNode: initialNode, changed: false});
-  const [keyHandlingEnabled, setKeyHandlingEnabled] = useState(true);
+  const [state, setState] = useState<IState>({rootNode: initialNode, changed: false, keyHandlingEnabled: true});
 
 
   useEffect(() => {
@@ -85,9 +106,30 @@ export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorCo
     return () => document.removeEventListener('keydown', handleJumpKey);
   });
 
+  function setKeyHandlingEnabled(value: boolean): void {
+    setState((state) => update(state, {keyHandlingEnabled: {$set: value}}));
+  }
+
   function exportXml(): void {
+    // FIXME: add annot node...
+
+    let author: string | null | undefined = state.author;
+
+    if (!author) {
+      author = prompt(t('authorAbbreviation?'));
+
+      if (!author) {
+        return;
+      }
+
+      setState((state) => update(state, {author: {$set: author as string}}));
+    }
+
+    const toExport = addAuthorNode(state.rootNode as XmlElementNode, author);
+
+
     download(
-      writeNode(state.rootNode)
+      writeNode(toExport)
         .join('\n')
         .replaceAll('®', '\n\t')
         .replaceAll('{', '\n\t\t{')
@@ -128,15 +170,13 @@ export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorCo
       if (path) {
         const node = findElement(state.rootNode as XmlElementNode, path);
 
-        setState(({rootNode, changed}) => {
-          return {rootNode, editorState: {node, path}, changed};
-        });
+        setState((state) => update(state, {editorState: {$set: {node, path}}}));
       }
     }
   }
 
   function handleJumpKey(event: KeyboardEvent): void {
-    if (state.editorState && 'path' in state.editorState && keyHandlingEnabled) {
+    if (state.editorState && 'path' in state.editorState && state.keyHandlingEnabled) {
       if (editorKeyConfig.nextEditableNodeKeys.includes(event.key)) {
         jumpEditableNodes(state.editorState.node.tagName, true);
       } else if (editorKeyConfig.previousEditableNodeKeys.includes(event.key)) {
@@ -163,7 +203,7 @@ export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorCo
       updateNode: (node) => updateNode(node, editState.path),
       deleteNode: () => deleteNode(editState.path),
       initiateJumpElement: (forward) => jumpEditableNodes(editState.node.tagName, forward),
-      jumpEditableNodes, keyHandlingEnabled, setKeyHandlingEnabled,
+      jumpEditableNodes, keyHandlingEnabled: state.keyHandlingEnabled, setKeyHandlingEnabled,
     });
   }
 

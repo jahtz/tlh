@@ -22,3 +22,22 @@ export function isXmlTextNode(node: XmlNode): node is XmlTextNode {
 
 export type XmlNode = XmlElementNode | XmlTextNode;
 
+// Helper functions
+
+export function findFirstXmlElementByTagName(node: XmlNode, tagName: string): XmlElementNode | undefined {
+  if (isXmlTextNode(node)) {
+    return undefined;
+  }
+
+  if (node.tagName === tagName) {
+    return node;
+  }
+
+  for (const c of node.children) {
+    const found = findFirstXmlElementByTagName(c, tagName);
+
+    if (found) {
+      return found;
+    }
+  }
+}
