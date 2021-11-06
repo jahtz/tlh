@@ -68,7 +68,7 @@ const apolloClient = new ApolloClient({
 
 apolloClient.query<AllManuscriptLanguagesQuery>({query: AllManuscriptLanguagesDocument})
   .then(({data}) => store.dispatch(newLanguagesAction(data.manuscriptLanguages)))
-  .catch((error) => console.error(error));
+  .catch(() => void 0);
 
 render(
   <StrictMode>

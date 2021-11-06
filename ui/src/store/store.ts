@@ -5,6 +5,7 @@ import {defaultEditorKeyConfig, EditorKeyConfig} from '../editor/editorKeyConfig
 
 const localStorageUserKey = 'userId';
 const localStoragePreferencesKey = 'preferences';
+const localStorageLanguagesKey = 'languages';
 
 interface StoreState {
   currentUser?: LoggedInUserFragment;
@@ -23,6 +24,7 @@ function rootReducer(store: StoreState = {languages: []}, action: StoreAction): 
     case UPDATE_PREFERENCES:
       return {...store, editorKeyConfig: action.newPreferences};
     case NEW_LANGUAGES:
+      localStorage.setItem(localStorageLanguagesKey, JSON.stringify(action.languages));
       return {...store, languages: action.languages};
     default:
       return store;
@@ -46,11 +48,14 @@ export function allManuscriptLanguagesSelector(store: StoreState): ManuscriptLan
 function initialState(): StoreState {
   const localStorageUser = localStorage.getItem(localStorageUserKey);
   const localStoragePreferences = localStorage.getItem(localStoragePreferencesKey);
+  const localStorageLanguages = localStorage.getItem(localStorageLanguagesKey);
+
+  // FIXME: also load languages from localStorage..
 
   return {
     currentUser: localStorageUser ? JSON.parse(localStorageUser) : undefined,
     editorKeyConfig: localStoragePreferences ? JSON.parse(localStoragePreferences) : undefined,
-    languages: []
+    languages: localStorageLanguages ? JSON.parse(localStorageLanguages) : []
   };
 }
 

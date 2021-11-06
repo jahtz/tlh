@@ -153,7 +153,6 @@ export function WordNodeEditor(
   }
 
   function updateMorphology(newMa: MorphologicalAnalysis): void {
-
     setState((state) => update(state, {
       // FIXME: check if always working -> index can be wrong!
       morphologies: {[newMa.number - 1]: {$set: newMa}},
