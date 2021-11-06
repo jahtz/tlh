@@ -1,6 +1,6 @@
-import { Dispatch } from 'react';
+import {Dispatch} from 'react';
 import {Link, Route, Switch, useHistory} from 'react-router-dom';
-import {createManuscriptUrl, editDocumentUrl, homeUrl, loginUrl, preferencesUrl, registerUrl, xmlComparatorUrl} from './urls';
+import {createManuscriptUrl, documentMergerUrl, editDocumentUrl, homeUrl, loginUrl, preferencesUrl, registerUrl, xmlComparatorUrl} from './urls';
 import {Home} from './Home';
 import {RegisterForm} from './forms/RegisterForm';
 import {LoginForm} from './forms/LoginForm';
@@ -16,6 +16,7 @@ import {ManuscriptBase} from './manuscript/ManuscriptBase';
 import {XmlComparator} from './xmlComparator/XmlComparator';
 import {Preferences} from './Preferences';
 import {IoSettingsOutline} from 'react-icons/io5';
+import {DocumentMergerContainer} from './documentMerger/DocumentMergerContainer';
 
 // TODO: solve languages different?
 const languages: string[] = ['de', 'en'];
@@ -76,6 +77,7 @@ export function App(): JSX.Element {
         <Route path={createManuscriptUrl} component={CreateManuscriptForm}/>
         <Route path={'/manuscripts/:mainIdentifier'} component={ManuscriptBase}/>
         <Route path={editDocumentUrl} component={DocumentEditorContainer}/>
+        <Route path={documentMergerUrl} component={DocumentMergerContainer}/>
         <Route path={xmlComparatorUrl} component={XmlComparator}/>
         <Route path={preferencesUrl} component={Preferences}/>
         <Route component={NotFound}/>

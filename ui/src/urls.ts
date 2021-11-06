@@ -18,6 +18,8 @@ export const editDocumentUrl = '/editDocument';
 
 export const xmlComparatorUrl = '/xmlComparator';
 
+export const documentMergerUrl = '/documentMerger';
+
 
 // Foreign urls
 

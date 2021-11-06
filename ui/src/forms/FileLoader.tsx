@@ -5,9 +5,10 @@ import classNames from 'classnames';
 interface IProps {
   accept?: string;
   onLoad: (f: File) => Promise<void>;
+  text?: string;
 }
 
-export function FileLoader({accept, onLoad}: IProps): JSX.Element {
+export function FileLoader({accept, onLoad, text}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const fileInput = useRef<HTMLInputElement | null>(null);
@@ -26,7 +27,7 @@ export function FileLoader({accept, onLoad}: IProps): JSX.Element {
     <>
       <button type="button" className={classNames('button', 'is-fullwidth', {'is-loading': loading})}
               onClick={() => fileInput.current && fileInput.current.click()} disabled={loading}>
-        {t('chooseFile')}
+        {text || t('chooseFile')}
       </button>
 
       <input type="file" onChange={handleFile} accept={accept} ref={fileInput} hidden/>

@@ -14,14 +14,14 @@ function handleSaveToPC(data: string, filename: string): void {
   link.click();
 }
 
-interface IState {
-  rootNode: XmlNode;
+export interface LoadedDocument {
   filename: string;
+  rootNode: XmlNode;
 }
 
 export function DocumentEditorContainer(): JSX.Element {
 
-  const [state, setState] = useState<IState | undefined>();
+  const [state, setState] = useState<LoadedDocument | undefined>();
 
   async function readFile(file: File): Promise<void> {
     setState({rootNode: await loadNewXml(file), filename: file.name});
