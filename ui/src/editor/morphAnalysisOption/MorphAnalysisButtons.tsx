@@ -57,7 +57,8 @@ export function MorphAnalysisOptionButtons({
           <div className="control is-expanded">
             <button className="button is-static is-fullwidth">
               &nbsp;
-              {number}) {translation} ({referenceWord}, {t('paradigmClass')}:&nbsp;<span className="has-text-danger">{paradigmClass}</span>
+              {number})&nbsp;<span className="has-text-danger">{translation}</span>&nbsp;({referenceWord},
+              {t('paradigmClass')}:&nbsp;<span className="has-text-danger">{paradigmClass}</span>
               {determinativ && <span>, {t('determinativ')}:&nbsp;<span className="has-text-danger">{determinativ}</span></span>})&nbsp;
             </button>
           </div>
