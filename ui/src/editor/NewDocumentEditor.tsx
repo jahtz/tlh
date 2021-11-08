@@ -118,6 +118,7 @@ export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorCo
       author = prompt(t('authorAbbreviation?'));
 
       if (!author) {
+        alert(t('noExportWithoutAuthor'));
         return;
       }
 

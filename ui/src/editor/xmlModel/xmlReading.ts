@@ -4,7 +4,6 @@ type LetterCorrection = {
   [key: string]: string;
 }
 
-
 interface NodeReadConfig {
   letterCorrections: LetterCorrection;
   keepSpaces?: boolean;
@@ -79,4 +78,15 @@ export function loadNode(el: ChildNode, xmlReadConfig: XmlReadConfig, parentLett
   } else {
     throw new Error(`unexpected element: ${el.nodeType}`);
   }
+}
+
+export async function loadNewXml(file: File, xmlReadConfig: XmlReadConfig = tlhXmlReadConfig): Promise<XmlNode> {
+  const content = await file.text();
+
+  // non breakable space to normal space
+  const correctedText = content.replaceAll('\xa0', '');
+
+  const doc = new DOMParser().parseFromString(correctedText, 'text/xml');
+
+  return loadNode(doc.children[0], xmlReadConfig);
 }

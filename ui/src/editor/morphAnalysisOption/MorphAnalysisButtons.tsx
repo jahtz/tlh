@@ -6,7 +6,6 @@ import {SingleMorphAnalysisOptionButton} from './SingleMorphAnalysisOptionButton
 import {MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {UpdatePrevNextButtons, UpdatePrevNextButtonsProps} from './UpdatePrevNextButtons';
 import {Numerus} from './MorphologicalAnalysisOption';
-import {analysisIsInNumerus} from '../WordNodeEditor';
 import {LetteredAnalysisOptionButtons} from './LetteredAnalysisOptionButtons';
 
 
@@ -17,6 +16,12 @@ interface IProps extends UpdatePrevNextButtonsProps {
   toggleEncliticsSelection: (letter: string) => void;
   toggleEdit: () => void;
 }
+
+
+export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean {
+  return analysis.includes(numerus) || analysis.includes('ABL') || analysis.includes('INS') || analysis.includes('ALL');
+}
+
 
 const buttonClasses = 'button is-outlined is-primary is-fullwidth';
 
@@ -30,13 +35,11 @@ export function MorphAnalysisOptionButtons({
   toggleEdit
 }: IProps): JSX.Element {
 
-  const {number, translation, referenceWord, paradigmClass, encliticsAnalysis, determinativ} = morphologicalAnalysis;
-
   const {t} = useTranslation('common');
-
-  const isSingleAnalysisOption = 'analysis' in morphologicalAnalysis;
-
   const [isReduced, setIsReduced] = useState(false);
+
+  const {number, translation, referenceWord, paradigmClass, encliticsAnalysis, determinativ} = morphologicalAnalysis;
+  const isSingleAnalysisOption = 'analysis' in morphologicalAnalysis;
 
   function selectAll(ma: MultiMorphologicalAnalysis, numerus?: Numerus): void {
     ma.analysisOptions

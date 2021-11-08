@@ -3,7 +3,7 @@ import {readSelectedMorphology, SelectedAnalysisOption, writeSelectedMorphologie
 import {useTranslation} from 'react-i18next';
 import {useEffect, useState} from 'react';
 import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue} from '../model/morphologicalAnalysis';
-import {MorphAnalysisOption, Numerus} from './morphAnalysisOption/MorphologicalAnalysisOption';
+import {MorphAnalysisOption} from './morphAnalysisOption/MorphologicalAnalysisOption';
 import {NodeDisplay} from './NodeDisplay';
 import {tlhEditorConfig, WordNodeAttributes} from './tlhEditorConfig';
 import {getSelectedLetters, LetteredAnalysisOption} from '../model/analysisOptions';
@@ -23,8 +23,9 @@ type IProps = XmlEditableNodeIProps<WordNodeAttributes & GenericAttributes>;
 interface IState {
   lg: string | undefined;
   morphologies: MorphologicalAnalysis[];
-  changed: boolean;
-  addMorphology: boolean;
+  changed?: boolean;
+  addMorphology?: boolean;
+  editContent?: string;
 }
 
 function toggleLetteredAnalysisOptions(aos: LetteredAnalysisOption[], letter: string, value?: boolean): LetteredAnalysisOption[] {
@@ -35,31 +36,41 @@ function toggleLetteredAnalysisOptions(aos: LetteredAnalysisOption[], letter: st
   );
 }
 
-export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean {
-  return analysis.includes(numerus) || analysis.includes('ABL') || analysis.includes('INS');
+function initialStateFromNode(node: XmlElementNode): IState {
+  const initialSelectedMorphologies: SelectedAnalysisOption[] = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
+
+  return {
+    lg: node.attributes.lg,
+    morphologies: readMorphologiesFromNode(node, initialSelectedMorphologies)
+  };
 }
 
-export function WordNodeEditor(
-  {node, updateNode, deleteNode, path, jumpEditableNodes, keyHandlingEnabled, setKeyHandlingEnabled, initiateJumpElement}: IProps
-): JSX.Element {
+export function WordNodeEditor({
+  node,
+  updateNode,
+  deleteNode,
+  path,
+  jumpEditableNodes,
+  keyHandlingEnabled,
+  setKeyHandlingEnabled,
+  initiateJumpElement
+}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorConfig = useSelector(editorKeyConfigSelector);
   const allManuscriptLanguages = useSelector(allManuscriptLanguagesSelector);
-  const [editContent, setEditContent] = useState<string>();
-
-  const initialSelectedMorphologies = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
-
-  const [state, setState] = useState<IState>({
-    lg: node.attributes.lg, morphologies: readMorphologiesFromNode(node, initialSelectedMorphologies), changed: false, addMorphology: false
-  });
-
-  const handleKey = (event: KeyboardEvent) => editorConfig.submitChangeKeys.includes(event.key) && handleUpdate();
+  const [state, setState] = useState<IState>(initialStateFromNode(node));
 
   useEffect(() => {
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
   });
+
+  function handleKey(event: KeyboardEvent) {
+    if (editorConfig.submitChangeKeys.includes(event.key)) {
+      handleUpdate();
+    }
+  }
 
   function handleUpdate(): void {
     if (keyHandlingEnabled) {
@@ -96,11 +107,6 @@ export function WordNodeEditor(
     }
   }
 
-  function handleEditUpdate(node: XmlElementNode<WordNodeAttributes & GenericAttributes>): void {
-    updateNode(node, path);
-    // FIXME: reload morphological analysis!
-    setEditContent(undefined);
-  }
 
   function toggleAnalysisSelection(number: number, letter?: string): void {
     setState((state) => update(state, {
@@ -146,20 +152,42 @@ export function WordNodeEditor(
     }));
   }
 
-  function editWord(): void {
-    const transliteration = node.children.map((c, index) => reconstructTransliteration(c, index === 0)).join('');
-
-    setEditContent(transliteration);
-  }
-
-  function updateMorphology(newMa: MorphologicalAnalysis): void {
+  function enableEditWordState(): void {
     setState((state) => update(state, {
-      // FIXME: check if always working -> index can be wrong!
-      morphologies: {[newMa.number - 1]: {$set: newMa}},
-      changed: {$set: true},
-      addMorphology: {$set: false}
+      editContent: {
+        $set: node.children.map((c, index) => reconstructTransliteration(c, index === 0)).join('')
+      }
     }));
   }
+
+  function handleEditUpdate(node: XmlElementNode<WordNodeAttributes & GenericAttributes>): void {
+    updateNode(node, path);
+    // FIXME: reload morphological analysis!
+    cancelEdit();
+  }
+
+  function cancelEdit(): void {
+    setState((state) => update(state, {editContent: {$set: undefined}}));
+  }
+
+  function updateMorphology(index: number, newMa: MorphologicalAnalysis): void {
+    console.info(index);
+    console.info(JSON.stringify(newMa, null, 2));
+
+    setState((state) => {
+      const newState = update(state, {
+        morphologies: {[index]: {$set: newMa}},
+        changed: {$set: true},
+        addMorphology: {$set: false}
+      });
+
+      console.info(JSON.stringify(newState.morphologies, null, 2));
+
+      return newState;
+    });
+  }
+
+  console.info(JSON.stringify(state.morphologies, null, 2));
 
   function toggleAddMorphology(): void {
     setState((state) => update(state, {$toggle: ['addMorphology']}));
@@ -171,13 +199,14 @@ export function WordNodeEditor(
     return {number, translation: '', referenceWord: '', analysisOptions: [], paradigmClass: ''};
   }
 
-  if (editContent || typeof editContent === 'string') {
-    return <WordContentEditor initialTransliteration={editContent} cancelEdit={() => setEditContent(undefined)} updateNode={handleEditUpdate}/>;
-  }
 
   function updateLanguage(value: string): void {
     const lg = value.trim();
-    setState((state) => update(state, {lg: {$set: lg.length === 0 ? undefined : lg}, changed: {$set: true}}));
+    setState((state) => update(state, {lg: {$set: lg}, changed: {$set: true}}));
+  }
+
+  if (state.editContent || typeof state.editContent === 'string') {
+    return <WordContentEditor initialTransliteration={state.editContent} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>;
   }
 
   return (
@@ -203,19 +232,20 @@ export function WordNodeEditor(
 
         {state.morphologies.length === 0
           ? <div className="notification is-warning has-text-centered">{t('noMorphologicalAnalysesFound')}</div>
-          : state.morphologies.map((m) => <MorphAnalysisOption
+          : state.morphologies.map((m, index) => <MorphAnalysisOption
             key={m.number}
-            changed={state.changed}
+            changed={state.changed || false}
             morphologicalAnalysis={m}
             toggleAnalysisSelection={(letter) => toggleAnalysisSelection(m.number, letter)}
             toggleEncliticsSelection={(letter) => toggleEncliticsSelection(m.number, letter)}
-            updateMorphology={updateMorphology}
+            updateMorphology={(newMa) => updateMorphology(index, newMa)}
             setKeyHandlingEnabled={setKeyHandlingEnabled}
             initiateUpdate={handleUpdate}
             initiateJumpElement={initiateJumpElement}/>
           )}
 
-        {state.addMorphology && <MorphAnalysisEditor ma={nextMorphAnalysis()} update={updateMorphology} toggleUpdate={toggleAddMorphology}/>}
+        {state.addMorphology && <MorphAnalysisEditor ma={nextMorphAnalysis()} update={(newMa) => updateMorphology(state.morphologies.length, newMa)}
+                                                     toggleUpdate={toggleAddMorphology}/>}
       </div>
 
       <div className="columns mt-2">
@@ -226,12 +256,12 @@ export function WordNodeEditor(
           <button onClick={deleteNode} className="button is-danger is-fullwidth">{t('deleteNode')}</button>
         </div>
         <div className="column">
-          <button type="button" className="button is-fullwidth" onClick={editWord}><IoSettingsOutline/>&nbsp;{t('editContent')}</button>
+          <button type="button" className="button is-fullwidth" onClick={enableEditWordState}><IoSettingsOutline/>&nbsp;{t('editContent')}</button>
         </div>
       </div>
 
-      <UpdatePrevNextButtons changed={state.changed} initiateUpdate={handleUpdate} initiateJumpElement={(forward) => jumpEditableNodes(node.tagName, forward)}/>
+      <UpdatePrevNextButtons changed={state.changed || false} initiateUpdate={handleUpdate}
+                             initiateJumpElement={(forward) => jumpEditableNodes(node.tagName, forward)}/>
     </>
   );
 }
-

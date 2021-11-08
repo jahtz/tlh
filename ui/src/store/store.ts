@@ -22,6 +22,7 @@ function rootReducer(store: StoreState = {languages: []}, action: StoreAction): 
       localStorage.removeItem(localStorageUserKey);
       return {...store, currentUser: undefined};
     case UPDATE_PREFERENCES:
+      localStorage.setItem(localStoragePreferencesKey, JSON.stringify(action.newPreferences));
       return {...store, editorKeyConfig: action.newPreferences};
     case NEW_LANGUAGES:
       localStorage.setItem(localStorageLanguagesKey, JSON.stringify(action.languages));

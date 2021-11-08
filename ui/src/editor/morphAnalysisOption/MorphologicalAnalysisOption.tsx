@@ -1,5 +1,5 @@
 import {MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 import {MorphAnalysisOptionButtons} from './MorphAnalysisButtons';
 import {MorphAnalysisEditor} from './MorphAnalysisEditor';
 import {UpdatePrevNextButtonsProps} from './UpdatePrevNextButtons';
@@ -42,6 +42,7 @@ export function MorphAnalysisOption({
   });
 
   function innerUpdateMorphology(newMa: MorphologicalAnalysis): void {
+    console.info(JSON.stringify(newMa, null, 2));
     toggleUpdateMode();
     updateMorphology(newMa);
   }
