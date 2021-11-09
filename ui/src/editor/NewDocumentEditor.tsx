@@ -156,15 +156,31 @@ export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhEdito
   }
 
   function updateNode(nextEditablePath?: number[]): void {
+
+    console.info(nextEditablePath);
+
+    let newEditorState: IEditNodeState<T> | undefined = undefined;
+    if (nextEditablePath) {
+      const node = findElement(state.rootNode as XmlElementNode, nextEditablePath);
+
+      if (state.editorState && 'path' in state.editorState) {
+
+        newEditorState = {
+          node, path: nextEditablePath, changed: false, data: (editorConfig[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node)
+        };
+      }
+    }
+
     setState((state) =>
       state.editorState && editorStateIsEditNodeState(state.editorState)
-        ?
-        update(state, {
+        ? update(state, {
           rootNode: state.editorState.path.reduceRight<Spec<XmlNode>>(
             (acc, index) => ({children: {[index]: acc}}),
             {$set: (editorConfig[state.editorState.node.tagName] as XmlSingleEditableNodeConfig<T>).writeNode(state.editorState.data)}
           ),
-          editorState: {changed: {$set: false}},
+          editorState: newEditorState
+            ? {$set: newEditorState}
+            : {changed: {$set: false}},
           changed: {$set: true}
         })
         : state
@@ -207,14 +223,16 @@ export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhEdito
     if (state.editorState && 'path' in state.editorState && state.keyHandlingEnabled) {
       if (editorKeyConfig.updateAndNextEditableNodeKeys.includes(event.key)) {
         // FIXME: update and jump...
-        updateNode();
-        // jumpEditableNodes(state.editorState.node.tagName, true);
+        updateNode(
+          searchEditableNode(state.editorState.node.tagName, state.rootNode as XmlElementNode, state.editorState.path, true)
+        );
       } else if (editorKeyConfig.nextEditableNodeKeys.includes(event.key)) {
         jumpEditableNodes(state.editorState.node.tagName, true);
       } else if (editorKeyConfig.updateAndPreviousEditableNodeKeys.includes(event.key)) {
         // FIXME: update and jump...
-        updateNode();
-        // jumpEditableNodes(state.editorState.node.tagName, false);
+        updateNode(
+          searchEditableNode(state.editorState.node.tagName, state.rootNode as XmlElementNode, state.editorState.path, false)
+        );
       } else if (editorKeyConfig.previousEditableNodeKeys.includes(event.key)) {
         jumpEditableNodes(state.editorState.node.tagName, false);
       }
