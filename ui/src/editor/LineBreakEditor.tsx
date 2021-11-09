@@ -4,9 +4,14 @@ import {LinebreakNodeAttributes} from './tlhEditorConfig';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
 
-type IProps = XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>;
-
-export function LineBreakEditor({node, updateNode, deleteNode, path, jumpEditableNodes, setKeyHandlingEnabled}: IProps): JSX.Element {
+export function LineBreakEditor({
+  node,
+  updateNode,
+  deleteNode,
+  path,
+  jumpEditableNodes,
+  setKeyHandlingEnabled
+}: XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>): JSX.Element {
 
   const {t} = useTranslation('common');
 

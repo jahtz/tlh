@@ -2,17 +2,16 @@ import {Field, FieldArray, Form, Formik} from 'formik';
 import {MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {LetteredAnalysisOption} from '../../model/analysisOptions';
 import {useTranslation} from 'react-i18next';
-import {IoSettingsOutline} from 'react-icons/io5';
 
 interface IProps {
-  ma: MorphologicalAnalysis;
-  update: (newMa: MorphologicalAnalysis) => void;
-  toggleUpdate: () => void;
+  morphologicalAnalysis: MorphologicalAnalysis;
+  onSubmit: (ma: MorphologicalAnalysis) => void;
+  cancelUpdate: () => void;
 }
 
 const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
-export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Element {
+export function MorphAnalysisOptionEditor({morphologicalAnalysis, onSubmit, cancelUpdate}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -28,7 +27,7 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
     return {letter, analysis: '', selected: false};
   }
 
-  if ('analysis' in ma) {
+  if ('analysis' in morphologicalAnalysis) {
     // TODO: disabled until further notice...
     return <div className="notification is-warning has-text-centered">This should be disabled and not selectable...</div>;
   }
@@ -36,12 +35,12 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
   // FIXME: validationSchema for morphological analysis?!
 
   return (
-    <Formik initialValues={ma} onSubmit={update}>
+    <Formik initialValues={morphologicalAnalysis} onSubmit={onSubmit}>
       {({values}) =>
         <Form>
           <div className="field has-addons">
             <div className="control">
-              <button type="button" className="button is-static">{ma.number}</button>
+              <button type="button" className="button is-static">{morphologicalAnalysis.number}</button>
             </div>
             <div className="control is-expanded">
               <Field name="translation" className="input" placeholder={t('translation')}/>
@@ -54,9 +53,6 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
             </div>
             <div className="control">
               <Field name="paradigmClass" className="input" placeholder={t('paradigmClass')}/>
-            </div>
-            <div className="control">
-              <button type="button" className="button" onClick={toggleUpdate}><IoSettingsOutline/></button>
             </div>
           </div>
 
@@ -80,7 +76,7 @@ export function MorphAnalysisEditor({ma, update, toggleUpdate}: IProps): JSX.Ele
 
                 <div className="buttons">
                   <button type="button" className="button is-primary" onClick={() => arrayHelpers.push(nextAnalysisOption(values))}>+</button>
-                  <button type="button" className="button is-warning" onClick={toggleUpdate}>{t('cancelEdit')}</button>
+                  <button type="button" className="button is-warning" onClick={cancelUpdate}>{t('cancelEdit')}</button>
                   <button type="submit" className="button is-link">{t('updateAnalyses')}</button>
                 </div>
               </div>

@@ -45,7 +45,7 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
     if (state.parseResult.status) {
       fetchMorphologicalAnalyses(writeNode(state.parseResult.value).join(''), 'Hit')
         .then((res) => {
-          console.info(JSON.stringify(res, null, 2));
+          // console.info(JSON.stringify(res, null, 2));
 
           if (res) {
             setState({parseResult: {status: true, value: res}});

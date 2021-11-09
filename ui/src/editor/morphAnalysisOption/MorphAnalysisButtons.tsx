@@ -5,16 +5,18 @@ import {MultiMorphAnalysisSelection} from './MultiMorphAnalysisSelection';
 import {SingleMorphAnalysisOptionButton} from './SingleMorphAnalysisOptionButton';
 import {MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {UpdatePrevNextButtons, UpdatePrevNextButtonsProps} from './UpdatePrevNextButtons';
-import {Numerus} from './MorphologicalAnalysisOption';
+import {Numerus} from './MorphAnalysisOptionContainer';
 import {LetteredAnalysisOptionButtons} from './LetteredAnalysisOptionButtons';
 
 
-interface IProps extends UpdatePrevNextButtonsProps {
+interface IProps {
+  updatePrevNextButtonsProps: UpdatePrevNextButtonsProps;
+
   morphologicalAnalysis: MorphologicalAnalysis;
 
   toggleAnalysisSelection: (letter?: string) => void;
   toggleEncliticsSelection: (letter: string) => void;
-  toggleEdit: () => void;
+  enableEditMode: () => void;
 }
 
 
@@ -26,13 +28,11 @@ export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean
 const buttonClasses = 'button is-outlined is-primary is-fullwidth';
 
 export function MorphAnalysisOptionButtons({
-  changed,
+  updatePrevNextButtonsProps,
   morphologicalAnalysis,
   toggleAnalysisSelection,
   toggleEncliticsSelection,
-  initiateUpdate,
-  initiateJumpElement,
-  toggleEdit
+  enableEditMode
 }: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
@@ -66,7 +66,7 @@ export function MorphAnalysisOptionButtons({
             </button>
           </div>
           {!isSingleAnalysisOption && <div className="control">
-            <button className="button" onClick={toggleEdit}><IoSettingsOutline/></button>
+            <button className="button" onClick={enableEditMode}><IoSettingsOutline/></button>
           </div>}
         </div>
       </div>
@@ -88,7 +88,7 @@ export function MorphAnalysisOptionButtons({
           </div>}
 
           <div className="column is-one-third">
-            <UpdatePrevNextButtons changed={changed} initiateUpdate={initiateUpdate} initiateJumpElement={initiateJumpElement}/>
+            <UpdatePrevNextButtons {...updatePrevNextButtonsProps}/>
 
             {!isSingleAnalysisOption && <>
               <div className="mb-1">

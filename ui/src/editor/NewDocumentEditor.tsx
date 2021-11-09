@@ -34,10 +34,10 @@ interface IAddNodeState {
 type EditorState = IEditNodeState | IAddNodeState;
 
 interface IState {
+  keyHandlingEnabled: boolean;
   rootNode: XmlNode;
   editorState?: EditorState;
   changed: boolean;
-  keyHandlingEnabled: boolean;
   author?: string;
 }
 
@@ -97,17 +97,13 @@ export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorCo
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);
-  const [state, setState] = useState<IState>({rootNode: initialNode, changed: false, keyHandlingEnabled: true});
+  const [state, setState] = useState<IState>({keyHandlingEnabled: true, rootNode: initialNode, changed: false});
 
 
   useEffect(() => {
     document.addEventListener('keydown', handleJumpKey);
     return () => document.removeEventListener('keydown', handleJumpKey);
   });
-
-  function setKeyHandlingEnabled(value: boolean): void {
-    setState((state) => update(state, {keyHandlingEnabled: {$set: value}}));
-  }
 
   function exportXml(): void {
     // FIXME: add annot node...
@@ -197,13 +193,14 @@ export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorCo
     );
   }
 
-  function NodeEditor({editState}: { editState: IEditNodeState }): JSX.Element {
+  function renderNodeEditor(editState: IEditNodeState): JSX.Element {
     return (editorConfig[editState.node.tagName] as XmlSingleEditableNodeConfig).edit({
       ...editState,
       updateNode: (node) => updateNode(node, editState.path),
       deleteNode: () => deleteNode(editState.path),
       initiateJumpElement: (forward) => jumpEditableNodes(editState.node.tagName, forward),
-      jumpEditableNodes, keyHandlingEnabled: state.keyHandlingEnabled, setKeyHandlingEnabled,
+      jumpEditableNodes,
+      setKeyHandlingEnabled: (value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}})),
     });
   }
 
@@ -265,7 +262,7 @@ export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorCo
 
         <div className="column">
           {state.editorState && 'path' in state.editorState
-            ? <NodeEditor editState={state.editorState}/>
+            ? renderNodeEditor(state.editorState) /* don't convert to a component! */
             : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}/>}
         </div>
       </div>
