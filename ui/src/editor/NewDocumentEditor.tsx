@@ -156,9 +156,7 @@ export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhEdito
   }
 
   function updateNode(nextEditablePath?: number[]): void {
-
-    console.info(nextEditablePath);
-
+   
     let newEditorState: IEditNodeState<T> | undefined = undefined;
     if (nextEditablePath) {
       const node = findElement(state.rootNode as XmlElementNode, nextEditablePath);
