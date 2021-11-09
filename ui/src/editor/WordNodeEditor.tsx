@@ -22,6 +22,7 @@ interface IState {
 }
 
 export function WordNodeEditor({
+  node,
   data,
   changed,
   updateNode,
@@ -90,7 +91,7 @@ export function WordNodeEditor({
   function enableEditWordState(): void {
     setState((state) => update(state, {
       editContent: {
-        $set: data.originalNode.children.map((c, index) => reconstructTransliteration(c, index === 0)).join('')
+        $set: node.children.map((c, index) => reconstructTransliteration(c, index === 0)).join('')
       }
     }));
   }
@@ -135,7 +136,7 @@ export function WordNodeEditor({
   return (
     <>
       <div className="box has-text-centered">
-        <NodeDisplay node={data.originalNode} editorConfig={tlhEditorConfig}/>
+        <NodeDisplay node={node} editorConfig={tlhEditorConfig}/>
         <sup>&nbsp;</sup><sub>&nbsp;</sub>
       </div>
 

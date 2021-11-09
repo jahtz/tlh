@@ -6,18 +6,16 @@ import {getSelectedLetters} from '../../model/analysisOptions';
 export interface WordNodeData {
   lg: string;
   morphologies: MorphologicalAnalysis[];
-  originalNode: XmlElementNode;
 }
 
 export function readWordNodeData(originalNode: XmlElementNode): WordNodeData {
   return {
     lg: originalNode.attributes.lg || '',
     morphologies: readMorphologiesFromNode(originalNode, readSelectedMorphology(originalNode.attributes.mrp0sel?.trim() || '')),
-    originalNode: originalNode
   };
 }
 
-export function writeWordNodeData({lg, morphologies, originalNode}: WordNodeData): XmlElementNode {
+export function writeWordNodeData({lg, morphologies}: WordNodeData, originalNode: XmlElementNode): XmlElementNode {
   const {tagName, attributes, children} = originalNode;
 
   // FIXME: selected morphologies!

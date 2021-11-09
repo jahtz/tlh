@@ -4,6 +4,7 @@ import {LineBreakEditor} from '../LineBreakEditor';
 import classNames from 'classnames';
 import {IoCloseSharp} from 'react-icons/io5';
 import {readWordNodeData, WordNodeData, writeWordNodeData} from './wordNodeData';
+import {LineBreakData, readLineBreakData, writeLineBreakData} from './lineBreakData';
 
 const foreignLanguageColors: { [key: string]: string } = {
   HURR: 'Hur',
@@ -12,7 +13,7 @@ const foreignLanguageColors: { [key: string]: string } = {
   LUW: 'Luw'
 };
 
-const lb: XmlSingleEditableNodeConfig = {
+const lb: XmlSingleEditableNodeConfig<LineBreakData> = {
   // TODO: only render <br/> if not first linebreak!
   replace: (node, _renderedChildren, path, currentSelectedPath) => {
 
@@ -26,8 +27,8 @@ const lb: XmlSingleEditableNodeConfig = {
     );
   },
   edit: (props) => <LineBreakEditor key={props.path.join('.')} {...props} />,
-  readNode: (n) => n,
-  writeNode: (t) => t,
+  readNode: readLineBreakData,
+  writeNode: writeLineBreakData,
   insertablePositions: {
     beforeElement: ['lb'],
     asLastChildOf: ['div1']

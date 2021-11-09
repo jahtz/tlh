@@ -6,9 +6,10 @@ export interface UpdatePrevNextButtonsProps {
   changed: boolean;
   initiateUpdate: () => void;
   initiateJumpElement: (forward: boolean) => void;
+  children?: JSX.Element;
 }
 
-export function UpdatePrevNextButtons({changed, initiateUpdate, initiateJumpElement}: UpdatePrevNextButtonsProps): JSX.Element {
+export function UpdatePrevNextButtons({changed, initiateUpdate, children, initiateJumpElement}: UpdatePrevNextButtonsProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -20,6 +21,9 @@ export function UpdatePrevNextButtons({changed, initiateUpdate, initiateJumpElem
             <IoArrowBack/>
           </button>
         </div>
+
+        {children && children}
+
         <div className="control is-expanded">
           <button type="button" className={classNames('button', 'is-fullwidth', {'is-link': changed})} onClick={initiateUpdate} tabIndex={-1}>
             {t('update')}

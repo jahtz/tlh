@@ -11,6 +11,7 @@ export type EditTriggerFunc = (node: XmlElementNode, path: NodePath) => void;
 
 
 export interface XmlEditableNodeIProps<T = XmlElementNode> {
+  node: XmlElementNode;
   data: T;
   changed: boolean;
   path: number[];
@@ -32,7 +33,7 @@ export interface XmlSingleNodeConfig {
 export interface XmlSingleEditableNodeConfig<T = XmlElementNode> extends XmlSingleNodeConfig {
   edit: (props: XmlEditableNodeIProps<T>) => JSX.Element;
   readNode: (node: XmlElementNode) => T;
-  writeNode: (t: T) => XmlElementNode;
+  writeNode: (t: T, originalNode: XmlElementNode) => XmlElementNode;
 }
 
 export interface XmlEditorConfig {

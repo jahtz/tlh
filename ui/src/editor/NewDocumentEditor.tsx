@@ -156,9 +156,10 @@ export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhEdito
   }
 
   function updateNode(nextEditablePath?: number[]): void {
-   
+
     let newEditorState: IEditNodeState<T> | undefined = undefined;
     if (nextEditablePath) {
+
       const node = findElement(state.rootNode as XmlElementNode, nextEditablePath);
 
       if (state.editorState && 'path' in state.editorState) {
@@ -174,7 +175,7 @@ export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhEdito
         ? update(state, {
           rootNode: state.editorState.path.reduceRight<Spec<XmlNode>>(
             (acc, index) => ({children: {[index]: acc}}),
-            {$set: (editorConfig[state.editorState.node.tagName] as XmlSingleEditableNodeConfig<T>).writeNode(state.editorState.data)}
+            {$set: (editorConfig[state.editorState.node.tagName] as XmlSingleEditableNodeConfig<T>).writeNode(state.editorState.data, state.editorState.node)}
           ),
           editorState: newEditorState
             ? {$set: newEditorState}
@@ -251,6 +252,7 @@ export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhEdito
 
   function renderNodeEditor({node, data, path, changed}: IEditNodeState<T>): JSX.Element {
     return (editorConfig[node.tagName] as XmlSingleEditableNodeConfig<T>).edit({
+      node,
       data,
       path,
       changed,
@@ -259,7 +261,7 @@ export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhEdito
       initiateJumpElement: (forward) => jumpEditableNodes(node.tagName, forward),
       jumpEditableNodes,
       setKeyHandlingEnabled: (value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}})),
-      initiateSubmit: updateNode
+      initiateSubmit: () => updateNode()
     });
   }
 
