@@ -1,4 +1,4 @@
-import {XmlEditorConfig} from './xmlDisplayConfigs';
+import {XmlEditorConfig} from './editorConfig/editorConfig';
 import {useTranslation} from 'react-i18next';
 import classNames from 'classnames';
 import {InsertablePositions} from './insertablePositions';

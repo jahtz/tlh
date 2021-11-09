@@ -1,6 +1,6 @@
 import {isXmlTextNode, XmlNode} from './xmlModel/xmlModel';
-import {EditTriggerFunc, XmlEditorConfig} from './xmlDisplayConfigs';
-import {tlhEditorConfig} from './tlhEditorConfig';
+import {EditTriggerFunc, XmlEditorConfig} from './editorConfig/editorConfig';
+import {tlhEditorConfig} from './editorConfig/tlhEditorConfig';
 import classNames from 'classnames';
 import {NodePath} from './insertablePositions';
 import {IoAddOutline} from 'react-icons/io5';

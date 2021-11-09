@@ -14,8 +14,8 @@ interface IProps {
 
   morphologicalAnalysis: MorphologicalAnalysis;
 
-  toggleAnalysisSelection: (letter?: string) => void;
-  toggleEncliticsSelection: (letter: string) => void;
+  toggleAnalysisSelection: (index?: number) => void;
+  toggleEncliticsSelection: (index: number) => void;
   enableEditMode: () => void;
 }
 
@@ -44,8 +44,7 @@ export function MorphAnalysisOptionButtons({
   function selectAll(ma: MultiMorphologicalAnalysis, numerus?: Numerus): void {
     ma.analysisOptions
       .filter(({analysis}) => !numerus || analysisIsInNumerus(analysis, numerus))
-      .map(({letter}) => letter)
-      .forEach((letter) => toggleAnalysisSelection(letter));
+      .forEach((_, index) => toggleAnalysisSelection(index));
   }
 
   return (

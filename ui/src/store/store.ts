@@ -1,7 +1,7 @@
 import {createStore} from 'redux';
 import {NEW_LANGUAGES, StoreAction, UPDATE_PREFERENCES, USER_LOGGED_IN, USER_LOGGED_OUT} from './actions';
 import {LoggedInUserFragment, ManuscriptLanguageFragment} from '../graphql';
-import {defaultEditorKeyConfig, EditorKeyConfig} from '../editor/editorKeyConfig';
+import {defaultEditorKeyConfig, EditorKeyConfig, OldEditorKeyConfig} from '../editor/editorKeyConfig';
 
 const localStorageUserKey = 'userId';
 const localStoragePreferencesKey = 'preferences';
@@ -45,6 +45,14 @@ export function allManuscriptLanguagesSelector(store: StoreState): ManuscriptLan
   return store.languages;
 }
 
+function sanitizePreferences(object: OldEditorKeyConfig | EditorKeyConfig): EditorKeyConfig {
+  if ('updateAndNextEditableNodeKeys' in object) {
+    return object;
+  } else {
+    return {...object, updateAndPreviousEditableNodeKeys: [], updateAndNextEditableNodeKeys: []};
+  }
+}
+
 
 function initialState(): StoreState {
   const localStorageUser = localStorage.getItem(localStorageUserKey);
@@ -55,7 +63,7 @@ function initialState(): StoreState {
 
   return {
     currentUser: localStorageUser ? JSON.parse(localStorageUser) : undefined,
-    editorKeyConfig: localStoragePreferences ? JSON.parse(localStoragePreferences) : undefined,
+    editorKeyConfig: localStoragePreferences ? sanitizePreferences(JSON.parse(localStoragePreferences)) : undefined,
     languages: localStorageLanguages ? JSON.parse(localStorageLanguages) : []
   };
 }

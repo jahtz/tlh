@@ -1,26 +1,23 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {transliteration as transliterationLanguage} from '../transliterationParser/parser';
 import {AOWordContent} from '../model/wordContent/wordContent';
 import {xmlifyAoWord} from '../model/sentenceContent/word';
 import {Result} from 'parsimmon';
-import {GenericAttributes, XmlElementNode} from './xmlModel/xmlModel';
-import {WordNodeAttributes} from './tlhEditorConfig';
+import {XmlElementNode} from './xmlModel/xmlModel';
 import classNames from 'classnames';
 import {fetchMorphologicalAnalyses} from '../model/morphologicalAnalysis';
 import {NodeDisplay} from './NodeDisplay';
 import {writeNode} from './xmlModel/xmlWriting';
 
-export type WordNode = XmlElementNode<WordNodeAttributes & GenericAttributes>;
-
 interface IProps {
   initialTransliteration: string;
   cancelEdit: () => void;
-  updateNode: (node: WordNode) => void;
+  updateNode: (node: XmlElementNode) => void;
 }
 
 interface IState {
-  parseResult: Result<WordNode>;
+  parseResult: Result<XmlElementNode>;
 }
 
 function readTransliteration(transliteration: string): IState {

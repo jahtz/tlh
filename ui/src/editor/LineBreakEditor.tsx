@@ -1,26 +1,23 @@
-import {XmlEditableNodeIProps} from './xmlDisplayConfigs';
-import {GenericAttributes} from './xmlModel/xmlModel';
-import {LinebreakNodeAttributes} from './tlhEditorConfig';
+import {XmlEditableNodeIProps} from './editorConfig/editorConfig';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
 
 export function LineBreakEditor({
-  node,
+  data,
   updateNode,
   deleteNode,
-  path,
   jumpEditableNodes,
   setKeyHandlingEnabled
-}: XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>): JSX.Element {
+}: XmlEditableNodeIProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
-  function onSubmit(attributes: LinebreakNodeAttributes & GenericAttributes): void {
-    updateNode({...node, attributes}, path);
+  function onSubmit(attributes: Record<string, string>): void {
+    // TODO: updateNode({...node, attributes});
   }
 
   return (
-    <Formik initialValues={node.attributes} onSubmit={onSubmit}>
+    <Formik initialValues={data.attributes} onSubmit={onSubmit}>
       <Form>
 
         <div className="field">
@@ -55,10 +52,10 @@ export function LineBreakEditor({
 
         <div className="columns">
           <div className="column">
-            <button className="button is-fullwidth" onClick={() => jumpEditableNodes(node.tagName, false)}>{t('previousEditable')}</button>
+            <button className="button is-fullwidth" onClick={() => jumpEditableNodes(data.tagName, false)}>{t('previousEditable')}</button>
           </div>
           <div className="column">
-            <button className="button is-fullwidth" onClick={() => jumpEditableNodes(node.tagName, true)}>{t('nextEditable')}</button>
+            <button className="button is-fullwidth" onClick={() => jumpEditableNodes(data.tagName, true)}>{t('nextEditable')}</button>
           </div>
         </div>
 

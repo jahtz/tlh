@@ -1,10 +1,13 @@
+/**
+ * @deprecated
+ */
 export interface GenericAttributes {
-  [name: string]: string;
+  [name: string]: string | undefined;
 }
 
-export interface XmlElementNode<A = GenericAttributes> {
+export interface XmlElementNode {
   tagName: string;
-  attributes: A;
+  attributes: Record<string, string>;
   children: XmlNode[];
 }
 

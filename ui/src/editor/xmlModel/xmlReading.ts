@@ -1,4 +1,4 @@
-import {GenericAttributes, isXmlElementNode, XmlNode, XmlTextNode} from './xmlModel';
+import {isXmlElementNode, XmlNode, XmlTextNode} from './xmlModel';
 
 type LetterCorrection = {
   [key: string]: string;
@@ -67,7 +67,7 @@ export function loadNode(el: ChildNode, xmlReadConfig: XmlReadConfig, parentLett
     return {
       tagName: el.tagName,
       attributes: Array.from(el.attributes)
-        .reduce<GenericAttributes>((acc, {name, value}) => {
+        .reduce((acc, {name, value}) => {
           return {...acc, [name]: value};
         }, {}),
       children: Array.from(el.childNodes)

@@ -9,8 +9,8 @@ interface IProps {
 
   morphologicalAnalysis: MorphologicalAnalysis;
   updateMorphology: (ma: MorphologicalAnalysis) => void;
-  toggleAnalysisSelection: (letter?: string) => void;
-  toggleEncliticsSelection: (letter: string) => void;
+  toggleAnalysisSelection: (index?: number) => void;
+  toggleEncliticsSelection: (index: number) => void;
 
   setKeyHandlingEnabled: (b: boolean) => void;
 }

@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {findFirstXmlElementByTagName, isXmlElementNode, XmlElementNode, XmlNode} from './xmlModel/xmlModel';
-import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './xmlDisplayConfigs';
-import {tlhEditorConfig} from './tlhEditorConfig';
+import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './editorConfig/editorConfig';
+import {tlhEditorConfig} from './editorConfig/tlhEditorConfig';
 import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
 import {editorKeyConfigSelector} from '../store/store';
@@ -21,9 +21,15 @@ interface IProps {
   closeFile: () => void;
 }
 
-interface IEditNodeState {
+interface IEditNodeState<T> {
   node: XmlElementNode;
+  data: T;
+  changed: boolean;
   path: number[];
+}
+
+function editorStateIsEditNodeState<T>(s: EditorState<T>): s is IEditNodeState<T> {
+  return 'path' in s;
 }
 
 interface IAddNodeState {
@@ -31,12 +37,12 @@ interface IAddNodeState {
   insertablePositions: InsertablePositions;
 }
 
-type EditorState = IEditNodeState | IAddNodeState;
+type EditorState<T> = IEditNodeState<T> | IAddNodeState;
 
-interface IState {
+interface IState<T> {
   keyHandlingEnabled: boolean;
   rootNode: XmlNode;
-  editorState?: EditorState;
+  editorState?: EditorState<T>;
   changed: boolean;
   author?: string;
 }
@@ -93,11 +99,11 @@ function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode
   return rootNode;
 }
 
-export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorConfig, download, filename, closeFile}: IProps): JSX.Element {
+export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhEditorConfig, download, filename, closeFile}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);
-  const [state, setState] = useState<IState>({keyHandlingEnabled: true, rootNode: initialNode, changed: false});
+  const [state, setState] = useState<IState<T>>({keyHandlingEnabled: true, rootNode: initialNode, changed: false});
 
 
   useEffect(() => {
@@ -123,6 +129,7 @@ export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorCo
 
     const toExport = addAuthorNode(state.rootNode as XmlElementNode, author);
 
+    setState((state) => update(state, {changed: {$set: false}}));
 
     download(
       writeNode(toExport)
@@ -140,22 +147,38 @@ export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorCo
   function onNodeSelect(node: XmlElementNode, path: number[]): void {
     setState((state) => update(state, {
       editorState: {
-        $apply: (editorState) => editorState && 'path' in editorState && editorState.path.join('.') === path.join('.') ?
-          undefined
-          : {node, path}
+        $apply: (editorState) => editorState && 'path' in editorState && editorState.path.join('.') === path.join('.')
+          ? undefined
+          // FIXME: read data!
+          : {node, data: (editorConfig[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node), changed: false, path}
       }
     }));
   }
 
-  function updateNode(node: XmlElementNode, path: number[]): void {
-    setState((state) => update(state, {
-        rootNode: path.reduceRight<Spec<XmlNode>>(
-          (acc, index) => ({children: {[index]: acc}}),
-          {$set: node}
-        ),
-        changed: {$set: true}
-      })
+  function updateNode(nextEditablePath?: number[]): void {
+    setState((state) =>
+      state.editorState && editorStateIsEditNodeState(state.editorState)
+        ?
+        update(state, {
+          rootNode: state.editorState.path.reduceRight<Spec<XmlNode>>(
+            (acc, index) => ({children: {[index]: acc}}),
+            {$set: (editorConfig[state.editorState.node.tagName] as XmlSingleEditableNodeConfig<T>).writeNode(state.editorState.data)}
+          ),
+          editorState: {changed: {$set: false}},
+          changed: {$set: true}
+        })
+        : state
     );
+  }
+
+  function updateEditedNode(updateSpec: Spec<T>): void {
+    setState((state) => update(state, {
+      editorState: {
+        $apply: (editorState) => editorState && 'path' in editorState
+          ? update(editorState, {data: updateSpec, changed: {$set: true}})
+          : editorState
+      }
+    }));
   }
 
   function jumpEditableNodes(tagName: string, forward: boolean): void {
@@ -166,15 +189,32 @@ export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorCo
       if (path) {
         const node = findElement(state.rootNode as XmlElementNode, path);
 
-        setState((state) => update(state, {editorState: {$set: {node, path}}}));
+        setState((state) => update(state, {
+          editorState: {
+            $set: {
+              node,
+              data: (editorConfig[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node),
+              changed: false,
+              path
+            }
+          }
+        }));
       }
     }
   }
 
   function handleJumpKey(event: KeyboardEvent): void {
     if (state.editorState && 'path' in state.editorState && state.keyHandlingEnabled) {
-      if (editorKeyConfig.nextEditableNodeKeys.includes(event.key)) {
+      if (editorKeyConfig.updateAndNextEditableNodeKeys.includes(event.key)) {
+        // FIXME: update and jump...
+        updateNode();
+        // jumpEditableNodes(state.editorState.node.tagName, true);
+      } else if (editorKeyConfig.nextEditableNodeKeys.includes(event.key)) {
         jumpEditableNodes(state.editorState.node.tagName, true);
+      } else if (editorKeyConfig.updateAndPreviousEditableNodeKeys.includes(event.key)) {
+        // FIXME: update and jump...
+        updateNode();
+        // jumpEditableNodes(state.editorState.node.tagName, false);
       } else if (editorKeyConfig.previousEditableNodeKeys.includes(event.key)) {
         jumpEditableNodes(state.editorState.node.tagName, false);
       }
@@ -193,14 +233,17 @@ export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorCo
     );
   }
 
-  function renderNodeEditor(editState: IEditNodeState): JSX.Element {
-    return (editorConfig[editState.node.tagName] as XmlSingleEditableNodeConfig).edit({
-      ...editState,
-      updateNode: (node) => updateNode(node, editState.path),
-      deleteNode: () => deleteNode(editState.path),
-      initiateJumpElement: (forward) => jumpEditableNodes(editState.node.tagName, forward),
+  function renderNodeEditor({node, data, path, changed}: IEditNodeState<T>): JSX.Element {
+    return (editorConfig[node.tagName] as XmlSingleEditableNodeConfig<T>).edit({
+      data,
+      path,
+      changed,
+      updateNode: (data) => updateEditedNode(data),
+      deleteNode: () => deleteNode(path),
+      initiateJumpElement: (forward) => jumpEditableNodes(node.tagName, forward),
       jumpEditableNodes,
       setKeyHandlingEnabled: (value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}})),
+      initiateSubmit: updateNode
     });
   }
 
@@ -232,7 +275,7 @@ export function NewDocumentEditor({node: initialNode, editorConfig = tlhEditorCo
           (acc, index) => ({children: {[index]: acc}}),
           {children: {$splice: [[path[path.length - 1], 0, node]]}}
         ),
-        editorState: {$set: {path, node}},
+        editorState: {$set: {path, changed: false, node, data: (editorConfig[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node)}},
         changed: {$set: true}
       }));
     }
