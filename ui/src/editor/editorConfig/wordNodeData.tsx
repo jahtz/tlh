@@ -2,6 +2,10 @@ import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue
 import {XmlElementNode} from '../xmlModel/xmlModel';
 import {readSelectedMorphology, SelectedAnalysisOption, writeSelectedMorphologies} from '../selectedAnalysisOption';
 import {getSelectedLetters} from '../../model/analysisOptions';
+import {XmlSingleEditableNodeConfig} from './editorConfig';
+import classNames from 'classnames';
+import {IoCloseSharp} from 'react-icons/io5';
+import {WordNodeEditor} from '../WordNodeEditor';
 
 export interface WordNodeData {
   lg: string;
@@ -54,3 +58,63 @@ export function writeWordNodeData({lg, morphologies}: WordNodeData, originalNode
 
   return node;
 }
+
+
+const foreignLanguageColors: { [key: string]: string } = {
+  HURR: 'Hur',
+  HATT: 'Hat',
+  // PAL: '',
+  LUW: 'Luw'
+};
+
+function ignoreNode(node: XmlElementNode): boolean {
+
+  const wrongMrp0Sel = ['DEL', 'HURR', 'HATT', 'LUW'].includes(node.attributes.mrp0sel);
+
+  console.info(wrongMrp0Sel);
+
+  // TODO: other conditions...
+  const y = false;
+
+  return wrongMrp0Sel || y;
+}
+
+export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
+  ignore: ignoreNode,
+  replace: (node, renderedChildren, path, currentSelectedPath) => {
+    const notMarked = node.attributes.mrp0sel === 'DEL';
+
+    const isForeignLanguage = Object.keys(foreignLanguageColors).includes(node.attributes.mrp0sel);
+
+    const needsMorphology = !!node.attributes.mrp0sel;
+    const hasNoMorphologySelected = needsMorphology && node.attributes.mrp0sel.trim().length === 0 || node.attributes.mrp0sel === '???';
+
+    const hasMorphAnalyses = Object.keys(node.attributes)
+      .filter((name) => name.startsWith('mrp') && !name.startsWith('mrp0'))
+      .length > 0;
+
+    const classes = classNames(node.attributes.lg || '', {
+      'is-underlined': !notMarked && hasNoMorphologySelected,
+      'has-background-primary': !notMarked && !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.'),
+      'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
+      [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,
+      'has-text-weight-bold': isForeignLanguage,
+      'has-text-danger': node.children.length === 0
+    });
+
+    return <>
+        <span className={classes}>
+          {node.children.length === 0 ? <IoCloseSharp/> : renderedChildren}
+        </span>
+      &nbsp;&nbsp;
+    </>;
+  },
+  edit: (props) => <WordNodeEditor key={props.path.join('.')} {...props}/>,
+  readNode: readWordNodeData,
+  writeNode: writeWordNodeData,
+  insertablePositions: {
+    beforeElement: ['w'],
+    afterElement: ['lb', 'w'],
+    asLastChildOf: ['div1']
+  }
+};

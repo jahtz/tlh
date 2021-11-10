@@ -1,17 +1,8 @@
 import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './editorConfig';
-import {WordNodeEditor} from '../WordNodeEditor';
 import {LineBreakEditor} from '../LineBreakEditor';
 import classNames from 'classnames';
-import {IoCloseSharp} from 'react-icons/io5';
-import {readWordNodeData, WordNodeData, writeWordNodeData} from './wordNodeData';
+import {wordNodeConfig} from './wordNodeData';
 import {LineBreakData, readLineBreakData, writeLineBreakData} from './lineBreakData';
-
-const foreignLanguageColors: { [key: string]: string } = {
-  HURR: 'Hur',
-  HATT: 'Hat',
-  // PAL: '',
-  LUW: 'Luw'
-};
 
 const lb: XmlSingleEditableNodeConfig<LineBreakData> = {
   // TODO: only render <br/> if not first linebreak!
@@ -35,54 +26,13 @@ const lb: XmlSingleEditableNodeConfig<LineBreakData> = {
   }
 };
 
-
-const w: XmlSingleEditableNodeConfig<WordNodeData> = {
-  replace: (node, renderedChildren, path, currentSelectedPath) => {
-
-    const notMarked = node.attributes.mrp0sel === 'DEL';
-
-    const isForeignLanguage = Object.keys(foreignLanguageColors).includes(node.attributes.mrp0sel);
-
-    const needsMorphology = !!node.attributes.mrp0sel;
-    const hasNoMorphologySelected = needsMorphology && node.attributes.mrp0sel.trim().length === 0 || node.attributes.mrp0sel === '???';
-
-    const hasMorphAnalyses = Object.keys(node.attributes)
-      .filter((name) => name.startsWith('mrp') && !name.startsWith('mrp0'))
-      .length > 0;
-
-    const classes = classNames(node.attributes.lg || '', {
-      'is-underlined': !notMarked && hasNoMorphologySelected,
-      'has-background-primary': !notMarked && !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.'),
-      'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
-      [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,
-      'has-text-weight-bold': isForeignLanguage,
-      'has-text-danger': node.children.length === 0
-    });
-
-    return <>
-        <span className={classes}>
-          {node.children.length === 0 ? <IoCloseSharp/> : renderedChildren}
-        </span>
-      &nbsp;&nbsp;
-    </>;
-  },
-  edit: (props) => <WordNodeEditor key={props.path.join('.')} {...props}/>,
-  readNode: readWordNodeData,
-  writeNode: writeWordNodeData,
-  insertablePositions: {
-    beforeElement: ['w'],
-    afterElement: ['lb', 'w'],
-    asLastChildOf: ['div1']
-  }
-};
-
 export const tlhEditorConfig: XmlEditorConfig = {
   docID: {replace: () => <span/>},
   'AO:Manuscripts': {replace: () => <span/>},
   lb,
 
   // Words
-  w,
+  w: wordNodeConfig,
 
   // Word contents
   aGr: {styling: () => ['akkadogramm']},
