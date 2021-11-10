@@ -76,9 +76,7 @@ function hasText({children}: XmlElementNode): boolean {
 function ignoreNode(node: XmlElementNode): boolean {
 
   const wrongMrp0Sel = ['DEL', 'HURR', 'HATT', 'LUW'].includes(node.attributes.mrp0sel);
-
-  console.info(wrongMrp0Sel);
-
+ 
   // TODO: other conditions?
 
   return wrongMrp0Sel || !hasText(node);
