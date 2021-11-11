@@ -24,23 +24,26 @@ export function EditorLeftSide({
 }: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
-  const [fontSize, setFontSize] = useState(1);
+  const [fontSize, setFontSize] = useState(100);
   const [useSerifFont, setUseSerifFont] = useState(false);
 
   return (
     <>
       <div className="box has-text-centered">{filename}<sup>&nbsp;</sup><sub>&nbsp;</sub></div>
 
-      <div className={classNames('box', 'scrollable', useSerifFont ? 'font-hpm-serif' : 'font-hpm')} style={{fontSize: `${fontSize}em`}}>
+      <div className={classNames('box', 'scrollable', useSerifFont ? 'font-hpm-serif' : 'font-hpm')} style={{fontSize: `${fontSize}%`}}>
         <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} editorConfig={editorConfig} onSelect={onNodeSelect} insertStuff={insertStuff}/>
       </div>
 
       <div className="field has-addons mt-2">
         <div className="control">
-          <button type="button" className="button" onClick={() => setFontSize((value) => Math.round(value * 10 - 1) / 10)}><IoChevronDown/></button>
+          <button type="button" className="button" onClick={() => setFontSize((value) => value - 10)}><IoChevronDown/></button>
         </div>
         <div className="control is-expanded">
-          <input type="number" value={fontSize} step={0.1} onChange={(event) => setFontSize(() => parseFloat(event.target.value))} className="input"/>
+          <input type="number" value={fontSize} step={10} onChange={(event) => setFontSize(() => parseInt(event.target.value))} className="input"/>
+        </div>
+        <div className="control">
+          <button className="button is-static">%</button>
         </div>
         <div className="control is-expanded">
           <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="button is-fullwidth">
@@ -48,7 +51,7 @@ export function EditorLeftSide({
           </button>
         </div>
         <div className="control">
-          <button type="button" className="button" onClick={() => setFontSize((value) => Math.round(value * 10 + 1) / 10)}><IoChevronUp/></button>
+          <button type="button" className="button" onClick={() => setFontSize((value) => value + 10 )}><IoChevronUp/></button>
         </div>
       </div>
 
