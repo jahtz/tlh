@@ -66,14 +66,15 @@ export function DocumentMergerContainer(): JSX.Element {
     <div className="container">
       <h1 className="title has-text-centered">{t('documentMerger')}</h1>
 
+      {'firstFile' in state &&
       <div className="field has-addons">
         <div className="control is-expanded">
-          <button type="button" className="button is-static is-fullwidth">{'firstFile' in state && state.firstFile.filename}</button>
+          <button type="button" className="button is-static is-fullwidth">{state.firstFile.filename}</button>
         </div>
-        <div className="control is-expanded">
-          <button type="button" className="button is-static is-fullwidth">{'secondFile' in state && state.secondFile?.filename}</button>
-        </div>
-      </div>
+        {'secondFile' in state && <div className="control is-expanded">
+          <button type="button" className="button is-static is-fullwidth">{}</button>
+        </div>}
+      </div>}
 
       {(state._type === 'EmptyState' && <FileLoader onLoad={loadFirstDocument} accept={'text/xml'} text={t('loadFirstFile')}/>)
       || (state._type === 'FirstFileLoadedState' && <FileLoader onLoad={loadSecondDocument} accept={'text/xml'} text={t('loadSecondFile')}/>)

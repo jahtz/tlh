@@ -49,6 +49,12 @@ export function mergeLines(mls: ZipWithOffsetResult<MergeLine>): MergeLine[] {
   });
 }
 
+const mergeSeparatorElement: XmlElementNode = {
+  tagName: 'w',
+  attributes: {},
+  children: []
+};
+
 function mergeLine({lineNumber: leftLineNumber, rest: leftRest}: MergeLine, {lineNumber: rightLineNumber, rest: rightRest}: MergeLine): MergeLine {
 
   const leftMatch = leftLineNumber.match(lineNumberRegex);
@@ -57,10 +63,10 @@ function mergeLine({lineNumber: leftLineNumber, rest: leftRest}: MergeLine, {lin
 
   const lineNumber = (!leftMatch || !leftMatch.groups || !rightMatch || !rightMatch.groups)
     ? leftLineNumber + rightLineNumber
-    : `{€${leftMatch.groups.fragment}+${rightMatch.groups.fragment}} ${leftMatch.groups.lines} + ${rightMatch.groups.lines}`;
+    : `{€${leftMatch.groups.fragment}+${rightMatch.groups.fragment}} ${leftMatch.groups.lines} / ${rightMatch.groups.lines}`;
 
   return {
     lineNumber,
-    rest: [...leftRest, ...rightRest]
+    rest: [...leftRest, mergeSeparatorElement, ...rightRest]
   };
 }
