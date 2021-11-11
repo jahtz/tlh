@@ -29,26 +29,24 @@ export function writeLineBreakData({textId, lineNumber, lg}: LineBreakData, orig
   };
 }
 
-export function lineBreakNodeConfig(withBr = true): XmlSingleEditableNodeConfig<LineBreakData> {
-  return {
-    // TODO: only render <br/> if not first linebreak!
-    replace: (node, _renderedChildren, path, currentSelectedPath) => {
+export const lineBreakNodeConfig: XmlSingleEditableNodeConfig<LineBreakData> = {
+  // TODO: only render <br/> if not first linebreak!
+  replace: (node, _renderedChildren, path, currentSelectedPath) => {
 
-      const isSelected = !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.');
+    const isSelected = !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.');
 
-      return (
-        <>
-          <span className={classNames('lb', {'has-background-primary': isSelected})}>{withBr && <br/>}{node.attributes.lnr}:</span>
-          &nbsp;&nbsp;&nbsp;
-        </>
-      );
-    },
-    edit: (props) => <LineBreakEditor key={props.path.join('.')} {...props} />,
-    readNode: readLineBreakData,
-    writeNode: writeLineBreakData,
-    insertablePositions: {
-      beforeElement: ['lb'],
-      asLastChildOf: ['div1']
-    }
-  };
-}
+    return (
+      <>
+        <span className={classNames('lb', {'has-background-primary': isSelected})}><br/>{node.attributes.lnr}:</span>
+        &nbsp;&nbsp;&nbsp;
+      </>
+    );
+  },
+  edit: (props) => <LineBreakEditor key={props.path.join('.')} {...props} />,
+  readNode: readLineBreakData,
+  writeNode: writeLineBreakData,
+  insertablePositions: {
+    beforeElement: ['lb'],
+    asLastChildOf: ['div1']
+  }
+};

@@ -111,7 +111,7 @@ function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode
   return rootNode;
 }
 
-export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEditorConfig(), download, filename, closeFile}: IProps): JSX.Element {
+export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEditorConfig, download, filename, closeFile}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);

@@ -22,7 +22,7 @@ export interface NodeDisplayIProps {
 export function NodeDisplay({
   node,
   currentSelectedPath,
-  editorConfig = tlhXmlEditorConfig(),
+  editorConfig = tlhXmlEditorConfig,
   onSelect,
   path = [],
   insertStuff,

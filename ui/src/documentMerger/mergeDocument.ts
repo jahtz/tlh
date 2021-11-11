@@ -1,7 +1,10 @@
 import {findFirstXmlElementByTagName, isXmlElementNode, XmlElementNode, XmlNode} from '../editor/xmlModel/xmlModel';
+import {ZipWithOffsetResult} from './zipWithOffset';
+
+const lineNumberRegex = /{€(?<fragment>\d)}\s*(?<lines>[\W\w]+)/;
 
 export interface MergeLine {
-  lb: XmlElementNode;
+  lineNumber: string;
   rest: XmlNode[];
 }
 
@@ -21,7 +24,7 @@ export function readMergeDocument(rootNode: XmlElementNode): MergeDocument {
 
   element.children.forEach((node) => {
     if (isXmlElementNode(node) && node.tagName === 'lb') {
-      result.lines.push({lb: node, rest: []});
+      result.lines.push({lineNumber: node.attributes.lnr, rest: []});
     } else if (result.lines.length === 0) {
       result.prior.push(node);
     } else {
@@ -30,4 +33,34 @@ export function readMergeDocument(rootNode: XmlElementNode): MergeDocument {
   });
 
   return result;
+}
+
+export function mergeLines(mls: ZipWithOffsetResult<MergeLine>): MergeLine[] {
+  return mls.map(([left, right]) => {
+    if (left && right) {
+      return mergeLine(left, right);
+    } else if (left) {
+      return left;
+    } else if (right) {
+      return right;
+    } else {
+      throw new Error('TODO');
+    }
+  });
+}
+
+function mergeLine({lineNumber: leftLineNumber, rest: leftRest}: MergeLine, {lineNumber: rightLineNumber, rest: rightRest}: MergeLine): MergeLine {
+
+  const leftMatch = leftLineNumber.match(lineNumberRegex);
+
+  const rightMatch = rightLineNumber.match(lineNumberRegex);
+
+  const lineNumber = (!leftMatch || !leftMatch.groups || !rightMatch || !rightMatch.groups)
+    ? leftLineNumber + rightLineNumber
+    : `{€${leftMatch.groups.fragment}+${rightMatch.groups.fragment}} ${leftMatch.groups.lines} + ${rightMatch.groups.lines}`;
+
+  return {
+    lineNumber,
+    rest: [...leftRest, ...rightRest]
+  };
 }

@@ -134,7 +134,7 @@ export function WordNodeEditor({
   return (
     <>
       <div className="box has-text-centered">
-        <NodeDisplay node={node} editorConfig={tlhXmlEditorConfig()}/>
+        <NodeDisplay node={node} editorConfig={tlhXmlEditorConfig}/>
         <sup>&nbsp;</sup><sub>&nbsp;</sub>
       </div>
 

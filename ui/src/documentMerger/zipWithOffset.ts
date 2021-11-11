@@ -1,4 +1,4 @@
-type ZipWithOffsetResult<T> = [T | undefined, T | undefined][];
+export type ZipWithOffsetResult<T> = [T | undefined, T | undefined][];
 
 export function zipWithOffset<T>(first: T[], second: T[], offset: number): ZipWithOffsetResult<T> {
   if (offset < 0) {
