@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import { useState } from 'react';
 import {useTranslation} from 'react-i18next';
 import {IndexQuery, useIndexLazyQuery} from './graphql';
 import {Link} from 'react-router-dom';
@@ -17,7 +17,7 @@ export function Home(): JSX.Element {
   if (!indexQuery.called) {
     getIndexQuery({variables: {page, paginationSize}});
   }
- 
+
   function previousPage(): void {
     if (page > 0) {
       goToPage(page - 1);
