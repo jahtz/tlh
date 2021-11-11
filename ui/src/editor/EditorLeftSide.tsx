@@ -2,7 +2,7 @@ import {useState} from 'react';
 import classNames from 'classnames';
 import {NodeDisplay, NodeDisplayIProps} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
-import {EditTriggerFunc} from './xmlDisplayConfigs';
+import {EditTriggerFunc} from './editorConfig/editorConfig';
 
 interface IProps extends NodeDisplayIProps {
   filename: string;

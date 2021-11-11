@@ -2,8 +2,8 @@ import {useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
 import {XmlNode} from './xmlModel/xmlModel';
 import {NewDocumentEditor} from './NewDocumentEditor';
-import {loadNewXml} from './xmlModel/xmlLoader';
 import classNames from 'classnames';
+import {loadNewXml} from './xmlModel/xmlReading';
 
 function handleSaveToPC(data: string, filename: string): void {
   const link = document.createElement('a');

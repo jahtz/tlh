@@ -2,9 +2,9 @@ import {useTranslation} from 'react-i18next';
 import {FileLoader} from '../forms/FileLoader';
 import {useState} from 'react';
 import update from 'immutability-helper';
-import {loadNewXml} from '../editor/xmlModel/xmlLoader';
 import {DocumentMerger} from './DocumentMerger';
 import {LoadedDocument} from '../editor/DocumentEditorContainer';
+import {loadNewXml} from '../editor/xmlModel/xmlReading';
 
 
 interface IState {

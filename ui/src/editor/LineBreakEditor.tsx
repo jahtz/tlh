@@ -1,63 +1,53 @@
-import {XmlEditableNodeIProps} from './xmlDisplayConfigs';
-import {GenericAttributes} from './xmlModel/xmlModel';
-import {LinebreakNodeAttributes} from './tlhEditorConfig';
+import {XmlEditableNodeIProps} from './editorConfig/editorConfig';
 import {useTranslation} from 'react-i18next';
-import {Field, Form, Formik} from 'formik';
+import {LineBreakData} from './editorConfig/lineBreakData';
+import {UpdatePrevNextButtons} from './morphAnalysisOption/UpdatePrevNextButtons';
 
-type IProps = XmlEditableNodeIProps<LinebreakNodeAttributes & GenericAttributes>;
-
-export function LineBreakEditor({node, updateNode, deleteNode, path, jumpEditableNodes, setKeyHandlingEnabled}: IProps): JSX.Element {
+export function LineBreakEditor({
+  data,
+  changed,
+  updateNode,
+  deleteNode,
+  jumpEditableNodes,
+  setKeyHandlingEnabled,
+  initiateSubmit
+}: XmlEditableNodeIProps<LineBreakData>): JSX.Element {
 
   const {t} = useTranslation('common');
 
-  function onSubmit(attributes: LinebreakNodeAttributes & GenericAttributes): void {
-    updateNode({...node, attributes}, path);
-  }
-
   return (
-    <Formik initialValues={node.attributes} onSubmit={onSubmit}>
-      <Form>
-
-        <div className="field">
-          <label htmlFor="txtid" className="label">{t('textId')}:</label>
-          <div className="control">
-            <Field type="text" name="txtid" id="txtid" className="input" readOnly/>
-          </div>
+    <>
+      <div className="field">
+        <label htmlFor="textId" className="label">{t('textId')}:</label>
+        <div className="control">
+          <input type="text" id="textId" className="input is-static" readOnly/>
         </div>
+      </div>
 
-        <div className="field">
-          <label htmlFor="lnr" className="label">{t('lineNumber')}:</label>
-          <div className="control">
-            <Field type="text" name="lnr" id="lnr" className="input" onFocus={() => setKeyHandlingEnabled(false)} onBlur={() => setKeyHandlingEnabled(true)}/>
-          </div>
+      <div className="field">
+        <label htmlFor="lineNumber" className="label">{t('lineNumber')}:</label>
+        <div className="control">
+          <input type="text" id="lineNumber" className="input" defaultValue={data.lineNumber} onFocus={() => setKeyHandlingEnabled(false)}
+                 onBlur={(event) => updateNode({lineNumber: {$set: event.target.value}})}/>
         </div>
+      </div>
 
-        <div className="field">
-          <label htmlFor="lg" className="label">{t('language')}</label>
-          <div className="control">
-            <Field type="text" name="lg" id="lg" className="input" onFocus={() => setKeyHandlingEnabled(false)} onBlur={() => setKeyHandlingEnabled(true)}/>
-          </div>
+      <div className="field">
+        <label htmlFor="lg" className="label">{t('language')}</label>
+        <div className="control">
+          <input type="text" id="lg" className="input" defaultValue={data.lg} onFocus={() => setKeyHandlingEnabled(false)}
+                 onBlur={(event) => updateNode({lg: {$set: event.target.value}})}/>
         </div>
+      </div>
 
-        <div className="columns">
-          <div className="column">
+      <div className="my-3">
+        <UpdatePrevNextButtons changed={changed} initiateUpdate={initiateSubmit} initiateJumpElement={(forward) => jumpEditableNodes('lb', forward)}>
+          <div className="control is-expanded">
             <button type="button" className="button is-danger is-fullwidth" onClick={deleteNode}>{t('delete')}</button>
           </div>
-          <div className="column">
-            <button type="submit" className="button is-link is-fullwidth">{t('update')}</button>
-          </div>
-        </div>
+        </UpdatePrevNextButtons>
+      </div>
 
-        <div className="columns">
-          <div className="column">
-            <button className="button is-fullwidth" onClick={() => jumpEditableNodes(node.tagName, false)}>{t('previousEditable')}</button>
-          </div>
-          <div className="column">
-            <button className="button is-fullwidth" onClick={() => jumpEditableNodes(node.tagName, true)}>{t('nextEditable')}</button>
-          </div>
-        </div>
-
-      </Form>
-    </Formik>
+    </>
   );
 }

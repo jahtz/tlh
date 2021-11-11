@@ -1,8 +1,7 @@
-import {GenericAttributes, XmlElementNode} from '../../editor/xmlModel/xmlModel';
+import {XmlElementNode} from '../../editor/xmlModel/xmlModel';
 import {AOWordContent, aoWordContentFormat, xmlifyAoWordContent} from '../wordContent/wordContent';
 import {MorphologicalAnalysis, writeMorphAnalysisAttribute} from '../morphologicalAnalysis';
 import {aoBasicText} from '../wordContent/basicText';
-import {WordNodeAttributes} from '../../editor/tlhEditorConfig';
 import {indent, XmlWriter} from '../../editor/xmlModel/xmlWriting';
 
 export interface AOWord {
@@ -23,9 +22,9 @@ export const aoWordFormat: XmlWriter<AOWord> = {
     ]
 };
 
-export function xmlifyAoWord({transliteration, content, language, mrp0sel, morphologies}: AOWord): XmlElementNode<WordNodeAttributes & GenericAttributes> {
+export function xmlifyAoWord({transliteration, content, language, mrp0sel, morphologies}: AOWord): XmlElementNode {
 
-  const attributes: WordNodeAttributes & GenericAttributes = {};
+  const attributes: Record<string, string> = {};
 
   if (mrp0sel) {
     attributes.mrp0sel = mrp0sel;

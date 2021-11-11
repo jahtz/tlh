@@ -20,6 +20,9 @@ export const xmlComparatorUrl = '/xmlComparator';
 
 export const documentMergerUrl = '/documentMerger';
 
+// Fragments
+
+export const manuscriptsUrlFragment = 'manuscripts';
 
 // Foreign urls
 

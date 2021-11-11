@@ -5,44 +5,46 @@ import {MultiMorphAnalysisSelection} from './MultiMorphAnalysisSelection';
 import {SingleMorphAnalysisOptionButton} from './SingleMorphAnalysisOptionButton';
 import {MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {UpdatePrevNextButtons, UpdatePrevNextButtonsProps} from './UpdatePrevNextButtons';
-import {Numerus} from './MorphologicalAnalysisOption';
-import {analysisIsInNumerus} from '../WordNodeEditor';
+import {Numerus} from './MorphAnalysisOptionContainer';
 import {LetteredAnalysisOptionButtons} from './LetteredAnalysisOptionButtons';
 
 
-interface IProps extends UpdatePrevNextButtonsProps {
+interface IProps {
+  updatePrevNextButtonsProps: UpdatePrevNextButtonsProps;
+
   morphologicalAnalysis: MorphologicalAnalysis;
 
-  toggleAnalysisSelection: (letter?: string) => void;
-  toggleEncliticsSelection: (letter: string) => void;
-  toggleEdit: () => void;
+  toggleAnalysisSelection: (index?: number) => void;
+  toggleEncliticsSelection: (index: number) => void;
+  enableEditMode: () => void;
 }
+
+
+export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean {
+  return analysis.includes(numerus) || analysis.includes('ABL') || analysis.includes('INS') || analysis.includes('ALL');
+}
+
 
 const buttonClasses = 'button is-outlined is-primary is-fullwidth';
 
 export function MorphAnalysisOptionButtons({
-  changed,
+  updatePrevNextButtonsProps,
   morphologicalAnalysis,
   toggleAnalysisSelection,
   toggleEncliticsSelection,
-  initiateUpdate,
-  initiateJumpElement,
-  toggleEdit
+  enableEditMode
 }: IProps): JSX.Element {
 
-  const {number, translation, referenceWord, paradigmClass, encliticsAnalysis, determinativ} = morphologicalAnalysis;
-
   const {t} = useTranslation('common');
-
-  const isSingleAnalysisOption = 'analysis' in morphologicalAnalysis;
-
   const [isReduced, setIsReduced] = useState(false);
+
+  const {number, translation, referenceWord, paradigmClass, encliticsAnalysis, determinativ} = morphologicalAnalysis;
+  const isSingleAnalysisOption = 'analysis' in morphologicalAnalysis;
 
   function selectAll(ma: MultiMorphologicalAnalysis, numerus?: Numerus): void {
     ma.analysisOptions
       .filter(({analysis}) => !numerus || analysisIsInNumerus(analysis, numerus))
-      .map(({letter}) => letter)
-      .forEach((letter) => toggleAnalysisSelection(letter));
+      .forEach((_, index) => toggleAnalysisSelection(index));
   }
 
   return (
@@ -57,12 +59,13 @@ export function MorphAnalysisOptionButtons({
           <div className="control is-expanded">
             <button className="button is-static is-fullwidth">
               &nbsp;
-              {number}) {translation} ({referenceWord}, {t('paradigmClass')}:&nbsp;<span className="has-text-danger">{paradigmClass}</span>
+              {number})&nbsp;<span className="has-text-danger">{translation}</span>&nbsp;({referenceWord},
+              {t('paradigmClass')}:&nbsp;<span className="has-text-danger">{paradigmClass}</span>
               {determinativ && <span>, {t('determinativ')}:&nbsp;<span className="has-text-danger">{determinativ}</span></span>})&nbsp;
             </button>
           </div>
           {!isSingleAnalysisOption && <div className="control">
-            <button className="button" onClick={toggleEdit}><IoSettingsOutline/></button>
+            <button className="button" onClick={enableEditMode}><IoSettingsOutline/></button>
           </div>}
         </div>
       </div>
@@ -84,7 +87,7 @@ export function MorphAnalysisOptionButtons({
           </div>}
 
           <div className="column is-one-third">
-            <UpdatePrevNextButtons changed={changed} initiateUpdate={initiateUpdate} initiateJumpElement={initiateJumpElement}/>
+            <UpdatePrevNextButtons {...updatePrevNextButtonsProps}/>
 
             {!isSingleAnalysisOption && <>
               <div className="mb-1">

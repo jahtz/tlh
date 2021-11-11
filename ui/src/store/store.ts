@@ -1,10 +1,11 @@
 import {createStore} from 'redux';
 import {NEW_LANGUAGES, StoreAction, UPDATE_PREFERENCES, USER_LOGGED_IN, USER_LOGGED_OUT} from './actions';
 import {LoggedInUserFragment, ManuscriptLanguageFragment} from '../graphql';
-import {defaultEditorKeyConfig, EditorKeyConfig} from '../editor/editorKeyConfig';
+import {defaultEditorKeyConfig, EditorKeyConfig, OldEditorKeyConfig} from '../editor/editorKeyConfig';
 
 const localStorageUserKey = 'userId';
 const localStoragePreferencesKey = 'preferences';
+const localStorageLanguagesKey = 'languages';
 
 interface StoreState {
   currentUser?: LoggedInUserFragment;
@@ -21,8 +22,10 @@ function rootReducer(store: StoreState = {languages: []}, action: StoreAction): 
       localStorage.removeItem(localStorageUserKey);
       return {...store, currentUser: undefined};
     case UPDATE_PREFERENCES:
+      localStorage.setItem(localStoragePreferencesKey, JSON.stringify(action.newPreferences));
       return {...store, editorKeyConfig: action.newPreferences};
     case NEW_LANGUAGES:
+      localStorage.setItem(localStorageLanguagesKey, JSON.stringify(action.languages));
       return {...store, languages: action.languages};
     default:
       return store;
@@ -42,15 +45,26 @@ export function allManuscriptLanguagesSelector(store: StoreState): ManuscriptLan
   return store.languages;
 }
 
+function sanitizePreferences(object: OldEditorKeyConfig | EditorKeyConfig): EditorKeyConfig {
+  if ('updateAndNextEditableNodeKeys' in object) {
+    return object;
+  } else {
+    return {...object, updateAndPreviousEditableNodeKeys: [], updateAndNextEditableNodeKeys: []};
+  }
+}
+
 
 function initialState(): StoreState {
   const localStorageUser = localStorage.getItem(localStorageUserKey);
   const localStoragePreferences = localStorage.getItem(localStoragePreferencesKey);
+  const localStorageLanguages = localStorage.getItem(localStorageLanguagesKey);
+
+  // FIXME: also load languages from localStorage..
 
   return {
     currentUser: localStorageUser ? JSON.parse(localStorageUser) : undefined,
-    editorKeyConfig: localStoragePreferences ? JSON.parse(localStoragePreferences) : undefined,
-    languages: []
+    editorKeyConfig: localStoragePreferences ? sanitizePreferences(JSON.parse(localStoragePreferences)) : undefined,
+    languages: localStorageLanguages ? JSON.parse(localStorageLanguages) : []
   };
 }
 

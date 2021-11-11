@@ -5,6 +5,6 @@ interface IProps {
   secondRootNode: XmlNode;
 }
 
-export function DocumentMerger({firstRootNode, secondRootNode}: IProps) {
+export function DocumentMerger({firstRootNode, secondRootNode}: IProps): JSX.Element {
   return <div>TODO!</div>;
 }

@@ -25,10 +25,15 @@ export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXml
     const writeConfig: NodeWriteConfig | undefined = xmlWriteConfig[tagName] || undefined;
 
     const writtenAttributes = Object.entries(attributes)
-      .map(([name, value]) => {
+      .flatMap(([name, value]) => {
+        if (!value) {
+          return [];
+        }
+
         const writtenValue = value
           .replaceAll(/&(?!amp;)/g, '&amp;')
           .replaceAll('<', '&lt;');
+
         return `${name}="${writtenValue}"`;
       })
       .join(' ');

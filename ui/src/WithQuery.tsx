@@ -8,6 +8,7 @@ interface IProps<T> {
   notCalledMessage?: JSX.Element;
 }
 
+// FIXME: rename render as children!
 export function WithQuery<T>({query: {data, loading, error, called}, render, notCalledMessage}: IProps<T>): JSX.Element {
 
   const {t} = useTranslation('common');

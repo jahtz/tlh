@@ -1,9 +1,7 @@
 import {LetteredAnalysisOption, parseMultiAnalysisString} from './analysisOptions';
 import {tlhAnalyzerUrl} from '../urls';
 import {isXmlElementNode, XmlElementNode} from '../editor/xmlModel/xmlModel';
-import {WordNode} from '../editor/WordContentEditor';
 import {loadNode, tlhXmlReadConfig} from '../editor/xmlModel/xmlReading';
-import {WordNodeAttributes} from '../editor/tlhEditorConfig';
 import {SelectedAnalysisOption} from '../editor/selectedAnalysisOption';
 
 const morphologyAttributeNameRegex = /^mrp(\d+)$/;
@@ -137,7 +135,7 @@ export function readMorphologicalAnalysis(number: number, content: string | null
     : {number, translation, referenceWord, analysis: analysesString, paradigmClass, encliticsAnalysis, determinativ, selected: selected.length > 0};
 }
 
-export function readMorphologiesFromNode(node: XmlElementNode<WordNodeAttributes>, initialSelectedMorphologies: SelectedAnalysisOption[]): MorphologicalAnalysis[] {
+export function readMorphologiesFromNode(node: XmlElementNode, initialSelectedMorphologies: SelectedAnalysisOption[]): MorphologicalAnalysis[] {
   return Object.entries(node.attributes)
     .map(([name, value]) => {
       const match = name.trim().match(morphologyAttributeNameRegex);
@@ -175,7 +173,7 @@ export function writeMorphAnalysisAttribute(ma: MorphologicalAnalysis): string[]
 
 // Fetching from TLHaly
 
-export function fetchMorphologicalAnalyses(w: string, tl = 'Hit'): Promise<WordNode | undefined> {
+export function fetchMorphologicalAnalyses(w: string, tl = 'Hit'): Promise<XmlElementNode | undefined> {
   // FIXME: set language!
   const formData = new FormData();
   formData.append('w', w);
@@ -190,7 +188,7 @@ export function fetchMorphologicalAnalyses(w: string, tl = 'Hit'): Promise<WordN
       const loadedTag = loadNode(wTag, tlhXmlReadConfig);
 
       return isXmlElementNode(loadedTag)
-        ? loadedTag as WordNode
+        ? loadedTag as XmlElementNode
         : undefined;
     });
 }

@@ -1,9 +1,8 @@
-import {GenericAttributes, isXmlElementNode, XmlNode, XmlTextNode} from './xmlModel';
+import {isXmlElementNode, XmlNode, XmlTextNode} from './xmlModel';
 
 type LetterCorrection = {
   [key: string]: string;
 }
-
 
 interface NodeReadConfig {
   letterCorrections: LetterCorrection;
@@ -68,7 +67,7 @@ export function loadNode(el: ChildNode, xmlReadConfig: XmlReadConfig, parentLett
     return {
       tagName: el.tagName,
       attributes: Array.from(el.attributes)
-        .reduce<GenericAttributes>((acc, {name, value}) => {
+        .reduce((acc, {name, value}) => {
           return {...acc, [name]: value};
         }, {}),
       children: Array.from(el.childNodes)
@@ -79,4 +78,15 @@ export function loadNode(el: ChildNode, xmlReadConfig: XmlReadConfig, parentLett
   } else {
     throw new Error(`unexpected element: ${el.nodeType}`);
   }
+}
+
+export async function loadNewXml(file: File, xmlReadConfig: XmlReadConfig = tlhXmlReadConfig): Promise<XmlNode> {
+  const content = await file.text();
+
+  // non breakable space to normal space
+  const correctedText = content.replaceAll('\xa0', '');
+
+  const doc = new DOMParser().parseFromString(correctedText, 'text/xml');
+
+  return loadNode(doc.children[0], xmlReadConfig);
 }

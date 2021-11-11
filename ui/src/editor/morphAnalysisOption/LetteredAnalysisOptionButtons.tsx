@@ -3,7 +3,7 @@ import {LetteredAnalysisOption} from '../../model/analysisOptions';
 
 interface IProps {
   analysisOptions: LetteredAnalysisOption[];
-  toggleAnalysisSelection: (letter: string) => void;
+  toggleAnalysisSelection: (index: number) => void;
 }
 
 export function LetteredAnalysisOptionButtons({analysisOptions, toggleAnalysisSelection}: IProps): JSX.Element {
@@ -12,7 +12,7 @@ export function LetteredAnalysisOptionButtons({analysisOptions, toggleAnalysisSe
       {analysisOptions.map(({letter, analysis, selected}, index) =>
         <div key={index} className="mb-1">
           <button type="button" className={classNames('button', 'is-fullwidth', 'button-text-left', {'is-link': selected})}
-                  onClick={() => toggleAnalysisSelection(letter)}>
+                  onClick={() => toggleAnalysisSelection(index)}>
             {letter} - {analysis}
           </button>
         </div>
