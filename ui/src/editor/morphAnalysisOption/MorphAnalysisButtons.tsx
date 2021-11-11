@@ -43,8 +43,11 @@ export function MorphAnalysisOptionButtons({
 
   function selectAll(ma: MultiMorphologicalAnalysis, numerus?: Numerus): void {
     ma.analysisOptions
-      .filter(({analysis}) => !numerus || analysisIsInNumerus(analysis, numerus))
-      .forEach((_, index) => toggleAnalysisSelection(index));
+      .forEach(({analysis}, index) => {
+        if (!numerus || analysisIsInNumerus(analysis, numerus)) {
+          toggleAnalysisSelection(index);
+        }
+      });
   }
 
   return (
