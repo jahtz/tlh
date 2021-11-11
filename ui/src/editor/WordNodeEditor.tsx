@@ -14,7 +14,7 @@ import {WordContentEditor} from './WordContentEditor';
 import update, {Spec} from 'immutability-helper';
 import {UpdatePrevNextButtons, UpdatePrevNextButtonsProps} from './morphAnalysisOption/UpdatePrevNextButtons';
 import {IoAddOutline, IoSettingsOutline} from 'react-icons/io5';
-import {WordNodeData} from './editorConfig/wordNodeData';
+import {readWordNodeData, WordNodeData} from './editorConfig/wordNodeData';
 
 interface IState {
   addMorphology?: boolean;
@@ -97,9 +97,7 @@ export function WordNodeEditor({
   }
 
   function handleEditUpdate(node: XmlElementNode): void {
-    // FIXME: update...
-    // updateNode(node, path);
-    // FIXME: reload morphological analysis!
+    updateNode({$set: readWordNodeData(node)});
     cancelEdit();
   }
 
@@ -182,7 +180,7 @@ export function WordNodeEditor({
           <button onClick={deleteNode} className="button is-danger is-fullwidth">{t('deleteNode')}</button>
         </div>
         <div className="column">
-          <button type="button" className="button is-fullwidth" onClick={enableEditWordState} disabled><IoSettingsOutline/>&nbsp;{t('editContent')}</button>
+          <button type="button" className="button is-fullwidth" onClick={enableEditWordState}><IoSettingsOutline/>&nbsp;{t('editContent')}</button>
         </div>
       </div>
 
