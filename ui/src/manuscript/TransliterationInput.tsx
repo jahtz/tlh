@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
 import {activeUserSelector} from '../store/store';
 import {homeUrl} from '../urls';
-import {Redirect} from 'react-router-dom';
 import {TransliterationInput as TI, useUploadTransliterationMutation} from '../graphql';
 import {ManuscriptBaseIProps} from './ManuscriptBase';
 import {TransliterationSideInput} from './TransliterationSideInput';
+import {Navigate} from 'react-router-dom';
 
 interface SideParseResultContainer {
   newSideParseResult?: TI;
@@ -27,7 +27,7 @@ export function TransliterationInput({manuscript}: ManuscriptBaseIProps): JSX.El
   const mainIdentifier = manuscript.mainIdentifier.identifier;
 
   if (!currentUser || currentUser.username !== manuscript.creatorUsername) {
-    return <Redirect to={homeUrl}/>;
+    return <Navigate to={homeUrl}/>;
   }
 
   if (data) {

@@ -1,4 +1,4 @@
-import { Dispatch, useState } from 'react';
+import {Dispatch, useState} from 'react';
 import {LoginMutationVariables, useLoginMutation} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
@@ -6,7 +6,7 @@ import {BulmaField} from './BulmaFields';
 import {loginSchema} from './schemas';
 import classnames from 'classnames';
 import {homeUrl} from '../urls';
-import {Redirect} from 'react-router-dom';
+import {Navigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {StoreAction, userLoggedInAction} from '../store/actions';
 import {activeUserSelector} from '../store/store';
@@ -21,7 +21,7 @@ export function LoginForm(): JSX.Element {
   const [login, {loading, error}] = useLoginMutation();
 
   if (useSelector(activeUserSelector)) { // User is already logged in
-    return <Redirect to={homeUrl}/>;
+    return <Navigate to={homeUrl}/>;
   }
 
   function handleSubmit(values: LoginMutationVariables): void {

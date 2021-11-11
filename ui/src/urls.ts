@@ -18,6 +18,9 @@ export const editDocumentUrl = '/editDocument';
 
 export const xmlComparatorUrl = '/xmlComparator';
 
+// Fragments
+
+export const manuscriptsUrlFragment = 'manuscripts';
 
 // Foreign urls
 

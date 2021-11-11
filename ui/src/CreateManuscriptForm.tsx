@@ -1,6 +1,5 @@
 import {useTranslation} from 'react-i18next';
 import {
-  LoggedInUserFragment,
   ManuscriptIdentifierInput,
   ManuscriptIdentifierType,
   ManuscriptMetaDataInput,
@@ -11,13 +10,11 @@ import {ErrorMessage, Field, FieldArray, FieldArrayRenderProps, Form, Formik, Fo
 import {manuscriptSchema} from './forms/schemas';
 import classNames from 'classnames';
 import {ManuscriptIdInputField} from './forms/ManuscriptIdInputField';
-import {loginUrl} from './urls';
-import {Redirect} from 'react-router-dom';
+import {Navigate} from 'react-router-dom';
 import {BulmaField} from './forms/BulmaFields';
-import {useSelector} from 'react-redux';
-import {activeUserSelector} from './store/store';
 import {allPalaeographicClassifications, getNameForPalaeoClassification} from './palaeoClassification';
 import {allKnownProvenances} from './provenances';
+import {manuscriptsUrlFragment} from './urls';
 
 function newManuscriptIdentifier(): ManuscriptIdentifierInput {
   return {
@@ -40,16 +37,11 @@ export function CreateManuscriptForm(): JSX.Element {
 
   const {t} = useTranslation('common');
   const [createManuscript, {data, loading, error}] = useCreateManuscriptMutation();
-  const currentUser: LoggedInUserFragment | undefined = useSelector(activeUserSelector);
 
   const createdManuscript: string | null | undefined = data?.me?.createManuscript;
 
-  if (!currentUser) {
-    return <Redirect to={loginUrl}/>;
-  }
-
   if (createdManuscript) {
-    return <Redirect to={`./manuscripts/${encodeURIComponent(createdManuscript)}/data`}/>;
+    return <Navigate to={`/${manuscriptsUrlFragment}/${encodeURIComponent(createdManuscript)}/data`}/>;
   }
 
   function handleSubmit(manuscriptMetaData: ManuscriptMetaDataInput): void {

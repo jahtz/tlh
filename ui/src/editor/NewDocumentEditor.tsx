@@ -7,7 +7,6 @@ import {useSelector} from 'react-redux';
 import {editorKeyConfigSelector} from '../store/store';
 import {writeNode} from './xmlModel/xmlWriting';
 import update, {Spec} from 'immutability-helper';
-import {Prompt} from 'react-router-dom';
 import {EditorLeftSide} from './EditorLeftSide';
 import {EditorEmptyRightSide} from './EditorEmptyRightSide';
 import {calculateInsertablePositions, InsertablePositions, NodePath} from './insertablePositions';
@@ -337,7 +336,9 @@ export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhEdito
 
   return (
     <>
+      {/* FIXME: propmt!
       <Prompt when={state.changed} message={t('leaveUnfinishedChangesMessage')}/>
+      */}
 
       <div className="columns">
         <div className="column">
