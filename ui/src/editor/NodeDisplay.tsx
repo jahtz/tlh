@@ -1,6 +1,6 @@
 import {isXmlTextNode, XmlNode} from './xmlModel/xmlModel';
 import {EditTriggerFunc, XmlEditorConfig} from './editorConfig/editorConfig';
-import {tlhEditorConfig} from './editorConfig/tlhEditorConfig';
+import {tlhXmlEditorConfig} from './editorConfig/tlhXmlEditorConfig';
 import classNames from 'classnames';
 import {NodePath} from './insertablePositions';
 import {IoAddOutline} from 'react-icons/io5';
@@ -22,7 +22,7 @@ export interface NodeDisplayIProps {
 export function NodeDisplay({
   node,
   currentSelectedPath,
-  editorConfig = tlhEditorConfig,
+  editorConfig = tlhXmlEditorConfig(),
   onSelect,
   path = [],
   insertStuff,

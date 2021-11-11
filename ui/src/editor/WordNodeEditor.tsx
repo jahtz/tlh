@@ -4,7 +4,7 @@ import {useEffect, useState} from 'react';
 import {MorphologicalAnalysis} from '../model/morphologicalAnalysis';
 import {MorphAnalysisOptionContainer} from './morphAnalysisOption/MorphAnalysisOptionContainer';
 import {NodeDisplay} from './NodeDisplay';
-import {tlhEditorConfig} from './editorConfig/tlhEditorConfig';
+import {tlhXmlEditorConfig} from './editorConfig/tlhXmlEditorConfig';
 import {useSelector} from 'react-redux';
 import {allManuscriptLanguagesSelector, editorKeyConfigSelector} from '../store/store';
 import {XmlElementNode} from './xmlModel/xmlModel';
@@ -134,7 +134,7 @@ export function WordNodeEditor({
   return (
     <>
       <div className="box has-text-centered">
-        <NodeDisplay node={node} editorConfig={tlhEditorConfig}/>
+        <NodeDisplay node={node} editorConfig={tlhXmlEditorConfig()}/>
         <sup>&nbsp;</sup><sub>&nbsp;</sub>
       </div>
 

@@ -4,16 +4,19 @@ import {NodeDisplay} from '../editor/NodeDisplay';
 import {zipWithOffset} from './zipWithOffset';
 import {useTranslation} from 'react-i18next';
 import {IoChevronDown, IoChevronUp} from 'react-icons/io5';
+import {tlhXmlEditorConfig} from '../editor/editorConfig/tlhXmlEditorConfig';
 
 interface IProps {
   firstDocument: MergeDocument;
   secondDocument: MergeDocument;
 }
 
+const editorConfig = tlhXmlEditorConfig(false);
+
 function MergeDocumentLine({line}: { line: MergeLine }): JSX.Element {
   return (
     <>
-      {/*<NodeDisplay node={line.lb}/>*/}
+      <NodeDisplay node={line.lb} editorConfig={editorConfig}/>
       {line.rest.map((n, index) => <NodeDisplay key={index} node={n}/>)}
     </>
   );

@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {findFirstXmlElementByTagName, isXmlElementNode, XmlElementNode, XmlNode} from './xmlModel/xmlModel';
 import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './editorConfig/editorConfig';
-import {tlhEditorConfig} from './editorConfig/tlhEditorConfig';
+import {tlhXmlEditorConfig} from './editorConfig/tlhXmlEditorConfig';
 import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
 import {editorKeyConfigSelector} from '../store/store';
@@ -111,7 +111,7 @@ function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode
   return rootNode;
 }
 
-export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhEditorConfig, download, filename, closeFile}: IProps): JSX.Element {
+export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEditorConfig(), download, filename, closeFile}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);
