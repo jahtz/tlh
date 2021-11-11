@@ -51,14 +51,16 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
         </div>
       </div>
 
-      <table className="table is-fullwidth">
-        <tbody>
-          {data.map(([left, right], index) => <tr key={index}>
-            {left && <td colSpan={right ? 1 : 2} className="has-text-centered"><MergeDocumentLine line={left}/></td>}
-            {right && <td colSpan={left ? 1 : 2} className="has-text-centered"><MergeDocumentLine line={right}/></td>}
-          </tr>)}
-        </tbody>
-      </table>
+      <div className="scrollable">
+        <table className="table is-fullwidth">
+          <tbody>
+            {data.map(([left, right], index) => <tr key={index}>
+              {left && <td colSpan={right ? 1 : 2} className="has-text-centered"><MergeDocumentLine line={left}/></td>}
+              {right && <td colSpan={left ? 1 : 2} className="has-text-centered"><MergeDocumentLine line={right}/></td>}
+            </tr>)}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }
