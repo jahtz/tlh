@@ -3,13 +3,18 @@ import {FileLoader} from '../forms/FileLoader';
 import {useState} from 'react';
 import update from 'immutability-helper';
 import {DocumentMerger} from './DocumentMerger';
-import {LoadedDocument} from '../editor/DocumentEditorContainer';
 import {loadNewXml} from '../editor/xmlModel/xmlReading';
+import {MergeDocument, readMergeDocument} from './mergeDocument';
+import {XmlElementNode} from '../editor/xmlModel/xmlModel';
 
+interface MergeFile {
+  filename: string;
+  document: MergeDocument;
+}
 
 interface IState {
-  firstFile?: LoadedDocument;
-  secondFile?: LoadedDocument;
+  firstFile?: MergeFile;
+  secondFile?: MergeFile;
 }
 
 export function DocumentMergerContainer(): JSX.Element {
@@ -18,13 +23,13 @@ export function DocumentMergerContainer(): JSX.Element {
   const [state, setState] = useState<IState>({});
 
   async function loadFirstDocument(file: File): Promise<void> {
-    const rootNode = await loadNewXml(file);
-    setState((state) => update(state, {firstFile: {$set: {filename: file.name, rootNode}}}));
+    const document = readMergeDocument(await loadNewXml(file) as XmlElementNode);
+    setState((state) => update(state, {firstFile: {$set: {filename: file.name, document}}}));
   }
 
   async function loadSecondDocument(file: File): Promise<void> {
-    const rootNode = await loadNewXml(file);
-    setState((state) => update(state, {secondFile: {$set: {filename: file.name, rootNode}}}));
+    const document = readMergeDocument(await loadNewXml(file) as XmlElementNode);
+    setState((state) => update(state, {secondFile: {$set: {filename: file.name, document}}}));
   }
 
   return (
@@ -43,7 +48,7 @@ export function DocumentMergerContainer(): JSX.Element {
       {state.firstFile
         ? <>
           {state.secondFile
-            ? <DocumentMerger firstRootNode={state.firstFile.rootNode} secondRootNode={state.secondFile.rootNode}/>
+            ? <DocumentMerger firstDocument={state.firstFile.document} secondDocument={state.secondFile.document}/>
             : <FileLoader onLoad={loadSecondDocument} accept={'text/xml'} text={t('loadSecondFile')}/>}
         </>
         : <FileLoader onLoad={loadFirstDocument} accept={'text/xml'} text={t('loadFirstFile')}/>}

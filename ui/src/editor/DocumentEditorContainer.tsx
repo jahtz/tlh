@@ -14,7 +14,7 @@ function handleSaveToPC(data: string, filename: string): void {
   link.click();
 }
 
-export interface LoadedDocument {
+interface LoadedDocument {
   filename: string;
   rootNode: XmlNode;
 }
