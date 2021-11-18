@@ -1,5 +1,5 @@
 // regex means multiple whitespaces followed by (but not including) an opening curly brace
-const letteredAnalysesSplitRegex = /\s+(?={)/;
+const letteredAnalysesSplitRegex = /\s*(?={)/;
 
 export interface LetteredAnalysisOption {
   letter: string;
@@ -16,7 +16,8 @@ export function getSelectedLetters(laos: LetteredAnalysisOption[]): string[] {
 function parseAnalysisOption(as: string, selectedLetters: string[]): LetteredAnalysisOption {
   const [letter, analysis] = as
     // Remove curly braces
-    .substr(1, as.length - 2)
+    .substring(1, as.length - 1)
+    .trim()
     .split('→')
     .map((s) => s.trim());
 

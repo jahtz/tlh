@@ -26,6 +26,6 @@ export const manuscriptsUrlFragment = 'manuscripts';
 
 // Foreign urls
 
-const tlhAnalyzerServerUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:8057' : 'https://hethport3.uni-wuerzburg.de/TLHaly';
+const tlhAnalyzerServerUrl = /*process.env.NODE_ENV === 'development' ? 'http://localhost:8057' :*/ 'https://www.hethport3.uni-wuerzburg.de/TLHaly';
 
-export const tlhAnalyzerUrl = `${tlhAnalyzerServerUrl}/webanalysis.php`;
+export const tlhAnalyzerUrl = `${tlhAnalyzerServerUrl}/jasonanalysis.php`;

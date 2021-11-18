@@ -1,7 +1,6 @@
 import {LetteredAnalysisOption, parseMultiAnalysisString} from './analysisOptions';
 import {tlhAnalyzerUrl} from '../urls';
-import {isXmlElementNode, XmlElementNode} from '../editor/xmlModel/xmlModel';
-import {loadNode, tlhXmlReadConfig} from '../editor/xmlModel/xmlReading';
+import {XmlElementNode} from '../editor/xmlModel/xmlModel';
 import {SelectedAnalysisOption} from '../editor/selectedAnalysisOption';
 
 const morphologyAttributeNameRegex = /^mrp(\d+)$/;
@@ -173,23 +172,13 @@ export function writeMorphAnalysisAttribute(ma: MorphologicalAnalysis): string[]
 
 // Fetching from TLHaly
 
-export function fetchMorphologicalAnalyses(w: string, tl = 'Hit'): Promise<XmlElementNode | undefined> {
+export function fetchMorphologicalAnalyses(w: string, tl = 'Hit'): Promise<Record<string, string> | undefined> {
   // FIXME: set language!
   const formData = new FormData();
   formData.append('w', w);
   formData.append('tl', tl);
 
   return fetch(tlhAnalyzerUrl, {method: 'POST', body: formData})
-    .then((res) => res.text())
-    .then((resText) => {
-
-      const wTag: ChildNode = new DOMParser().parseFromString(resText, 'text/xml').childNodes[0];
-
-      const loadedTag = loadNode(wTag, tlhXmlReadConfig);
-
-      return isXmlElementNode(loadedTag)
-        ? loadedTag as XmlElementNode
-        : undefined;
-    });
+    .then((res) => res.json());
 }
 

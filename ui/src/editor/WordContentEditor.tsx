@@ -9,6 +9,7 @@ import classNames from 'classnames';
 import {fetchMorphologicalAnalyses} from '../model/morphologicalAnalysis';
 import {NodeDisplay} from './NodeDisplay';
 import {writeNode} from './xmlModel/xmlWriting';
+import update from 'immutability-helper';
 
 interface IProps {
   initialTransliteration: string;
@@ -42,10 +43,8 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
     if (state.parseResult.status) {
       fetchMorphologicalAnalyses(writeNode(state.parseResult.value).join(''), 'Hit')
         .then((res) => {
-          // console.info(JSON.stringify(res, null, 2));
-
           if (res) {
-            setState({parseResult: {status: true, value: res}});
+            setState((state) => update(state, {parseResult: {value: {attributes: {$set: res}}}}));
           }
         })
         .catch((err) => console.error(err));
@@ -80,7 +79,7 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
       </div>
 
       {state.parseResult.status && <>
-        <button type="button" className="button is-link is-fullwidth" onClick={updateMorphologies} disabled>{t('fetchMorphologicalAnalyses')}</button>
+        <button type="button" className="button is-link is-fullwidth" onClick={updateMorphologies}>{t('fetchMorphologicalAnalyses')}</button>
       </>}
 
       <div className="columns my-3">
