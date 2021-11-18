@@ -18,6 +18,7 @@ interface IProps {
   editorConfig?: XmlEditorConfig;
   download: (content: string) => void;
   closeFile: () => void;
+  autoSave: (rootNode: XmlNode) => void;
 }
 
 interface IEditNodeState<T> {
@@ -111,16 +112,14 @@ function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode
   return rootNode;
 }
 
-export const localStorageEditorStateKey = 'editorState';
-
-export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEditorConfig, download, filename, closeFile}: IProps): JSX.Element {
+export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEditorConfig, download, filename, closeFile, autoSave}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);
   const [state, setState] = useState<IState<T>>({keyHandlingEnabled: true, rootNode: initialNode, changed: false});
 
   useEffect(() => {
-    state.changed && localStorage.setItem(localStorageEditorStateKey, JSON.stringify(state));
+    state.changed && autoSave(state.rootNode);
   }, [state]);
 
   useEffect(() => {
@@ -159,8 +158,6 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
         .replaceAll(' mrp', '\n\tmrp')
         .replaceAll('@', ' @ ')
     );
-
-    localStorage.removeItem(localStorageEditorStateKey);
   }
 
   function onNodeSelect(node: XmlElementNode, path: number[]): void {

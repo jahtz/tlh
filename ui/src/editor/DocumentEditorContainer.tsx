@@ -1,9 +1,11 @@
 import {useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
 import {XmlNode} from './xmlModel/xmlModel';
-import {DocumentEditor, localStorageEditorStateKey} from './DocumentEditor';
+import {DocumentEditor} from './DocumentEditor';
 import classNames from 'classnames';
 import {loadNewXml} from './xmlModel/xmlReading';
+
+const localStorageEditorStateKey = 'editorState';
 
 function handleSaveToPC(data: string, filename: string): void {
   const link = document.createElement('a');
@@ -27,6 +29,16 @@ function initialState(): LoadedDocument | undefined {
     : undefined;
 }
 
+function autoSave(filename: string, rootNode: XmlNode): void {
+  console.info('Auto save...');
+  localStorage.setItem(localStorageEditorStateKey, JSON.stringify({filename, rootNode}));
+}
+
+function removeAutoSave(): void {
+  console.info('Remove auto save...');
+  localStorage.removeItem(localStorageEditorStateKey);
+}
+
 export function DocumentEditorContainer(): JSX.Element {
 
   const [state, setState] = useState<LoadedDocument | undefined>(initialState());
@@ -39,10 +51,16 @@ export function DocumentEditorContainer(): JSX.Element {
     state && handleSaveToPC(content, state.filename);
   }
 
+  function closeFile(): void {
+    setState(undefined);
+    removeAutoSave();
+  }
+
   return (
     <div className={classNames('container', {'is-fluid': state})}>
       {state
-        ? <DocumentEditor node={state.rootNode} download={download} filename={state.filename} closeFile={() => setState(undefined)}/>
+        ? <DocumentEditor node={state.rootNode} download={download} filename={state.filename} closeFile={closeFile}
+                          autoSave={(node) => autoSave(state.filename, node)}/>
         : <FileLoader accept="text/xml" onLoad={readFile}/>}
     </div>
   );
