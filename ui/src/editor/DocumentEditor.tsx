@@ -279,7 +279,6 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
 
   function renderNodeEditor({node, data, path, changed}: IEditNodeState<T>): JSX.Element {
     return (editorConfig[node.tagName] as XmlSingleEditableNodeConfig<T>).edit({
-      node,
       data,
       path,
       changed,
