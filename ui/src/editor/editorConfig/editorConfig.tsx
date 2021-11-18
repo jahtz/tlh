@@ -11,7 +11,6 @@ export type EditTriggerFunc = (node: XmlElementNode, path: NodePath) => void;
 
 
 export interface XmlEditableNodeIProps<T = XmlElementNode> {
-  node: XmlElementNode;
   data: T;
   changed: boolean;
   path: number[];

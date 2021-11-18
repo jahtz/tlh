@@ -8,18 +8,20 @@ import {IoCloseSharp} from 'react-icons/io5';
 import {WordNodeEditor} from '../WordNodeEditor';
 
 export interface WordNodeData {
+  node: XmlElementNode;
   lg: string;
   morphologies: MorphologicalAnalysis[];
 }
 
-export function readWordNodeData(originalNode: XmlElementNode): WordNodeData {
+export function readWordNodeData(node: XmlElementNode): WordNodeData {
   return {
-    lg: originalNode.attributes.lg || '',
-    morphologies: readMorphologiesFromNode(originalNode, readSelectedMorphology(originalNode.attributes.mrp0sel?.trim() || '')),
+    node: node,
+    lg: node.attributes.lg || '',
+    morphologies: readMorphologiesFromNode(node, readSelectedMorphology(node.attributes.mrp0sel?.trim() || '')),
   };
 }
 
-export function writeWordNodeData({lg, morphologies}: WordNodeData, originalNode: XmlElementNode): XmlElementNode {
+export function writeWordNodeData({node: originalNode, lg, morphologies}: WordNodeData): XmlElementNode {
   const {tagName, attributes, children} = originalNode;
 
   // FIXME: selected morphologies!
@@ -30,11 +32,9 @@ export function writeWordNodeData({lg, morphologies}: WordNodeData, originalNode
     children
   };
 
-
   for (const ma of morphologies) {
     node.attributes[`mrp${ma.number}`] = writeMorphAnalysisValue(ma);
   }
-
 
   const selectedAnalysisOptions: SelectedAnalysisOption[] = morphologies.flatMap((ma) => {
 
@@ -59,7 +59,6 @@ export function writeWordNodeData({lg, morphologies}: WordNodeData, originalNode
   return node;
 }
 
-
 const foreignLanguageColors: { [key: string]: string } = {
   HURR: 'Hur',
   HATT: 'Hat',
@@ -76,7 +75,7 @@ function hasText({children}: XmlElementNode): boolean {
 function ignoreNode(node: XmlElementNode): boolean {
 
   const wrongMrp0Sel = ['DEL', 'HURR', 'HATT', 'LUW'].includes(node.attributes.mrp0sel);
- 
+
   // TODO: other conditions?
 
   return wrongMrp0Sel || !hasText(node);

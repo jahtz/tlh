@@ -30,12 +30,10 @@ function initialState(): LoadedDocument | undefined {
 }
 
 function autoSave(filename: string, rootNode: XmlNode): void {
-  console.info('Auto save...');
   localStorage.setItem(localStorageEditorStateKey, JSON.stringify({filename, rootNode}));
 }
 
 function removeAutoSave(): void {
-  console.info('Remove auto save...');
   localStorage.removeItem(localStorageEditorStateKey);
 }
 
