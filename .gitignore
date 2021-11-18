@@ -9,4 +9,3 @@ uploads/*
 !uploads/.gitkeep
 
 html/public/*
-!html/public/.gitkeep
