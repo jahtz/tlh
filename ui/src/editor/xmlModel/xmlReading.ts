@@ -1,8 +1,6 @@
 import {isXmlElementNode, XmlNode, XmlTextNode} from './xmlModel';
 
-type LetterCorrection = {
-  [key: string]: string;
-}
+type LetterCorrection = [string, string][];
 
 interface NodeReadConfig {
   letterCorrections: LetterCorrection;
@@ -14,39 +12,26 @@ export interface XmlReadConfig {
 }
 
 function performCorrections(text: string, corrections: LetterCorrection): string {
-  return Object.entries(corrections).reduce<string>((acc, [key, value]) => acc.replaceAll(key, value), text);
+  return corrections.reduce<string>((acc, [key, value]) => acc.replaceAll(key, value), text);
 }
 
-const localLetterCorrections: LetterCorrection = {
-  'š': 'š', // kombi zu 161
-  'Š': 'Š', // kombi zu 160
-
-  'ḫ̮': 'ḫ',
-  'Ḫ̮': 'Ḫ',
-
-  'ḫ': 'ḫ',
-  'Ḫ': 'Ḫ',
-
-  'h': 'ḫ',
-  'H': 'Ḫ',
-
-  '̮': '', // Achtung, überzähliger Bogen unter Het! schlecht sichtbar
-
-  '〈': '〈', // U+3008 aus CJK zu  U+2329
-  '〉': '〉'
-};
-
-const letterHarmonization: LetterCorrection = {
-  'á': 'á', 'à': 'à', 'â': 'â', 'ā': 'a',
-  'é': 'é', 'è': 'è', 'ê': 'ê', 'ē': 'e',
-  'í': 'í', 'ì': 'ì', 'î': 'î', 'ī': 'i',
-  'ú': 'ú', 'ù': 'ù', 'û': 'û', 'ū': 'u',
-  '=': '-'
-};
+const letterCorrections: LetterCorrection = [
+  // Corrections
+  ['š', 'š' /* kombi zu 161 */], ['Š', 'Š' /* kombi zu 160 */],
+  ['ḫ̮', 'ḫ'], ['Ḫ̮', 'Ḫ'], ['ḫ', 'ḫ'], ['Ḫ', 'Ḫ'], ['h', 'ḫ'], ['H', 'Ḫ'],
+  ['̮', '' /* Achtung, überzähliger Bogen unter Het! schlecht sichtbar */],
+  ['〈', '〈' /* U+3008 aus CJK zu  U+2329 */], ['〉', '〉'],
+  // Harmonizations
+  ['á', 'á'], ['à', 'à'], ['â', 'â'], ['ā', 'a'],
+  ['é', 'é'], ['è', 'è'], ['ê', 'ê'], ['ē', 'e'],
+  ['í', 'í'], ['ì', 'ì'], ['î', 'î'], ['ī', 'i'],
+  ['ú', 'ú'], ['ù', 'ù'], ['û', 'û'], ['ū', 'u'],
+  ['=', '-']
+];
 
 export const tlhXmlReadConfig: XmlReadConfig = {
   w: {
-    letterCorrections: {...localLetterCorrections, ...letterHarmonization},
+    letterCorrections,
     keepSpaces: true
   }
 };
