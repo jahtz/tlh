@@ -42,7 +42,7 @@ function createTextNode(baseTextContent: string, letterCorrections?: LetterCorre
     : {textContent: baseTextContent};
 }
 
-export function loadNode(el: ChildNode, xmlReadConfig: XmlReadConfig, parentLetterCorrections?: LetterCorrection): XmlNode {
+function loadNode(el: ChildNode, xmlReadConfig: XmlReadConfig, parentLetterCorrections?: LetterCorrection): XmlNode {
   if (el instanceof Text) {
     return createTextNode(el.textContent || '', parentLetterCorrections);
   } else if (el instanceof Element) {

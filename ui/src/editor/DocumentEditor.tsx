@@ -111,12 +111,17 @@ function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode
   return rootNode;
 }
 
-export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEditorConfig, download, filename, closeFile}: IProps): JSX.Element {
+export const localStorageEditorStateKey = 'editorState';
+
+export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEditorConfig, download, filename, closeFile}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);
   const [state, setState] = useState<IState<T>>({keyHandlingEnabled: true, rootNode: initialNode, changed: false});
 
+  useEffect(() => {
+    state.changed && localStorage.setItem(localStorageEditorStateKey, JSON.stringify(state));
+  }, [state]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleJumpKey);
@@ -154,6 +159,8 @@ export function NewDocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEd
         .replaceAll(' mrp', '\n\tmrp')
         .replaceAll('@', ' @ ')
     );
+
+    localStorage.removeItem(localStorageEditorStateKey);
   }
 
   function onNodeSelect(node: XmlElementNode, path: number[]): void {
