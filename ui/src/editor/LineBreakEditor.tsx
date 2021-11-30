@@ -20,7 +20,7 @@ export function LineBreakEditor({
       <div className="field">
         <label htmlFor="textId" className="label">{t('textId')}:</label>
         <div className="control">
-          <input type="text" id="textId" className="input is-static" readOnly/>
+          <input type="text" id="textId" className="input is-static" defaultValue={data.textId} readOnly/>
         </div>
       </div>
 

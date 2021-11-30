@@ -1,6 +1,7 @@
 import {XmlEditorConfig} from './editorConfig';
 import {wordNodeConfig} from './wordNodeData';
 import {lineBreakNodeConfig} from './lineBreakData';
+import {noteNodeConfig} from './noteData';
 
 
 export const tlhXmlEditorConfig: XmlEditorConfig = {
@@ -43,7 +44,5 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     styling: () => ['corr'],
     replace: (node) => <span>{node.attributes.c}</span>
   },
-  note: {
-    replace: (node) => <sup title={node.attributes.c} className="has-text-weight-bold">x</sup>
-  }
+  note: noteNodeConfig
 };

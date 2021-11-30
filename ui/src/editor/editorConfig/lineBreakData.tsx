@@ -9,7 +9,7 @@ export interface LineBreakData {
   lg: string | undefined;
 }
 
-export function readLineBreakData(node: XmlElementNode): LineBreakData {
+function readLineBreakData(node: XmlElementNode): LineBreakData {
   return {
     textId: node.attributes.txtid,
     lineNumber: node.attributes.lnr,
@@ -17,7 +17,7 @@ export function readLineBreakData(node: XmlElementNode): LineBreakData {
   };
 }
 
-export function writeLineBreakData({textId, lineNumber, lg}: LineBreakData, originalNode: XmlElementNode): XmlElementNode {
+function writeLineBreakData({textId, lineNumber, lg}: LineBreakData, originalNode: XmlElementNode): XmlElementNode {
   return {
     ...originalNode,
     attributes: {
