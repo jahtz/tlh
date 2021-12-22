@@ -30,7 +30,6 @@ export interface XmlSingleNodeConfig {
 }
 
 export interface XmlSingleEditableNodeConfig<T = XmlElementNode> extends XmlSingleNodeConfig {
-  ignore?: (node: XmlElementNode) => boolean;
   edit: (props: XmlEditableNodeIProps<T>) => JSX.Element;
   readNode: (node: XmlElementNode) => T;
   writeNode: (t: T, originalNode: XmlElementNode) => XmlElementNode;

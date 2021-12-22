@@ -1,5 +1,5 @@
 import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue} from '../../model/morphologicalAnalysis';
-import {isXmlTextNode, XmlElementNode} from '../xmlModel/xmlModel';
+import {XmlElementNode} from '../xmlModel/xmlModel';
 import {readSelectedMorphology, SelectedAnalysisOption, writeSelectedMorphologies} from '../selectedAnalysisOption';
 import {getSelectedLetters} from '../../model/analysisOptions';
 import {XmlSingleEditableNodeConfig} from './editorConfig';
@@ -66,23 +66,7 @@ const foreignLanguageColors: { [key: string]: string } = {
   LUW: 'Luw'
 };
 
-function hasText({children}: XmlElementNode): boolean {
-  return children.some((c) => isXmlTextNode(c)
-    ? c.textContent.trim().length > 0
-    : hasText(c));
-}
-
-function ignoreNode(node: XmlElementNode): boolean {
-
-  const wrongMrp0Sel = ['DEL', 'HURR', 'HATT', 'LUW'].includes(node.attributes.mrp0sel);
-
-  // TODO: other conditions?
-
-  return wrongMrp0Sel || !hasText(node);
-}
-
 export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
-  ignore: ignoreNode,
   replace: (node, renderedChildren, path, currentSelectedPath) => {
     const notMarked = node.attributes.mrp0sel === 'DEL';
 

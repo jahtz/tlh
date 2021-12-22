@@ -52,13 +52,12 @@ function searchEditableNode(
   rootNode: XmlElementNode,
   currentPath: number[],
   forward: boolean,
-  ignoreNode: ((node: XmlElementNode) => boolean) | undefined
 ): number[] | undefined {
   // FIXME: ignore nodes...
 
   function go(node: XmlElementNode, currentPath: number[]): number[] | undefined {
 
-    if (node.tagName === tagName && (!ignoreNode || !ignoreNode(node))) {
+    if (node.tagName === tagName) {
       return [];
     }
 
@@ -166,9 +165,7 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
         $apply: (editorState: EditorState<T> | undefined) => {
           const config = editorConfig[node.tagName] as XmlSingleEditableNodeConfig<T>;
 
-          if (config.ignore && config.ignore(node)) {
-            return editorState;
-          } else if (editorState && editorStateIsEditNodeState(editorState) && editorState.path.join('.') === path.join('.')) {
+          if (editorState && editorStateIsEditNodeState(editorState) && editorState.path.join('.') === path.join('.')) {
             return undefined;
           } else {
             return {node, data: config.readNode(node), changed: false, path};
@@ -224,7 +221,7 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
     if (state.editorState && 'path' in state.editorState) {
       const currentPath = state.editorState.path;
 
-      const path = searchEditableNode(tagName, state.rootNode as XmlElementNode, currentPath, forward, (editorConfig[tagName] as XmlSingleEditableNodeConfig<T>).ignore);
+      const path = searchEditableNode(tagName, state.rootNode as XmlElementNode, currentPath, forward);
       if (path) {
         const node = findElement(state.rootNode as XmlElementNode, path);
 
@@ -250,14 +247,14 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
       if (editorKeyConfig.updateAndNextEditableNodeKeys.includes(event.key)) {
         // FIXME: update and jump...
         updateNode(
-          searchEditableNode(tagName, state.rootNode as XmlElementNode, state.editorState.path, true, (editorConfig[tagName] as XmlSingleEditableNodeConfig<T>).ignore)
+          searchEditableNode(tagName, state.rootNode as XmlElementNode, state.editorState.path, true)
         );
       } else if (editorKeyConfig.nextEditableNodeKeys.includes(event.key)) {
         jumpEditableNodes(tagName, true);
       } else if (editorKeyConfig.updateAndPreviousEditableNodeKeys.includes(event.key)) {
         // FIXME: update and jump...
         updateNode(
-          searchEditableNode(tagName, state.rootNode as XmlElementNode, state.editorState.path, false, (editorConfig[tagName] as XmlSingleEditableNodeConfig<T>).ignore)
+          searchEditableNode(tagName, state.rootNode as XmlElementNode, state.editorState.path, false)
         );
       } else if (editorKeyConfig.previousEditableNodeKeys.includes(event.key)) {
         jumpEditableNodes(tagName, false);
