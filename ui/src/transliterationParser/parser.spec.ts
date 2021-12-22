@@ -60,7 +60,7 @@ describe.skip('The transliteration parser', () => {
   const line07 = '6\'# [ ... pa-ra-a] da-a-aš ¬¬¬';
   const result07 = lineParseResult('6\'', [
     // <w><del_in/></w> <w><sGr>...</sGr></w> <w>pa-ra-a<del_fin/></w> <w>da-a-aš</w> </s></p><parsep/><p><s>
-    w(ds), w(aoEllipsis), w('pa-ra-a', de), w('da-a-aš'), w(paragraphSeparator)
+    w(ds), w(aoEllipsis), w('pa-ra-a', de), w('da-a-aš')/*, w(paragraphSeparator)*/
   ]);
 
   const line08 = '7\'# [ ... ] x  °m°mur-ši--DINGIR-LIM °MUNUS°ŠU.GI LÚ°MEŠ° DINGIR°MEŠ°-aš';
@@ -96,15 +96,15 @@ describe.skip('The transliteration parser', () => {
   const line12 = '11 # šaṭ-rat°at° °MUNUS.MEŠ°kat°at°-re-eš {G: fünf Zeichen abgebr.} kar-°di°dim-mi-ia-az §§';
   const result12 = lineParseResult('11', [
     // <w>šaṭ-rat<SP___AO_3a_MaterLect>at</SP___AO_3a_MaterLect></w> <w><d>MUNUS.MEŠ</d>kat<SP___AO_3a_MaterLect>at</SP___AO_3a_MaterLect>-re-eš</w> <gap c="fünf Zeichen abgebr."/>
-    w('šaṭ-rat', ml('at')), w(dt('MUNUS.MEŠ'), 'kat', ml('at'), '-re-eš'), w(aoGap('fünf Zeichen abgebr.')),
+    w('šaṭ-rat', ml('at')), w(dt('MUNUS.MEŠ'), 'kat', ml('at'), '-re-eš'), w(/*aoGap('fünf Zeichen abgebr.')*/),
     // <w>kar-<SP___AO_3a_MaterLect>di</SP___AO_3a_MaterLect>dim-mi-ia-az</w> </s></p><parsep_dbl/><p><s>
-    w('kar-', ml('di'), 'dim-mi-ia-az'), w(paragraphSeparatorDouble)
+    w('kar-', ml('di'), 'dim-mi-ia-az'), w(/*paragraphSeparatorDouble*/)
   ]);
 
   const line13 = '12 # GU4 ka4 ubx ub[x K]AxU §';
   const result13 = lineParseResult('12', [
     // <w><sGr>GU₄</sGr></w> <w>ka₄</w> <w>ubₓ</w> <w>ub<del_in/>ₓ</w> <w><sGr>K<del_fin/>A×U</sGr></w> </s></p><parsep/><p><s>
-    w(sg('GU', id(4))), w('ka', id(4)), w('ub', id('x')), w('ub', ds, id('x')), w(sg('K', de, 'A', inscribedLetter('U'))), w(paragraphSeparator)
+    w(sg('GU', id(4))), w('ka', id(4)), w('ub', id('x')), w('ub', ds, id('x')), w(sg('K', de, 'A', inscribedLetter('U'))), w(/*paragraphSeparator*/)
   ]);
 
   const line14 = '13 # 4 GU4';
@@ -153,7 +153,7 @@ describe.skip('The transliteration parser', () => {
 
   const ownLine04 = '4\' # nu ḫu-u-ma-an az-[zi-ik-ki- ¬¬¬';
   const ownResult04 = lineParseResult('4\'', [
-    w('nu'), w('ḫu-u-ma-an'), w('az-', ds, 'zi-ik-ki-'), w(paragraphSeparator)
+    w('nu'), w('ḫu-u-ma-an'), w('az-', ds, 'zi-ik-ki-'), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine05 = '5\' # [k]u-it-ma-an-aš-ma x [';
@@ -188,7 +188,7 @@ describe.skip('The transliteration parser', () => {
 
   const ownLine11 = '11\' # [x (x)]-ri-⸢ia⸣-[ ¬¬¬';
   const ownResult11 = lineParseResult('11\'', [
-    w(ds, aoIllegibleContent), w(us, aoIllegibleContent, ue, de, '-ri-', ls, 'ia', le, '-', ds), w(paragraphSeparator)
+    w(ds, aoIllegibleContent), w(us, aoIllegibleContent, ue, de, '-ri-', ls, 'ia', le, '-', ds), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine12 = '12\' # [x x] x [';
@@ -198,7 +198,7 @@ describe.skip('The transliteration parser', () => {
 
   const ownLine13 = '1\' # [ … ] x ¬¬¬';
   const ownResult13 = lineParseResult('1\'', [
-    w(ds), w(aoEllipsis), w(de), w(aoIllegibleContent), w(paragraphSeparator)
+    w(ds), w(aoEllipsis), w(de), w(aoIllegibleContent), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine14 = '2\' # [ … °MUNUS.MEŠ°zi-i]n-tu-ḫi-e-eš';
@@ -208,7 +208,7 @@ describe.skip('The transliteration parser', () => {
 
   const ownLine15 = '3\' # [ … -i]a-u-an-zi tar-kum-mi-ia-iz-zi ¬¬¬';
   const ownResult15 = lineParseResult('3\'', [
-    w(ds), w(aoEllipsis), w('-i', de, 'a-u-an-zi'), w('tar-kum-mi-ia-iz-zi'), w(paragraphSeparator)
+    w(ds), w(aoEllipsis), w('-i', de, 'a-u-an-zi'), w('tar-kum-mi-ia-iz-zi'), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine16 = '4\' # [ … °G]IŠ°BANŠUR °GIŠ°BANŠUR an-da';
@@ -223,7 +223,7 @@ describe.skip('The transliteration parser', () => {
 
   const ownLine18 = '6\' # [ … -t]i-ia še-er pé-ra-an da-a-i ¬¬¬';
   const ownResult18 = lineParseResult('6\'', [
-    w(ds), w(aoEllipsis), w('-t', de, 'i-ia'), w('še-er'), w('pé-ra-an'), w('da-a-i'), w(paragraphSeparator)
+    w(ds), w(aoEllipsis), w('-t', de, 'i-ia'), w('še-er'), w('pé-ra-an'), w('da-a-i'), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine19 = '7\' # [ … pé-r]a-an ḫu-u-wa-a-i';
@@ -238,12 +238,12 @@ describe.skip('The transliteration parser', () => {
 
   const ownLine21 = '9\' # [ú-wa-an-zi … k]i?-an-ta ¬¬¬';
   const ownResult21 = lineParseResult('9\'', [
-    w(ds, 'ú-wa-an-zi'), w(aoEllipsis), w('k', de, 'i', uc, '-an-ta'), w(paragraphSeparator)
+    w(ds, 'ú-wa-an-zi'), w(aoEllipsis), w('k', de, 'i', uc, '-an-ta'), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine22 = '10\' # [ … ] x-zi ¬¬¬';
   const ownResult22 = lineParseResult('10\'', [
-    w(ds), w(aoEllipsis), w(de), w('x-zi'), w(paragraphSeparator)
+    w(ds), w(aoEllipsis), w(de), w('x-zi'), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine23 = '11\' # [ … ]-da';
@@ -258,12 +258,12 @@ describe.skip('The transliteration parser', () => {
 
   const ownLine25 = '13\' # [ … -z]i ¬¬¬';
   const ownResult25 = lineParseResult('13\'', [
-    w(ds), w(aoEllipsis), w('-z', de, 'i'), w(paragraphSeparator)
+    w(ds), w(aoEllipsis), w('-z', de, 'i'), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine26 = '1\' # [x x] x x [ ¬¬¬';
   const ownResult26 = lineParseResult('1\'', [
-    w(ds, aoIllegibleContent), w(aoIllegibleContent, de), w(aoIllegibleContent), w(aoIllegibleContent), w(ds), w(paragraphSeparator)
+    w(ds, aoIllegibleContent), w(aoIllegibleContent, de), w(aoIllegibleContent), w(aoIllegibleContent), w(ds), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine27 = '2\' # LUGAL-uš GUB-[aš';
@@ -278,7 +278,7 @@ describe.skip('The transliteration parser', () => {
 
   const ownLine29 = '4\' # °D°zi-in-t[u-ḫi ¬¬¬';
   const ownResult29 = lineParseResult('4\'', [
-    w(dt('D'), 'zi-in-t', ds, 'u-ḫi'), w(paragraphSeparator)
+    w(dt('D'), 'zi-in-t', ds, 'u-ḫi'), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine30 = '5\' # °LÚ°SAGI.A 1 NINDA.G[UR₄.RA _EM-ṢA]';
@@ -288,7 +288,7 @@ describe.skip('The transliteration parser', () => {
 
   const ownLine31 = '6\' # LUGAL-i pa-a-i LUGAL-u[š pár-ši-ia] ¬¬¬';
   const ownResult31 = lineParseResult('6\'', [
-    w(sg('LUGAL'), '-i'), w('pa-a-i'), w(sg('LUGAL'), '-u', ds, 'š'), w('pár-ši-ia', de), w(paragraphSeparator)
+    w(sg('LUGAL'), '-i'), w('pa-a-i'), w(sg('LUGAL'), '-u', ds, 'š'), w('pár-ši-ia', de), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine32 = '7\' # ta-aš-ta °MUNUS.MEŠ°zi-[in-tu-ḫi-e-eš';
@@ -298,12 +298,12 @@ describe.skip('The transliteration parser', () => {
 
   const ownLine33 = '8\' # pa-ra-a [ ¬¬¬';
   const ownResult33 = lineParseResult('8\'', [
-    w('pa-ra-a'), w(ds), w(paragraphSeparator)
+    w('pa-ra-a'), w(ds), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine34 = '9\' # pár-aš-na-a-u-<aš>-kán °LÚ°SAG[I.A ¬¬¬';
   const ownResult34 = lineParseResult('9\'', [
-    w('pár-aš-na-a-u-', supS, 'aš', supE, '-kán'), w(dt('LÚ'), sg('SAG'), ds, sg('I', '.', 'A')), w(paragraphSeparator)
+    w('pár-aš-na-a-u-', supS, 'aš', supE, '-kán'), w(dt('LÚ'), sg('SAG'), ds, sg('I', '.', 'A')), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine35 = '10\' # LUGAL-uš TUŠ-aš <°D°>iz-zi-i[š?-ta?-nu?';
@@ -313,7 +313,7 @@ describe.skip('The transliteration parser', () => {
 
   const ownLine36 = '11\' # e-ku-zi GIŠ ⸢°D°⸣[INANNA ¬¬¬';
   const ownResult36 = lineParseResult('11\'', [
-    w('e-ku-zi'), w(sg('GIŠ')), w(ls, dt('D'), le, ds, sg('INANNA')), w(paragraphSeparator)
+    w('e-ku-zi'), w(sg('GIŠ')), w(ls, dt('D'), le, ds, sg('INANNA')), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine37 = '12\' # °LÚ°SAGI.A [1 NINDA.GUR₄.RA EM-ṢA]';
@@ -323,7 +323,7 @@ describe.skip('The transliteration parser', () => {
 
   const ownLine38 = '13\' # LUGAL-i pa-a-i [LUGAL-uš pár-ši-ia] ¬¬¬';
   const ownResult38 = lineParseResult('13\'', [
-    w(sg('LUGAL'), '-i'), w('pa-a-i'), w(ds, sg('LUGAL'), '-uš'), w('pár-ši-ia', de), w(paragraphSeparator)
+    w(sg('LUGAL'), '-i'), w('pa-a-i'), w(ds, sg('LUGAL'), '-uš'), w('pár-ši-ia', de), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine39 = '14\' # GAL DUMU.MEŠ ⸢É⸣.[GAL';
@@ -333,7 +333,7 @@ describe.skip('The transliteration parser', () => {
 
   const ownLine40 = '15\' # °LÚ.MEŠ°GA[LA ¬¬¬';
   const ownResult40 = lineParseResult('15\'', [
-    w(dt('LÚ', '.', 'MEŠ'), sg('GA', ds, 'LA')), w(paragraphSeparator)
+    w(dt('LÚ', '.', 'MEŠ'), sg('GA', ds, 'LA')), w(/*paragraphSeparator*/)
   ]);
 
   const ownLine41 = '16\' # ⸢na-aš⸣-k[án';
