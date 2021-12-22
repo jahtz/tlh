@@ -1,4 +1,5 @@
 import {isXmlElementNode, XmlNode, XmlTextNode} from './xmlModel';
+import update from 'immutability-helper';
 
 type LetterCorrection = [string, string][];
 
@@ -51,10 +52,7 @@ function loadNode(el: ChildNode, xmlReadConfig: XmlReadConfig, parentLetterCorre
 
     return {
       tagName: el.tagName,
-      attributes: Array.from(el.attributes)
-        .reduce((acc, {name, value}) => {
-          return {...acc, [name]: value};
-        }, {}),
+      attributes: Array.from(el.attributes).reduce((acc, {name, value}) => update(acc, {[name]: {$set: value}}), {}),
       children: Array.from(el.childNodes)
         .map((c) => loadNode(c, xmlReadConfig, nodeReadConfig?.letterCorrections))
         // Filter out empty text nodes
