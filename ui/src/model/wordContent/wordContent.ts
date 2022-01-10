@@ -55,7 +55,11 @@ export function xmlifyAoWordContent(c: AOWordContent): XmlNode {
     return {tagName: 'space', attributes: {c: c.c}, children: []};
   } else if (isDamageContent(c)) {
     return {tagName: c.damageType, attributes: {}, children: []};
-  } else {
+  } else if (isAoFootNote(c)) {
+    return {tagName: 'note', attributes: {n: c.number.toString(), c: c.content}, children: []};
+  }/* else if (isNumeralContent(c)) {
+    return c.content;
+  }*/ else {
     // FIXME: implement rest!
     console.error(c.type);
     throw new Error('TODO: implement!');
