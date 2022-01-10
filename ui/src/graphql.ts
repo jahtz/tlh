@@ -1,6 +1,7 @@
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -30,7 +31,7 @@ export type LoggedInUserMutations = {
 
 
 export type LoggedInUserMutationsCreateManuscriptArgs = {
-  values?: Maybe<ManuscriptMetaDataInput>;
+  values?: InputMaybe<ManuscriptMetaDataInput>;
 };
 
 
@@ -77,13 +78,13 @@ export type ManuscriptMetaData = {
 };
 
 export type ManuscriptMetaDataInput = {
-  bibliography?: Maybe<Scalars['String']>;
-  cthClassification?: Maybe<Scalars['Int']>;
+  bibliography?: InputMaybe<Scalars['String']>;
+  cthClassification?: InputMaybe<Scalars['Int']>;
   mainIdentifier: ManuscriptIdentifierInput;
   otherIdentifiers: Array<ManuscriptIdentifierInput>;
   palaeographicClassification: PalaeographicClassification;
   palaeographicClassificationSure: Scalars['Boolean'];
-  provenance?: Maybe<Scalars['String']>;
+  provenance?: InputMaybe<Scalars['String']>;
 };
 
 export type ManuscriptMutations = {
@@ -186,7 +187,7 @@ export type TransliterationInput = {
 };
 
 export type UserInput = {
-  affiliation?: Maybe<Scalars['String']>;
+  affiliation?: InputMaybe<Scalars['String']>;
   email: Scalars['String'];
   name: Scalars['String'];
   password: Scalars['String'];
@@ -231,7 +232,7 @@ export type IndexQueryVariables = Exact<{
 export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null | undefined, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }> };
 
 export type CreateManuscriptMutationVariables = Exact<{
-  manuscriptMetaData?: Maybe<ManuscriptMetaDataInput>;
+  manuscriptMetaData?: InputMaybe<ManuscriptMetaDataInput>;
 }>;
 
 

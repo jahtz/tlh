@@ -2,11 +2,11 @@ import {XmlEditorConfig} from './editorConfig';
 import {wordNodeConfig} from './wordNodeData';
 import {lineBreakNodeConfig} from './lineBreakData';
 import {noteNodeConfig} from './noteData';
-
+import {aoManuscriptsConfig} from './aoManuscriptsConfigData';
 
 export const tlhXmlEditorConfig: XmlEditorConfig = {
   docID: {replace: () => <span/>},
-  'AO:Manuscripts': {replace: () => <span/>},
+  'AO:Manuscripts': aoManuscriptsConfig,
   lb: lineBreakNodeConfig,
 
   // Words

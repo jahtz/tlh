@@ -8,7 +8,7 @@ interface IProps {
   nextPage: () => void;
 }
 
-export function Pagination({currentPage, pageCount, previousPage, goToPage, nextPage}: IProps): JSX.Element {
+export function BulmaPagination({currentPage, pageCount, previousPage, goToPage, nextPage}: IProps): JSX.Element {
   return (
     <nav className="pagination is-centered" role="navigation" aria-label="pagination">
       <button className="pagination-previous" onClick={previousPage} disabled={currentPage <= 0}>Previous</button>
