@@ -30,7 +30,6 @@ function writeLineBreakData({textId, lineNumber, lg}: LineBreakData, originalNod
 }
 
 export const lineBreakNodeConfig: XmlSingleEditableNodeConfig<LineBreakData> = {
-  // TODO: only render <br/> if not first linebreak!
   replace: (node, _renderedChildren, path, currentSelectedPath) => {
 
     const isSelected = !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.');
@@ -46,7 +45,7 @@ export const lineBreakNodeConfig: XmlSingleEditableNodeConfig<LineBreakData> = {
   readNode: readLineBreakData,
   writeNode: writeLineBreakData,
   insertablePositions: {
-    beforeElement: ['lb'],
+    beforeElement: ['lb', 'w'],
     asLastChildOf: ['div1']
   }
 };
