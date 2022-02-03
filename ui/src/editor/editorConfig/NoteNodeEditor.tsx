@@ -13,7 +13,7 @@ export function NoteNodeEditor({
   initiateSubmit
 }: XmlEditableNodeIProps<NoteData>): JSX.Element {
 
-  console.info(JSON.stringify(data, null, 2));
+  // console.info(JSON.stringify(data, null, 2));
 
   const {t} = useTranslation('common');
 
