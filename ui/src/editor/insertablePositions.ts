@@ -1,6 +1,5 @@
 import {isXmlTextNode, XmlNode} from './xmlModel/xmlModel';
 
-
 export type NodePath = number[];
 
 export interface InsertablePositions {

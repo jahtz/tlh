@@ -7,6 +7,7 @@ import {IoAddOutline} from 'react-icons/io5';
 
 export interface InsertStuff {
   insertablePaths: string[];
+  insertAsLastChildOf: string[];
   initiateInsert: (path: NodePath) => void;
 }
 
@@ -52,17 +53,16 @@ export function NodeDisplay({
     ? () => onSelect(node, path)
     : () => void 0;
 
-
-  // FIXME: display addon buttons!
-
   return (
     <>
-      {insertStuff && insertStuff.insertablePaths.includes(path.join('.')) && <span>
-        &nbsp;
-        <button onClick={() => insertStuff.initiateInsert(path)}><IoAddOutline/></button>
-        &nbsp;&nbsp;
-      </span>}
+      {insertStuff && insertStuff.insertablePaths.includes(path.join('.')) &&
+        <span>&nbsp;
+          <button onClick={() => insertStuff.initiateInsert(path)}><IoAddOutline/></button>
+          &nbsp;&nbsp;</span>}
       <span className={classNames(classes)} onClick={onClick}>{display}</span>
+      {insertStuff && insertStuff.insertAsLastChildOf.includes(node.tagName) &&
+        <span><button onClick={() => insertStuff.initiateInsert([...path, node.children.length])}><IoAddOutline/></button>
+          &nbsp;</span>}
     </>
   );
 }

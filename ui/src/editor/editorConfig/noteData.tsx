@@ -30,5 +30,8 @@ export const noteNodeConfig: XmlSingleEditableNodeConfig<NoteData> = {
   replace: (node) => <sup title={node.attributes.c} className="has-text-weight-bold">x</sup>,
   edit: (props) => <NoteNodeEditor {...props}/>,
   readNode: readNoteNodeData,
-  writeNode: writeNoteNodeData
+  writeNode: writeNoteNodeData,
+  insertablePositions: {
+    asLastChildOf: ['w']
+  }
 };

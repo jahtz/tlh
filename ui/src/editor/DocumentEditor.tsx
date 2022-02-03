@@ -331,7 +331,11 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
     : undefined;
 
   const insertStuff: InsertStuff | undefined = state.editorState && 'tagName' in state.editorState
-    ? {insertablePaths: Array.from(new Set(calculateInsertablePositions(state.editorState.insertablePositions, state.rootNode))), initiateInsert}
+    ? {
+      insertablePaths: Array.from(new Set(calculateInsertablePositions(state.editorState.insertablePositions, state.rootNode))),
+      insertAsLastChildOf: state.editorState.insertablePositions.asLastChildOf || [],
+      initiateInsert
+    }
     : undefined;
 
   return (
