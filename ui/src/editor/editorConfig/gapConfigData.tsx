@@ -2,7 +2,6 @@ import {XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from './editorConfig
 import classNames from 'classnames';
 import {useTranslation} from 'react-i18next';
 
-// FIXME: highlight!
 export const gapConfig: XmlSingleEditableNodeConfig = {
   replace: (node, x, currentPath, currentSelectedPath) => {
 
