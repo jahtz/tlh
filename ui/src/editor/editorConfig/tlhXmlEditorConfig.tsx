@@ -3,7 +3,8 @@ import {wordNodeConfig} from './wordNodeData';
 import {lineBreakNodeConfig} from './lineBreakData';
 import {noteNodeConfig} from './noteData';
 import {aoManuscriptsConfig} from './aoManuscriptsConfigData';
-import {gapConfig}  from './gapConfigData';
+import {gapConfig} from './gapConfigData';
+import {paragraphSeparatorConfig} from './paragraphSeparatorConfig';
 
 export const tlhXmlEditorConfig: XmlEditorConfig = {
   docID: {replace: () => <span/>},
@@ -32,8 +33,8 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     styling: () => ['has-background-light']
   },
 
-  parsep: {replace: () => <span>¬¬¬</span>},
-  parsep_dbl: {replace: () => <span>===</span>},
+  parsep: paragraphSeparatorConfig,
+  parsep_dbl: paragraphSeparatorConfig,
 
   corr: {
     styling: () => ['corr'],
