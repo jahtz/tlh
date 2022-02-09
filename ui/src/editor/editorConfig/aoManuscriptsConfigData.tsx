@@ -7,7 +7,7 @@ export type SourceType = 'AO:TxtPubl' | 'AO:InvNr';
 
 export const sourceTypes: SourceType[] = ['AO:TxtPubl', 'AO:InvNr'];
 
-interface AoSource {
+export interface AoSource {
   type: SourceType;
   name: string;
 }
@@ -29,7 +29,7 @@ function writeSource({type, name}: AoSource): XmlElementNode {
 }
 
 export interface AoManuscriptsData {
-  sources: AoSource[];
+  content: (string | AoSource)[];
 }
 
 export const aoManuscriptsConfig: XmlSingleEditableNodeConfig<AoManuscriptsData> = {
@@ -40,15 +40,19 @@ export const aoManuscriptsConfig: XmlSingleEditableNodeConfig<AoManuscriptsData>
 
 function readAoManuscriptsNode(node: XmlElementNode): AoManuscriptsData {
   return {
-    sources: node.children
-      .filter((n): n is XmlElementNode => isXmlElementNode(n))
-      .map(readSource)
+    content: node.children.map((n) => isXmlElementNode(n) ? readSource(n) : n.textContent.trim())
   };
 }
 
 function writeAoManuscriptsNode(data: AoManuscriptsData, originalNode: XmlElementNode): XmlElementNode {
   return {
     ...originalNode,
-    children: data.sources.map(writeSource)
+    children: data.content.map((s) => {
+      if (typeof s === 'string') {
+        return {textContent: ' ' + s + ' '};
+      } else {
+        return writeSource(s);
+      }
+    })
   };
 }
