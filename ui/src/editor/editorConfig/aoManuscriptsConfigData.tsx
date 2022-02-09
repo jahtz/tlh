@@ -2,6 +2,7 @@ import {XmlSingleEditableNodeConfig} from './editorConfig';
 import {isXmlElementNode, XmlElementNode, XmlTextNode} from '../xmlModel/xmlModel';
 
 import {AoManuscriptsEditor} from '../AoManuscriptsEditor';
+import classNames from 'classnames';
 
 export type SourceType = 'AO:TxtPubl' | 'AO:InvNr';
 
@@ -33,6 +34,11 @@ export interface AoManuscriptsData {
 }
 
 export const aoManuscriptsConfig: XmlSingleEditableNodeConfig<AoManuscriptsData> = {
+  replace: (node, element, currentPath, currentSelectedPath) => {
+    const isSelected = currentSelectedPath && currentPath.join('.') === currentSelectedPath.join('.');
+
+    return <span className={classNames({'has-background-primary': isSelected})}>{element}</span>;
+  },
   edit: (props) => <AoManuscriptsEditor {...props}/>,
   readNode: readAoManuscriptsNode,
   writeNode: writeAoManuscriptsNode
