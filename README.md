@@ -27,7 +27,9 @@ npm i
 ### Starting the server
 
 ```bash
-php7 -S 0.0.0.0:8066 -t html router.php
+cd html
+
+php7 -S 0.0.0.0:8066
 ```
 
 ### Starting the ui

@@ -8,7 +8,7 @@ services:
     image: mariadb
     restart: always
     ports:
-      - 3406:3306
+      - "3406:3306"
     volumes:
       - type: volume
         source: db_data_volume

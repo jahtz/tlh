@@ -4,7 +4,6 @@ import {useTranslation} from 'react-i18next';
 
 export const gapConfig: XmlSingleEditableNodeConfig = {
   replace: (node, x, currentPath, currentSelectedPath) => {
-
     const isLineGap = 't' in node.attributes && node.attributes.t === 'line';
     const isSelected = currentSelectedPath && currentPath.join('.') === currentSelectedPath.join('.');
 
