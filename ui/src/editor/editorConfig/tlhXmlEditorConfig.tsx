@@ -3,6 +3,7 @@ import {wordNodeConfig} from './wordNodeData';
 import {lineBreakNodeConfig} from './lineBreakData';
 import {noteNodeConfig} from './noteData';
 import {aoManuscriptsConfig} from './aoManuscriptsConfigData';
+import {gapConfig}  from './gapConfigData';
 
 export const tlhXmlEditorConfig: XmlEditorConfig = {
   docID: {replace: () => <span/>},
@@ -24,13 +25,7 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
   laes_in: {replace: () => <span>⸢</span>},
   laes_fin: {replace: () => <span>⸣</span>},
 
-  gap: {
-    styling: () => ['gap'],
-    replace: (node) => <>
-      {'t' in node.attributes && node.attributes.t === 'line' && <br/>}
-      <span>{node.attributes.c}</span>
-    </>
-  },
+  gap: gapConfig,
 
   space: {
     replace: (node) => <>{Array.from({length: parseInt(node.attributes.c) || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}</>,
