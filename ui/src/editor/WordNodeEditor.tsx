@@ -15,6 +15,8 @@ import update, {Spec} from 'immutability-helper';
 import {UpdatePrevNextButtons, UpdatePrevNextButtonsProps} from './morphAnalysisOption/UpdatePrevNextButtons';
 import {IoAddOutline, IoSettingsOutline} from 'react-icons/io5';
 import {readWordNodeData, WordNodeData} from './editorConfig/wordNodeData';
+import {WordQuestion} from './wordEditor/WordQuestion';
+import {WordQuestionForm} from './wordEditor/WordQuestionForm';
 
 interface IState {
   addMorphology?: boolean;
@@ -37,6 +39,7 @@ export function WordNodeEditor({
   const allManuscriptLanguages = useSelector(allManuscriptLanguagesSelector);
 
   const [state, setState] = useState<IState>({});
+  const [isAddNote, setIsAddNote] = useState(false);
 
   const [isAddMorphologyState, setIsAddMorphologyState] = useState(false);
 
@@ -128,6 +131,15 @@ export function WordNodeEditor({
     return <WordContentEditor initialTransliteration={state.editContent} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>;
   }
 
+  function removeNote(): void {
+    updateNode((state) => update(state, {node: {attributes: {$unset: ['q']}}}));
+  }
+
+  function addNote(value: string): void {
+    updateNode((state) => update(state, {node: {attributes: {q: {$set: value}}}}));
+    setIsAddNote(false);
+  }
+
   const updatePrevNextButtonProps: UpdatePrevNextButtonsProps = {changed, initiateUpdate: initiateSubmit, initiateJumpElement};
 
   return (
@@ -139,7 +151,6 @@ export function WordNodeEditor({
 
       <div className="box scrollable">
 
-        {/* TODO: edit language... */}
         <div className="field">
           <div className="control">
             <input defaultValue={data.lg} className="input" placeholder={t('language')} list="languages"
@@ -150,6 +161,14 @@ export function WordNodeEditor({
             {allManuscriptLanguages.map(({abbreviation}) => <option key={abbreviation}>{abbreviation}</option>)}
           </datalist>
         </div>
+
+        {data.node.attributes.q
+          ? <WordQuestion comment={data.node.attributes.q} removeNote={removeNote}/>
+          : (isAddNote
+            ? <WordQuestionForm onSubmit={addNote}/>
+            : <div className="field">
+              <button type="button" className="button is-primary is-fullwidth" onClick={() => setIsAddNote(true)}>{t('addNote')}</button>
+            </div>)}
 
         {data.morphologies.length === 0
           ? <div className="notification is-warning has-text-centered">{t('noMorphologicalAnalysesFound')}</div>
@@ -165,10 +184,10 @@ export function WordNodeEditor({
           )}
 
         {isAddMorphologyState &&
-        <MorphAnalysisOptionEditor
-          morphologicalAnalysis={nextMorphAnalysis()}
-          onSubmit={(newMa) => updateMorphology(data.morphologies.length, newMa)}
-          cancelUpdate={toggleAddMorphology}/>}
+          <MorphAnalysisOptionEditor
+            morphologicalAnalysis={nextMorphAnalysis()}
+            onSubmit={(newMa) => updateMorphology(data.morphologies.length, newMa)}
+            cancelUpdate={toggleAddMorphology}/>}
       </div>
 
       <div className="columns mt-2">
