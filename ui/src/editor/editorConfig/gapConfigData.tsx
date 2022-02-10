@@ -1,6 +1,7 @@
 import {XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from './editorConfig';
 import classNames from 'classnames';
 import {useTranslation} from 'react-i18next';
+import {IoRemoveCircle} from 'react-icons/io5';
 
 export const gapConfig: XmlSingleEditableNodeConfig = {
   replace: (node, x, currentPath, currentSelectedPath) => {
@@ -19,7 +20,7 @@ export const gapConfig: XmlSingleEditableNodeConfig = {
   writeNode: (n) => n
 };
 
-function GapEditor({data, updateNode, changed, initiateSubmit}: XmlEditableNodeIProps): JSX.Element {
+function GapEditor({data, updateNode, changed, initiateSubmit, deleteNode}: XmlEditableNodeIProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -29,9 +30,18 @@ function GapEditor({data, updateNode, changed, initiateSubmit}: XmlEditableNodeI
         <input type="text" defaultValue={data.attributes.c} className="input" onBlur={(event) => updateNode({attributes: {c: {$set: event.target.value}}})}/>
       </div>
 
-      <button type="button" className={classNames('button', 'is-fullwidth', {'is-link': changed})} disabled={!changed} onClick={initiateSubmit}>
-        {t('update')}
-      </button>
+      <div className="columns">
+        <div className="column">
+          <button type="button" className="button is-danger is-fullwidth" onClick={deleteNode}>
+            <IoRemoveCircle/>
+          </button>
+        </div>
+        <div className="column">
+          <button type="button" className={classNames('button', 'is-fullwidth', {'is-link': changed})} disabled={!changed} onClick={initiateSubmit}>
+            {t('update')}
+          </button>
+        </div>
+      </div>
     </>
   );
 }
