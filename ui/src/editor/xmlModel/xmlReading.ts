@@ -63,13 +63,17 @@ function loadNode(el: ChildNode, xmlReadConfig: XmlReadConfig, parentLetterCorre
   }
 }
 
+export function parseNewXml(content: string, xmlReadConfig: XmlReadConfig = tlhXmlReadConfig): XmlNode {
+  const doc = new DOMParser().parseFromString(content, 'text/xml');
+
+  return loadNode(doc.children[0], xmlReadConfig);
+}
+
 export async function loadNewXml(file: File, xmlReadConfig: XmlReadConfig = tlhXmlReadConfig): Promise<XmlNode> {
   const content = await file.text();
 
-  // non breakable space to normal space
+  // non-breakable space to normal space
   const correctedText = content.replaceAll('\xa0', '');
 
-  const doc = new DOMParser().parseFromString(correctedText, 'text/xml');
-
-  return loadNode(doc.children[0], xmlReadConfig);
+  return parseNewXml(correctedText, xmlReadConfig);
 }

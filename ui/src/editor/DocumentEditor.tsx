@@ -111,6 +111,18 @@ function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode
   return rootNode;
 }
 
+export function writeXml(node: XmlElementNode): string {
+  return writeNode(node)
+    .join('\n')
+    .replaceAll('®', '\n\t')
+    .replaceAll('{', '\n\t\t{')
+    .replaceAll('+=', '\n\t\t   += ')
+    .replaceAll('<w', '\n <w')
+    .replaceAll('<lb', '\n\n<lb')
+    .replaceAll(' mrp', '\n\tmrp')
+    .replaceAll('@', ' @ ');
+}
+
 export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEditorConfig, download, filename, closeFile, autoSave}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
@@ -147,15 +159,7 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
     setState((state) => update(state, {changed: {$set: false}}));
 
     download(
-      writeNode(toExport)
-        .join('\n')
-        .replaceAll('®', '\n\t')
-        .replaceAll('{', '\n\t\t{')
-        .replaceAll('+=', '\n\t\t   += ')
-        .replaceAll('<w', '\n <w')
-        .replaceAll('<lb', '\n\n<lb')
-        .replaceAll(' mrp', '\n\tmrp')
-        .replaceAll('@', ' @ ')
+      writeXml(toExport)
     );
   }
 
@@ -322,6 +326,10 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
     }
   }
 
+  function updateRootNode(node: XmlElementNode): void {
+    setState((state) => update(state, {rootNode: {$set: node}}));
+  }
+
   const currentSelectedPath = state.editorState && 'path' in state.editorState
     ? state.editorState.path
     : undefined;
@@ -339,23 +347,17 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
     : undefined;
 
   return (
-    <>
-      {/* FIXME: propmt!
-      <Prompt when={state.changed} message={t('leaveUnfinishedChangesMessage')}/>
-      */}
-
-      <div className="columns">
-        <div className="column">
-          <EditorLeftSide filename={filename} node={state.rootNode} currentSelectedPath={currentSelectedPath} editorConfig={editorConfig}
-                          onNodeSelect={onNodeSelect} closeFile={onCloseFile} exportXml={exportXml} insertStuff={insertStuff}/>
-        </div>
-
-        <div className="column">
-          {state.editorState && 'path' in state.editorState
-            ? renderNodeEditor(state.editorState) /* don't convert to a component! */
-            : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}/>}
-        </div>
+    <div className="columns">
+      <div className="column is-half">
+        <EditorLeftSide filename={filename} node={state.rootNode} currentSelectedPath={currentSelectedPath} editorConfig={editorConfig}
+                        onNodeSelect={onNodeSelect} closeFile={onCloseFile} exportXml={exportXml} insertStuff={insertStuff} updateNode={updateRootNode}/>
       </div>
-    </>
+
+      <div className="column is-half">
+        {state.editorState && 'path' in state.editorState
+          ? renderNodeEditor(state.editorState) /* don't convert to a component! */
+          : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}/>}
+      </div>
+    </div>
   );
 }
