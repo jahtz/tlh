@@ -47,7 +47,7 @@ export function AoManuscriptsEditor({data, updateNode, changed, initiateSubmit}:
     <>
       {data.content.map((source, index) =>
         typeof source === 'string'
-          ? <div className="field">
+          ? <div className="field" key={index}>
             <input type="text" className="input" defaultValue={source} onBlur={(event) => updatePlus(index, event.currentTarget.value)}/>
           </div>
           : <AoTextNumberField key={index} source={source} updateType={(value) => updateType(index, value)} updateText={(value) => updateText(index, value)}/>
