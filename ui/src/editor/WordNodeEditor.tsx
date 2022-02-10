@@ -17,6 +17,7 @@ import {IoAddOutline, IoSettingsOutline} from 'react-icons/io5';
 import {readWordNodeData, WordNodeData} from './editorConfig/wordNodeData';
 import {WordQuestion} from './wordEditor/WordQuestion';
 import {WordQuestionForm} from './wordEditor/WordQuestionForm';
+import {LanguageInput} from './LanguageInput';
 
 interface IState {
   addMorphology?: boolean;
@@ -36,7 +37,6 @@ export function WordNodeEditor({
 
   const {t} = useTranslation('common');
   const editorConfig = useSelector(editorKeyConfigSelector);
-  const allManuscriptLanguages = useSelector(allManuscriptLanguagesSelector);
 
   const [state, setState] = useState<IState>({});
   const [isAddNote, setIsAddNote] = useState(false);
@@ -151,16 +151,7 @@ export function WordNodeEditor({
 
       <div className="box scrollable">
 
-        <div className="field">
-          <div className="control">
-            <input defaultValue={data.lg} className="input" placeholder={t('language')} list="languages"
-                   onBlur={(event) => updateLanguage(event.target.value)}/>
-          </div>
-
-          <datalist id="languages">
-            {allManuscriptLanguages.map(({abbreviation}) => <option key={abbreviation}>{abbreviation}</option>)}
-          </datalist>
-        </div>
+        <LanguageInput initialValue={data.lg} onBlur={updateLanguage}/>
 
         {data.node.attributes.q
           ? <WordQuestion comment={data.node.attributes.q} removeNote={removeNote}/>
