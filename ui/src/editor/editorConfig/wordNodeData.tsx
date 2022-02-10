@@ -79,17 +79,20 @@ export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
       .filter((name) => name.startsWith('mrp') && !name.startsWith('mrp0'))
       .length > 0;
 
+    const hasQuestion = !!node.attributes.q;
+
     const classes = classNames(node.attributes.lg || '', {
       'is-underlined': !notMarked && hasNoMorphologySelected,
       'has-background-primary': !notMarked && !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.'),
       'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
+      'has-background-info': hasQuestion,
       [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,
       'has-text-weight-bold': isForeignLanguage,
       'has-text-danger': node.children.length === 0
     });
 
     return <>
-        <span className={classes}>
+        <span className={classes} title={hasQuestion ? node.attributes.q : undefined}>
           {node.children.length === 0 ? <IoCloseSharp/> : renderedChildren}
         </span>
       &nbsp;&nbsp;
