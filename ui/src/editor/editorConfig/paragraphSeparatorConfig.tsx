@@ -18,7 +18,7 @@ export const paragraphSeparatorConfig: XmlSingleEditableNodeConfig = {
 
 const separatorTypes: string[] = ['parsep', 'parsep_dbl'];
 
-function ParagraphSeparatorEditor({data, updateNode, changed, initiateSubmit}: XmlEditableNodeIProps): JSX.Element {
+function ParagraphSeparatorEditor({data, updateNode, changed, initiateSubmit, deleteNode}: XmlEditableNodeIProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -32,9 +32,16 @@ function ParagraphSeparatorEditor({data, updateNode, changed, initiateSubmit}: X
         </div>
       </div>
 
-      <button type="button" className={classNames('button', 'is-fullwidth', {'is-link': changed})} disabled={!changed} onClick={initiateSubmit}>
-        {t('update')}
-      </button>
+      <div className="columns">
+        <div className="column">
+          <button type="button" className="button is-danger is-fullwidth" onClick={deleteNode}>{t('deleteNode')}</button>
+        </div>
+        <div className="column">
+          <button type="button" className={classNames('button', 'is-fullwidth', {'is-link': changed})} disabled={!changed} onClick={initiateSubmit}>
+            {t('update')}
+          </button>
+        </div>
+      </div>
     </>
   );
 }
