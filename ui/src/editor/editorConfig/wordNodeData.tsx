@@ -1,11 +1,12 @@
 import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue} from '../../model/morphologicalAnalysis';
-import {XmlElementNode} from '../xmlModel/xmlModel';
+import {isXmlElementNode, XmlElementNode} from '../xmlModel/xmlModel';
 import {readSelectedMorphology, SelectedAnalysisOption, writeSelectedMorphologies} from '../selectedAnalysisOption';
 import {getSelectedLetters} from '../../model/analysisOptions';
 import {XmlSingleEditableNodeConfig} from './editorConfig';
 import classNames from 'classnames';
 import {IoCloseSharp} from 'react-icons/io5';
 import {WordNodeEditor} from '../WordNodeEditor';
+import {SpacesEditor} from './SpacesEditor';
 
 export interface WordNodeData {
   node: XmlElementNode;
@@ -98,7 +99,15 @@ export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
       &nbsp;&nbsp;
     </>;
   },
-  edit: (props) => <WordNodeEditor key={props.path.join('.')} {...props}/>,
+  edit: (props) => {
+    const children = props.data.node.children;
+
+    const isSpace = children.length === 1 && isXmlElementNode(children[0]) && children[0].tagName === 'space';
+
+    return isSpace
+      ? <SpacesEditor {...props}/>
+      : <WordNodeEditor key={props.path.join('.')} {...props}/>;
+  },
   readNode: readWordNodeData,
   writeNode: writeWordNodeData,
   insertablePositions: {
