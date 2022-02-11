@@ -6,7 +6,7 @@ import {MorphAnalysisOptionContainer} from './morphAnalysisOption/MorphAnalysisO
 import {NodeDisplay} from './NodeDisplay';
 import {tlhXmlEditorConfig} from './editorConfig/tlhXmlEditorConfig';
 import {useSelector} from 'react-redux';
-import {allManuscriptLanguagesSelector, editorKeyConfigSelector} from '../store/store';
+import {editorKeyConfigSelector} from '../store/store';
 import {XmlElementNode} from './xmlModel/xmlModel';
 import {MorphAnalysisOptionEditor} from './morphAnalysisOption/MorphAnalysisOptionEditor';
 import {reconstructTransliteration} from './transliterationReconstruction';
