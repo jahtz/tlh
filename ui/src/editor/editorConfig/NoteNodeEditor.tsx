@@ -2,6 +2,29 @@ import {XmlEditableNodeIProps} from './editorConfig';
 import {NoteData} from './noteData';
 import {useTranslation} from 'react-i18next';
 import {UpdatePrevNextButtons} from '../morphAnalysisOption/UpdatePrevNextButtons';
+import {isXmlTextNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
+
+export function reCountNoteNumbers(rootNode: XmlElementNode): void {
+
+  function go(node: XmlNode, currentCount: number): number {
+    if (isXmlTextNode(node)) {
+      return currentCount;
+    } else {
+      if (node.tagName === 'note') {
+        node.attributes.n = currentCount.toString();
+        currentCount++;
+      }
+
+      for (const child of node.children) {
+        currentCount = go(child, currentCount);
+      }
+
+      return currentCount;
+    }
+  }
+
+  go(rootNode, 1);
+}
 
 export function NoteNodeEditor({
   data,
@@ -22,8 +45,8 @@ export function NoteNodeEditor({
       <div className="field">
         <label htmlFor="n" className="label">n:</label>
         <div className="control">
-          <input type="text" id="n" className="input" value={data.n} onFocus={() => setKeyHandlingEnabled(false)}
-                 onBlur={(event) => updateNode({n: {$set: event.target.value}})}/>
+          <input type="text" id="n" className="input" value={data.n} disabled/>
+          <p className="help is-info">{t('recountedAtExport')}</p>
         </div>
       </div>
 

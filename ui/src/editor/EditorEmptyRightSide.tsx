@@ -13,7 +13,7 @@ export function EditorEmptyRightSide({editorConfig, currentInsertedElement, togg
 
   const {t} = useTranslation('common');
 
-  const insertableTags: [string, InsertablePositions][] = Object.entries(editorConfig)
+  const insertableTags: [string, InsertablePositions][] = Object.entries(editorConfig.nodeConfigs)
     .map<[string, InsertablePositions | undefined]>(([tagName, {insertablePositions}]) => [tagName, insertablePositions])
     .filter((t): t is [string, InsertablePositions] => !!t[1]);
 

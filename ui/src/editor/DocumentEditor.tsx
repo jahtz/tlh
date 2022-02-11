@@ -15,7 +15,6 @@ import {InsertStuff} from './NodeDisplay';
 interface IProps {
   node: XmlNode;
   filename: string;
-  editorConfig?: XmlEditorConfig;
   download: (content: string) => void;
   closeFile: () => void;
   autoSave: (rootNode: XmlNode) => void;
@@ -111,23 +110,22 @@ function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode
   return rootNode;
 }
 
-export function writeXml(node: XmlElementNode): string {
-  return writeNode(node)
-    .join('\n')
-    .replaceAll('®', '\n\t')
-    .replaceAll('{', '\n\t\t{')
-    .replaceAll('+=', '\n\t\t   += ')
-    .replaceAll('<w', '\n <w')
-    .replaceAll('<lb', '\n\n<lb')
-    .replaceAll(' mrp', '\n\tmrp')
-    .replaceAll('@', ' @ ');
+
+export function writeXml(node: XmlElementNode, editorConfig: XmlEditorConfig = tlhXmlEditorConfig): string {
+  const nodeToExport = editorConfig.beforeExport(node);
+
+  const exported = writeNode(nodeToExport);
+
+  return editorConfig.afterExport(exported.join('\n'));
 }
 
-export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEditorConfig, download, filename, closeFile, autoSave}: IProps): JSX.Element {
+export function DocumentEditor<T>({node: initialNode, download, filename, closeFile, autoSave}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);
   const [state, setState] = useState<IState<T>>({keyHandlingEnabled: true, rootNode: initialNode, changed: false});
+
+  const editorConfig = tlhXmlEditorConfig;
 
   useEffect(() => {
     state.changed && autoSave(state.rootNode);
@@ -159,7 +157,7 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
     setState((state) => update(state, {changed: {$set: false}}));
 
     download(
-      writeXml(toExport)
+      writeXml(toExport, editorConfig)
     );
   }
 
@@ -167,7 +165,7 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
     setState((state) => update(state, {
       editorState: {
         $apply: (editorState: EditorState<T> | undefined) => {
-          const config = editorConfig[node.tagName] as XmlSingleEditableNodeConfig<T>;
+          const config = editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>;
 
           if (editorState && editorStateIsEditNodeState(editorState) && editorState.path.join('.') === path.join('.')) {
             return undefined;
@@ -190,7 +188,7 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
       if (state.editorState && 'path' in state.editorState) {
 
         newEditorState = {
-          node, path: nextEditablePath, changed: false, data: (editorConfig[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node)
+          node, path: nextEditablePath, changed: false, data: (editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node)
         };
       }
     }
@@ -200,7 +198,7 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
         ? update(state, {
           rootNode: state.editorState.path.reduceRight<Spec<XmlNode>>(
             (acc, index) => ({children: {[index]: acc}}),
-            {$set: (editorConfig[state.editorState.node.tagName] as XmlSingleEditableNodeConfig<T>).writeNode(state.editorState.data, state.editorState.node)}
+            {$set: (editorConfig.nodeConfigs[state.editorState.node.tagName] as XmlSingleEditableNodeConfig<T>).writeNode(state.editorState.data, state.editorState.node)}
           ),
           editorState: newEditorState
             ? {$set: newEditorState}
@@ -233,7 +231,7 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
           editorState: {
             $set: {
               node,
-              data: (editorConfig[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node),
+              data: (editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node),
               changed: false,
               path
             }
@@ -279,7 +277,7 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
   }
 
   function renderNodeEditor({node, data, path, changed}: IEditNodeState<T>): JSX.Element {
-    return (editorConfig[node.tagName] as XmlSingleEditableNodeConfig<T>).edit({
+    return (editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>).edit({
       data,
       path,
       changed,
@@ -320,7 +318,7 @@ export function DocumentEditor<T>({node: initialNode, editorConfig = tlhXmlEdito
           (acc, index) => ({children: {[index]: acc}}),
           {children: {$splice: [[path[path.length - 1], 0, node]]}}
         ),
-        editorState: {$set: {path, changed: false, node, data: (editorConfig[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node)}},
+        editorState: {$set: {path, changed: false, node, data: (editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node)}},
         changed: {$set: true}
       }));
     }

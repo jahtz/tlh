@@ -32,7 +32,7 @@ export function NodeDisplay({
     return <span>{node.textContent}</span>;
   }
 
-  const currentConfig = editorConfig[node.tagName];
+  const currentConfig = editorConfig?.nodeConfigs[node.tagName];
 
   const renderedChildren = <>
     {node.children.map((c, i) =>

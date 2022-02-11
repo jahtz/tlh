@@ -36,5 +36,9 @@ export interface XmlSingleEditableNodeConfig<T = XmlElementNode> extends XmlSing
 }
 
 export interface XmlEditorConfig {
-  [tagName: string]: XmlSingleNodeConfig | XmlSingleEditableNodeConfig;
+  nodeConfigs: {
+    [tagName: string]: XmlSingleNodeConfig | XmlSingleEditableNodeConfig;
+  };
+  beforeExport: (node: XmlElementNode) => XmlElementNode;
+  afterExport: (content: string) => string;
 }
