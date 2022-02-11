@@ -15,7 +15,7 @@ import {XmlWriter} from '../../editor/xmlModel/xmlWriting';
 import {InscribedLetter, inscribedLetterFormat, isInscribedLetter} from './inscribedLetter';
 import {Ellipsis, ellipsisFormat, isEllipsis} from './ellipsis';
 import {BasicText, isBasicText} from './basicText';
-import {IndexDigit} from './indexDigit';
+import {IndexDigit, isIndexDigit} from './indexDigit';
 
 // Word content
 
@@ -59,10 +59,12 @@ export function xmlifyAoWordContent(c: AOWordContent): XmlNode {
     return {tagName: 'note', attributes: {n: c.number.toString(), c: c.content}, children: []};
   }/* else if (isNumeralContent(c)) {
     return c.content;
-  }*/ else {
+  }*/
+  else if (isIndexDigit(c)) {
+    return {textContent: c.content.toString()};
+  } else {
     // FIXME: implement rest!
-    console.error(c.type);
-    throw new Error('TODO: implement!');
+    throw new Error('TODO: implement: ' + c.type + '!');
   }
 }
 
