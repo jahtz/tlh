@@ -41,12 +41,14 @@ export function NodeDisplay({
     )}
   </>;
 
+  const isSelected = !!currentSelectedPath && path.join('.') === currentSelectedPath.join('.');
+
   const display = currentConfig && currentConfig.replace
-    ? currentConfig.replace(node, renderedChildren, path, currentSelectedPath)
+    ? currentConfig.replace(node, renderedChildren, isSelected)
     : renderedChildren;
 
   const classes = currentConfig && currentConfig.styling
-    ? currentConfig.styling(node, path, currentSelectedPath)
+    ? currentConfig.styling(node, isSelected)
     : [];
 
   const onClick = currentConfig && 'edit' in currentConfig && onSelect

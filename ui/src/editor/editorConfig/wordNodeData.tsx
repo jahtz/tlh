@@ -52,9 +52,11 @@ export function writeWordNodeData({node: originalNode, lg, morphologies}: WordNo
     }
   });
 
-  node.attributes.mrp0sel = selectedAnalysisOptions.length > 0
-    ? writeSelectedMorphologies(selectedAnalysisOptions)
-    : ' ';
+  if (selectedAnalysisOptions.length > 0) {
+    node.attributes.mrp0sel = selectedAnalysisOptions.length > 0
+      ? writeSelectedMorphologies(selectedAnalysisOptions)
+      : ' ';
+  }
 
 
   return node;
@@ -68,7 +70,7 @@ const foreignLanguageColors: { [key: string]: string } = {
 };
 
 export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
-  replace: (node, renderedChildren, path, currentSelectedPath) => {
+  replace: (node, renderedChildren, isSelected) => {
     const notMarked = node.attributes.mrp0sel === 'DEL';
 
     const isForeignLanguage = Object.keys(foreignLanguageColors).includes(node.attributes.mrp0sel);
@@ -84,7 +86,7 @@ export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
 
     const classes = classNames(node.attributes.lg || '', {
       'is-underlined': !notMarked && hasNoMorphologySelected,
-      'has-background-primary': !notMarked && !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.'),
+      'has-background-primary': !notMarked && isSelected,
       'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
       'has-background-info': hasQuestion,
       [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,

@@ -30,17 +30,12 @@ function writeLineBreakData({textId, lineNumber, lg}: LineBreakData, originalNod
 }
 
 export const lineBreakNodeConfig: XmlSingleEditableNodeConfig<LineBreakData> = {
-  replace: (node, _renderedChildren, path, currentSelectedPath) => {
-
-    const isSelected = !!currentSelectedPath && currentSelectedPath.join('.') === path.join('.');
-
-    return (
-      <>
-        <span className={classNames('lb', {'has-background-primary': isSelected})}><br/>{node.attributes.lnr}:</span>
-        &nbsp;&nbsp;&nbsp;
-      </>
-    );
-  },
+  replace: (node, _renderedChildren, isSelected) => (
+    <>
+      <span className={classNames('lb', {'has-background-primary': isSelected})}><br/>{node.attributes.lnr}:</span>
+      &nbsp;&nbsp;&nbsp;
+    </>
+  ),
   edit: (props) => <LineBreakEditor key={props.path.join('.')} {...props} />,
   readNode: readLineBreakData,
   writeNode: writeLineBreakData,

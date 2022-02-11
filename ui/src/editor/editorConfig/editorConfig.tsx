@@ -3,9 +3,9 @@ import {Argument as ClassNamesArgument} from 'classnames';
 import {InsertablePositions, NodePath} from '../insertablePositions';
 import {Spec} from 'immutability-helper';
 
-type ReplaceFunc = (node: XmlElementNode, renderedChildren: JSX.Element, path: NodePath, currentSelectedPath?: NodePath) => JSX.Element;
+type ReplaceFunc = (node: XmlElementNode, renderedChildren: JSX.Element, isSelected: boolean) => JSX.Element;
 
-type NodeStylingFunc = (node: XmlElementNode, path: NodePath, currentSelectedPath?: NodePath) => ClassNamesArgument;
+type NodeStylingFunc = (node: XmlElementNode, isSelected: boolean) => ClassNamesArgument;
 
 export type EditTriggerFunc = (node: XmlElementNode, path: NodePath) => void;
 

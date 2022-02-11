@@ -3,14 +3,11 @@ import classNames from 'classnames';
 import {useTranslation} from 'react-i18next';
 
 export const paragraphSeparatorConfig: XmlSingleEditableNodeConfig = {
-  replace: (node, _, currentPath, currentSelectedPath) => {
-
-    const isSelected = currentSelectedPath && currentPath.join('.') === currentSelectedPath.join('.');
-
-    return <span className={classNames({'has-background-primary': isSelected})}>
+  replace: (node, _renderedChildren, isSelected) => (
+    <span className={classNames({'has-background-primary': isSelected})}>
       {node.tagName === 'parsep' ? '¬¬¬' : '==='}
-    </span>;
-  },
+    </span>
+  ),
   edit: (props) => <ParagraphSeparatorEditor {...props}/>,
   readNode: (node) => node,
   writeNode: (node) => node,
