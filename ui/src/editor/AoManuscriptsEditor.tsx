@@ -2,7 +2,7 @@ import {XmlEditableNodeIProps} from './editorConfig/editorConfig';
 import {AoManuscriptsData, AoSource, SourceType, sourceTypes} from './editorConfig/aoManuscriptsConfigData';
 import {useTranslation} from 'react-i18next';
 import classNames from 'classnames';
-import {IoAddOutline, IoRemoveCircle} from 'react-icons/io5';
+import {IoRemoveCircle} from 'react-icons/io5';
 
 
 interface AoTextNumberFieldProps {
@@ -14,16 +14,11 @@ interface AoTextNumberFieldProps {
 function AoTextNumberField({source: {type, name}, updateType, updateText}: AoTextNumberFieldProps): JSX.Element {
   return (
     <>
-      <div className="control">
-        <div className="select is-fullwidth">
-          <select defaultValue={type} onBlur={(event) => updateType(event.target.value as SourceType)}>
-            {sourceTypes.map((st) => <option key={st}>{st}</option>)}
-          </select>
-        </div>
-      </div>
-      <div className="control is-expanded">
-        <input type="text" className="input" defaultValue={name} onBlur={(event) => updateText(event.target.value)}/>
-      </div>
+      <select defaultValue={type} onBlur={(event) => updateType(event.target.value as SourceType)}
+              className="p-2 rounded-l border border-slate-500 bg-gray-100">
+        {sourceTypes.map((st) => <option key={st}>{st}</option>)}
+      </select>
+      <input type="text" className="flex-grow p-2 border border-slate-500" defaultValue={name} onBlur={(event) => updateText(event.target.value)}/>
     </>
   );
 }
@@ -35,9 +30,7 @@ interface AoPlusFieldProps {
 
 function AoPlusField({source, onBlur}: AoPlusFieldProps): JSX.Element {
   return (
-    <div className="control is-expanded">
-      <input type="text" className="input" defaultValue={source} onBlur={(event) => onBlur(event.currentTarget.value)}/>
-    </div>
+    <input className="flex-grow p-2 rounded-l border border-slate-500" type="text" defaultValue={source} onBlur={(event) => onBlur(event.currentTarget.value)}/>
   );
 }
 
@@ -66,30 +59,25 @@ export function AoManuscriptsEditor({data, updateNode, changed, initiateSubmit}:
   }
 
   return (
-    <>
+    <div>
       {data.content.map((source, index) =>
-        <div className="field has-addons" key={index}>
+        <div className="my-2 flex flex-row" key={index}>
           {typeof source === 'string'
             ? <AoPlusField key={index} source={source} onBlur={(value) => updatePlus(index, value)}/>
             : <AoTextNumberField key={index} source={source} updateType={(value) => updateType(index, value)}
                                  updateText={(value) => updateText(index, value)}/>}
-          <div className="control">
-            <button type="button" className="button is-danger" onClick={() => deleteEntry(index)}>
-              <IoRemoveCircle/>
-            </button>
-          </div>
+          <button type="button" className="p-2 rounded-r border-r bg-red-500 text-white" onClick={() => deleteEntry(index)}>
+            <IoRemoveCircle/>
+          </button>
         </div>
       )}
 
-      <div className="field">
-        <button type="button" className="button is-link is-fullwidth" onClick={addEntry}>
-          <IoAddOutline/>
-        </button>
-      </div>
+      <button type="button" className="p-2 mb-2 rounded border bg-blue-600 text-white text-center w-full" onClick={addEntry}>+</button>
 
-      <button type="button" className={classNames('button', 'is-fullwidth', {'is-link': changed})} onClick={initiateSubmit} disabled={!changed}>
+      <button type="button" onClick={initiateSubmit} disabled={!changed}
+              className={classNames('p-2', 'rounded', 'text-center', 'w-full', changed ? ['bg-blue-600', 'text-white'] : ['border', 'border-slate-500'])}>
         {t('updateNode')}
       </button>
-    </>
+    </div>
   );
 }

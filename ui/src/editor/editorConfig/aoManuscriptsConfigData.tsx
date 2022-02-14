@@ -1,11 +1,9 @@
 import {XmlSingleEditableNodeConfig} from './editorConfig';
 import {isXmlElementNode, XmlElementNode, XmlTextNode} from '../xmlModel/xmlModel';
-
 import {AoManuscriptsEditor} from '../AoManuscriptsEditor';
 import classNames from 'classnames';
 
 export type SourceType = 'AO:TxtPubl' | 'AO:InvNr';
-
 export const sourceTypes: SourceType[] = ['AO:TxtPubl', 'AO:InvNr'];
 
 export interface AoSource {
@@ -34,20 +32,10 @@ export interface AoManuscriptsData {
 }
 
 export const aoManuscriptsConfig: XmlSingleEditableNodeConfig<AoManuscriptsData> = {
-  replace: (node, renderedChildren, isSelected) => <span className={classNames({'has-background-primary': isSelected})}>{renderedChildren}</span>,
+  replace: (node, renderedChildren, isSelected) => <span className={classNames(isSelected ? ['bg-teal-400', 'p-2'] : [])}>{renderedChildren}</span>,
   edit: (props) => <AoManuscriptsEditor {...props}/>,
-  readNode: readAoManuscriptsNode,
-  writeNode: writeAoManuscriptsNode
-};
-
-function readAoManuscriptsNode(node: XmlElementNode): AoManuscriptsData {
-  return {
-    content: node.children.map((n) => isXmlElementNode(n) ? readSource(n) : n.textContent.trim())
-  };
-}
-
-function writeAoManuscriptsNode(data: AoManuscriptsData, originalNode: XmlElementNode): XmlElementNode {
-  return {
+  readNode: (node) => ({content: node.children.map((n) => isXmlElementNode(n) ? readSource(n) : n.textContent.trim())}),
+  writeNode: (data, originalNode) => ({
     ...originalNode,
     children: data.content.map((s) => {
       if (typeof s === 'string') {
@@ -56,5 +44,5 @@ function writeAoManuscriptsNode(data: AoManuscriptsData, originalNode: XmlElemen
         return writeSource(s);
       }
     })
-  };
-}
+  })
+};
