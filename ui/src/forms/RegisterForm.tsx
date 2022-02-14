@@ -1,9 +1,8 @@
 import {useRegisterMutation, UserInput} from '../graphql';
 import {useTranslation} from 'react-i18next';
-import {Field, Form, Formik, FormikHelpers} from 'formik';
+import {Field, Form, Formik} from 'formik';
 import {registerSchema} from './schemas';
-import {BulmaField} from './BulmaFields';
-import classnames from 'classnames';
+import {MyField} from './BulmaFields';
 
 const initialValues: UserInput = {username: '', password: '', passwordRepeat: '', name: '', email: '', affiliation: ''};
 
@@ -12,42 +11,38 @@ export function RegisterForm(): JSX.Element {
   const {t} = useTranslation('common');
   const [register, {data, loading, error}] = useRegisterMutation();
 
-  function onSubmit(values: UserInput, {setSubmitting}: FormikHelpers<UserInput>): void {
+  function onSubmit(values: UserInput): void {
     register({variables: {userInput: values}})
       .catch((e) => console.error(e));
-
-    setSubmitting(false);
   }
 
   return (
-    <div className="container">
-      <h1 className="title is-3 has-text-centered">{t('register')}</h1>
+    <div className="container mx-auto">
+      <h1 className="font-bold text-2xl text-center mb-4">{t('register')}</h1>
 
       <Formik initialValues={initialValues} validationSchema={registerSchema} onSubmit={onSubmit}>
         <Form>
-          <Field name="username" id="username" label={t('username')} component={BulmaField}/>
+          <Field name="username" id="username" label={t('username')} component={MyField}/>
 
-          <Field type="password" name="password" id="password" label={t('password')} component={BulmaField}/>
+          <Field type="password" name="password" id="password" label={t('password')} component={MyField}/>
 
-          <Field type="password" name="passwordRepeat" id="passwordRepeat" label={t('passwordRepeat')} component={BulmaField}/>
+          <Field type="password" name="passwordRepeat" id="passwordRepeat" label={t('passwordRepeat')} component={MyField}/>
 
-          <Field name="name" id="name" label={t('name')} component={BulmaField}/>
+          <Field name="name" id="name" label={t('name')} component={MyField}/>
 
-          <Field type="email" name="email" label={t('email')} component={BulmaField}/>
+          <Field type="email" name="email" label={t('email')} component={MyField}/>
 
-          <Field name="affiliation" id="affiliation" label={t('affiliation')} component={BulmaField}/>
+          <Field name="affiliation" id="affiliation" label={t('affiliation')} component={MyField}/>
 
-          {data?.register && <div className="notification is-success has-text-centered">
+          {data?.register && <div className="p-4 rounded border border-green-600 bg-green-500 text-white text-center">
             {t('userRegistered{{who}}', {who: data.register})}.
           </div>}
 
-          {error && <div className="notification is-danger has-text-centered">{error.message}</div>}
+          {error && <div className="p-4 rounded border border-red-600 bg-red-500 text-white text-center">{error.message}</div>}
 
-          <div className="field">
-            <button type="submit" disabled={loading || !!data?.register} className={classnames('button', 'is-link', 'is-fullwidth', {'is-loading': loading})}>
-              {t('register')}
-            </button>
-          </div>
+          <button type="submit" disabled={loading || !!data?.register} className="mt-4 p-2 rounded border w-full bg-blue-500 text-white">
+            {t('register')}
+          </button>
         </Form>
       </Formik>
     </div>

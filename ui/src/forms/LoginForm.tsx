@@ -2,9 +2,8 @@ import {Dispatch, useState} from 'react';
 import {LoginMutationVariables, useLoginMutation} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
-import {BulmaField} from './BulmaFields';
+import {MyField} from './BulmaFields';
 import {loginSchema} from './schemas';
-import classnames from 'classnames';
 import {homeUrl} from '../urls';
 import {Navigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
@@ -41,26 +40,24 @@ export function LoginForm(): JSX.Element {
   }
 
   return (
-    <div className="container">
-      <h1 className="title is-3 has-text-centered">{t('login')}</h1>
+    <div className="container mx-auto">
+      <h1 className="font-bold text-2xl text-center mb-4">{t('login')}</h1>
 
       <Formik initialValues={initialValues} validationSchema={loginSchema} onSubmit={handleSubmit}>
         <Form>
-          <Field name="username" id="username" label={t('username')} component={BulmaField}/>
+          <Field name="username" id="username" label={t('username')} component={MyField}/>
 
-          <Field type="password" name="password" id="password" label={t('password')} component={BulmaField}/>
+          <Field type="password" name="password" id="password" label={t('password')} component={MyField}/>
 
-          {invalidLoginTry && <div className="notification is-warning has-text-centered">
+          {invalidLoginTry && <div className="p-4 rounded border border-red-600 bg-red-500 text-white text-center">
             {t('invalidUsernamePasswordCombination')}.
           </div>}
 
-          {error && <div className="notification is-danger has-text-centered">{error.message}</div>}
+          {error && <div className="p-4 rounded border border-red-600 bg-red-500 text-white text-center">{error.message}</div>}
 
-          <div className="field">
-            <button type="submit" disabled={loading} className={classnames('button', 'is-link', 'is-fullwidth', {'is-loading': loading})}>
-              {t('login')}
-            </button>
-          </div>
+          <button type="submit" disabled={loading} className="mt-4 p-2 rounded border w-full bg-blue-500 text-white">
+            {t('login')}
+          </button>
         </Form>
       </Formik>
     </div>

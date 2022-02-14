@@ -15,7 +15,6 @@ import {Home} from './Home';
 import {RegisterForm} from './forms/RegisterForm';
 import {LoginForm} from './forms/LoginForm';
 import {useTranslation} from 'react-i18next';
-import i18next from 'i18next';
 import {CreateManuscriptForm} from './CreateManuscriptForm';
 import {DocumentEditorContainer} from './editor/DocumentEditorContainer';
 import {useDispatch, useSelector} from 'react-redux';
@@ -24,12 +23,9 @@ import {StoreAction, userLoggedOutAction} from './store/actions';
 import {ManuscriptBase} from './manuscript/ManuscriptBase';
 import {XmlComparator} from './xmlComparator/XmlComparator';
 import {Preferences} from './Preferences';
-import {IoSettingsOutline} from 'react-icons/io5';
 import {DocumentMergerContainer} from './documentMerger/DocumentMergerContainer';
 import {RequireAuth} from './RequireAuth';
-
-// TODO: solve languages different?
-const languages: string[] = ['de', 'en'];
+import {LanguageSelector} from './LanguageSelector';
 
 export function App(): JSX.Element {
 
@@ -45,65 +41,59 @@ export function App(): JSX.Element {
 
   return (
     <>
-      <nav className="navbar is-dark">
-        <div className="navbar-brand">
-          <NavLink className="navbar-item" to={homeUrl}>TLH<sup>dig</sup></NavLink>
-        </div>
-        <div className="navbar-menu">
-          <div className="navbar-start">
-            {user && <NavLink className="navbar-item" to={createManuscriptUrl}>{t('createManuscript')}</NavLink>}
-            <NavLink className="navbar-item" to={editDocumentUrl}>{t('editDocument')}</NavLink>
-            <NavLink className="navbar-item" to={xmlComparatorUrl}>{t('xmlComparator')}</NavLink>
-          </div>
+      <nav className="p-4 flex bg-gray-800 text-white mb-4">
+        <NavLink className="font-extrabold" to={homeUrl}>TLH<sup>dig</sup></NavLink>
 
-          <div className="navbar-end">
-            <NavLink className="navbar-item" to={preferencesUrl}><IoSettingsOutline/>&nbsp;{t('preferences')}</NavLink>
-            <div className="navbar-item has-dropdown is-hoverable">
-              <div className="navbar-link">{t('language')}</div>
-              <div className="navbar-dropdown">
-                {languages.map((lang) =>
-                  <div className="navbar-item" key={lang} onClick={() => i18next.changeLanguage(lang)}>{lang}</div>
-                )}
-              </div>
-            </div>
-            <div className="navbar-item">
-              {user
-                ? <div className="buttons">
-                  <button className="button is-light" onClick={logout}>{t('logout')} {user.name}</button>
-                </div>
-                : <div className="buttons">
-                  <NavLink className="button is-light" to={registerUrl}>{t('register')}</NavLink>
-                  <NavLink className="button is-light" to={loginUrl}>{t('login')}</NavLink>
-                </div>
-              }
-            </div>
-          </div>
+        <div>
+          {user && <NavLink className="ml-4" to={createManuscriptUrl}>{t('createManuscript')}</NavLink>}
+          <NavLink className="ml-4" to={editDocumentUrl}>{t('editDocument')}</NavLink>
+          <NavLink className="ml-4" to={xmlComparatorUrl}>{t('xmlComparator')}</NavLink>
         </div>
+
+        <div className="flex-grow"/>
+
+        <NavLink className="ml-4" to={preferencesUrl}>
+          {/*<IoSettingsOutline/>&nbsp;*/}{t('preferences')}
+        </NavLink>
+
+        <div className="ml-4">
+          <LanguageSelector/>
+        </div>
+
+        {user
+          ? <button className="ml-4" onClick={logout}>{t('logout')} {user.name}</button>
+          : <>
+            <NavLink className="ml-4" to={registerUrl}>{t('register')}</NavLink>
+            <NavLink className="ml-4" to={loginUrl}>{t('login')}</NavLink>
+          </>
+        }
       </nav>
 
-      <Routes>
-        <Route path={homeUrl} element={<Home/>}/>
+      <div className="p-2">
+        <Routes>
+          <Route path={homeUrl} element={<Home/>}/>
 
-        <Route path={registerUrl} element={<RegisterForm/>}/>
+          <Route path={registerUrl} element={<RegisterForm/>}/>
 
-        <Route path={loginUrl} element={<LoginForm/>}/>
+          <Route path={loginUrl} element={<LoginForm/>}/>
 
-        <Route path={createManuscriptUrl} element={
-          <RequireAuth>
-            {() => <CreateManuscriptForm/>}
-          </RequireAuth>
-        }/>
+          <Route path={createManuscriptUrl} element={
+            <RequireAuth>
+              {() => <CreateManuscriptForm/>}
+            </RequireAuth>
+          }/>
 
-        <Route path={`/${manuscriptsUrlFragment}/:mainIdentifier`} element={<ManuscriptBase/>}/>
+          <Route path={`/${manuscriptsUrlFragment}/:mainIdentifier`} element={<ManuscriptBase/>}/>
 
-        <Route path={editDocumentUrl} element={<DocumentEditorContainer/>}/>
+          <Route path={editDocumentUrl} element={<DocumentEditorContainer/>}/>
 
-        <Route path={xmlComparatorUrl} element={<XmlComparator/>}/>
+          <Route path={xmlComparatorUrl} element={<XmlComparator/>}/>
 
-        <Route path={preferencesUrl} element={<Preferences/>}/>
+          <Route path={preferencesUrl} element={<Preferences/>}/>
 
-        <Route path={documentMergerUrl} element={<DocumentMergerContainer/>}/>
-      </Routes>
+          <Route path={documentMergerUrl} element={<DocumentMergerContainer/>}/>
+        </Routes>
+      </div>
     </>
   );
 }

@@ -4,7 +4,7 @@ import {useIndexLazyQuery} from './graphql';
 import {Link} from 'react-router-dom';
 import {WithQuery} from './WithQuery';
 import {createManuscriptUrl} from './urls';
-import {BulmaPagination} from './bulmaHelpers/BulmaPagination';
+import {MyPagination} from './bulmaHelpers/BulmaPagination';
 
 const paginationSize = 10;
 
@@ -34,8 +34,8 @@ export function Home(): JSX.Element {
   }
 
   return (
-    <div className="container">
-      <h1 className="title is-3 has-text-centered">{t('manuskript_plural')}</h1>
+    <div className="container mx-auto">
+      <h1 className="font-bold text-2xl text-center mb-4">{t('manuskript_plural')}</h1>
 
       {indexQuery.called && <WithQuery query={indexQuery}>
         {({manuscriptCount, allManuscripts}) => {
@@ -47,36 +47,36 @@ export function Home(): JSX.Element {
 
           return (
             <>
-              <table className="table is-fullwidth">
+              <table className="table-auto w-full border-collapse">
                 <thead>
-                  <tr>
-                    <th>{t('mainIdentifier')}</th>
-                    <th>{t('status')}</th>
-                    <th>{t('creator')}</th>
+                  <tr className="text-left border-b-2 border-slate-500">
+                    <th className="p-2">{t('mainIdentifier')}</th>
+                    <th className="p-2">{t('status')}</th>
+                    <th className="p-2">{t('creator')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {allManuscripts.map(({mainIdentifier: {identifier, identifierType}, status, creatorUsername}) =>
-                    <tr key={identifier}>
-                      <td>
+                    <tr key={identifier} className="border-t border-slate-600">
+                      <td className="p-2">
                         <Link to={`manuscripts/${encodeURIComponent(identifier)}/data`}>
                           {identifier} ({identifierType})
                         </Link>
                       </td>
-                      <td>{status}</td>
-                      <td>{creatorUsername}</td>
+                      <td className="p-2">{status}</td>
+                      <td className="p-2">{creatorUsername}</td>
                     </tr>
                   )}
                 </tbody>
               </table>
 
-              <BulmaPagination currentPage={page} pageCount={pageCount} previousPage={previousPage} goToPage={goToPage} nextPage={nextPage}/>
+              <MyPagination currentPage={page} pageCount={pageCount} previousPage={previousPage} goToPage={goToPage} nextPage={nextPage}/>
             </>
           );
         }}
       </WithQuery>}
 
-      <Link className="button is-link is-fullwidth" to={createManuscriptUrl}>
+      <Link className="mt-4 rounded bg-blue-600 text-white w-full p-2" to={createManuscriptUrl}>
         {t('createManuscript')}
       </Link>
     </div>

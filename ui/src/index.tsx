@@ -1,6 +1,6 @@
 import {StrictMode} from 'react';
 import {render} from 'react-dom';
-import './index.sass';
+import './index.css';
 import {App} from './App';
 import {HashRouter} from 'react-router-dom';
 import * as serviceWorker from './serviceWorker';
