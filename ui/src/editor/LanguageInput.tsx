@@ -13,11 +13,11 @@ export function LanguageInput({initialValue, onBlur}: IProps): JSX.Element {
   const allManuscriptLanguages = useSelector(allManuscriptLanguagesSelector);
 
   return (
-    <div className="field">
-      <div className="control">
-        <input defaultValue={initialValue} className="input" placeholder={t('language')} list="languages"
-               onBlur={(event) => onBlur(event.target.value)}/>
-      </div>
+    <div>
+      <label htmlFor="language" className="font-bold">{t('language')}:</label>
+
+      <input defaultValue={initialValue} id="language" className="p-2 rounded border border-slate-500 mt-2 w-full" placeholder={t('language')} list="languages"
+             onBlur={(event) => onBlur(event.target.value)}/>
 
       <datalist id="languages">
         {allManuscriptLanguages.map(({abbreviation}) => <option key={abbreviation}>{abbreviation}</option>)}

@@ -1,9 +1,8 @@
-import {XmlEditableNodeIProps} from './editorConfig/editorConfig';
-import {AoManuscriptsData, AoSource, SourceType, sourceTypes} from './editorConfig/aoManuscriptsConfigData';
+import {XmlEditableNodeIProps} from '../editorConfig/editorConfig';
+import {AoManuscriptsData, AoSource, SourceType, sourceTypes} from './aoManuscriptsConfigData';
 import {useTranslation} from 'react-i18next';
 import classNames from 'classnames';
 import {IoRemoveCircle} from 'react-icons/io5';
-
 
 interface AoTextNumberFieldProps {
   source: AoSource;
@@ -20,17 +19,6 @@ function AoTextNumberField({source: {type, name}, updateType, updateText}: AoTex
       </select>
       <input type="text" className="flex-grow p-2 border border-slate-500" defaultValue={name} onBlur={(event) => updateText(event.target.value)}/>
     </>
-  );
-}
-
-interface AoPlusFieldProps {
-  source: string;
-  onBlur: (value: string) => void;
-}
-
-function AoPlusField({source, onBlur}: AoPlusFieldProps): JSX.Element {
-  return (
-    <input className="flex-grow p-2 rounded-l border border-slate-500" type="text" defaultValue={source} onBlur={(event) => onBlur(event.currentTarget.value)}/>
   );
 }
 
@@ -63,7 +51,8 @@ export function AoManuscriptsEditor({data, updateNode, changed, initiateSubmit}:
       {data.content.map((source, index) =>
         <div className="my-2 flex flex-row" key={index}>
           {typeof source === 'string'
-            ? <AoPlusField key={index} source={source} onBlur={(value) => updatePlus(index, value)}/>
+            ? <input key={index} className="flex-grow p-2 rounded-l border border-slate-500" type="text" defaultValue={source}
+                     onBlur={(event) => updatePlus(index, event.currentTarget.value)}/>
             : <AoTextNumberField key={index} source={source} updateType={(value) => updateType(index, value)}
                                  updateText={(value) => updateText(index, value)}/>}
           <button type="button" className="p-2 rounded-r border-r bg-red-500 text-white" onClick={() => deleteEntry(index)}>

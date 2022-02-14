@@ -1,4 +1,3 @@
-import {IoArrowBack, IoArrowForward} from 'react-icons/io5';
 import {useTranslation} from 'react-i18next';
 import classNames from 'classnames';
 
@@ -6,36 +5,33 @@ export interface UpdatePrevNextButtonsProps {
   changed: boolean;
   initiateUpdate: () => void;
   initiateJumpElement: (forward: boolean) => void;
-  children?: JSX.Element;
+  deleteElement?: () => void;
 }
 
-export function UpdatePrevNextButtons({changed, initiateUpdate, children, initiateJumpElement}: UpdatePrevNextButtonsProps): JSX.Element {
+export function UpdatePrevNextButtons({changed, initiateUpdate, deleteElement, initiateJumpElement}: UpdatePrevNextButtonsProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
   return (
-    <>
-      <div className="field has-addons">
-        <div className="control is-expanded">
-          <button type="button" className="button is-fullwidth" onClick={() => initiateJumpElement(false)} tabIndex={-1}>
-            <IoArrowBack/>
-          </button>
-        </div>
+    <div className={classNames('grid', deleteElement ? 'grid-cols-4' : 'grid-cols-3')}>
+      <button type="button" className="p-2 rounded-l border border-slate-500 font-bold text-xl text-center" onClick={() => initiateJumpElement(false)}
+              tabIndex={-1}>
+        &larr;
+      </button>
 
-        {children && children}
+      {deleteElement && <button type="button" className="p-2 bg-red-600 text-white font-bold text-xl text-center" title={t('deleteNode')}>
+        &minus;
+      </button>}
 
-        <div className="control is-expanded">
-          <button type="button" className={classNames('button', 'is-fullwidth', {'is-link': changed})} onClick={initiateUpdate} tabIndex={-1}>
-            {t('update')}
-          </button>
-        </div>
+      <button type="button" className={classNames('p-2', 'text-center', changed ? ['bg-blue-600', 'text-white'] : ['border', 'border-slate-500'])}
+              onClick={initiateUpdate} tabIndex={-1}>
+        {t('update')}
+      </button>
 
-        <div className="control is-expanded">
-          <button type="button" className="button is-fullwidth" onClick={() => initiateJumpElement(true)} tabIndex={-1}>
-            <IoArrowForward/>
-          </button>
-        </div>
-      </div>
-    </>
+      <button type="button" className="p-2 rounded-r border border-slate-500 font-bold text-xl text-center" onClick={() => initiateJumpElement(true)}
+              tabIndex={-1}>
+        &rarr;
+      </button>
+    </div>
   );
 }

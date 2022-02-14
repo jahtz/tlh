@@ -14,7 +14,7 @@ interface IProps {
 export function MergeDocumentLine({line}: { line: MergeLine }): JSX.Element {
   return (
     <>
-      <span className="lb">{line.lineNumber}</span>&nbsp;
+      <span className="text-gray-500">{line.lineNumber}</span>&nbsp;
       {line.rest.map((n, index) => <NodeDisplay key={index} node={n}/>)}
     </>
   );

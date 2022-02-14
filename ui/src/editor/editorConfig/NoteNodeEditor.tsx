@@ -59,11 +59,8 @@ export function NoteNodeEditor({
       </div>
 
       <div className="my-3">
-        <UpdatePrevNextButtons changed={changed} initiateUpdate={initiateSubmit} initiateJumpElement={(forward) => jumpEditableNodes('note', forward)}>
-          <div className="control is-expanded">
-            <button type="button" className="button is-danger is-fullwidth" onClick={deleteNode}>{t('deleteNode')}</button>
-          </div>
-        </UpdatePrevNextButtons>
+        <UpdatePrevNextButtons changed={changed} initiateUpdate={initiateSubmit} initiateJumpElement={(forward) => jumpEditableNodes('note', forward)}
+                               deleteElement={deleteNode}/>
       </div>
 
     </>

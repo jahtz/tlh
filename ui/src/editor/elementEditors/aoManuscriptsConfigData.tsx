@@ -1,7 +1,8 @@
-import {XmlSingleEditableNodeConfig} from './editorConfig';
+import {XmlSingleEditableNodeConfig} from '../editorConfig/editorConfig';
 import {isXmlElementNode, XmlElementNode, XmlTextNode} from '../xmlModel/xmlModel';
-import {AoManuscriptsEditor} from '../AoManuscriptsEditor';
+import {AoManuscriptsEditor} from './AoManuscriptsEditor';
 import classNames from 'classnames';
+import update from 'immutability-helper';
 
 export type SourceType = 'AO:TxtPubl' | 'AO:InvNr';
 export const sourceTypes: SourceType[] = ['AO:TxtPubl', 'AO:InvNr'];
@@ -35,14 +36,9 @@ export const aoManuscriptsConfig: XmlSingleEditableNodeConfig<AoManuscriptsData>
   replace: (node, renderedChildren, isSelected) => <span className={classNames(isSelected ? ['bg-teal-400', 'p-2'] : [])}>{renderedChildren}</span>,
   edit: (props) => <AoManuscriptsEditor {...props}/>,
   readNode: (node) => ({content: node.children.map((n) => isXmlElementNode(n) ? readSource(n) : n.textContent.trim())}),
-  writeNode: (data, originalNode) => ({
-    ...originalNode,
-    children: data.content.map((s) => {
-      if (typeof s === 'string') {
-        return {textContent: ' ' + s + ' '};
-      } else {
-        return writeSource(s);
-      }
-    })
+  writeNode: (data, originalNode) => update(originalNode, {
+    children: {
+      $set: data.content.map((s) => typeof s === 'string' ? {textContent: ' ' + s + ' '} : writeSource(s))
+    }
   })
 };
