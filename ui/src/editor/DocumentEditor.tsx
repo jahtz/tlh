@@ -345,17 +345,21 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
     : undefined;
 
   return (
-    <div className="columns">
-      <div className="column is-half">
-        <EditorLeftSide filename={filename} node={state.rootNode} currentSelectedPath={currentSelectedPath} editorConfig={editorConfig}
-                        onNodeSelect={onNodeSelect} closeFile={onCloseFile} exportXml={exportXml} insertStuff={insertStuff} updateNode={updateRootNode}/>
-      </div>
+    <div className="grid grid-cols-2 gap-4 h-full max-h-full">
+      <EditorLeftSide
+        filename={filename}
+        node={state.rootNode}
+        currentSelectedPath={currentSelectedPath}
+        editorConfig={editorConfig}
+        onNodeSelect={onNodeSelect}
+        closeFile={onCloseFile}
+        exportXml={exportXml}
+        insertStuff={insertStuff}
+        updateNode={updateRootNode}/>
 
-      <div className="column is-half">
-        {state.editorState && 'path' in state.editorState
-          ? renderNodeEditor(state.editorState) /* don't convert to a component! */
-          : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}/>}
-      </div>
+      {state.editorState && 'path' in state.editorState
+        ? renderNodeEditor(state.editorState) /* don't convert to a component! */
+        : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}/>}
     </div>
   );
 }

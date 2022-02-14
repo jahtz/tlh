@@ -63,26 +63,21 @@ export function DocumentMergerContainer(): JSX.Element {
   }
 
   return (
-    <div className="container">
-      <h1 className="title has-text-centered">{t('documentMerger')}</h1>
+    <div className="container mx-auto">
+      <h1 className="font-bold text-2xl text-center mb-2">{t('documentMerger')}</h1>
 
-      {'firstFile' in state &&
-      <div className="field has-addons">
-        <div className="control is-expanded">
-          <button type="button" className="button is-static is-fullwidth">{state.firstFile.filename}</button>
-        </div>
-        {'secondFile' in state && <div className="control is-expanded">
-          <button type="button" className="button is-static is-fullwidth">{}</button>
-        </div>}
+      {'firstFile' in state && <div className="grid grid-cols-2 gap-2 my-2">
+        <button type="button" className="p-2 rounded border border-slate-500">{state.firstFile.filename}</button>
+        {'secondFile' in state && <button type="button" className="p-2 rounded border border-slate-500">{state.secondFile.filename}</button>}
       </div>}
 
       {(state._type === 'EmptyState' && <FileLoader onLoad={loadFirstDocument} accept={'text/xml'} text={t('loadFirstFile')}/>)
-      || (state._type === 'FirstFileLoadedState' && <FileLoader onLoad={loadSecondDocument} accept={'text/xml'} text={t('loadSecondFile')}/>)
-      || (state._type === 'SecondFileLoadedState' &&
-        <DocumentMerger firstDocument={state.firstFile.document} secondDocument={state.secondFile.document} onMerge={onMerge}/>)
-      || (state._type === 'MergedState' && <>
-        {state.mergedLines.map((l, index) => <p key={index}><MergeDocumentLine line={l}/></p>)}
-      </>)}
+        || (state._type === 'FirstFileLoadedState' && <FileLoader onLoad={loadSecondDocument} accept={'text/xml'} text={t('loadSecondFile')}/>)
+        || (state._type === 'SecondFileLoadedState' &&
+          <DocumentMerger firstDocument={state.firstFile.document} secondDocument={state.secondFile.document} onMerge={onMerge}/>)
+        || (state._type === 'MergedState' && <>
+          {state.mergedLines.map((l, index) => <p key={index}><MergeDocumentLine line={l}/></p>)}
+        </>)}
 
     </div>
   );

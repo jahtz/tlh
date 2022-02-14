@@ -25,7 +25,7 @@ export function FileLoader({accept, onLoad, text}: IProps): JSX.Element {
 
   return (
     <>
-      <button type="button" className={classNames('button', 'is-fullwidth', {'is-loading': loading})}
+      <button type="button" className={classNames('p-2', 'rounded', 'border', 'border-slate-500', 'w-full', {'is-loading': loading /*TODO!*/})}
               onClick={() => fileInput.current && fileInput.current.click()} disabled={loading}>
         {text || t('chooseFile')}
       </button>

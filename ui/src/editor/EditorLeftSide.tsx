@@ -2,7 +2,6 @@ import {useState} from 'react';
 import {NodeDisplay, NodeDisplayIProps} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
 import {EditTriggerFunc} from './editorConfig/editorConfig';
-import {IoChevronDown, IoChevronUp} from 'react-icons/io5';
 import {XmlSourceEditor} from './XmlSourceEditor';
 import {writeXml} from './DocumentEditor';
 import {XmlElementNode} from './xmlModel/xmlModel';
@@ -15,6 +14,8 @@ interface IProps extends NodeDisplayIProps {
   exportXml: () => void;
   updateNode: (node: XmlElementNode) => void;
 }
+
+const FONT_STEP = 10;
 
 export function EditorLeftSide({
   filename,
@@ -40,50 +41,39 @@ export function EditorLeftSide({
   }
 
   return (
-    <>
-      <div className="box has-text-centered">{filename}<sup>&nbsp;</sup><sub>&nbsp;</sub></div>
+    <div className="flex flex-col h-full min-h-full max-h-full">
+      <div className="py-4 rounded border border-slate-300 shadow-md text-center">{filename}<sup>&nbsp;</sup><sub>&nbsp;</sub></div>
 
-      <div className="box ">
+      <div className="flex p-4 rounded border border-slate-300 shadow-md mb-4 flex-auto overflow-auto">
         {showSource
           ? <XmlSourceEditor source={writeXml(node as XmlElementNode)} updateNode={onUpdateNode}/>
-          : <div className={classNames('scrollable', useSerifFont ? 'font-hpm-serif' : 'font-hpm')} style={{fontSize: `${fontSize}%`}}>
+          : <div className={classNames(useSerifFont ? 'font-hpm-serif' : 'font-hpm')} style={{fontSize: `${fontSize}%`}}>
             <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} editorConfig={editorConfig} onSelect={onNodeSelect} insertStuff={insertStuff}/>
           </div>}
       </div>
 
-      <div className="field has-addons mt-2">
-        <div className="control">
-          <button type="button" className="button" onClick={() => setFontSize((value) => value - 10)}><IoChevronDown/></button>
-        </div>
-        <div className="control is-expanded">
-          <input type="number" value={fontSize} step={10} onChange={(event) => setFontSize(() => parseInt(event.target.value))} className="input"/>
-        </div>
-        <div className="control">
-          <button className="button is-static">%</button>
-        </div>
-        <div className="control is-expanded">
-          <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="button is-fullwidth">
-            {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
-          </button>
-        </div>
-        <div className="control">
-          <button type="button" className="button" onClick={() => setFontSize((value) => value + 10)}><IoChevronUp/></button>
-        </div>
+      <div className="grid grid-cols-4">
+        <button type="button" className="p-2 border border-slate-500 rounded-l" onClick={() => setFontSize((value) => value - FONT_STEP)}>
+          -{FONT_STEP}%
+        </button>
+        <button className="p-2 border border-slate-500" disabled>{fontSize}%</button>
+        <button type="button" className="p-2 border border-slate-500" onClick={() => setFontSize((value) => value + FONT_STEP)}>
+          +{FONT_STEP}%
+        </button>
+
+        <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="p-2 border border-slate-500 rounded-r">
+          {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
+        </button>
+
       </div>
 
-      <div className="field has-addons">
-        <div className="control is-expanded">
-          <button className="button is-fullwidth" onClick={closeFile}>{t('closeFile')}</button>
-        </div>
-        <div className="control is-expanded">
-          <button className="button is-fullwidth" onClick={() => setShowSource((value) => !value)}>
-            {showSource ? t('cancelEditSource') : t('editSource')}
-          </button>
-        </div>
-        <div className="control is-expanded">
-          <button type="button" onClick={exportXml} className="button is-link is-fullwidth">{t('exportXml')}</button>
-        </div>
+      <div className="grid grid-cols-3 mt-2">
+        <button className="p-2 border border-slate-500 rounded-l" onClick={closeFile}>{t('closeFile')}</button>
+        <button className="p-2 border border-slate-500" onClick={() => setShowSource((value) => !value)}>
+          {showSource ? t('cancelEditSource') : t('editSource')}
+        </button>
+        <button type="button" className="p-2 border border-slate-500 bg-blue-600 text-white rounded-r" onClick={exportXml}>{t('exportXml')}</button>
       </div>
-    </>
+    </div>
   );
 }

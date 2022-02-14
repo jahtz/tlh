@@ -40,36 +40,34 @@ export function App(): JSX.Element {
   }
 
   return (
-    <>
-      <nav className="p-4 flex bg-gray-800 text-white mb-4">
-        <NavLink className="font-extrabold" to={homeUrl}>TLH<sup>dig</sup></NavLink>
+    <div className="flex flex-col h-screen max-h-screen">
+      <nav className="flex flex-row bg-gray-800 text-white">
+        <NavLink className="p-4 hover:bg-slate-700 font-extrabold" to={homeUrl}>TLH<sup>dig</sup></NavLink>
 
-        <div>
-          {user && <NavLink className="ml-4" to={createManuscriptUrl}>{t('createManuscript')}</NavLink>}
-          <NavLink className="ml-4" to={editDocumentUrl}>{t('editDocument')}</NavLink>
-          <NavLink className="ml-4" to={xmlComparatorUrl}>{t('xmlComparator')}</NavLink>
-        </div>
+        {user && <NavLink className="p-4 ml-4 hover:bg-slate-700" to={createManuscriptUrl}>{t('createManuscript')}</NavLink>}
+        <NavLink className="p-4 ml-4 hover:bg-slate-700" to={editDocumentUrl}>{t('editDocument')}</NavLink>
+        <NavLink className="p-4 ml-4 hover:bg-slate-700" to={xmlComparatorUrl}>{t('xmlComparator')}</NavLink>
 
         <div className="flex-grow"/>
 
-        <NavLink className="ml-4" to={preferencesUrl}>
+        <NavLink className="p-4 ml-4 hover:bg-slate-700" to={preferencesUrl}>
           {/*<IoSettingsOutline/>&nbsp;*/}{t('preferences')}
         </NavLink>
 
-        <div className="ml-4">
+        <div className="p-4 ml-4 hover:bg-slate-700">
           <LanguageSelector/>
         </div>
 
         {user
-          ? <button className="ml-4" onClick={logout}>{t('logout')} {user.name}</button>
+          ? <button className="p-4 ml-4 hover:bg-slate-700" onClick={logout}>{t('logout')} {user.name}</button>
           : <>
-            <NavLink className="ml-4" to={registerUrl}>{t('register')}</NavLink>
-            <NavLink className="ml-4" to={loginUrl}>{t('login')}</NavLink>
+            <NavLink className="p-4 ml-4 hover:bg-slate-700" to={registerUrl}>{t('register')}</NavLink>
+            <NavLink className="p-4 ml-4 hover:bg-slate-700" to={loginUrl}>{t('login')}</NavLink>
           </>
         }
       </nav>
 
-      <div className="p-2">
+      <div className="py-4 h-full max-h-full flex-auto">
         <Routes>
           <Route path={homeUrl} element={<Home/>}/>
 
@@ -94,6 +92,6 @@ export function App(): JSX.Element {
           <Route path={documentMergerUrl} element={<DocumentMergerContainer/>}/>
         </Routes>
       </div>
-    </>
+    </div>
   );
 }

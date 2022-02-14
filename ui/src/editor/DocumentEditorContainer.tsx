@@ -2,7 +2,6 @@ import {useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
 import {XmlNode} from './xmlModel/xmlModel';
 import {DocumentEditor} from './DocumentEditor';
-import classNames from 'classnames';
 import {loadNewXml} from './xmlModel/xmlReading';
 
 const localStorageEditorStateKey = 'editorState';
@@ -55,7 +54,7 @@ export function DocumentEditorContainer(): JSX.Element {
   }
 
   return (
-    <div className={classNames('container', {'is-fluid': state})}>
+    <div className="px-2 h-full max-h-full">
       {state
         ? <DocumentEditor node={state.rootNode} download={download} filename={state.filename} closeFile={closeFile}
                           autoSave={(node) => autoSave(state.filename, node)}/>

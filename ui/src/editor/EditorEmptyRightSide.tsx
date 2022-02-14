@@ -18,17 +18,32 @@ export function EditorEmptyRightSide({editorConfig, currentInsertedElement, togg
     .filter((t): t is [string, InsertablePositions] => !!t[1]);
 
   return (
-    <>
-      <h2 className="subtitle is-5 has-text-centered">{t('insertableElements')}</h2>
+    <div>
+      <h2 className="p2 text-center font-bold text-lg">{t('insertableElements')}</h2>
 
-      <div className="columns is-multiline">
-        {insertableTags.map(([tagName, insertablePositions]) => <div key={tagName} className="column is-one-quarter">
-          <button type="button" className={classNames('button', 'is-fullwidth', {'is-link': tagName === currentInsertedElement})}
-                  onClick={() => toggleElementInsert(tagName, insertablePositions)}>
-            {tagName}
-          </button>
-        </div>)}
+      <div className="mt-4 grid grid-cols-4 gap-2">
+        {insertableTags.map(([tagName, insertablePositions]) =>
+          <InsertableTagButton key={tagName} tagName={tagName} currentInsertedElement={currentInsertedElement}
+                               onClick={() => toggleElementInsert(tagName, insertablePositions)}/>
+        )}
       </div>
-    </>
+    </div>
+  );
+}
+
+interface InsertableTagButtonProps {
+  tagName: string;
+  currentInsertedElement?: string;
+  onClick: () => void;
+}
+
+function InsertableTagButton({tagName, currentInsertedElement, onClick}: InsertableTagButtonProps): JSX.Element {
+
+  const classes = classNames('p-2', 'rounded', 'border', 'border-slate-500', tagName === currentInsertedElement ? ['bg-blue-500', 'text-white'] : []);
+
+  return (
+    <button type="button" className={classes} onClick={onClick}>
+      {tagName}
+    </button>
   );
 }
