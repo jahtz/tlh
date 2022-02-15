@@ -36,26 +36,20 @@ export function NoteNodeEditor({
   initiateSubmit
 }: XmlEditableNodeIProps<NoteData>): JSX.Element {
 
-  // console.info(JSON.stringify(data, null, 2));
-
   const {t} = useTranslation('common');
 
   return (
-    <>
-      <div className="field">
-        <label htmlFor="n" className="label">n:</label>
-        <div className="control">
-          <input type="text" id="n" className="input" value={data.n} disabled/>
-          <p className="help is-info">{t('recountedAtExport')}</p>
-        </div>
+    <div>
+      <div className="mb-4">
+        <label htmlFor="n" className="font-bold">n:</label>
+        <input type="text" id="n" className="p-2 mt-2 rounded border border-slate-500 w-full" value={data.n} disabled/>
+        <p className="text-blue-600 text-sm">{t('recountedAtExport')}</p>
       </div>
 
-      <div className="field">
-        <label htmlFor="content" className="label">{t('content')}:</label>
-        <div className="control">
-          <input type="text" id="content" className="input" defaultValue={data.content} onFocus={() => setKeyHandlingEnabled(false)}
-                 onBlur={(event) => updateNode({content: {$set: event.target.value}})}/>
-        </div>
+      <div className="mb-4">
+        <label htmlFor="content" className="font-bold">{t('content')}:</label>
+        <input type="text" id="content" className="p-2 mt-2 rounded border border-slate-500 w-full" defaultValue={data.content} placeholder={t('content')}
+               onFocus={() => setKeyHandlingEnabled(false)} onBlur={(event) => updateNode({content: {$set: event.target.value}})}/>
       </div>
 
       <div className="my-3">
@@ -63,6 +57,6 @@ export function NoteNodeEditor({
                                deleteElement={deleteNode}/>
       </div>
 
-    </>
+    </div>
   );
 }

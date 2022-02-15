@@ -42,9 +42,9 @@ export function EditorLeftSide({
 
   return (
     <div className="flex flex-col h-full min-h-full max-h-full">
-      <div className="py-4 rounded border border-slate-300 shadow-md text-center">{filename}<sup>&nbsp;</sup><sub>&nbsp;</sub></div>
+      <div className="py-4 rounded-t border border-slate-300 shadow-md text-center">{filename}<sup>&nbsp;</sup><sub>&nbsp;</sub></div>
 
-      <div className="flex p-4 rounded border border-slate-300 shadow-md mb-4 flex-auto overflow-auto">
+      <div className="flex p-4 rounded-b border border-slate-300 shadow-md mb-4 flex-auto overflow-auto">
         {showSource
           ? <XmlSourceEditor source={writeXml(node as XmlElementNode)} updateNode={onUpdateNode}/>
           : <div className={classNames(useSerifFont ? 'font-hpm-serif' : 'font-hpm')} style={{fontSize: `${fontSize}%`}}>

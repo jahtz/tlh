@@ -8,15 +8,15 @@ interface IProps {
 
 export function LetteredAnalysisOptionButtons({analysisOptions, toggleAnalysisSelection}: IProps): JSX.Element {
   return (
-    <>
+    <div>
       {analysisOptions.map(({letter, analysis, selected}, index) =>
         <div key={index} className="mb-1">
-          <button type="button" className={classNames('button', 'is-fullwidth', 'button-text-left', {'is-link': selected})}
+          <button type="button" className={classNames('p-2', 'rounded', 'w-full', selected ? ['bg-blue-500', 'text-white'] : ['border', 'border-slate-500'])}
                   onClick={() => toggleAnalysisSelection(index)}>
             {letter} - {analysis}
           </button>
         </div>
       )}
-    </>
+    </div>
   );
 }

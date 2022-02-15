@@ -2,11 +2,12 @@ import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue
 import {isXmlElementNode, XmlElementNode} from '../xmlModel/xmlModel';
 import {readSelectedMorphology, SelectedAnalysisOption, writeSelectedMorphologies} from '../selectedAnalysisOption';
 import {getSelectedLetters} from '../../model/analysisOptions';
-import {XmlSingleEditableNodeConfig} from './editorConfig';
+import {XmlSingleEditableNodeConfig} from '../editorConfig/editorConfig';
 import classNames from 'classnames';
 import {IoCloseSharp} from 'react-icons/io5';
-import {WordNodeEditor} from '../WordNodeEditor';
+import {WordNodeEditor} from './WordNodeEditor';
 import {SpacesEditor} from './SpacesEditor';
+import {selectedNodeClass} from '../editorConfig/tlhXmlEditorConfig';
 
 export interface WordNodeData {
   node: XmlElementNode;
@@ -69,8 +70,13 @@ const foreignLanguageColors: { [key: string]: string } = {
   LUW: 'Luw'
 };
 
+function isOnlySpaces({children}: XmlElementNode): boolean {
+  return children.length === 1 && isXmlElementNode(children[0]) && children[0].tagName === 'space';
+}
+
 export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
   replace: (node, renderedChildren, isSelected) => {
+
     const notMarked = node.attributes.mrp0sel === 'DEL';
 
     const isForeignLanguage = Object.keys(foreignLanguageColors).includes(node.attributes.mrp0sel);
@@ -84,15 +90,20 @@ export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
 
     const hasQuestion = !!node.attributes.q;
 
-    const classes = classNames(node.attributes.lg || '', {
-      'is-underlined': !notMarked && hasNoMorphologySelected,
-      'has-background-primary': !notMarked && isSelected,
-      'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
-      'has-background-info': hasQuestion,
-      [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,
-      'has-text-weight-bold': isForeignLanguage,
-      'has-text-danger': node.children.length === 0
-    });
+    // FIXME: colors / classes!
+
+    const classes = classNames(node.attributes.lg || '',
+      isOnlySpaces(node)
+        ? [isSelected ? selectedNodeClass : 'bg-gray-200']
+        : {
+          'underline': !notMarked && hasNoMorphologySelected,
+          'bg-teal-400': !notMarked && isSelected,
+          'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
+          'has-background-info': hasQuestion,
+          [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,
+          'has-text-weight-bold': isForeignLanguage,
+          'has-text-danger': node.children.length === 0
+        });
 
     return <>
         <span className={classes} title={hasQuestion ? node.attributes.q : undefined}>
@@ -101,15 +112,9 @@ export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
       &nbsp;&nbsp;
     </>;
   },
-  edit: (props) => {
-    const children = props.data.node.children;
-
-    const isSpace = children.length === 1 && isXmlElementNode(children[0]) && children[0].tagName === 'space';
-
-    return isSpace
-      ? <SpacesEditor {...props}/>
-      : <WordNodeEditor key={props.path.join('.')} {...props}/>;
-  },
+  edit: (props) => isOnlySpaces(props.data.node)
+    ? <SpacesEditor {...props}/>
+    : <WordNodeEditor key={props.path.join('.')} {...props}/>,
   readNode: readWordNodeData,
   writeNode: writeWordNodeData,
   insertablePositions: {

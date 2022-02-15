@@ -1,8 +1,8 @@
 import {XmlSingleEditableNodeConfig} from '../editorConfig/editorConfig';
 import {isXmlElementNode, XmlElementNode, XmlTextNode} from '../xmlModel/xmlModel';
 import {AoManuscriptsEditor} from './AoManuscriptsEditor';
-import classNames from 'classnames';
 import update from 'immutability-helper';
+import {selectedNodeClass} from '../editorConfig/tlhXmlEditorConfig';
 
 export type SourceType = 'AO:TxtPubl' | 'AO:InvNr';
 export const sourceTypes: SourceType[] = ['AO:TxtPubl', 'AO:InvNr'];
@@ -33,7 +33,7 @@ export interface AoManuscriptsData {
 }
 
 export const aoManuscriptsConfig: XmlSingleEditableNodeConfig<AoManuscriptsData> = {
-  replace: (node, renderedChildren, isSelected) => <span className={classNames(isSelected ? ['bg-teal-400', 'p-2'] : [])}>{renderedChildren}</span>,
+  replace: (node, renderedChildren, isSelected) => <span className={isSelected ? selectedNodeClass : ''}>{renderedChildren}</span>,
   edit: (props) => <AoManuscriptsEditor {...props}/>,
   readNode: (node) => ({content: node.children.map((n) => isXmlElementNode(n) ? readSource(n) : n.textContent.trim())}),
   writeNode: (data, originalNode) => update(originalNode, {

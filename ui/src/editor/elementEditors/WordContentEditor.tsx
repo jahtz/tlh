@@ -1,14 +1,14 @@
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {transliteration as transliterationLanguage} from '../transliterationParser/parser';
-import {AOWordContent} from '../model/wordContent/wordContent';
-import {xmlifyAoWord} from '../model/sentenceContent/word';
+import {transliteration as transliterationLanguage} from '../../transliterationParser/parser';
+import {AOWordContent} from '../../model/wordContent/wordContent';
+import {xmlifyAoWord} from '../../model/sentenceContent/word';
 import {Result} from 'parsimmon';
-import {XmlElementNode} from './xmlModel/xmlModel';
+import {XmlElementNode} from '../xmlModel/xmlModel';
 import classNames from 'classnames';
-import {fetchMorphologicalAnalyses} from '../model/morphologicalAnalysis';
-import {NodeDisplay} from './NodeDisplay';
-import {writeNode} from './xmlModel/xmlWriting';
+import {fetchMorphologicalAnalyses} from '../../model/morphologicalAnalysis';
+import {NodeDisplay} from '../NodeDisplay';
+import {writeNode} from '../xmlModel/xmlWriting';
 import update from 'immutability-helper';
 
 interface IProps {

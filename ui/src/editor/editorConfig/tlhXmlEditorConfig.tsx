@@ -1,5 +1,5 @@
 import {XmlEditorConfig} from './editorConfig';
-import {wordNodeConfig} from './wordNodeData';
+import {wordNodeConfig} from '../elementEditors/wordNodeData';
 import {lineBreakNodeConfig} from '../elementEditors/lineBreakData';
 import {noteNodeConfig} from './noteData';
 import {aoManuscriptsConfig} from '../elementEditors/aoManuscriptsConfigData';
@@ -9,6 +9,8 @@ import {XmlElementNode} from '../xmlModel/xmlModel';
 import {reCountNoteNumbers} from './NoteNodeEditor';
 
 // FIXME: recount node numbers!
+
+export const selectedNodeClass = 'bg-teal-400';
 
 export const tlhXmlEditorConfig: XmlEditorConfig = {
   nodeConfigs: {
@@ -35,8 +37,7 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     subscr: {replace: (node) => <sub>{node.attributes.c}</sub>},
 
     space: {
-      replace: (node) => <>{Array.from({length: parseInt(node.attributes.c) || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}</>,
-      styling: (/*node, isSelected*/) => [/*isSelected ? 'has-background-primary' :*/ 'has-background-light'] // TODO: parent tag <w/> is selected, but child (<space/>) needs background!
+      replace: (node) => <>{Array.from({length: parseInt(node.attributes.c) || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}</>
     },
 
     parsep: paragraphSeparatorConfig,

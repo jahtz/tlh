@@ -1,23 +1,22 @@
-import {XmlEditableNodeIProps} from './editorConfig/editorConfig';
+import {XmlEditableNodeIProps} from '../editorConfig/editorConfig';
 import {useTranslation} from 'react-i18next';
 import {useEffect, useState} from 'react';
-import {MorphologicalAnalysis} from '../model/morphologicalAnalysis';
-import {MorphAnalysisOptionContainer} from './morphAnalysisOption/MorphAnalysisOptionContainer';
-import {NodeDisplay} from './NodeDisplay';
-import {tlhXmlEditorConfig} from './editorConfig/tlhXmlEditorConfig';
+import {MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
+import {MorphAnalysisOptionContainer} from '../morphAnalysisOption/MorphAnalysisOptionContainer';
+import {NodeDisplay} from '../NodeDisplay';
+import {tlhXmlEditorConfig} from '../editorConfig/tlhXmlEditorConfig';
 import {useSelector} from 'react-redux';
-import {editorKeyConfigSelector} from '../store/store';
-import {XmlElementNode} from './xmlModel/xmlModel';
-import {MorphAnalysisOptionEditor} from './morphAnalysisOption/MorphAnalysisOptionEditor';
-import {reconstructTransliteration} from './transliterationReconstruction';
+import {editorKeyConfigSelector} from '../../store/store';
+import {XmlElementNode} from '../xmlModel/xmlModel';
+import {MorphAnalysisOptionEditor} from '../morphAnalysisOption/MorphAnalysisOptionEditor';
+import {reconstructTransliteration} from '../transliterationReconstruction';
 import {WordContentEditor} from './WordContentEditor';
 import update, {Spec} from 'immutability-helper';
-import {UpdatePrevNextButtons, UpdatePrevNextButtonsProps} from './morphAnalysisOption/UpdatePrevNextButtons';
-import {IoAddOutline, IoSettingsOutline} from 'react-icons/io5';
-import {readWordNodeData, WordNodeData} from './editorConfig/wordNodeData';
-import {WordQuestion} from './wordEditor/WordQuestion';
-import {WordQuestionForm} from './wordEditor/WordQuestionForm';
-import {LanguageInput} from './LanguageInput';
+import {UpdatePrevNextButtons, UpdatePrevNextButtonsProps} from '../morphAnalysisOption/UpdatePrevNextButtons';
+import {readWordNodeData, WordNodeData} from './wordNodeData';
+import {WordQuestion} from '../wordEditor/WordQuestion';
+import {WordQuestionForm} from '../wordEditor/WordQuestionForm';
+import {LanguageInput} from '../LanguageInput';
 
 interface IState {
   addMorphology?: boolean;
@@ -143,26 +142,28 @@ export function WordNodeEditor({
   const updatePrevNextButtonProps: UpdatePrevNextButtonsProps = {changed, initiateUpdate: initiateSubmit, initiateJumpElement};
 
   return (
-    <>
-      <div className="box has-text-centered">
+    <div>
+      <div className="p-4 text-center rounded-t border border-slate-300 shadow-md">
         <NodeDisplay node={data.node} editorConfig={tlhXmlEditorConfig}/>
         <sup>&nbsp;</sup><sub>&nbsp;</sub>
       </div>
 
-      <div className="box scrollable">
+      <div className="p-2 rounded-b border border-slate-300">
 
-        <LanguageInput initialValue={data.lg} onBlur={updateLanguage}/>
+        <div className="mt-4">
+          <LanguageInput initialValue={data.lg} onBlur={updateLanguage}/>
+        </div>
 
-        {data.node.attributes.q
-          ? <WordQuestion comment={data.node.attributes.q} removeNote={removeNote}/>
-          : (isAddNote
-            ? <WordQuestionForm onSubmit={addNote}/>
-            : <div className="field">
-              <button type="button" className="button is-primary is-fullwidth" onClick={() => setIsAddNote(true)}>{t('addNote')}</button>
-            </div>)}
+        <div className="mt-4">
+          {data.node.attributes.q
+            ? <WordQuestion comment={data.node.attributes.q} removeNote={removeNote}/>
+            : (isAddNote
+              ? <WordQuestionForm cancel={() => setIsAddNote(false)} onSubmit={addNote}/>
+              : <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={() => setIsAddNote(true)}>{t('addNote')}</button>)}
+        </div>
 
         {data.morphologies.length === 0
-          ? <div className="notification is-warning has-text-centered">{t('noMorphologicalAnalysesFound')}</div>
+          ? <div className="p-4 mt-2 rounded bg-amber-400 text-center">{t('noMorphologicalAnalysesFound')}</div>
           : data.morphologies.map((m, index) => <MorphAnalysisOptionContainer
               key={m.number}
               updatePrevNextButtonsProps={updatePrevNextButtonProps}
@@ -181,19 +182,13 @@ export function WordNodeEditor({
             cancelUpdate={toggleAddMorphology}/>}
       </div>
 
-      <div className="columns mt-2">
-        <div className="column">
-          <button type="button" className="button is-fullwidth" onClick={toggleAddMorphology}><IoAddOutline/>&nbsp;{t('addMorphology')}</button>
-        </div>
-        <div className="column">
-          <button onClick={deleteNode} className="button is-danger is-fullwidth">{t('deleteNode')}</button>
-        </div>
-        <div className="column">
-          <button type="button" className="button is-fullwidth" onClick={enableEditWordState}><IoSettingsOutline/>&nbsp;{t('editContent')}</button>
-        </div>
+      <div className="grid grid-cols-3 my-2">
+        <button type="button" className="p-2 rounded-l border-l border-y border-slate-500" onClick={toggleAddMorphology}>+&nbsp;{t('addMorphology')}</button>
+        <button type="button" className="p-2 bg-red-600 text-white" onClick={deleteNode}>{t('deleteNode')}</button>
+        <button type="button" className="p-2 rounded-r border-r border-y border-slate-500" onClick={enableEditWordState}>&#9998;&nbsp;{t('editContent')}</button>
       </div>
 
       <UpdatePrevNextButtons changed={changed} initiateUpdate={initiateSubmit} initiateJumpElement={(forward) => jumpEditableNodes('w', forward)}/>
-    </>
+    </div>
   );
 }

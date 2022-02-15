@@ -14,7 +14,7 @@ export function UpdatePrevNextButtons({changed, initiateUpdate, deleteElement, i
 
   return (
     <div className={classNames('grid', deleteElement ? 'grid-cols-4' : 'grid-cols-3')}>
-      <button type="button" className="p-2 rounded-l border border-slate-500 font-bold text-xl text-center" onClick={() => initiateJumpElement(false)}
+      <button type="button" className="p-2 rounded-l border-l border-y border-slate-500 font-bold text-center" onClick={() => initiateJumpElement(false)}
               tabIndex={-1}>
         &larr;
       </button>
@@ -28,7 +28,7 @@ export function UpdatePrevNextButtons({changed, initiateUpdate, deleteElement, i
         {t('update')}
       </button>
 
-      <button type="button" className="p-2 rounded-r border border-slate-500 font-bold text-xl text-center" onClick={() => initiateJumpElement(true)}
+      <button type="button" className="p-2 rounded-r border-r border-y border-slate-500 font-bold text-center" onClick={() => initiateJumpElement(true)}
               tabIndex={-1}>
         &rarr;
       </button>

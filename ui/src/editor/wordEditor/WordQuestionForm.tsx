@@ -2,23 +2,24 @@ import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 interface IProps {
+  cancel: () => void;
   onSubmit: (value: string) => void;
 }
 
-export function WordQuestionForm({onSubmit}: IProps): JSX.Element {
+export function WordQuestionForm({cancel, onSubmit}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [value, setValue] = useState('');
 
   return (
-    <>
-      <div className="field">
-        <input type="text" defaultValue={value} onChange={(event) => setValue(event.target.value)} className="input" placeholder={t('question')}/>
-      </div>
+    <div>
+      <input type="text" className="p-2 my-2 rounded border border-slate-500 w-full" defaultValue={value} onChange={(event) => setValue(event.target.value)}
+             placeholder={t('question')}/>
 
-      <button type="button" className="button is-primary is-fullwidth" onClick={() => onSubmit(value)}>
-        {t('addNote')}
-      </button>
-    </>
+      <div className="grid grid-cols-2">
+        <button type="button" className="p-2 rounded-l border border-slate-500" onClick={cancel}>{t('cancel')}</button>
+        <button type="button" className="p-2 rounded-r bg-blue-500 text-white" onClick={() => onSubmit(value)}>{t('addNote')}</button>
+      </div>
+    </div>
   );
 }

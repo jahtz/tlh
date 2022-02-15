@@ -1,10 +1,11 @@
 import {XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from './editorConfig';
 import classNames from 'classnames';
 import {useTranslation} from 'react-i18next';
+import {selectedNodeClass} from './tlhXmlEditorConfig';
 
 export const paragraphSeparatorConfig: XmlSingleEditableNodeConfig = {
   replace: (node, _renderedChildren, isSelected) => (
-    <span className={classNames({'has-background-primary': isSelected})}>
+    <span className={isSelected ? selectedNodeClass : ''}>
       {node.tagName === 'parsep' ? '¬¬¬' : '==='}
     </span>
   ),
@@ -20,25 +21,19 @@ function ParagraphSeparatorEditor({data, updateNode, changed, initiateSubmit, de
   const {t} = useTranslation('common');
 
   return (
-    <>
-      <div className="field">
-        <div className="select is-fullwidth">
-          <select defaultValue={data.tagName} onChange={(event) => updateNode({tagName: {$set: event.target.value}})}>
-            {separatorTypes.map((st) => <option key={st}>{st}</option>)}
-          </select>
-        </div>
-      </div>
+    <div>
+      <select className="p-2 rounded border border-slate-500 bg-white w-full" defaultValue={data.tagName}
+              onChange={(event) => updateNode({tagName: {$set: event.target.value}})}>
+        {separatorTypes.map((st) => <option key={st}>{st}</option>)}
+      </select>
 
-      <div className="columns">
-        <div className="column">
-          <button type="button" className="button is-danger is-fullwidth" onClick={deleteNode}>{t('deleteNode')}</button>
-        </div>
-        <div className="column">
-          <button type="button" className={classNames('button', 'is-fullwidth', {'is-link': changed})} disabled={!changed} onClick={initiateSubmit}>
-            {t('update')}
-          </button>
-        </div>
+      <div className="grid grid-cols-2 mt-2">
+        <button type="button" className="p-2 rounded-l bg-red-500 text-white" onClick={deleteNode}>{t('deleteNode')}</button>
+        <button type="button" className={classNames('p-2', 'rounded-r', changed ? ['bg-blue-500', 'text-white'] : ['border', 'border-slate-500'])}
+                disabled={!changed} onClick={initiateSubmit}>
+          {t('update')}
+        </button>
       </div>
-    </>
+    </div>
   );
 }

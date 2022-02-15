@@ -1,12 +1,13 @@
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {IoChevronDown, IoChevronForward, IoSettingsOutline} from 'react-icons/io5';
+import {IoSettingsOutline} from 'react-icons/io5';
 import {MultiMorphAnalysisSelection} from './MultiMorphAnalysisSelection';
 import {SingleMorphAnalysisOptionButton} from './SingleMorphAnalysisOptionButton';
 import {MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {UpdatePrevNextButtons, UpdatePrevNextButtonsProps} from './UpdatePrevNextButtons';
 import {Numerus} from './MorphAnalysisOptionContainer';
 import {LetteredAnalysisOptionButtons} from './LetteredAnalysisOptionButtons';
+import classNames from 'classnames';
 
 
 interface IProps {
@@ -25,7 +26,7 @@ export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean
 }
 
 
-const buttonClasses = 'button is-outlined is-primary is-fullwidth';
+const buttonClasses = 'p-2 mt-1 rounded border border-teal-300 w-full';
 
 export function MorphAnalysisOptionButtons({
   updatePrevNextButtonsProps,
@@ -51,33 +52,28 @@ export function MorphAnalysisOptionButtons({
   }
 
   return (
-    <>
+    <div>
       <div className="my-2">
-        <div className="field has-addons">
-          <div className="control">
-            <button onClick={() => setIsReduced((value) => !value)} className="button">
-              {isReduced ? <IoChevronForward/> : <IoChevronDown/>}
-            </button>
+        <div className="flex flex-row">
+          <button onClick={() => setIsReduced((value) => !value)} className="p-2 rounded-l border-l border-y border-slate-500 font-bold text-lg">
+            {isReduced ? <span>&gt;</span> : <span>&or;</span>}
+          </button>
+          <div className={classNames('flex-grow', 'p-2', 'border', 'border-slate-500', 'bg-gray-100', {'rounded-r': isSingleAnalysisOption})}>
+            &nbsp;
+            {number})&nbsp;<span className="text-red-600">{translation}</span>&nbsp;({referenceWord},
+            {t('paradigmClass')}:&nbsp;<span className="text-red-600">{paradigmClass}</span>
+            {determinativ && <span>, {t('determinativ')}:&nbsp;<span className="text-red-600">{determinativ}</span></span>})&nbsp;
           </div>
-          <div className="control is-expanded">
-            <button className="button is-static is-fullwidth">
-              &nbsp;
-              {number})&nbsp;<span className="has-text-danger">{translation}</span>&nbsp;({referenceWord},
-              {t('paradigmClass')}:&nbsp;<span className="has-text-danger">{paradigmClass}</span>
-              {determinativ && <span>, {t('determinativ')}:&nbsp;<span className="has-text-danger">{determinativ}</span></span>})&nbsp;
-            </button>
-          </div>
-          {!isSingleAnalysisOption && <div className="control">
-            <button className="button" onClick={enableEditMode}><IoSettingsOutline/></button>
-          </div>}
+          {!isSingleAnalysisOption &&
+            <button className="p-2 rounded-r border-r border-y border-slate-500" onClick={enableEditMode}><IoSettingsOutline/></button>}
         </div>
       </div>
 
       {!isReduced && <>
         {!isSingleAnalysisOption && <MultiMorphAnalysisSelection ma={morphologicalAnalysis}/>}
 
-        <div className="columns">
-          <div className="column">
+        <div className="grid grid-cols-3 gap-2">
+          <div className={classNames({'col-span-2': !encliticsAnalysis || 'analysis' in encliticsAnalysis})}>
             {isSingleAnalysisOption
               ? <SingleMorphAnalysisOptionButton morphAnalysis={morphologicalAnalysis} toggleAnalysisSelection={() => toggleAnalysisSelection(undefined)}/>
               : <LetteredAnalysisOptionButtons analysisOptions={morphologicalAnalysis.analysisOptions} toggleAnalysisSelection={toggleAnalysisSelection}/>
@@ -85,37 +81,31 @@ export function MorphAnalysisOptionButtons({
 
           </div>
 
-          {encliticsAnalysis && 'analysisOptions' in encliticsAnalysis && <div className="column">
-            <LetteredAnalysisOptionButtons analysisOptions={encliticsAnalysis.analysisOptions} toggleAnalysisSelection={toggleEncliticsSelection}/>
-          </div>}
+          {encliticsAnalysis && 'analysisOptions' in encliticsAnalysis &&
+            <LetteredAnalysisOptionButtons analysisOptions={encliticsAnalysis.analysisOptions} toggleAnalysisSelection={toggleEncliticsSelection}/>}
 
-          <div className="column is-one-third">
+          <div className="">
             <UpdatePrevNextButtons {...updatePrevNextButtonsProps}/>
 
             {!isSingleAnalysisOption && <>
-              <div className="mb-1">
-                <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis)} tabIndex={-1}>
-                  {t('selectAll')}
-                </button>
-              </div>
-              <div className="mb-1">
-                <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis, Numerus.Singular)} tabIndex={-1}>
-                  {t('selectAllSingular')}
-                </button>
-              </div>
-              <div className="mb-1">
-                <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis, Numerus.Plural)} tabIndex={-1}>
-                  {t('selectAllPlural')}
-                </button>
-              </div>
+              <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis)} tabIndex={-1}>
+                {t('selectAll')}
+              </button>
+              <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis, Numerus.Singular)} tabIndex={-1}>
+                {t('selectAllSingular')}
+              </button>
+              <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis, Numerus.Plural)} tabIndex={-1}>
+                {t('selectAllPlural')}
+              </button>
             </>}
           </div>
         </div>
 
-        {encliticsAnalysis && 'analysis' in encliticsAnalysis && <div className="box has-text-centered">
-          <span>{t('encliticsAnalysis')}: <code>{encliticsAnalysis.enclitics}</code> @ <code>{encliticsAnalysis.analysis}</code></span>
+        {encliticsAnalysis && 'analysis' in encliticsAnalysis && <div className="p-2 text-center rounded border border-slate-300 shadow-md">
+          <span>{t('encliticsAnalysis')}: <code className="text-red-600">{encliticsAnalysis.enclitics}</code> @ <code
+            className="text-red-600">{encliticsAnalysis.analysis}</code></span>
         </div>}
       </>}
-    </>
+    </div>
   );
 }

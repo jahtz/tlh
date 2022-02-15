@@ -52,19 +52,15 @@ export function MorphAnalysisOptionContainer({
     updateMorphology(ma);
   }
 
-  if (isUpdateMode) {
-    return <MorphAnalysisOptionEditor
+  return isUpdateMode
+    ? <MorphAnalysisOptionEditor
       morphologicalAnalysis={morphologicalAnalysis}
       onSubmit={onEditSubmit}
-      cancelUpdate={disableUpdateMode}/>;
-  } else {
-    return (
-      <MorphAnalysisOptionButtons
-        updatePrevNextButtonsProps={updatePrevNextButtonsProps}
-        morphologicalAnalysis={morphologicalAnalysis}
-        toggleAnalysisSelection={toggleAnalysisSelection}
-        toggleEncliticsSelection={toggleEncliticsSelection}
-        enableEditMode={enableUpdateMode}/>
-    );
-  }
+      cancelUpdate={disableUpdateMode}/>
+    : <MorphAnalysisOptionButtons
+      updatePrevNextButtonsProps={updatePrevNextButtonsProps}
+      morphologicalAnalysis={morphologicalAnalysis}
+      toggleAnalysisSelection={toggleAnalysisSelection}
+      toggleEncliticsSelection={toggleEncliticsSelection}
+      enableEditMode={enableUpdateMode}/>;
 }
