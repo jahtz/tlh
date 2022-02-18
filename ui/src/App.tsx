@@ -67,7 +67,7 @@ export function App(): JSX.Element {
         }
       </nav>
 
-      <div className="py-4 h-full max-h-full flex-auto">
+      <div className="py-2 h-full max-h-full flex-auto">
         <Routes>
           <Route path={homeUrl} element={<Home/>}/>
 
