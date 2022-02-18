@@ -15,7 +15,7 @@ import {Home} from './Home';
 import {RegisterForm} from './forms/RegisterForm';
 import {LoginForm} from './forms/LoginForm';
 import {useTranslation} from 'react-i18next';
-import {CreateManuscriptForm} from './CreateManuscriptForm';
+import {CreateManuscriptForm} from './forms/CreateManuscriptForm';
 import {DocumentEditorContainer} from './editor/DocumentEditorContainer';
 import {useDispatch, useSelector} from 'react-redux';
 import {activeUserSelector} from './store/store';
