@@ -2,10 +2,12 @@ import {useState} from 'react';
 import {NodeDisplay, NodeDisplayIProps} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
 import {EditTriggerFunc} from './editorConfig/editorConfig';
-import {XmlSourceEditor} from './XmlSourceEditor';
-import {writeXml} from './DocumentEditor';
 import {XmlElementNode} from './xmlModel/xmlModel';
 import classNames from 'classnames';
+import {parseNewXml} from './xmlModel/xmlReading';
+import {xml} from '@codemirror/lang-xml';
+import ReactCodeMirror from '@uiw/react-codemirror';
+import {writeXml} from './DocumentEditor';
 
 interface IProps extends NodeDisplayIProps {
   filename: string;
@@ -13,6 +15,7 @@ interface IProps extends NodeDisplayIProps {
   closeFile: () => void;
   exportXml: () => void;
   updateNode: (node: XmlElementNode) => void;
+  setKeyHandlingEnabled: (value: boolean) => void;
 }
 
 const FONT_STEP = 10;
@@ -26,18 +29,35 @@ export function EditorLeftSide({
   closeFile,
   exportXml,
   insertStuff,
-  updateNode
+  updateNode,
+  setKeyHandlingEnabled
 }: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [fontSize, setFontSize] = useState(100);
   const [useSerifFont, setUseSerifFont] = useState(false);
 
-  const [showSource, setShowSource] = useState(false);
+  const [xmlSource, setXmlSource] = useState<string | undefined>();
 
-  function onUpdateNode(node: XmlElementNode): void {
-    setShowSource(false);
-    updateNode(node);
+  function activateShowSource(): void {
+    // FIXME: disable key handling!
+    console.info('Activating');
+    setKeyHandlingEnabled(false);
+
+    const source = writeXml(node as XmlElementNode);
+
+    setXmlSource(source);
+  }
+
+  function deactivateShowSource(): void {
+    setKeyHandlingEnabled(true);
+    setXmlSource(undefined);
+  }
+
+  function onXmlSourceUpdate(): void {
+    updateNode(parseNewXml(xmlSource as string) as XmlElementNode);
+
+    deactivateShowSource();
   }
 
   return (
@@ -54,15 +74,24 @@ export function EditorLeftSide({
             +{FONT_STEP}%
           </button>
 
-          <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="mr-2 px-2 border border-slate-500 rounded">
-            {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
-          </button>
 
-          <button type="button" className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={() => setShowSource((value) => !value)}
-                  title={t('editSource')}>
-            {/* FIXME: change on state: {showSource ? t('cancelEditSource') : t('editSource')} */}
-            &#x270E;
-          </button>
+          {xmlSource
+            ? <>
+              <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="mr-2 px-2 border border-slate-500 rounded">
+                {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
+              </button>
+              <button type="button" className="mr-2 px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource}
+                      title={t('cancelEditXmlSource')}>
+                &#x270E;
+              </button>
+              <button type="button" className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={onXmlSourceUpdate}
+                      title={t('applyXmlSourceChange')}>
+                &#x270E;
+              </button>
+            </>
+            : <button type="button" className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={activateShowSource} title={t('editSource')}>
+              &#x270E;
+            </button>}
 
           <button type="button" className="mr-2 px-2 rounded bg-green-400 text-white font-bold" onClick={exportXml}>&#x1F5AB;</button>
 
@@ -71,8 +100,8 @@ export function EditorLeftSide({
       </div>
 
       <div className="flex p-4 rounded-b border border-slate-300 shadow-md flex-auto overflow-auto">
-        {showSource
-          ? <XmlSourceEditor source={writeXml(node as XmlElementNode)} updateNode={onUpdateNode}/>
+        {xmlSource
+          ? <ReactCodeMirror value={xmlSource} extensions={[xml()]} onChange={setXmlSource}/>
           : <div className={classNames(useSerifFont ? 'font-hpm-serif' : 'font-hpm')} style={{fontSize: `${fontSize}%`}}>
             <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} editorConfig={editorConfig} onSelect={onNodeSelect} insertStuff={insertStuff}/>
           </div>}

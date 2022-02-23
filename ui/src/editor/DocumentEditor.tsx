@@ -355,7 +355,8 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
         closeFile={onCloseFile}
         exportXml={exportXml}
         insertStuff={insertStuff}
-        updateNode={updateRootNode}/>
+        updateNode={updateRootNode}
+        setKeyHandlingEnabled={(value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}}))}/>
 
       {state.editorState && 'path' in state.editorState
         ? renderNodeEditor(state.editorState) /* don't convert to a component! */
