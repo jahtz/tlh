@@ -19,9 +19,10 @@ export function UpdatePrevNextButtons({changed, initiateUpdate, deleteElement, i
         &larr;
       </button>
 
-      {deleteElement && <button type="button" className="p-2 bg-red-600 text-white font-bold text-xl text-center" title={t('deleteNode')}>
-        &minus;
-      </button>}
+      {deleteElement &&
+        <button type="button" className="p-2 bg-red-600 text-white font-bold text-xl text-center" title={t('deleteNode')} onClick={deleteElement}>
+          &minus;
+        </button>}
 
       <button type="button" className={classNames('p-2', 'text-center', changed ? ['bg-blue-600', 'text-white'] : ['border', 'border-slate-500'])}
               onClick={initiateUpdate} tabIndex={-1}>

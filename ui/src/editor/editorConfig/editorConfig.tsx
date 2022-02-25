@@ -16,12 +16,10 @@ export interface XmlEditableNodeIProps<T = XmlElementNode> {
   path: number[];
   updateNode: (spec: Spec<T>) => void;
   deleteNode: () => void;
-  jumpEditableNodes: (tagName: string, forward: boolean) => void;
   setKeyHandlingEnabled: (enabled: boolean) => void;
   initiateJumpElement: (forward: boolean) => void;
   initiateSubmit: () => void;
 }
-
 
 export interface XmlSingleNodeConfig {
   replace?: ReplaceFunc;

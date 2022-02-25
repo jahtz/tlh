@@ -31,9 +31,9 @@ export function NoteNodeEditor({
   changed,
   updateNode,
   deleteNode,
-  jumpEditableNodes,
   setKeyHandlingEnabled,
-  initiateSubmit
+  initiateSubmit,
+  initiateJumpElement
 }: XmlEditableNodeIProps<NoteData>): JSX.Element {
 
   const {t} = useTranslation('common');
@@ -53,7 +53,7 @@ export function NoteNodeEditor({
       </div>
 
       <div className="my-3">
-        <UpdatePrevNextButtons changed={changed} initiateUpdate={initiateSubmit} initiateJumpElement={(forward) => jumpEditableNodes('note', forward)}
+        <UpdatePrevNextButtons changed={changed} initiateUpdate={initiateSubmit} initiateJumpElement={(forward) => initiateJumpElement(forward)}
                                deleteElement={deleteNode}/>
       </div>
 

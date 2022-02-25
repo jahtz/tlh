@@ -12,11 +12,11 @@ import {MorphAnalysisOptionEditor} from '../morphAnalysisOption/MorphAnalysisOpt
 import {reconstructTransliteration} from '../transliterationReconstruction';
 import {WordContentEditor} from './WordContentEditor';
 import update, {Spec} from 'immutability-helper';
-import {UpdatePrevNextButtons, UpdatePrevNextButtonsProps} from '../morphAnalysisOption/UpdatePrevNextButtons';
 import {readWordNodeData, WordNodeData} from './wordNodeData';
 import {WordQuestion} from '../wordEditor/WordQuestion';
 import {WordQuestionForm} from '../wordEditor/WordQuestionForm';
 import {LanguageInput} from '../LanguageInput';
+import classNames from 'classnames';
 
 interface IState {
   addMorphology?: boolean;
@@ -28,7 +28,6 @@ export function WordNodeEditor({
   changed,
   updateNode,
   deleteNode,
-  jumpEditableNodes,
   setKeyHandlingEnabled,
   initiateJumpElement,
   initiateSubmit
@@ -57,44 +56,20 @@ export function WordNodeEditor({
     const action: Spec<{ selected: boolean }> = {$toggle: ['selected']};
 
     if (letterIndex || letterIndex === 0) {
-      updateNode({
-        morphologies: {
-          [morphIndex]: {
-            analysisOptions: {
-              [letterIndex]: action
-            }
-          }
-        }
-      });
+      updateNode({morphologies: {[morphIndex]: {analysisOptions: {[letterIndex]: action}}}});
     } else {
-      updateNode({
-        morphologies: {
-          [morphIndex]: action
-        }
-      });
+      updateNode({morphologies: {[morphIndex]: action}});
     }
   }
 
   function toggleEncliticsSelection(morphIndex: number, letterIndex: number): void {
-    updateNode({
-      morphologies: {
-        [morphIndex]: {
-          encliticsAnalysis: {
-            analysisOptions: {
-              [letterIndex]: {$toggle: ['selected']}
-            }
-          }
-        }
-      }
-    });
+    updateNode({morphologies: {[morphIndex]: {encliticsAnalysis: {analysisOptions: {[letterIndex]: {$toggle: ['selected']}}}}}});
   }
 
   function enableEditWordState(): void {
-    setState((state) => update(state, {
-      editContent: {
-        $set: data.node.children.map((c, index) => reconstructTransliteration(c, index === 0)).join('')
-      }
-    }));
+    const newValue = data.node.children.map((c, index) => reconstructTransliteration(c, index === 0)).join('');
+
+    setState((state) => update(state, {editContent: {$set: newValue}}));
   }
 
   function handleEditUpdate(node: XmlElementNode): void {
@@ -131,7 +106,7 @@ export function WordNodeEditor({
   }
 
   function removeNote(): void {
-    updateNode((state) => update(state, {node: {attributes: {$unset: ['q']}}}));
+    updateNode((state) => update(state, {node: {attributes: {$unset: ['editingQuestion']}}}));
   }
 
   function addEditingQuestion(value: string): void {
@@ -139,13 +114,38 @@ export function WordNodeEditor({
     setIsAddNote(false);
   }
 
-  const updatePrevNextButtonProps: UpdatePrevNextButtonsProps = {changed, initiateUpdate: initiateSubmit, initiateJumpElement};
-
   return (
     <div>
-      <div className="p-4 text-center rounded-t border border-slate-300 shadow-md">
+      <div className="p-4 rounded-t border border-slate-300 shadow-md">
         <NodeDisplay node={data.node} editorConfig={tlhXmlEditorConfig}/>
-        <sup>&nbsp;</sup><sub>&nbsp;</sub>
+
+        <div className="float-right">
+          <button type="button" className="ml-2 px-2 rounded border border-slate-500 font-bold" onClick={() => initiateJumpElement(false)}
+                  title={t('previousTag')}>
+            &larr;
+          </button>
+
+          <button type="button" className="ml-2 px-2 rounded border border-slate-500" onClick={toggleAddMorphology} title={t('addMorphologicalAnalysis')}>
+            +
+          </button>
+
+          <button type="button" className="ml-2 px-2 rounded bg-blue-500 text-white" onClick={enableEditWordState} title={t('editContent')}>
+            &#9998;
+          </button>
+
+          <button type="button" className="ml-2 px-2 rounded bg-red-600 text-white" onClick={deleteNode} title={t('deleteNode')}>
+            &minus;
+          </button>
+
+          <button type="button" className={classNames('ml-2', 'px-2', 'rounded', changed ? ['bg-blue-600', 'text-white'] : ['border', 'border-slate-500'])}
+                  onClick={initiateSubmit} title={t('updateNode')}>
+            {t('update')}
+          </button>
+
+          <button type="button" className="ml-2 px-2 rounded border border-slate-500 font-bold" onClick={() => initiateJumpElement(true)} title={t('nextTag')}>
+            &rarr;
+          </button>
+        </div>
       </div>
 
       <div className="p-2 rounded-b border border-slate-300">
@@ -159,36 +159,31 @@ export function WordNodeEditor({
             ? <WordQuestion comment={data.node.attributes.editingQuestion} removeNote={removeNote}/>
             : (isAddNote
               ? <WordQuestionForm cancel={() => setIsAddNote(false)} onSubmit={addEditingQuestion}/>
-              : <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={() => setIsAddNote(true)}>{t('addEditingQuestion')}</button>)}
+              : <button type="button" className="p-2 rounded bg-cyan-500 text-white w-full"
+                        onClick={() => setIsAddNote(true)}>{t('addEditingQuestion')}</button>)}
         </div>
 
-        {data.morphologies.length === 0
-          ? <div className="p-4 mt-2 rounded bg-amber-400 text-center">{t('noMorphologicalAnalysesFound')}</div>
-          : data.morphologies.map((m, index) => <MorphAnalysisOptionContainer
-              key={m.number}
-              updatePrevNextButtonsProps={updatePrevNextButtonProps}
-              morphologicalAnalysis={m}
-              toggleAnalysisSelection={(letterIndex) => toggleAnalysisSelection(index, letterIndex)}
-              toggleEncliticsSelection={(letterIndex) => toggleEncliticsSelection(index, letterIndex)}
-              updateMorphology={(newMa) => updateMorphology(index, newMa)}
-              setKeyHandlingEnabled={setKeyHandlingEnabled}
-            />
-          )}
+        <div className="mt-4">
+          {data.morphologies.length === 0
+            ? <div className="p-4 rounded bg-amber-400 text-center">{t('noMorphologicalAnalysesFound')}</div>
+            : data.morphologies.map((m, index) => <MorphAnalysisOptionContainer
+                key={m.number}
+                morphologicalAnalysis={m}
+                toggleAnalysisSelection={(letterIndex) => toggleAnalysisSelection(index, letterIndex)}
+                toggleEncliticsSelection={(letterIndex) => toggleEncliticsSelection(index, letterIndex)}
+                updateMorphology={(newMa) => updateMorphology(index, newMa)}
+                setKeyHandlingEnabled={setKeyHandlingEnabled}
+              />
+            )}
 
-        {isAddMorphologyState &&
-          <MorphAnalysisOptionEditor
+
+          {isAddMorphologyState && <MorphAnalysisOptionEditor
             morphologicalAnalysis={nextMorphAnalysis()}
             onSubmit={(newMa) => updateMorphology(data.morphologies.length, newMa)}
             cancelUpdate={toggleAddMorphology}/>}
-      </div>
+        </div>
 
-      <div className="grid grid-cols-3 my-2">
-        <button type="button" className="p-2 rounded-l border-l border-y border-slate-500" onClick={toggleAddMorphology}>+&nbsp;{t('addMorphology')}</button>
-        <button type="button" className="p-2 bg-red-600 text-white" onClick={deleteNode}>{t('deleteNode')}</button>
-        <button type="button" className="p-2 rounded-r border-r border-y border-slate-500" onClick={enableEditWordState}>&#9998;&nbsp;{t('editContent')}</button>
       </div>
-
-      <UpdatePrevNextButtons changed={changed} initiateUpdate={initiateSubmit} initiateJumpElement={(forward) => jumpEditableNodes('w', forward)}/>
     </div>
   );
 }

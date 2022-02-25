@@ -4,17 +4,13 @@ import {IoSettingsOutline} from 'react-icons/io5';
 import {MultiMorphAnalysisSelection} from './MultiMorphAnalysisSelection';
 import {SingleMorphAnalysisOptionButton} from './SingleMorphAnalysisOptionButton';
 import {MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
-import {UpdatePrevNextButtons, UpdatePrevNextButtonsProps} from './UpdatePrevNextButtons';
 import {Numerus} from './MorphAnalysisOptionContainer';
 import {LetteredAnalysisOptionButtons} from './LetteredAnalysisOptionButtons';
 import classNames from 'classnames';
 
 
 interface IProps {
-  updatePrevNextButtonsProps: UpdatePrevNextButtonsProps;
-
   morphologicalAnalysis: MorphologicalAnalysis;
-
   toggleAnalysisSelection: (index?: number) => void;
   toggleEncliticsSelection: (index: number) => void;
   enableEditMode: () => void;
@@ -29,7 +25,6 @@ export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean
 const buttonClasses = 'p-2 mt-1 rounded border border-teal-300 w-full';
 
 export function MorphAnalysisOptionButtons({
-  updatePrevNextButtonsProps,
   morphologicalAnalysis,
   toggleAnalysisSelection,
   toggleEncliticsSelection,
@@ -84,9 +79,7 @@ export function MorphAnalysisOptionButtons({
           {encliticsAnalysis && 'analysisOptions' in encliticsAnalysis &&
             <LetteredAnalysisOptionButtons analysisOptions={encliticsAnalysis.analysisOptions} toggleAnalysisSelection={toggleEncliticsSelection}/>}
 
-          <div className="">
-            <UpdatePrevNextButtons {...updatePrevNextButtonsProps}/>
-
+          <div>
             {!isSingleAnalysisOption && <>
               <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis)} tabIndex={-1}>
                 {t('selectAll')}

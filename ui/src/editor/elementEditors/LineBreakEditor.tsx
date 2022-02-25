@@ -9,9 +9,9 @@ export function LineBreakEditor({
   changed,
   updateNode,
   deleteNode,
-  jumpEditableNodes,
   setKeyHandlingEnabled,
-  initiateSubmit
+  initiateSubmit,
+  initiateJumpElement
 }: XmlEditableNodeIProps<LineBreakData>): JSX.Element {
 
   const {t} = useTranslation('common');
@@ -34,7 +34,7 @@ export function LineBreakEditor({
         <LanguageInput initialValue={data.lg} onBlur={(value) => updateNode({lg: {$set: value}})}/>
       </div>
 
-      <UpdatePrevNextButtons changed={changed} initiateUpdate={initiateSubmit} initiateJumpElement={(forward) => jumpEditableNodes('lb', forward)}
+      <UpdatePrevNextButtons changed={changed} initiateUpdate={initiateSubmit} initiateJumpElement={(forward) => initiateJumpElement(forward)}
                              deleteElement={deleteNode}/>
 
     </div>

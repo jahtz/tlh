@@ -2,16 +2,12 @@ import {MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {useEffect, useState} from 'react';
 import {MorphAnalysisOptionButtons} from './MorphAnalysisButtons';
 import {MorphAnalysisOptionEditor} from './MorphAnalysisOptionEditor';
-import {UpdatePrevNextButtonsProps} from './UpdatePrevNextButtons';
 
 interface IProps {
-  updatePrevNextButtonsProps: UpdatePrevNextButtonsProps;
-
   morphologicalAnalysis: MorphologicalAnalysis;
   updateMorphology: (ma: MorphologicalAnalysis) => void;
   toggleAnalysisSelection: (index?: number) => void;
   toggleEncliticsSelection: (index: number) => void;
-
   setKeyHandlingEnabled: (b: boolean) => void;
 }
 
@@ -20,7 +16,6 @@ export enum Numerus {
 }
 
 export function MorphAnalysisOptionContainer({
-  updatePrevNextButtonsProps,
   morphologicalAnalysis,
   updateMorphology,
   toggleAnalysisSelection,
@@ -58,7 +53,6 @@ export function MorphAnalysisOptionContainer({
       onSubmit={onEditSubmit}
       cancelUpdate={disableUpdateMode}/>
     : <MorphAnalysisOptionButtons
-      updatePrevNextButtonsProps={updatePrevNextButtonsProps}
       morphologicalAnalysis={morphologicalAnalysis}
       toggleAnalysisSelection={toggleAnalysisSelection}
       toggleEncliticsSelection={toggleEncliticsSelection}
