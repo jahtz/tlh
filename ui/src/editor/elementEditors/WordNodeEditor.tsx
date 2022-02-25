@@ -37,8 +37,8 @@ export function WordNodeEditor({
   const editorConfig = useSelector(editorKeyConfigSelector);
 
   const [state, setState] = useState<IState>({});
-  const [isAddNote, setIsAddNote] = useState(false);
 
+  const [addEditingQuestionEnabled, setAddEditingQuestionEnabled] = useState(false);
   const [isAddMorphologyState, setIsAddMorphologyState] = useState(false);
 
   useEffect(() => {
@@ -111,7 +111,17 @@ export function WordNodeEditor({
 
   function addEditingQuestion(value: string): void {
     updateNode((state) => update(state, {node: {attributes: {editingQuestion: {$set: value}}}}));
-    setIsAddNote(false);
+    cancelAddEditingQuestion();
+  }
+
+  function cancelAddEditingQuestion(): void {
+    setKeyHandlingEnabled(true);
+    setAddEditingQuestionEnabled(false);
+  }
+
+  function enableAddEditingQuestion(): void {
+    setKeyHandlingEnabled(false);
+    setAddEditingQuestionEnabled(true);
   }
 
   return (
@@ -157,10 +167,10 @@ export function WordNodeEditor({
         <div className="mt-4">
           {data.node.attributes.editingQuestion
             ? <WordQuestion comment={data.node.attributes.editingQuestion} removeNote={removeNote}/>
-            : (isAddNote
-              ? <WordQuestionForm cancel={() => setIsAddNote(false)} onSubmit={addEditingQuestion}/>
+            : (addEditingQuestionEnabled
+              ? <WordQuestionForm cancel={cancelAddEditingQuestion} onSubmit={addEditingQuestion}/>
               : <button type="button" className="p-2 rounded bg-cyan-500 text-white w-full"
-                        onClick={() => setIsAddNote(true)}>{t('addEditingQuestion')}</button>)}
+                        onClick={enableAddEditingQuestion}>{t('addEditingQuestion')}</button>)}
         </div>
 
         <div className="mt-4">
