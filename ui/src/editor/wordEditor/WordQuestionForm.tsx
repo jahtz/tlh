@@ -18,7 +18,7 @@ export function WordQuestionForm({cancel, onSubmit}: IProps): JSX.Element {
 
       <div className="grid grid-cols-2">
         <button type="button" className="p-2 rounded-l border border-slate-500" onClick={cancel}>{t('cancel')}</button>
-        <button type="button" className="p-2 rounded-r bg-blue-500 text-white" onClick={() => onSubmit(value)}>{t('addNote')}</button>
+        <button type="button" className="p-2 rounded-r bg-blue-500 text-white" onClick={() => onSubmit(value)}>{t('addEditingQuestion')}</button>
       </div>
     </div>
   );

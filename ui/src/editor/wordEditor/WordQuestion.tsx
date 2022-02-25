@@ -10,6 +10,7 @@ export function WordQuestion({comment, removeNote}: IProps): JSX.Element {
   const {t} = useTranslation('common');
 
   // FIXME: delete button!
+  // FIXME:
 
   return (
     <div className="p-2 mt-4 rounded border-l-4 border-teal-600 bg-teal-300">

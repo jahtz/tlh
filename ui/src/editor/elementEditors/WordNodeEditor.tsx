@@ -134,8 +134,8 @@ export function WordNodeEditor({
     updateNode((state) => update(state, {node: {attributes: {$unset: ['q']}}}));
   }
 
-  function addNote(value: string): void {
-    updateNode((state) => update(state, {node: {attributes: {q: {$set: value}}}}));
+  function addEditingQuestion(value: string): void {
+    updateNode((state) => update(state, {node: {attributes: {editingQuestion: {$set: value}}}}));
     setIsAddNote(false);
   }
 
@@ -155,11 +155,11 @@ export function WordNodeEditor({
         </div>
 
         <div className="mt-4">
-          {data.node.attributes.q
-            ? <WordQuestion comment={data.node.attributes.q} removeNote={removeNote}/>
+          {data.node.attributes.editingQuestion
+            ? <WordQuestion comment={data.node.attributes.editingQuestion} removeNote={removeNote}/>
             : (isAddNote
-              ? <WordQuestionForm cancel={() => setIsAddNote(false)} onSubmit={addNote}/>
-              : <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={() => setIsAddNote(true)}>{t('addNote')}</button>)}
+              ? <WordQuestionForm cancel={() => setIsAddNote(false)} onSubmit={addEditingQuestion}/>
+              : <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={() => setIsAddNote(true)}>{t('addEditingQuestion')}</button>)}
         </div>
 
         {data.morphologies.length === 0

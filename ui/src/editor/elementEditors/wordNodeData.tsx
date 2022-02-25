@@ -99,7 +99,7 @@ export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
           'underline': !notMarked && hasNoMorphologySelected,
           'bg-teal-400': !notMarked && isSelected,
           'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
-          'has-background-info': hasQuestion,
+          'bg-blue-700': hasQuestion,
           [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,
           'has-text-weight-bold': isForeignLanguage,
           'has-text-danger': node.children.length === 0
