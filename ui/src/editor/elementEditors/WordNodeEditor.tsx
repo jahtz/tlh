@@ -176,16 +176,16 @@ export function WordNodeEditor({
             <div className="mt-4">
               {data.morphologies.length === 0
                 ? <div className="p-4 rounded bg-amber-400 text-center">{t('noMorphologicalAnalysesFound')}</div>
-                : data.morphologies.map((m, index) => <MorphAnalysisOptionContainer
-                    key={m.number}
-                    morphologicalAnalysis={m}
-                    toggleAnalysisSelection={(letterIndex) => toggleAnalysisSelection(index, letterIndex)}
-                    toggleEncliticsSelection={(letterIndex) => toggleEncliticsSelection(index, letterIndex)}
-                    updateMorphology={(newMa) => updateMorphology(index, newMa)}
-                    setKeyHandlingEnabled={setKeyHandlingEnabled}
-                  />
+                : data.morphologies.map((m, index) => <div className="mt-2" key={m.number}>
+                    <MorphAnalysisOptionContainer
+                      morphologicalAnalysis={m}
+                      toggleAnalysisSelection={(letterIndex) => toggleAnalysisSelection(index, letterIndex)}
+                      toggleEncliticsSelection={(letterIndex) => toggleEncliticsSelection(index, letterIndex)}
+                      updateMorphology={(newMa) => updateMorphology(index, newMa)}
+                      setKeyHandlingEnabled={setKeyHandlingEnabled}
+                    />
+                  </div>
                 )}
-
 
               {isAddMorphologyState && <MorphAnalysisOptionEditor
                 morphologicalAnalysis={nextMorphAnalysis()}

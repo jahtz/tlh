@@ -38,49 +38,37 @@ export function MorphAnalysisOptionEditor({morphologicalAnalysis, onSubmit, canc
     <Formik initialValues={morphologicalAnalysis} onSubmit={onSubmit}>
       {({values}) =>
         <Form>
-          <div className="field has-addons">
-            <div className="control">
-              <button type="button" className="button is-static">{morphologicalAnalysis.number}</button>
-            </div>
-            <div className="control is-expanded">
-              <Field name="translation" className="input" placeholder={t('translation')}/>
-            </div>
-            <div className="control is-expanded">
-              <Field name="referenceWord" className="input" placeholder={t('referenceWord')}/>
-            </div>
-            <div className="control">
-              <Field name="determinativ" className="input" placeholder={t('determinativ')}/>
-            </div>
-            <div className="control">
-              <Field name="paradigmClass" className="input" placeholder={t('paradigmClass')}/>
-            </div>
+
+          <div className="flex flex-row">
+            <button type="button" className="px-4 py-2 rounded-l bg-gray-100 border-l border-y border-slate-500">{morphologicalAnalysis.number}</button>
+
+            <Field name="translation" className="flex-grow p-2 border border-slate-500" placeholder={t('translation')}/>
+
+            <Field name="referenceWord" className="flex-grow p-2 border-r border-y border-slate-500" placeholder={t('referenceWord')}/>
+
+            <Field name="determinativ" className="flex-1 p-2 border-r border-y border-slate-500" placeholder={t('determinativ')}/>
+
+            <Field name="paradigmClass" className="flex-1 p-2 rounded-r border-r border-y border-slate-500" placeholder={t('paradigmClass')}/>
           </div>
 
           <FieldArray name={'analysisOptions'}>
-            {(arrayHelpers) =>
-              <div>
+            {(arrayHelpers) => <div>
 
-                {(values.analysisOptions as LetteredAnalysisOption[]).map(({letter}, index) =>
-                  <div className="field has-addons" key={letter}>
-                    <div className="control">
-                      <button className="button is-static">{letter}</button>
-                    </div>
-                    <div className="control is-expanded">
-                      <Field name={`analysisOptions.${index}.analysis`} className="input" placeholder={t('analysis')}/>
-                    </div>
-                    <div className="control">
-                      <button type="button" className="button is-danger" onClick={() => arrayHelpers.remove(index)}>-</button>
-                    </div>
-                  </div>
-                )}
-
-                <div className="buttons">
-                  <button type="button" className="button is-primary" onClick={() => arrayHelpers.push(nextAnalysisOption(values))}>+</button>
-                  <button type="button" className="button is-warning" onClick={cancelUpdate}>{t('cancelEdit')}</button>
-                  <button type="submit" className="button is-link">{t('updateAnalyses')}</button>
+              {(values.analysisOptions as LetteredAnalysisOption[]).map(({letter}, index) =>
+                <div className="mt-2 flex flex-row" key={letter}>
+                  <button className="px-4 py-2 rounded-l bg-gray-100 border-l border-y border-slate-500">{letter}</button>
+                  <Field name={`analysisOptions.${index}.analysis`} className="flex-grow p-2 border-l border-y border-slate-500" placeholder={t('analysis')}/>
+                  <button type="button" className="px-4 py-2 rounded-r bg-red-500 text-white" onClick={() => arrayHelpers.remove(index)}>-</button>
                 </div>
+              )}
+
+              <div className="mt-2">
+                <button type="button" className="px-4 py-2 rounded bg-teal-500 text-white" onClick={() => arrayHelpers.push(nextAnalysisOption(values))}>+
+                </button>
+                <button type="button" className="ml-2 px-4 py-2 rounded bg-amber-400" onClick={cancelUpdate}>{t('cancelEdit')}</button>
+                <button type="submit" className="ml-2 px-4 py-2 rounded bg-blue-600 text-white">{t('updateAnalyses')}</button>
               </div>
-            }
+            </div>}
 
           </FieldArray>
         </Form>

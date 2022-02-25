@@ -22,7 +22,7 @@ export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean
 }
 
 
-const buttonClasses = 'p-2 mt-1 rounded border border-teal-300 w-full';
+const buttonClasses = 'mb-1 p-2 rounded border border-teal-300 w-full';
 
 export function MorphAnalysisOptionButtons({
   morphologicalAnalysis,
@@ -47,58 +47,53 @@ export function MorphAnalysisOptionButtons({
   }
 
   return (
-    <div>
-      <div className="my-2">
-        <div className="flex flex-row">
-          <button onClick={() => setIsReduced((value) => !value)} className="p-2 rounded-l border-l border-y border-slate-500 font-bold text-lg">
-            {isReduced ? <span>&gt;</span> : <span>&or;</span>}
-          </button>
-          <div className={classNames('flex-grow', 'p-2', 'border', 'border-slate-500', 'bg-gray-100', {'rounded-r': isSingleAnalysisOption})}>
-            &nbsp;
-            {number})&nbsp;<span className="text-red-600">{translation}</span>&nbsp;({referenceWord},
-            {t('paradigmClass')}:&nbsp;<span className="text-red-600">{paradigmClass}</span>
-            {determinativ && <span>, {t('determinativ')}:&nbsp;<span className="text-red-600">{determinativ}</span></span>})&nbsp;
-          </div>
-          {!isSingleAnalysisOption &&
-            <button className="p-2 rounded-r border-r border-y border-slate-500" onClick={enableEditMode}><IoSettingsOutline/></button>}
+    <div className="mt-2">
+      <div className="flex flex-row">
+        <button onClick={() => setIsReduced((value) => !value)} className="p-2 rounded-l border-l border-y border-slate-500 font-bold text-lg">
+          {isReduced ? <span>&gt;</span> : <span>&or;</span>}
+        </button>
+        <div className={classNames('flex-grow', 'p-2', 'border', 'border-slate-500', 'bg-gray-100', {'rounded-r': isSingleAnalysisOption})}>
+          &nbsp;
+          {number})&nbsp;<span className="text-red-600">{translation}</span>&nbsp;({referenceWord},
+          {t('paradigmClass')}:&nbsp;<span className="text-red-600">{paradigmClass}</span>
+          {determinativ && <span>, {t('determinativ')}:&nbsp;<span className="text-red-600">{determinativ}</span></span>})&nbsp;
         </div>
+        {!isSingleAnalysisOption &&
+          <button className="p-2 rounded-r border-r border-y border-slate-500" onClick={enableEditMode}><IoSettingsOutline/></button>}
       </div>
 
-      {!isReduced && <>
+      {!isReduced && <div className="mt-2">
         {!isSingleAnalysisOption && <MultiMorphAnalysisSelection ma={morphologicalAnalysis}/>}
 
         <div className="grid grid-cols-3 gap-2">
+
           <div className={classNames({'col-span-2': !encliticsAnalysis || 'analysis' in encliticsAnalysis})}>
             {isSingleAnalysisOption
               ? <SingleMorphAnalysisOptionButton morphAnalysis={morphologicalAnalysis} toggleAnalysisSelection={() => toggleAnalysisSelection(undefined)}/>
-              : <LetteredAnalysisOptionButtons analysisOptions={morphologicalAnalysis.analysisOptions} toggleAnalysisSelection={toggleAnalysisSelection}/>
-            }
-
+              : <LetteredAnalysisOptionButtons analysisOptions={morphologicalAnalysis.analysisOptions} toggleAnalysisSelection={toggleAnalysisSelection}/>}
           </div>
 
           {encliticsAnalysis && 'analysisOptions' in encliticsAnalysis &&
             <LetteredAnalysisOptionButtons analysisOptions={encliticsAnalysis.analysisOptions} toggleAnalysisSelection={toggleEncliticsSelection}/>}
 
-          <div>
-            {!isSingleAnalysisOption && <>
-              <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis)} tabIndex={-1}>
-                {t('selectAll')}
-              </button>
-              <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis, Numerus.Singular)} tabIndex={-1}>
-                {t('selectAllSingular')}
-              </button>
-              <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis, Numerus.Plural)} tabIndex={-1}>
-                {t('selectAllPlural')}
-              </button>
-            </>}
-          </div>
+          {!isSingleAnalysisOption && <div>
+            <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis)} tabIndex={-1}>
+              {t('selectAll')}
+            </button>
+            <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis, Numerus.Singular)} tabIndex={-1}>
+              {t('selectAllSingular')}
+            </button>
+            <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis, Numerus.Plural)} tabIndex={-1}>
+              {t('selectAllPlural')}
+            </button>
+          </div>}
         </div>
 
         {encliticsAnalysis && 'analysis' in encliticsAnalysis && <div className="mt-2 p-2 text-center rounded border border-slate-300 shadow-md">
           <span>{t('encliticsAnalysis')}: <code className="text-red-600">{encliticsAnalysis.enclitics}</code> @ <code
             className="text-red-600">{encliticsAnalysis.analysis}</code></span>
         </div>}
-      </>}
+      </div>}
     </div>
   );
 }

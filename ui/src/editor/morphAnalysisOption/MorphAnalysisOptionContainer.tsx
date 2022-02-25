@@ -48,13 +48,7 @@ export function MorphAnalysisOptionContainer({
   }
 
   return isUpdateMode
-    ? <MorphAnalysisOptionEditor
-      morphologicalAnalysis={morphologicalAnalysis}
-      onSubmit={onEditSubmit}
-      cancelUpdate={disableUpdateMode}/>
-    : <MorphAnalysisOptionButtons
-      morphologicalAnalysis={morphologicalAnalysis}
-      toggleAnalysisSelection={toggleAnalysisSelection}
-      toggleEncliticsSelection={toggleEncliticsSelection}
-      enableEditMode={enableUpdateMode}/>;
+    ? <MorphAnalysisOptionEditor morphologicalAnalysis={morphologicalAnalysis} onSubmit={onEditSubmit} cancelUpdate={disableUpdateMode}/>
+    : <MorphAnalysisOptionButtons morphologicalAnalysis={morphologicalAnalysis} toggleAnalysisSelection={toggleAnalysisSelection}
+                                  toggleEncliticsSelection={toggleEncliticsSelection} enableEditMode={enableUpdateMode}/>;
 }
