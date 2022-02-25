@@ -43,35 +43,33 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
     if (state.parseResult.status) {
       fetchMorphologicalAnalyses(writeNode(state.parseResult.value).join(''), 'Hit')
         .then((res) => {
-          if (res) {
-            setState((state) => update(state, {parseResult: {value: {attributes: {$set: res}}}}));
-          }
+          res && setState((state) => update(state, {parseResult: {value: {attributes: {$set: res}}}}));
         })
         .catch((err) => console.error(err));
     }
   }
 
   return (
-    <>
-      <div className="field">
-        <label htmlFor="newTransliteration" className="label">{t('newTransliteration')}:</label>
-        <div className="control">
-          <input defaultValue={initialTransliteration} className="input" id="newTransliteration" placeholder={t('newTransliteration')}
-                 onChange={(event) => setState(readTransliteration(event.target.value))}/>
-        </div>
+    <div>
+
+      <div className="flex">
+        <label htmlFor="newTransliteration" className="p-2 rounded-l border-l border-y border-slate-500 font-bold">{t('newTransliteration')}:</label>
+
+        <input defaultValue={initialTransliteration} className="flex-grow rounded-r border border-slate-500 p-2" id="newTransliteration"
+               placeholder={t('newTransliteration')} onChange={(event) => setState(readTransliteration(event.target.value))}/>
       </div>
 
-      <hr/>
+      <hr className="mt-4"/>
 
-      <div className={classNames('message', state.parseResult.status ? 'is-success' : 'is-danger')}>
-        <div className="message-header">{t('result')}</div>
-        <div className="message-body">
+      <div className="rounded-t">
+        <div className={classNames('p-2', 'rounded-t', state.parseResult.status ? 'bg-green-500' : 'bg-red-600', 'text-white', 'font-bold')}>{t('result')}</div>
+        <div className={classNames('p-4', state.parseResult.status ? 'bg-green-50' : 'bg-red-200')}>
           {state.parseResult.status
             ? <>
-              <div className="box">
+              <div className="p-2 rounded bg-white">
                 <NodeDisplay node={state.parseResult.value} currentSelectedPath={undefined}/>
               </div>
-              <div className="box">{writeNode(state.parseResult.value).join('')}</div>
+              <div className="mt-2 p-2 rounded bg-white">{writeNode(state.parseResult.value).join('')}</div>
             </>
             : <pre>{JSON.stringify(state, null, 2)}</pre>
           }
@@ -79,17 +77,13 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
       </div>
 
       {state.parseResult.status && <>
-        <button type="button" className="button is-link is-fullwidth" onClick={updateMorphologies}>{t('fetchMorphologicalAnalyses')}</button>
+        <button type="button" className="mt-4 p-2 rounded bg-blue-600 text-white w-full" onClick={updateMorphologies}>{t('fetchMorphologicalAnalyses')}</button>
       </>}
 
-      <div className="columns my-3">
-        <div className="column">
-          <button onClick={cancelEdit} className="button is-warning is-fullwidth">{t('cancelEdit')}</button>
-        </div>
-        <div className="column">
-          <button type="button" onClick={submitEdit} className="button is-link is-fullwidth">{t('submitEdit')}</button>
-        </div>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <button type="button" onClick={cancelEdit} className="p-2 rounded bg-amber-400">{t('cancelEdit')}</button>
+        <button type="button" onClick={submitEdit} className="p-2 rounded bg-blue-600 text-white">{t('submitEdit')}</button>
       </div>
-    </>
+    </div>
   );
 }

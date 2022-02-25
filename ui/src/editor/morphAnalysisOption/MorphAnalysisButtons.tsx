@@ -94,7 +94,7 @@ export function MorphAnalysisOptionButtons({
           </div>
         </div>
 
-        {encliticsAnalysis && 'analysis' in encliticsAnalysis && <div className="p-2 text-center rounded border border-slate-300 shadow-md">
+        {encliticsAnalysis && 'analysis' in encliticsAnalysis && <div className="mt-2 p-2 text-center rounded border border-slate-300 shadow-md">
           <span>{t('encliticsAnalysis')}: <code className="text-red-600">{encliticsAnalysis.enclitics}</code> @ <code
             className="text-red-600">{encliticsAnalysis.analysis}</code></span>
         </div>}
