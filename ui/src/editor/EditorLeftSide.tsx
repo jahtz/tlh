@@ -8,8 +8,9 @@ import {parseNewXml} from './xmlModel/xmlReading';
 import {xml} from '@codemirror/lang-xml';
 import ReactCodeMirror from '@uiw/react-codemirror';
 import {writeXml} from './DocumentEditor';
+import {isDebug} from '../index';
 
-interface IProps extends NodeDisplayIProps {
+export interface EditorLeftSideProps extends NodeDisplayIProps {
   filename: string;
   onNodeSelect: EditTriggerFunc;
   closeFile: () => void;
@@ -24,14 +25,13 @@ export function EditorLeftSide({
   filename,
   node,
   currentSelectedPath,
-  editorConfig,
   onNodeSelect,
   closeFile,
   exportXml,
   insertStuff,
   updateNode,
   setKeyHandlingEnabled
-}: IProps): JSX.Element {
+}: EditorLeftSideProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [fontSize, setFontSize] = useState(100);
@@ -61,7 +61,7 @@ export function EditorLeftSide({
   }
 
   return (
-    <div className="flex flex-col h-full min-h-full max-h-full">
+    <div className={classNames('flex', 'flex-col', 'h-full', 'min-h-full', 'max-h-full', isDebug ? ['border', 'border-green-300'] : [])}>
       <div className="p-4 rounded-t border border-slate-300 shadow-md">
         <span className="font-bold">{filename}</span>
 
@@ -74,12 +74,8 @@ export function EditorLeftSide({
             +{FONT_STEP}%
           </button>
 
-
           {xmlSource
             ? <>
-              <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="mr-2 px-2 border border-slate-500 rounded">
-                {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
-              </button>
               <button type="button" className="mr-2 px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource}
                       title={t('cancelEditXmlSource')}>
                 &#x270E;
@@ -89,9 +85,14 @@ export function EditorLeftSide({
                 &#x270E;
               </button>
             </>
-            : <button type="button" className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={activateShowSource} title={t('editSource')}>
-              &#x270E;
-            </button>}
+            : <>
+              <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="mr-2 px-2 border border-slate-500 rounded">
+                {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
+              </button>
+              <button type="button" className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={activateShowSource} title={t('editSource')}>
+                &#x270E;
+              </button>
+            </>}
 
           <button type="button" className="mr-2 px-2 rounded bg-green-400 text-white font-bold" onClick={exportXml}>&#x1F5AB;</button>
 
@@ -103,7 +104,7 @@ export function EditorLeftSide({
         {xmlSource
           ? <ReactCodeMirror value={xmlSource} extensions={[xml()]} onChange={setXmlSource}/>
           : <div className={classNames(useSerifFont ? 'font-hpm-serif' : 'font-hpm')} style={{fontSize: `${fontSize}%`}}>
-            <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} editorConfig={editorConfig} onSelect={onNodeSelect} insertStuff={insertStuff}/>
+            <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} onSelect={onNodeSelect} insertStuff={insertStuff}/>
           </div>}
       </div>
     </div>

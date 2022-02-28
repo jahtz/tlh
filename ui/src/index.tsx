@@ -16,6 +16,7 @@ import common_en from './locales/en/common.json';
 import {AllManuscriptLanguagesDocument, AllManuscriptLanguagesQuery} from './graphql';
 import {newLanguagesAction} from './store/actions';
 
+export const isDebug = process.env.NODE_ENV === 'development';
 
 // noinspection JSIgnoredPromiseFromCall
 i18n

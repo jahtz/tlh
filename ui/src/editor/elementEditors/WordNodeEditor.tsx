@@ -4,7 +4,6 @@ import {useEffect, useState} from 'react';
 import {MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {MorphAnalysisOptionContainer} from '../morphAnalysisOption/MorphAnalysisOptionContainer';
 import {NodeDisplay} from '../NodeDisplay';
-import {tlhXmlEditorConfig} from '../editorConfig/tlhXmlEditorConfig';
 import {useSelector} from 'react-redux';
 import {editorKeyConfigSelector} from '../../store/store';
 import {XmlElementNode} from '../xmlModel/xmlModel';
@@ -124,7 +123,7 @@ export function WordNodeEditor({
   return (
     <div>
       <div className="p-4 rounded-t border border-slate-300 shadow-md">
-        <NodeDisplay node={data.node} editorConfig={tlhXmlEditorConfig}/>
+        <NodeDisplay node={data.node}/>
 
         <div className="float-right">
           <button type="button" className="ml-2 px-2 rounded border border-slate-500 font-bold" onClick={() => initiateJumpElement(false)}

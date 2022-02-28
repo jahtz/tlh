@@ -50,9 +50,7 @@ export function App(): JSX.Element {
 
         <div className="flex-grow"/>
 
-        <NavLink className="p-4 ml-4 hover:bg-slate-700" to={preferencesUrl}>
-          {/*<IoSettingsOutline/>&nbsp;*/}{t('preferences')}
-        </NavLink>
+        <NavLink className="p-4 ml-4 hover:bg-slate-700" to={preferencesUrl}>{t('preferences')}</NavLink>
 
         <div className="p-4 ml-4 hover:bg-slate-700">
           <LanguageSelector/>
@@ -67,7 +65,7 @@ export function App(): JSX.Element {
         }
       </nav>
 
-      <div className="py-2 h-full max-h-full flex-auto">
+      <div className="pt-2 h-full max-h-full flex-auto">
         <Routes>
           <Route path={homeUrl} element={<Home/>}/>
 

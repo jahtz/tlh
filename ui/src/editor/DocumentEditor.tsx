@@ -7,10 +7,11 @@ import {useSelector} from 'react-redux';
 import {editorKeyConfigSelector} from '../store/store';
 import {writeNode} from './xmlModel/xmlWriting';
 import update, {Spec} from 'immutability-helper';
-import {EditorLeftSide} from './EditorLeftSide';
+import {EditorLeftSide, EditorLeftSideProps} from './EditorLeftSide';
 import {EditorEmptyRightSide} from './EditorEmptyRightSide';
 import {calculateInsertablePositions, InsertablePositions, NodePath} from './insertablePositions';
-import {InsertStuff} from './NodeDisplay';
+import classNames from 'classnames';
+import {isDebug} from '../index';
 
 interface IProps {
   node: XmlNode;
@@ -138,7 +139,6 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
 
   function exportXml(): void {
     // FIXME: add annot node...
-
     let author: string | null | undefined = state.author;
 
     if (!author) {
@@ -167,26 +167,21 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
         $apply: (editorState: EditorState<T> | undefined) => {
           const config = editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>;
 
-          if (editorState && editorStateIsEditNodeState(editorState) && editorState.path.join('.') === path.join('.')) {
-            return undefined;
-          } else {
-            return {node, data: config.readNode(node), changed: false, path};
-          }
+          return (editorState && editorStateIsEditNodeState(editorState) && editorState.path.join('.') === path.join('.'))
+            ? undefined
+            : {node, data: config.readNode(node), changed: false, path};
         }
-
       }
     }));
   }
 
   function updateNode(nextEditablePath?: number[]): void {
-
     let newEditorState: IEditNodeState<T> | undefined = undefined;
-    if (nextEditablePath) {
 
+    if (nextEditablePath) {
       const node = findElement(state.rootNode as XmlElementNode, nextEditablePath);
 
       if (state.editorState && 'path' in state.editorState) {
-
         newEditorState = {
           node, path: nextEditablePath, changed: false, data: (editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node)
         };
@@ -289,11 +284,6 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
     });
   }
 
-  function onCloseFile(): void {
-    if (!state.changed || confirm(t('closeFileOnUnfinishedChangesMessage'))) {
-      closeFile();
-    }
-  }
 
   function toggleElementInsert(tagName: string, insertablePositions: InsertablePositions): void {
     setState((state) => {
@@ -323,39 +313,37 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
     }
   }
 
-  function updateRootNode(node: XmlElementNode): void {
-    setState((state) => update(state, {rootNode: {$set: node}}));
-  }
-
-  const currentSelectedPath = state.editorState && 'path' in state.editorState
-    ? state.editorState.path
-    : undefined;
-
   const currentInsertedElement = state.editorState && 'tagName' in state.editorState
     ? state.editorState.tagName
     : undefined;
 
-  const insertStuff: InsertStuff | undefined = state.editorState && 'tagName' in state.editorState
-    ? {
-      insertablePaths: Array.from(new Set(calculateInsertablePositions(state.editorState.insertablePositions, state.rootNode))),
-      insertAsLastChildOf: state.editorState.insertablePositions.asLastChildOf || [],
-      initiateInsert
-    }
-    : undefined;
+  const leftSideProps: EditorLeftSideProps = {
+    filename,
+    node: state.rootNode,
+    currentSelectedPath: state.editorState && 'path' in state.editorState
+      ? state.editorState.path
+      : undefined,
+    onNodeSelect,
+    exportXml,
+    insertStuff: state.editorState && 'tagName' in state.editorState
+      ? {
+        insertablePaths: Array.from(new Set(calculateInsertablePositions(state.editorState.insertablePositions, state.rootNode))),
+        insertAsLastChildOf: state.editorState.insertablePositions.asLastChildOf || [],
+        initiateInsert
+      }
+      : undefined,
+    closeFile: () => {
+      if (!state.changed || confirm(t('closeFileOnUnfinishedChangesMessage'))) {
+        closeFile();
+      }
+    },
+    updateNode: (node) => setState((state) => update(state, {rootNode: {$set: node}})),
+    setKeyHandlingEnabled: (value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}}))
+  };
 
   return (
-    <div className="grid grid-cols-2 gap-4 h-full max-h-full">
-      <EditorLeftSide
-        filename={filename}
-        node={state.rootNode}
-        currentSelectedPath={currentSelectedPath}
-        editorConfig={editorConfig}
-        onNodeSelect={onNodeSelect}
-        closeFile={onCloseFile}
-        exportXml={exportXml}
-        insertStuff={insertStuff}
-        updateNode={updateRootNode}
-        setKeyHandlingEnabled={(value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}}))}/>
+    <div className={classNames('px-2', 'grid', 'grid-cols-2', 'gap-4', 'h-full', 'max-h-full', isDebug ? ['border', 'border-cyan-400'] : [])}>
+      <EditorLeftSide {...leftSideProps}/>
 
       {state.editorState && 'path' in state.editorState
         ? renderNodeEditor(state.editorState) /* don't convert to a component! */

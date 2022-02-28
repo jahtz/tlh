@@ -1,9 +1,10 @@
 import {isXmlTextNode, XmlNode} from './xmlModel/xmlModel';
-import {EditTriggerFunc, XmlEditorConfig} from './editorConfig/editorConfig';
+import {EditTriggerFunc} from './editorConfig/editorConfig';
 import {tlhXmlEditorConfig} from './editorConfig/tlhXmlEditorConfig';
 import classNames from 'classnames';
 import {NodePath} from './insertablePositions';
 import {IoAddOutline} from 'react-icons/io5';
+import {Fragment} from 'react';
 
 export interface InsertStuff {
   insertablePaths: string[];
@@ -14,30 +15,22 @@ export interface InsertStuff {
 export interface NodeDisplayIProps {
   node: XmlNode;
   currentSelectedPath?: NodePath;
-  editorConfig?: XmlEditorConfig;
   onSelect?: EditTriggerFunc;
   path?: NodePath;
   insertStuff?: InsertStuff;
 }
 
-export function NodeDisplay({
-  node,
-  currentSelectedPath,
-  editorConfig = tlhXmlEditorConfig,
-  onSelect,
-  path = [],
-  insertStuff,
-}: NodeDisplayIProps): JSX.Element {
+export function NodeDisplay({node, currentSelectedPath, onSelect, path = [], insertStuff}: NodeDisplayIProps): JSX.Element {
   if (isXmlTextNode(node)) {
     return <span>{node.textContent}</span>;
   }
 
-  const currentConfig = editorConfig?.nodeConfigs[node.tagName];
+  const currentConfig = tlhXmlEditorConfig.nodeConfigs[node.tagName];
 
   const renderedChildren = <>
-    {node.children.map((c, i) =>
-      <NodeDisplay key={i} node={c} editorConfig={editorConfig} currentSelectedPath={currentSelectedPath} onSelect={onSelect} path={[...path, i]}
-                   insertStuff={insertStuff}/>
+    {node.children.map((c, i) => <Fragment key={i}>
+        <NodeDisplay node={c} currentSelectedPath={currentSelectedPath} onSelect={onSelect} path={[...path, i]} insertStuff={insertStuff}/>
+      </Fragment>
     )}
   </>;
 
@@ -53,7 +46,7 @@ export function NodeDisplay({
 
   const onClick = currentConfig && 'edit' in currentConfig && onSelect
     ? () => onSelect(node, path)
-    : () => void 0;
+    : undefined;
 
   return (
     <>

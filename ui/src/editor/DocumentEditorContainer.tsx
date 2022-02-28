@@ -3,6 +3,8 @@ import {FileLoader} from '../forms/FileLoader';
 import {XmlNode} from './xmlModel/xmlModel';
 import {DocumentEditor} from './DocumentEditor';
 import {loadNewXml} from './xmlModel/xmlReading';
+import classNames from 'classnames';
+import {isDebug} from '../index';
 
 const localStorageEditorStateKey = 'editorState';
 
@@ -36,6 +38,7 @@ function removeAutoSave(): void {
   localStorage.removeItem(localStorageEditorStateKey);
 }
 
+
 export function DocumentEditorContainer(): JSX.Element {
 
   const [state, setState] = useState<LoadedDocument | undefined>(initialState());
@@ -54,11 +57,14 @@ export function DocumentEditorContainer(): JSX.Element {
   }
 
   return (
-    <div className="px-2 h-full max-h-full">
+    <div className={classNames('h-full', 'max-h-full', isDebug ? ['border-2', 'border-amber-500'] : [])}>
       {state
         ? <DocumentEditor node={state.rootNode} download={download} filename={state.filename} closeFile={closeFile}
                           autoSave={(node) => autoSave(state.filename, node)}/>
-        : <FileLoader accept="text/xml" onLoad={readFile}/>}
+        : <div className="container mx-auto">
+          <FileLoader accept="text/xml" onLoad={readFile}/>
+          {/* TODO: let users open recently closed files? */}
+        </div>}
     </div>
   );
 }
