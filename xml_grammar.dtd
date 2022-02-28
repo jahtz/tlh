@@ -1,0 +1,121 @@
+<!ELEMENT AOxml (AOHeader, body)>
+
+  <!-- Header -->
+  <!ELEMENT AOHeader (docID, meta, AO:Manuscripts)>
+
+  <!ELEMENT docID (#PCDATA)>
+
+  <!-- Verschiedene Datumsangaben -->
+  <!-- TODO: creation-date, kor2 und AOxml-creation kommen nur einmal vor, evtl. Integration in Element meta?
+  <meta creation-data="" kor2-date="" xml-creation-date="">
+    <annotation>
+      <annot .../>
+    </annotation>
+  </meta>
+  -->
+  <!ELEMENT meta (creation-date, kor2, AOxml-creation, annotation)>
+
+  <!ELEMENT creation-date EMPTY>
+  <!ATTLIST creation-date date CDATA #REQUIRED>
+
+  <!ELEMENT kor2 EMPTY>
+  <!ATTLIST kor2 date CDATA #REQUIRED>
+
+  <!ELEMENT AOxml-creation EMPTY>
+  <!ATTLIST AOxml-creation date CDATA #REQUIRED>
+
+  <!ELEMENT annotation (annot+)>
+
+  <!ELEMENT annot EMPTY>
+  <!ATTLIST annot
+    date CDATA #REQUIRED
+    editor CDATA #REQUIRED
+    >
+
+  <!-- Angabe Textidentifikationsnummern -->
+  <!-- TODO: dritte Art? -->
+  <!ELEMENT AO:Manuscripts (AO:TxtPubl | AO:InvNr)>
+  <!ELEMENT AO:TxtPubl (#PCDATA)>
+  <!ELEMENT AO:InvNr (#PCDATA)>
+
+  <!-- Body -->
+  <!-- TODO: body enthält nur div1, daher Elemierung Zwischenelement? -->
+  <!ELEMENT body (div1)>
+
+  <!ELEMENT div1 (text)>
+  <!ATTLIST div1 type CDATA #REQUIRED>
+
+  <!ELEMENT text (lb | w | gap | parsep | parsep_dbl)+>
+
+  <!-- Zeilenumbruch -->
+  <!ELEMENT lb EMPTY>
+  <!ATTLIST lb
+    lg CDATA #REQUIRED
+    lnr CDATA #REQUIRED
+    txtid CDATA #REQUIRED
+    >
+
+  <!-- Paragraphenseparatoren -->
+  <!ELEMENT parsep EMPTY>
+  <!ELEMENT parsep_dbl EMPTY>
+
+  <!-- TODO falls Attribut "t" nur gewissen Inhalt annehmen kann Nutzung von enum -->
+  <!ELEMENT gap EMPTY>
+  <!ATTLIST gap
+    c CDATA #REQUIRED
+    t CDATA #IMPLIED
+    >
+
+  <!-- Worte -->
+  <!ELEMENT w (del_in | del_fin | ras_in | ras_fin | laes_in | laes_fin | d | sGr | aGr | num | space | corr | SP___AO_3a_MaterLect | SP___AO_3a_-KolonMark | note | #PCDATA)+>
+  <!ATTLIST w
+    <!-- falls alle Sprachen bekannt auch enum (Hit | Hur | Pal | ...) möglich... -->
+    lg CDATA #IMPLIED
+    mrp0sel CDATA #IMPLIED
+    mrp1 CDATA #IMPLIED
+    mrp2 CDATA #IMPLIED
+    mrp3 CDATA #IMPLIED
+    mrp4 CDATA #IMPLIED
+    mrp5 CDATA #IMPLIED
+    mrp6 CDATA #IMPLIED
+    mrp7 CDATA #IMPLIED
+    mrp8 CDATA #IMPLIED
+    mrp9 CDATA #IMPLIED
+    trans CDATA #IMPLIED>
+
+    <!-- Markierung schadhafter Stellen -->
+  <!ELEMENT del_in EMPTY>
+  <!ELEMENT del_fin EMPTY>
+
+  <!ELEMENT laes_in EMPTY>
+  <!ELEMENT laes_fin EMPTY>
+
+  <!ELEMENT ras_in EMPTY>
+  <!ELEMENT ras_fin EMPTY>
+
+  <!-- Sumerogramm -->
+  <!ELEMENT sGr (del_in | del_fin | ras_in | ras_fin | laes_in  | laes_fin | #PCDATA)+>
+
+  <!-- Akadogramm -->
+  <!ELEMENT aGr (del_in | del_fin | ras_in | ras_fin | laes_in  | laes_fin | #PCDATA)+>
+
+  <!-- Determinativ -->
+  <!ELEMENT d (del_in | del_fin | ras_in | ras_fin | laes_in  | laes_fin | #PCDATA)+>
+
+  <!ELEMENT num (del_in | del_fin | ras_in | ras_fin | laes_in  | laes_fin | #PCDATA)+>
+
+  <!ELEMENT SP___AO_3a_MaterLect (#PCDATA)>
+
+  <!ELEMENT SP___AO_3a_-KolonMark (#PCDATA)>
+
+  <!ELEMENT corr EMPTY>
+  <!ATTLIST corr c CDATA #REQUIRED>
+
+  <!ELEMENT space EMPTY>
+  <!ATTLIST space c CDATA #REQUIRED>
+
+  <!ELEMENT note EMPTY>
+  <!ATTLIST note
+    c CDATA #REQUIRED
+    n CDATA #REQUIRED
+    >
