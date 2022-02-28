@@ -40,13 +40,8 @@ export function EditorLeftSide({
   const [xmlSource, setXmlSource] = useState<string | undefined>();
 
   function activateShowSource(): void {
-    // FIXME: disable key handling!
-    console.info('Activating');
     setKeyHandlingEnabled(false);
-
-    const source = writeXml(node as XmlElementNode);
-
-    setXmlSource(source);
+    setXmlSource(writeXml(node as XmlElementNode));
   }
 
   function deactivateShowSource(): void {
@@ -56,7 +51,6 @@ export function EditorLeftSide({
 
   function onXmlSourceUpdate(): void {
     updateNode(parseNewXml(xmlSource as string) as XmlElementNode);
-
     deactivateShowSource();
   }
 
@@ -66,6 +60,7 @@ export function EditorLeftSide({
         <span className="font-bold">{filename}</span>
 
         <div className="float-right">
+         
           <button type="button" className="px-2 border border-slate-500 rounded-l" onClick={() => setFontSize((value) => value - FONT_STEP)}>
             -{FONT_STEP}%
           </button>
@@ -76,27 +71,25 @@ export function EditorLeftSide({
 
           {xmlSource
             ? <>
-              <button type="button" className="mr-2 px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource}
-                      title={t('cancelEditXmlSource')}>
+              <button className="mr-2 px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource} title={t('cancelEditXmlSource')}>
                 &#x270E;
               </button>
-              <button type="button" className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={onXmlSourceUpdate}
-                      title={t('applyXmlSourceChange')}>
+              <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={onXmlSourceUpdate} title={t('applyXmlSourceChange')}>
                 &#x270E;
               </button>
             </>
             : <>
-              <button type="button" onClick={() => setUseSerifFont((use) => !use)} className="mr-2 px-2 border border-slate-500 rounded">
+              <button onClick={() => setUseSerifFont((use) => !use)} className="mr-2 px-2 border border-slate-500 rounded">
                 {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
               </button>
-              <button type="button" className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={activateShowSource} title={t('editSource')}>
+              <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={activateShowSource} title={t('editSource')}>
                 &#x270E;
               </button>
             </>}
 
-          <button type="button" className="mr-2 px-2 rounded bg-green-400 text-white font-bold" onClick={exportXml}>&#x1F5AB;</button>
+          <button className="mr-2 px-2 rounded bg-green-400 text-white font-bold" onClick={exportXml} title={t('exportXml')}>&#x1F5AB;</button>
 
-          <button type="button" className="px-2 rounded bg-red-600 text-white font-bold" onClick={closeFile}>&#10799;</button>
+          <button className="px-2 rounded bg-red-600 text-white font-bold" onClick={closeFile} title={t('closeFile')}>&#10799;</button>
         </div>
       </div>
 
