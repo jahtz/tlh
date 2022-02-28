@@ -28,7 +28,7 @@ export function App(): JSX.Element {
     <div className="flex flex-col h-screen max-h-screen">
       <NavBar/>
 
-      <div className="pt-2 h-full max-h-full flex-auto">
+      <div className="p-2 h-full max-h-full flex-auto">
         <Routes>
           <Route path={homeUrl} element={<Home/>}/>
 
