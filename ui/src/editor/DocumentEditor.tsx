@@ -10,8 +10,6 @@ import update, {Spec} from 'immutability-helper';
 import {EditorLeftSide, EditorLeftSideProps} from './EditorLeftSide';
 import {EditorEmptyRightSide} from './EditorEmptyRightSide';
 import {calculateInsertablePositions, InsertablePositions, NodePath} from './insertablePositions';
-import classNames from 'classnames';
-import {isDebug} from '../index';
 
 interface IProps {
   node: XmlNode;
@@ -342,7 +340,7 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
   };
 
   return (
-    <div className={classNames('px-2', 'grid', 'grid-cols-2', 'gap-4', 'h-full', 'max-h-full', isDebug ? ['border', 'border-cyan-400'] : [])}>
+    <div className="px-2 grid grid-cols-2 gap-4 h-full max-h-full">
       <EditorLeftSide {...leftSideProps}/>
 
       {state.editorState && 'path' in state.editorState

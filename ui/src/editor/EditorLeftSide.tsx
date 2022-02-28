@@ -8,7 +8,6 @@ import {parseNewXml} from './xmlModel/xmlReading';
 import {xml} from '@codemirror/lang-xml';
 import ReactCodeMirror from '@uiw/react-codemirror';
 import {writeXml} from './DocumentEditor';
-import {isDebug} from '../index';
 
 export interface EditorLeftSideProps extends NodeDisplayIProps {
   filename: string;
@@ -55,12 +54,12 @@ export function EditorLeftSide({
   }
 
   return (
-    <div className={classNames('flex', 'flex-col', 'h-full', 'min-h-full', 'max-h-full', isDebug ? ['border', 'border-green-300'] : [])}>
+    <div className="flex flex-col h-full min-h-full max-h-full">
       <div className="p-4 rounded-t border border-slate-300 shadow-md">
         <span className="font-bold">{filename}</span>
 
         <div className="float-right">
-         
+
           <button type="button" className="px-2 border border-slate-500 rounded-l" onClick={() => setFontSize((value) => value - FONT_STEP)}>
             -{FONT_STEP}%
           </button>

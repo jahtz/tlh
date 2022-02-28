@@ -3,8 +3,6 @@ import {FileLoader} from '../forms/FileLoader';
 import {XmlNode} from './xmlModel/xmlModel';
 import {DocumentEditor} from './DocumentEditor';
 import {loadNewXml} from './xmlModel/xmlReading';
-import classNames from 'classnames';
-import {isDebug} from '../index';
 
 const localStorageEditorStateKey = 'editorState';
 
@@ -57,7 +55,7 @@ export function DocumentEditorContainer(): JSX.Element {
   }
 
   return (
-    <div className={classNames('h-full', 'max-h-full', isDebug ? ['border-2', 'border-amber-500'] : [])}>
+    <div className="h-full max-h-full">
       {state
         ? <DocumentEditor node={state.rootNode} download={download} filename={state.filename} closeFile={closeFile}
                           autoSave={(node) => autoSave(state.filename, node)}/>
