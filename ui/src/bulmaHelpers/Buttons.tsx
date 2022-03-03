@@ -35,3 +35,21 @@ export function DeleteButton({title, onClick, otherClasses}: DeleteButtonProps):
     </button>
   );
 }
+
+/*
+interface EditButtonProps {
+
+}
+ */
+
+export function EditButton({onClick, otherClasses}: BaseProps): JSX.Element {
+
+  const {t} = useTranslation('common');
+
+  return (
+    <button type="button" className={classNames('ml-2', 'px-2', 'rounded', 'bg-blue-500', 'text-white', otherClasses)} onClick={onClick}
+            title={t('editContent')}>
+      &#9998;
+    </button>
+  );
+}

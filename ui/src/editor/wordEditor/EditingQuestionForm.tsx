@@ -2,14 +2,15 @@ import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 interface IProps {
+  initialValue?: string;
   cancel: () => void;
   onSubmit: (value: string) => void;
 }
 
-export function WordQuestionForm({cancel, onSubmit}: IProps): JSX.Element {
+export function EditingQuestionForm({initialValue = '', cancel, onSubmit}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(initialValue);
 
   return (
     <div>

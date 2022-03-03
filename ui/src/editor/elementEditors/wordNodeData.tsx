@@ -88,7 +88,7 @@ export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
       .filter((name) => name.startsWith('mrp') && !name.startsWith('mrp0'))
       .length > 0;
 
-    const hasQuestion = !!node.attributes.q;
+    const hasQuestion = !!node.attributes.editingQuestion;
 
     // FIXME: colors / classes!
 

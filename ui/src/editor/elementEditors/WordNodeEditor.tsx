@@ -11,8 +11,7 @@ import {reconstructTransliteration} from '../transliterationReconstruction';
 import {WordContentEditor} from './WordContentEditor';
 import update, {Spec} from 'immutability-helper';
 import {readWordNodeData, WordNodeData} from './wordNodeData';
-import {WordQuestion} from '../wordEditor/WordQuestion';
-import {WordQuestionForm} from '../wordEditor/WordQuestionForm';
+import {EditingQuestionSection} from '../wordEditor/EditingQuestionSection';
 import {LanguageInput} from '../LanguageInput';
 import {NodeEditorRightSide} from '../NodeEditorRightSide';
 
@@ -37,7 +36,6 @@ export function WordNodeEditor({
 
   const [state, setState] = useState<IState>({});
 
-  const [addEditingQuestionEnabled, setAddEditingQuestionEnabled] = useState(false);
   const [isAddMorphologyState, setIsAddMorphologyState] = useState(false);
 
   useEffect(() => {
@@ -100,24 +98,12 @@ export function WordNodeEditor({
     updateNode((state) => update(state, {lg: {$set: lg.trim() || ''}}));
   }
 
-
-  function removeNote(): void {
+  function removeEditingQuestion(): void {
     updateNode((state) => update(state, {node: {attributes: {$unset: ['editingQuestion']}}}));
   }
 
-  function addEditingQuestion(value: string): void {
+  function setEditingQuestion(value: string): void {
     updateNode((state) => update(state, {node: {attributes: {editingQuestion: {$set: value}}}}));
-    cancelAddEditingQuestion();
-  }
-
-  function cancelAddEditingQuestion(): void {
-    setKeyHandlingEnabled(true);
-    setAddEditingQuestionEnabled(false);
-  }
-
-  function enableAddEditingQuestion(): void {
-    setKeyHandlingEnabled(false);
-    setAddEditingQuestionEnabled(true);
   }
 
   const otherButtons = (
@@ -143,12 +129,15 @@ export function WordNodeEditor({
           </div>
 
           <div className="mt-4">
-            {data.node.attributes.editingQuestion
-              ? <WordQuestion comment={data.node.attributes.editingQuestion} removeNote={removeNote}/>
+            <EditingQuestionSection editingQuestion={data.node.attributes.editingQuestion} setEditingQuestion={setEditingQuestion}
+                                    removeEditingQuestion={removeEditingQuestion}
+                                    setKeyHandlingEnabled={setKeyHandlingEnabled}/>
+            {/*data.node.attributes.editingQuestion
+              ? <WordQuestion comment={data.node.attributes.editingQuestion} removeEditingQuestion={removeEditingQuestion}/>
               : (addEditingQuestionEnabled
                 ? <WordQuestionForm cancel={cancelAddEditingQuestion} onSubmit={addEditingQuestion}/>
                 : <button type="button" className="p-2 rounded bg-cyan-500 text-white w-full"
-                          onClick={enableAddEditingQuestion}>{t('addEditingQuestion')}</button>)}
+                          onClick={enableAddEditingQuestion}>{t('addEditingQuestion')}</button>)*/}
           </div>
 
           <div className="mt-4">
