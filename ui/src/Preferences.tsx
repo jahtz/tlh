@@ -85,52 +85,42 @@ export function Preferences(): JSX.Element {
   }
 
   return (
-    <div className="container">
-      <h1 className="title is-3 has-text-centered">{t('preferences')}</h1>
+    <div className="container mx-auto">
+      <h1 className="font-bold text-2xl text-center">{t('preferences')}</h1>
 
-      <h2 className="subtitle is-4">{t('xmlEditor')}</h2>
+      <h2 className="font-bold text-xl">{t('xmlEditor')}</h2>
 
       <Formik initialValues={initialValues} onSubmit={onSubmit}>
         <Form>
 
-          <div className="field">
-            <label htmlFor="updateAndNextNodeKeys" className="label">{t('updateAndNextEditableNode')}</label>
-            <div className="control">
-              <Field type="text" className="input" id="updateAndNextNodeKeys" name="updateAndNextNodeKeys"/>
-            </div>
+          <div className="mt-4">
+            <label htmlFor="updateAndNextNodeKeys" className="font-bold">{t('updateAndNextEditableNode')}</label>
+            <Field type="text" id="updateAndNextNodeKeys" name="updateAndNextNodeKeys" className="mt-2 p-2 rounded border border-slate-500 w-full"/>
           </div>
 
-          <div className="field">
-            <label htmlFor="nextEditableNode" className="label">{t('nextEditableNode')}</label>
-            <div className="control">
-              <Field type="text" className="input" id="nextEditableNode" name="nextNodeKeys"/>
-            </div>
+          <div className="mt-4">
+            <label htmlFor="nextEditableNode" className="font-bold">{t('nextEditableNode')}</label>
+            <Field type="text" id="nextEditableNode" name="nextNodeKeys" className="mt-2 p-2 rounded border border-slate-500 w-full"/>
           </div>
 
-          <div className="field">
-            <label htmlFor="updateAndPrevEditableNode" className="label">{t('updateAndPrevEditableNode')}</label>
-            <div className="control">
-              <Field type="text" className="input" id="updateAndPrevEditableNode" name="updateAndPrevNodeKeys"/>
-            </div>
+          <div className="mt-4">
+            <label htmlFor="updateAndPrevEditableNode" className="font-bold">{t('updateAndPrevEditableNode')}</label>
+            <Field type="text" id="updateAndPrevEditableNode" name="updateAndPrevNodeKeys" className="mt-2 p-2 rounded border border-slate-500 w-full"/>
           </div>
 
-          <div className="field">
-            <label htmlFor="previousEditableNode" className="label">{t('previousEditableNode')}</label>
-            <div className="control">
-              <Field type="text" className="input" id="previousEditableNode" name="prevNodeKeys"/>
-            </div>
+          <div className="mt-4">
+            <label htmlFor="previousEditableNode" className="font-bold">{t('previousEditableNode')}</label>
+            <Field type="text" id="previousEditableNode" name="prevNodeKeys" className="mt-2 p-2 rounded border border-slate-500 w-full"/>
           </div>
 
-          <div className="field">
-            <label htmlFor="submitChangesKeys" className="label">{t('submitChangesKeys')}</label>
-            <div className="control">
-              <Field type="text" className="input" id="submitChangesKeys" name="submitKeys"/>
-            </div>
+          <div className="mt-4">
+            <label htmlFor="submitChangesKeys" className="font-bold">{t('submitChangesKeys')}</label>
+            <Field type="text" id="submitChangesKeys" name="submitKeys" className="mt-2 p-2 rounded border border-slate-500 w-full"/>
           </div>
 
-          {updated && <div className="notification is-success has-text-centered">{t('preferencesUpdated')}</div>}
+          {updated && <div className="mt-4 p-2 rounded bg-green-500 text-white text-center">{t('preferencesUpdated')}</div>}
 
-          <button type="submit" className="button is-link is-fullwidth">{t('updatePreferences')}</button>
+          <button type="submit" className="mt-4 p-2 rounded bg-blue-600 text-white w-full">{t('updatePreferences')}</button>
         </Form>
       </Formik>
 
