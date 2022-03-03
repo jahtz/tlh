@@ -51,7 +51,6 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
 
   return (
     <div>
-
       <div className="flex">
         <label htmlFor="newTransliteration" className="p-2 rounded-l border-l border-y border-slate-500 font-bold">{t('newTransliteration')}:</label>
 
@@ -67,7 +66,7 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
           {state.parseResult.status
             ? <>
               <div className="p-2 rounded bg-white">
-                <NodeDisplay node={state.parseResult.value} currentSelectedPath={undefined}/>
+                <NodeDisplay node={state.parseResult.value} currentSelectedPath={undefined} isLeftSide={false}/>
               </div>
               <div className="mt-2 p-2 rounded bg-white">{writeNode(state.parseResult.value).join('')}</div>
             </>

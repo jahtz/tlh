@@ -96,7 +96,7 @@ export function EditorLeftSide({
         {xmlSource
           ? <ReactCodeMirror value={xmlSource} extensions={[xml()]} onChange={setXmlSource}/>
           : <div className={classNames(useSerifFont ? 'font-hpm-serif' : 'font-hpm')} style={{fontSize: `${fontSize}%`}}>
-            <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} onSelect={onNodeSelect} insertStuff={insertStuff}/>
+            <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} onSelect={onNodeSelect} insertStuff={insertStuff} isLeftSide={true}/>
           </div>}
       </div>
     </div>

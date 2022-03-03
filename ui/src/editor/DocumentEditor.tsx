@@ -337,7 +337,8 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
       }
     },
     updateNode: (node) => setState((state) => update(state, {rootNode: {$set: node}})),
-    setKeyHandlingEnabled: (value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}}))
+    setKeyHandlingEnabled: (value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}})),
+    isLeftSide: true
   };
 
   return (

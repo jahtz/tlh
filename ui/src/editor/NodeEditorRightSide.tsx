@@ -20,7 +20,7 @@ export function NodeEditorRightSide({originalNode, children, changed, initiateSu
   return (
     <div>
       <div className="p-4 rounded-t border border-slate-300 shadow-md">
-        <NodeDisplay node={originalNode}/>
+        <NodeDisplay node={originalNode} isLeftSide={false}/>
 
         <div className="float-right">
 

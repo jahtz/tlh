@@ -4,7 +4,6 @@ import {tlhXmlEditorConfig} from './editorConfig/tlhXmlEditorConfig';
 import classNames from 'classnames';
 import {NodePath} from './insertablePositions';
 import {IoAddOutline} from 'react-icons/io5';
-import {Fragment} from 'react';
 
 export interface InsertStuff {
   insertablePaths: string[];
@@ -18,30 +17,31 @@ export interface NodeDisplayIProps {
   onSelect?: EditTriggerFunc;
   path?: NodePath;
   insertStuff?: InsertStuff;
+  isLeftSide: boolean;
 }
 
-export function NodeDisplay({node, currentSelectedPath, onSelect, path = [], insertStuff}: NodeDisplayIProps): JSX.Element {
+export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIProps): JSX.Element {
+
   if (isXmlTextNode(node)) {
     return <span>{node.textContent}</span>;
   }
 
+  const {currentSelectedPath, onSelect, insertStuff, isLeftSide} = inheritedProps;
+
   const currentConfig = tlhXmlEditorConfig.nodeConfigs[node.tagName];
 
   const renderedChildren = <>
-    {node.children.map((c, i) => <Fragment key={i}>
-        <NodeDisplay node={c} currentSelectedPath={currentSelectedPath} onSelect={onSelect} path={[...path, i]} insertStuff={insertStuff}/>
-      </Fragment>
-    )}
+    {node.children.map((c, i) => <NodeDisplay key={i} node={c} path={[...path, i]} {...inheritedProps}/>)}
   </>;
 
   const isSelected = !!currentSelectedPath && path.join('.') === currentSelectedPath.join('.');
 
   const display = currentConfig && currentConfig.replace
-    ? currentConfig.replace(node, renderedChildren, isSelected)
+    ? currentConfig.replace(node, renderedChildren, isSelected, isLeftSide)
     : renderedChildren;
 
   const classes = currentConfig && currentConfig.styling
-    ? currentConfig.styling(node, isSelected)
+    ? currentConfig.styling(node, isSelected, isLeftSide)
     : [];
 
   const onClick = currentConfig && 'edit' in currentConfig && onSelect
