@@ -271,6 +271,7 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
 
   function renderNodeEditor({node, data, path, changed}: IEditNodeState<T>): JSX.Element {
     return (editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>).edit({
+      originalNode: node,
       data,
       path,
       changed,

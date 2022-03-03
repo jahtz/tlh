@@ -1,7 +1,7 @@
 import {XmlEditorConfig} from './editorConfig/editorConfig';
 import {useTranslation} from 'react-i18next';
-import classNames from 'classnames';
 import {InsertablePositions} from './insertablePositions';
+import {ActivatableButton} from '../bulmaHelpers/Buttons';
 
 interface IProps {
   editorConfig: XmlEditorConfig;
@@ -23,27 +23,10 @@ export function EditorEmptyRightSide({editorConfig, currentInsertedElement, togg
 
       <div className="mt-4 grid grid-cols-4 gap-2">
         {insertableTags.map(([tagName, insertablePositions]) =>
-          <InsertableTagButton key={tagName} tagName={tagName} currentInsertedElement={currentInsertedElement}
-                               onClick={() => toggleElementInsert(tagName, insertablePositions)}/>
+          <ActivatableButton key={tagName} text={tagName} isActive={tagName === currentInsertedElement}
+                             onClick={() => toggleElementInsert(tagName, insertablePositions)} otherClasses={['p-2', 'rounded']}/>
         )}
       </div>
     </div>
-  );
-}
-
-interface InsertableTagButtonProps {
-  tagName: string;
-  currentInsertedElement?: string;
-  onClick: () => void;
-}
-
-function InsertableTagButton({tagName, currentInsertedElement, onClick}: InsertableTagButtonProps): JSX.Element {
-
-  const classes = classNames('p-2', 'rounded', 'border', 'border-slate-500', tagName === currentInsertedElement ? ['bg-blue-500', 'text-white'] : []);
-
-  return (
-    <button type="button" className={classes} onClick={onClick}>
-      {tagName}
-    </button>
   );
 }

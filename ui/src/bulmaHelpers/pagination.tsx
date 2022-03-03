@@ -13,6 +13,8 @@ export function MyPagination({currentPage, pageCount, previousPage, goToPage, ne
 
   const {t} = useTranslation('common');
 
+  // FIXME: implement function!
+
   return (
     <nav className="text-center">
       <button type="button" className="px-4 py-2 rounded border border-slate-500 mr-4">{t('previousPage')}</button>
