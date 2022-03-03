@@ -1,11 +1,14 @@
 import {NavLink, useNavigate} from 'react-router-dom';
 import {createManuscriptUrl, editDocumentUrl, homeUrl, loginUrl, preferencesUrl, registerUrl, xmlComparatorUrl} from './urls';
-import {LanguageSelector} from './LanguageSelector';
 import {useTranslation} from 'react-i18next';
 import {useDispatch, useSelector} from 'react-redux';
 import {activeUserSelector} from './store/store';
 import {Dispatch} from 'react';
 import {StoreAction, userLoggedOutAction} from './store/actions';
+import i18next from 'i18next';
+
+// TODO: solve languages different?
+const languages: string[] = ['de', 'en'];
 
 export function NavBar(): JSX.Element {
 
@@ -31,9 +34,9 @@ export function NavBar(): JSX.Element {
 
       <NavLink className="p-4 ml-4 hover:bg-slate-700" to={preferencesUrl}>{t('preferences')}</NavLink>
 
-      <div className="p-4 ml-4 hover:bg-slate-700">
-        <LanguageSelector/>
-      </div>
+      <select className="p-4 ml-4 hover:bg-slate-700 bg-gray-800 text-white">
+        {languages.map((lang) => <option key={lang} onClick={() => i18next.changeLanguage(lang)}>{lang}</option>)}
+      </select>
 
       {user
         ? <button className="p-4 ml-4 hover:bg-slate-700" onClick={logout}>{t('logout')} {user.name}</button>
