@@ -56,8 +56,7 @@ export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIPr
 
   return (
     <>
-      {insertStuff && insertStuff.insertablePaths.includes(path.join('.')) &&
-        <span><InsertButton initiate={() => insertStuff.initiateInsert(path)}/></span>}
+      {insertStuff && insertStuff.insertablePaths.includes(path.join('.')) && <InsertButton initiate={() => insertStuff.initiateInsert(path)}/>}
       <span className={classNames(classes)} onClick={onClick}>{display}</span>
       {insertStuff && insertStuff.insertAsLastChildOf.includes(node.tagName) &&
         <InsertButton initiate={() => insertStuff.initiateInsert([...path, node.children.length])}/>}
