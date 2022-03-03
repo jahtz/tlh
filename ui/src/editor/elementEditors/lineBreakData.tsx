@@ -32,7 +32,7 @@ export const lineBreakNodeConfig: XmlSingleEditableNodeConfig<LineBreakData> = {
     }
   }),
   insertablePositions: {
-    beforeElement: ['lb', 'w'],
+    beforeElement: ['lb', 'w', 'gap'],
     asLastChildOf: ['div1']
   }
 };
