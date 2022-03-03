@@ -1,7 +1,6 @@
 import {XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from './editorConfig';
 import classNames from 'classnames';
 import {useTranslation} from 'react-i18next';
-import {IoRemoveCircle} from 'react-icons/io5';
 import {XmlElementNode} from '../xmlModel/xmlModel';
 
 function isLineGapNode(node: XmlElementNode): boolean {
@@ -25,23 +24,20 @@ function GapEditor({data, updateNode, changed, initiateSubmit, deleteNode}: XmlE
   const {t} = useTranslation('common');
 
   return (
-    <>
-      <div className="field">
-        <input type="text" defaultValue={data.attributes.c} className="input" onBlur={(event) => updateNode({attributes: {c: {$set: event.target.value}}})}/>
+    <div>
+      <div className="flex">
+        <label htmlFor="content" className="p-2 rounded-l border-l border-y border-slate-500">{t('content')}:</label>
+        <input type="text" defaultValue={data.attributes.c} id="content" className="flex-grow p-2 rounded-r border border-slate-500"
+               onBlur={(event) => updateNode({attributes: {c: {$set: event.target.value}}})}/>
       </div>
 
-      <div className="columns">
-        <div className="column">
-          <button type="button" className="button is-danger is-fullwidth" onClick={deleteNode}>
-            <IoRemoveCircle/>
-          </button>
-        </div>
-        <div className="column">
-          <button type="button" className={classNames('button', 'is-fullwidth', {'is-link': changed})} disabled={!changed} onClick={initiateSubmit}>
-            {t('update')}
-          </button>
-        </div>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <button type="button" className="p-2 rounded bg-red-500 text-white" onClick={deleteNode} title={t('deleteNode')}>-</button>
+        <button type="button" onClick={initiateSubmit}
+                className={classNames('p-2', 'rounded', changed ? ['bg-blue-600', 'text-white'] : ['border', 'border-slate-500'])}>
+          {t('update')}
+        </button>
       </div>
-    </>
+    </div>
   );
 }
