@@ -3,7 +3,6 @@ import {EditTriggerFunc} from './editorConfig/editorConfig';
 import {tlhXmlEditorConfig} from './editorConfig/tlhXmlEditorConfig';
 import classNames from 'classnames';
 import {NodePath} from './insertablePositions';
-import {IoAddOutline} from 'react-icons/io5';
 
 export interface InsertStuff {
   insertablePaths: string[];
@@ -18,6 +17,13 @@ export interface NodeDisplayIProps {
   path?: NodePath;
   insertStuff?: InsertStuff;
   isLeftSide: boolean;
+}
+
+
+function InsertButton({initiate}: { initiate: () => void }): JSX.Element {
+  return (
+    <button type="button" onClick={initiate} className="mx-2 px-2 rounded bg-teal-100">+</button>
+  );
 }
 
 export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIProps): JSX.Element {
@@ -51,13 +57,10 @@ export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIPr
   return (
     <>
       {insertStuff && insertStuff.insertablePaths.includes(path.join('.')) &&
-        <span>&nbsp;
-          <button onClick={() => insertStuff.initiateInsert(path)}><IoAddOutline/></button>
-          &nbsp;&nbsp;</span>}
+        <span><InsertButton initiate={() => insertStuff.initiateInsert(path)}/></span>}
       <span className={classNames(classes)} onClick={onClick}>{display}</span>
       {insertStuff && insertStuff.insertAsLastChildOf.includes(node.tagName) &&
-        <span><button onClick={() => insertStuff.initiateInsert([...path, node.children.length])}><IoAddOutline/></button>
-          &nbsp;</span>}
+        <InsertButton initiate={() => insertStuff.initiateInsert([...path, node.children.length])}/>}
     </>
   );
 }
