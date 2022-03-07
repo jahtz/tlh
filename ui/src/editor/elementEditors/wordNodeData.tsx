@@ -1,5 +1,5 @@
 import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue} from '../../model/morphologicalAnalysis';
-import {isXmlElementNode, XmlElementNode} from '../xmlModel/xmlModel';
+import {isXmlElementNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
 import {readSelectedMorphology, SelectedAnalysisOption, writeSelectedMorphologies} from '../selectedAnalysisOption';
 import {getSelectedLetters} from '../../model/analysisOptions';
 import {XmlSingleEditableNodeConfig} from '../editorConfig/editorConfig';
@@ -13,20 +13,46 @@ export interface WordNodeData {
   node: XmlElementNode;
   lg: string;
   morphologies: MorphologicalAnalysis[];
+  footNote?: string;
 }
 
 export function readWordNodeData(node: XmlElementNode): WordNodeData {
+  const lastChild = node.children[node.children.length - 1];
+
   return {
     node: node,
     lg: node.attributes.lg || '',
     morphologies: readMorphologiesFromNode(node, readSelectedMorphology(node.attributes.mrp0sel?.trim() || '')),
+    footNote: isXmlElementNode(lastChild) && lastChild.tagName === 'note'
+      ? lastChild.attributes.c
+      : undefined,
   };
 }
 
-export function writeWordNodeData({node: originalNode, lg, morphologies}: WordNodeData): XmlElementNode {
-  const {tagName, attributes, children} = originalNode;
+function addFootNote(children: XmlNode[], footNote: string): XmlNode[] {
+  const lastElement = children[children.length - 1];
 
-  // FIXME: selected morphologies!
+  const newElement = {tagName: 'note', attributes: {c: footNote}, children: []};
+
+  return isXmlElementNode(lastElement) && lastElement.tagName === 'note'
+    ? [...children.slice(0, -1), newElement]
+    : [...children, newElement];
+}
+
+function removeFootNote(children: XmlNode[]): XmlNode[] {
+  const lastElement = children[children.length - 1];
+
+  return isXmlElementNode(lastElement) && lastElement.tagName === 'note'
+    ? children.slice(0, -1)
+    : children;
+}
+
+export function writeWordNodeData({node: originalNode, lg, morphologies, footNote}: WordNodeData): XmlElementNode {
+  const {tagName, attributes, children: originalChildren} = originalNode;
+
+  const children = footNote
+    ? addFootNote(originalChildren, footNote)
+    : removeFootNote(originalChildren);
 
   const node: XmlElementNode = {
     tagName,

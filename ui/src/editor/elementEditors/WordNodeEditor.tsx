@@ -11,9 +11,9 @@ import {reconstructTransliteration} from '../transliterationReconstruction';
 import {WordContentEditor} from './WordContentEditor';
 import update, {Spec} from 'immutability-helper';
 import {readWordNodeData, WordNodeData} from './wordNodeData';
-import {EditingQuestionSection} from '../wordEditor/EditingQuestionSection';
 import {LanguageInput} from '../LanguageInput';
 import {NodeEditorRightSide} from '../NodeEditorRightSide';
+import {WordStringChildEditor} from './WordStringChildEditor';
 
 interface IState {
   addMorphology?: boolean;
@@ -98,12 +98,21 @@ export function WordNodeEditor({
     updateNode((state) => update(state, {lg: {$set: lg.trim() || ''}}));
   }
 
+  function setEditingQuestion(value: string): void {
+    updateNode((state) => update(state, {node: {attributes: {editingQuestion: {$set: value}}}}));
+  }
+
   function removeEditingQuestion(): void {
     updateNode((state) => update(state, {node: {attributes: {$unset: ['editingQuestion']}}}));
   }
 
-  function setEditingQuestion(value: string): void {
-    updateNode((state) => update(state, {node: {attributes: {editingQuestion: {$set: value}}}}));
+
+  function setFootNote(value: string): void {
+    updateNode((state) => update(state, {footNote: {$set: value}}));
+  }
+
+  function removeFootNote(): void {
+    updateNode((state) => update(state, {$unset: ['footNote']}));
   }
 
   const otherButtons = (
@@ -129,15 +138,14 @@ export function WordNodeEditor({
           </div>
 
           <div className="mt-4">
-            <EditingQuestionSection editingQuestion={data.node.attributes.editingQuestion} setEditingQuestion={setEditingQuestion}
-                                    removeEditingQuestion={removeEditingQuestion}
-                                    setKeyHandlingEnabled={setKeyHandlingEnabled}/>
-            {/*data.node.attributes.editingQuestion
-              ? <WordQuestion comment={data.node.attributes.editingQuestion} removeEditingQuestion={removeEditingQuestion}/>
-              : (addEditingQuestionEnabled
-                ? <WordQuestionForm cancel={cancelAddEditingQuestion} onSubmit={addEditingQuestion}/>
-                : <button type="button" className="p-2 rounded bg-cyan-500 text-white w-full"
-                          onClick={enableAddEditingQuestion}>{t('addEditingQuestion')}</button>)*/}
+            <WordStringChildEditor value={data.node.attributes.editingQuestion} set={setEditingQuestion} remove={removeEditingQuestion}
+                                   setKeyHandlingEnabled={setKeyHandlingEnabled} baseColor="teal"
+                                   strings={{add: t('addEditingQuestion'), placeHolder: t('editingQuestion')}}/>
+          </div>
+
+          <div className="mt-4">
+            <WordStringChildEditor value={data.footNote} set={setFootNote} remove={removeFootNote} setKeyHandlingEnabled={setKeyHandlingEnabled}
+                                   baseColor="slate" strings={{add: t('addFootNote'), placeHolder: t('footNote')}}/>
           </div>
 
           <div className="mt-4">
