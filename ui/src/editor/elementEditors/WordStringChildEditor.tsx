@@ -8,7 +8,7 @@ interface IProps {
   set: (newValue: string) => void;
   remove: () => void;
   setKeyHandlingEnabled: (value: boolean) => void;
-  baseColor: string;
+  isEditingQuestion: boolean;
   strings: {
     add: string;
     placeHolder: string;
@@ -18,7 +18,7 @@ interface IProps {
 /**
  * Used for editing questions (attribute q) and footnotes (last child if tag name note)
  */
-export function WordStringChildEditor({value, set, remove, setKeyHandlingEnabled, baseColor, strings}: IProps): JSX.Element {
+export function WordStringChildEditor({value, set, remove, setKeyHandlingEnabled, isEditingQuestion, strings}: IProps): JSX.Element {
 
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -39,14 +39,15 @@ export function WordStringChildEditor({value, set, remove, setKeyHandlingEnabled
 
   if (!value && !isEditMode) {
     return (
-      <button type="button" className={classNames('p-2', 'rounded', `bg-${baseColor}-400`, 'text-white', 'w-full')} onClick={enableEditMode}>
+      <button type="button" className={classNames('p-2', 'rounded', isEditingQuestion ? 'bg-teal-400' : 'bg-slate-400', 'text-white', 'w-full')}
+              onClick={enableEditMode}>
         {strings.add}
       </button>
     );
   } else {
     return (
-      <div className={classNames('rounded', 'border-l-4', `border-${baseColor}-400`)}>
-        <div className={classNames('p-2', 'rounded-tr', `bg-${baseColor}-300`)}>
+      <div className={classNames('rounded', 'border-l-4', isEditingQuestion ? 'border-teal-400' : 'border-slate-400')}>
+        <div className={classNames('p-2', 'rounded-tr', isEditingQuestion ? 'bg-teal-300' : 'bg-slate-300')}>
           <span>{strings.placeHolder}</span>
 
           <div className="float-right">

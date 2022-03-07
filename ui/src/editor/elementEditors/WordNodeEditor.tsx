@@ -139,13 +139,13 @@ export function WordNodeEditor({
 
           <div className="mt-4">
             <WordStringChildEditor value={data.node.attributes.editingQuestion} set={setEditingQuestion} remove={removeEditingQuestion}
-                                   setKeyHandlingEnabled={setKeyHandlingEnabled} baseColor="teal"
+                                   isEditingQuestion={true} setKeyHandlingEnabled={setKeyHandlingEnabled}
                                    strings={{add: t('addEditingQuestion'), placeHolder: t('editingQuestion')}}/>
           </div>
 
           <div className="mt-4">
             <WordStringChildEditor value={data.footNote} set={setFootNote} remove={removeFootNote} setKeyHandlingEnabled={setKeyHandlingEnabled}
-                                   baseColor="slate" strings={{add: t('addFootNote'), placeHolder: t('footNote')}}/>
+                                   isEditingQuestion={false} strings={{add: t('addFootNote'), placeHolder: t('footNote')}}/>
           </div>
 
           <div className="mt-4">
