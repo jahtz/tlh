@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
 import {useTranslation} from 'react-i18next';
 import {Change, diffLines} from 'diff';
 import {allXmlComparatorConfig, emptyXmlComparatorConfig, makeReplacements, XmlComparatorConfig} from './xmlComparatorConfig';
 import {BulmaObjectSelect, SelectOption} from '../forms/BulmaFields';
+import classNames from 'classnames';
 
 interface IState {
   config: XmlComparatorConfig;
@@ -20,6 +21,9 @@ interface ReadFile {
 function beautifyXml(content: string): string {
   return new XMLSerializer().serializeToString(new DOMParser().parseFromString(content, 'text/xml'));
 }
+
+const leftColorClass = 'text-red-500';
+const rightColorClass = 'text-green-500';
 
 export function XmlComparator(): JSX.Element {
 
@@ -62,39 +66,33 @@ export function XmlComparator(): JSX.Element {
   const xmlConfigOptions: SelectOption<XmlComparatorConfig>[] = allXmlComparatorConfig.map((option) => ({value: option, label: option.name}));
 
   return (
-    <div className="container is-fluid">
-      <h1 className="title is-3 has-text-centered">{t('xmlComparator')}</h1>
+    <div className="container mx-auto">
+      <h1 className="font-bold text-2xl text-center">{t('xmlComparator')}</h1>
 
-      <div className="columns">
-        <div className="column">
-          {state.firstFile
-            ? <div className="has-text-danger has-text-centered">{state.firstFile.name}</div>
-            : <FileLoader onLoad={setFirstFile}/>}
-        </div>
-        <div className="column">
-          <BulmaObjectSelect label={t('xmlComparatorConfig')} id="xmlComparatorConfig" currentValue={state.config} options={xmlConfigOptions}
-                             onUpdate={updateXmlConfigOption}/>
-        </div>
-        <div className="column">
-          {state.secondFile
-            ? <div className="has-text-success has-text-centered">{state.secondFile.name}</div>
-            : <FileLoader onLoad={setSecondFile}/>}
-        </div>
+      <div className="mt-2 grid grid-cols-3 gap-2">
+        {state.firstFile
+          ? <div className={classNames('text-center', 'underline', leftColorClass)}>{state.firstFile.name}</div>
+          : <FileLoader onLoad={setFirstFile}/>}
+
+        <BulmaObjectSelect label={t('xmlComparatorConfig')} id="xmlComparatorConfig" currentValue={state.config} options={xmlConfigOptions}
+                           onUpdate={updateXmlConfigOption}/>
+        {state.secondFile
+          ? <div className={classNames('text-center', 'underline', rightColorClass)}>{state.secondFile.name}</div>
+          : <FileLoader onLoad={setSecondFile}/>}
       </div>
 
-      {state.changes && <div>
-        {state.changes.map(({value, added, removed}, index) => {
+      {state.changes && state.changes.map(({value, added, removed}, index) => {
 
-          const className = added ? 'has-text-success' : removed ? 'has-text-danger' : '';
+        const className = added ? rightColorClass : removed ? leftColorClass : '';
 
-          return value
-            .split('\n')
-            .map((line, lineIndex) =>
-              <p style={{wordBreak: 'break-all'}} className={className}
-                 key={state.config.name + '_' + index + '_' + lineIndex}>{line.replaceAll(' ', '\u00a0')}</p>
-            );
-        })}
-      </div>}
+        return value
+          .split('\n')
+          .map((line, lineIndex) =>
+            <p style={{wordBreak: 'break-all'}} className={className} key={state.config.name + '_' + index + '_' + lineIndex}>
+              {line.replaceAll(' ', '\u00a0')}
+            </p>
+          );
+      })}
     </div>
   );
 }
