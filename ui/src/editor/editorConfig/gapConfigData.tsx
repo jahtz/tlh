@@ -9,9 +9,9 @@ function isLineGapNode(node: XmlElementNode): boolean {
 }
 
 export const gapConfig: XmlSingleEditableNodeConfig = {
-  replace: (node, _renderedChildren, isSelected) => (
+  replace: (node, _renderedChildren, isSelected, isLeftSide) => (
     <>
-      {isLineGapNode(node) && <br/>}
+      {isLineGapNode(node) && isLeftSide && <br/>}
       <span className={classNames('gap', {'marked': isSelected})}>{node.attributes.c}</span>
     </>
   ),
