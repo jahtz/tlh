@@ -258,15 +258,17 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
   }
 
   function deleteNode(path: number[]): void {
-    setState((state) => update(state, {
-        rootNode: path.slice(0, -1).reduceRight<Spec<XmlNode>>(
-          (acc, index) => ({children: {[index]: acc}}),
-          {children: {$splice: [[path[path.length - 1], 1]]}}
-        ),
-        editorState: {$set: undefined},
-        changed: {$set: true}
-      })
-    );
+    if (confirm(t('deleteThisElement'))) {
+      setState((state) => update(state, {
+          rootNode: path.slice(0, -1).reduceRight<Spec<XmlNode>>(
+            (acc, index) => ({children: {[index]: acc}}),
+            {children: {$splice: [[path[path.length - 1], 1]]}}
+          ),
+          editorState: {$set: undefined},
+          changed: {$set: true}
+        })
+      );
+    }
   }
 
   function renderNodeEditor({node, data, path, changed}: IEditNodeState<T>): JSX.Element {
