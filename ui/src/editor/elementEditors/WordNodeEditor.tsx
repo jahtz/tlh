@@ -94,6 +94,10 @@ export function WordNodeEditor({
     return {number, translation: '', referenceWord: '', analysisOptions: [], paradigmClass: ''};
   }
 
+  function setSelectedMorphToDel(): void {
+    updateNode((state) => update(state, {node: {attributes: {mrp0sel: {$set: 'DEL'}}}}));
+  }
+
   function updateLanguage(lg: string): void {
     updateNode((state) => update(state, {lg: {$set: lg.trim() || ''}}));
   }
@@ -150,7 +154,14 @@ export function WordNodeEditor({
 
           <div className="mt-4">
             {data.morphologies.length === 0
-              ? <div className="p-4 rounded bg-amber-400 text-center">{t('noMorphologicalAnalysesFound')}</div>
+              ? <div>
+                <div className="p-4 rounded bg-amber-400 text-center">{t('noMorphologicalAnalysesFound')}</div>
+
+                {data.node.attributes.mrp0sel !== 'DEL' &&
+                  <button type="button" className="mt-2 p-2 rounded bg-blue-600 text-white text-center w-full" onClick={setSelectedMorphToDel}>
+                    {t('set_mrp0sel=DEL')}
+                  </button>}
+              </div>
               : data.morphologies.map((m, index) => <div className="mt-2" key={m.number}>
                   <MorphAnalysisOptionContainer
                     morphologicalAnalysis={m}
