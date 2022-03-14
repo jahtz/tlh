@@ -61,8 +61,7 @@ export function EditorLeftSide({
     const parseResult = parseNewXml(state.xmlSource as string);
 
     if (isLeft(parseResult)) {
-      // FIXME: display error!
-      console.error(parseResult);
+      alert(parseResult.value);
     } else {
       updateNode(parseResult.value as XmlElementNode);
       deactivateShowSource();

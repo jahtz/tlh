@@ -45,8 +45,7 @@ export function DocumentMergerContainer(): JSX.Element {
     const parseResult = await loadNewXml(file);
 
     if (isLeft(parseResult)) {
-      // FIXME: display error!
-      console.error(parseResult);
+      alert(parseResult.value);
     } else {
       const document = readMergeDocument(parseResult.value as XmlElementNode);
       setState((state) => update(state, {
@@ -60,8 +59,7 @@ export function DocumentMergerContainer(): JSX.Element {
     const parseResult = await loadNewXml(file);
 
     if (isLeft(parseResult)) {
-      // FIXME: display error!
-      console.error(parseResult);
+      alert(parseResult.value);
     } else {
       const document = readMergeDocument(parseResult.value as XmlElementNode);
       setState((state) => update(state, {

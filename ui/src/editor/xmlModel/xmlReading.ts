@@ -61,7 +61,7 @@ function loadNode(el: ChildNode, xmlReadConfig: XmlReadConfig, parentLetterCorre
   }
 }
 
-type ParseResult = Either<Element, XmlNode>;
+type ParseResult = Either<string, XmlNode>;
 
 export function parseNewXml(content: string, xmlReadConfig: XmlReadConfig = tlhXmlReadConfig): ParseResult {
   const doc = new DOMParser().parseFromString(content, 'text/xml');
@@ -69,7 +69,7 @@ export function parseNewXml(content: string, xmlReadConfig: XmlReadConfig = tlhX
   const rootElement = doc.children[0];
 
   if (rootElement.tagName === 'parsererror') {
-    return {_type: 'Left', value: rootElement};
+    return {_type: 'Left', value: new XMLSerializer().serializeToString(rootElement)};
   } else {
     return {_type: 'Right', value: loadNode(rootElement, xmlReadConfig)};
   }

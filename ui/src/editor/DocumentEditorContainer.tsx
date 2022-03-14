@@ -46,8 +46,7 @@ export function DocumentEditorContainer(): JSX.Element {
     const parseResult = await loadNewXml(file);
 
     if (isLeft(parseResult)) {
-      // FIXME: display error!
-      console.error(parseResult);
+      alert(parseResult.value);
     } else {
       setState({rootNode: parseResult.value, filename: file.name});
     }
