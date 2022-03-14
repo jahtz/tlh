@@ -8,6 +8,8 @@ import {parseNewXml} from './xmlModel/xmlReading';
 import {xml} from '@codemirror/lang-xml';
 import ReactCodeMirror from '@uiw/react-codemirror';
 import {writeXml} from './DocumentEditor';
+import {isLeft} from './either';
+import update from 'immutability-helper';
 
 export interface EditorLeftSideProps extends NodeDisplayIProps {
   filename: string;
@@ -19,6 +21,12 @@ export interface EditorLeftSideProps extends NodeDisplayIProps {
 }
 
 const FONT_STEP = 10;
+
+interface IState {
+  fontSize: number;
+  useSerifFont: boolean;
+  xmlSource: string | undefined;
+}
 
 export function EditorLeftSide({
   filename,
@@ -33,10 +41,7 @@ export function EditorLeftSide({
 }: EditorLeftSideProps): JSX.Element {
 
   const {t} = useTranslation('common');
-  const [fontSize, setFontSize] = useState(100);
-  const [useSerifFont, setUseSerifFont] = useState(false);
-
-  const [xmlSource, setXmlSource] = useState<string | undefined>();
+  const [state, setState] = useState<IState>({fontSize: 100, useSerifFont: false, xmlSource: undefined});
 
   function activateShowSource(): void {
     setKeyHandlingEnabled(false);
@@ -48,9 +53,24 @@ export function EditorLeftSide({
     setXmlSource(undefined);
   }
 
+  function setXmlSource(value: string | undefined): void {
+    setState((state) => update(state, {xmlSource: {$set: value}}));
+  }
+
   function onXmlSourceUpdate(): void {
-    updateNode(parseNewXml(xmlSource as string) as XmlElementNode);
-    deactivateShowSource();
+    const parseResult = parseNewXml(state.xmlSource as string);
+
+    if (isLeft(parseResult)) {
+      // FIXME: display error!
+      console.error(parseResult);
+    } else {
+      updateNode(parseResult.value as XmlElementNode);
+      deactivateShowSource();
+    }
+  }
+
+  function changeFontSize(isIncrease: boolean): void {
+    setState((state) => update((state), {fontSize: {$apply: (value) => isIncrease ? (value + FONT_STEP) : (value - FONT_STEP)}}));
   }
 
   return (
@@ -59,16 +79,15 @@ export function EditorLeftSide({
         <span className="font-bold">{filename}</span>
 
         <div className="float-right">
-
-          <button type="button" className="px-2 border border-slate-500 rounded-l" onClick={() => setFontSize((value) => value - FONT_STEP)}
-                  title={t('decreaseFontSize')}>-{FONT_STEP}%
+          <button type="button" className="px-2 border border-slate-500 rounded-l" onClick={() => changeFontSize(false)} title={t('decreaseFontSize')}>
+            -{FONT_STEP}%
           </button>
-          <button className="px-2 border border-slate-500" disabled>{fontSize}%</button>
-          <button type="button" className="mr-2 px-2 border border-slate-500 rounded-r" onClick={() => setFontSize((value) => value + FONT_STEP)}
-                  title={t('increaseFontSize')}>+{FONT_STEP}%
+          <button className="px-2 border border-slate-500" disabled>{state.fontSize}%</button>
+          <button type="button" className="mr-2 px-2 border border-slate-500 rounded-r" onClick={() => changeFontSize(true)} title={t('increaseFontSize')}>
+            +{FONT_STEP}%
           </button>
 
-          {xmlSource
+          {state.xmlSource
             ? <>
               <button className="mr-2 px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource} title={t('cancelEditXmlSource')}>
                 &#x270E;
@@ -78,8 +97,9 @@ export function EditorLeftSide({
               </button>
             </>
             : <>
-              <button onClick={() => setUseSerifFont((use) => !use)} className="mr-2 px-2 border border-slate-500 rounded">
-                {useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
+              <button onClick={() => setState((state) => update(state, {useSerifFont: {$apply: (use) => !use}}))}
+                      className="mr-2 px-2 border border-slate-500 rounded">
+                {state.useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
               </button>
               <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={activateShowSource} title={t('editSource')}>
                 &#x270E;
@@ -93,9 +113,9 @@ export function EditorLeftSide({
       </div>
 
       <div className="flex p-4 rounded-b border border-slate-300 shadow-md flex-auto overflow-auto">
-        {xmlSource
-          ? <ReactCodeMirror value={xmlSource} extensions={[xml()]} onChange={setXmlSource}/>
-          : <div className={classNames(useSerifFont ? 'font-hpm-serif' : 'font-hpm')} style={{fontSize: `${fontSize}%`}}>
+        {state.xmlSource
+          ? <ReactCodeMirror value={state.xmlSource} extensions={[xml()]} onChange={setXmlSource}/>
+          : <div className={classNames(state.useSerifFont ? 'font-hpm-serif' : 'font-hpm')} style={{fontSize: `${state.fontSize}%`}}>
             <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} onSelect={onNodeSelect} insertStuff={insertStuff} isLeftSide={true}/>
           </div>}
       </div>

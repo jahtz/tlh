@@ -1,5 +1,6 @@
 import {isXmlElementNode, XmlNode, XmlTextNode} from './xmlModel';
 import update from 'immutability-helper';
+import {Either} from '../either';
 
 type LetterCorrection = [string, string][];
 
@@ -31,10 +32,7 @@ const letterCorrections: LetterCorrection = [
 ];
 
 export const tlhXmlReadConfig: XmlReadConfig = {
-  w: {
-    letterCorrections,
-    keepSpaces: true
-  }
+  w: {letterCorrections, keepSpaces: true}
 };
 
 function createTextNode(baseTextContent: string, letterCorrections?: LetterCorrection): XmlTextNode {
@@ -63,17 +61,25 @@ function loadNode(el: ChildNode, xmlReadConfig: XmlReadConfig, parentLetterCorre
   }
 }
 
-export function parseNewXml(content: string, xmlReadConfig: XmlReadConfig = tlhXmlReadConfig): XmlNode {
+type ParseResult = Either<Element, XmlNode>;
+
+export function parseNewXml(content: string, xmlReadConfig: XmlReadConfig = tlhXmlReadConfig): ParseResult {
   const doc = new DOMParser().parseFromString(content, 'text/xml');
 
-  return loadNode(doc.children[0], xmlReadConfig);
+  const rootElement = doc.children[0];
+
+  if (rootElement.tagName === 'parsererror') {
+    return {_type: 'Left', value: rootElement};
+  } else {
+    return {_type: 'Right', value: loadNode(rootElement, xmlReadConfig)};
+  }
 }
 
-export async function loadNewXml(file: File, xmlReadConfig: XmlReadConfig = tlhXmlReadConfig): Promise<XmlNode> {
-  const content = await file.text();
-
-  // non-breakable space to normal space
-  const correctedText = content.replaceAll('\xa0', '');
-
-  return parseNewXml(correctedText, xmlReadConfig);
+export async function loadNewXml(file: File, xmlReadConfig: XmlReadConfig = tlhXmlReadConfig): Promise<ParseResult> {
+  return parseNewXml(
+    // non-breakable space to normal space
+    (await file.text()).replaceAll('\xa0', ''),
+    xmlReadConfig
+  );
 }
+

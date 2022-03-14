@@ -3,6 +3,7 @@ import {FileLoader} from '../forms/FileLoader';
 import {XmlNode} from './xmlModel/xmlModel';
 import {DocumentEditor} from './DocumentEditor';
 import {loadNewXml} from './xmlModel/xmlReading';
+import {isLeft} from './either';
 
 const localStorageEditorStateKey = 'editorState';
 
@@ -42,7 +43,14 @@ export function DocumentEditorContainer(): JSX.Element {
   const [state, setState] = useState<LoadedDocument | undefined>(initialState());
 
   async function readFile(file: File): Promise<void> {
-    setState({rootNode: await loadNewXml(file), filename: file.name});
+    const parseResult = await loadNewXml(file);
+
+    if (isLeft(parseResult)) {
+      // FIXME: display error!
+      console.error(parseResult);
+    } else {
+      setState({rootNode: parseResult.value, filename: file.name});
+    }
   }
 
   function download(content: string): void {

@@ -6,6 +6,7 @@ import {DocumentMerger, MergeDocumentLine} from './DocumentMerger';
 import {loadNewXml} from '../editor/xmlModel/xmlReading';
 import {MergeDocument, MergeLine, readMergeDocument} from './mergeDocument';
 import {XmlElementNode} from '../editor/xmlModel/xmlModel';
+import {isLeft} from '../editor/either';
 
 interface MergeFile {
   filename: string;
@@ -41,19 +42,33 @@ export function DocumentMergerContainer(): JSX.Element {
   const [state, setState] = useState<IState>({_type: 'EmptyState'});
 
   async function loadFirstDocument(file: File): Promise<void> {
-    const document = readMergeDocument(await loadNewXml(file) as XmlElementNode);
-    setState((state) => update(state, {
-      _type: {$set: 'FirstFileLoadedState'},
-      firstFile: {$set: {filename: file.name, document}}
-    }));
+    const parseResult = await loadNewXml(file);
+
+    if (isLeft(parseResult)) {
+      // FIXME: display error!
+      console.error(parseResult);
+    } else {
+      const document = readMergeDocument(parseResult.value as XmlElementNode);
+      setState((state) => update(state, {
+        _type: {$set: 'FirstFileLoadedState'},
+        firstFile: {$set: {filename: file.name, document}}
+      }));
+    }
   }
 
   async function loadSecondDocument(file: File): Promise<void> {
-    const document = readMergeDocument(await loadNewXml(file) as XmlElementNode);
-    setState((state) => update(state, {
-      _type: {$set: 'SecondFileLoadedState'},
-      secondFile: {$set: {filename: file.name, document}}
-    }));
+    const parseResult = await loadNewXml(file);
+
+    if (isLeft(parseResult)) {
+      // FIXME: display error!
+      console.error(parseResult);
+    } else {
+      const document = readMergeDocument(parseResult.value as XmlElementNode);
+      setState((state) => update(state, {
+        _type: {$set: 'SecondFileLoadedState'},
+        secondFile: {$set: {filename: file.name, document}}
+      }));
+    }
   }
 
   function onMerge(mergedLines: MergeLine[]): void {
