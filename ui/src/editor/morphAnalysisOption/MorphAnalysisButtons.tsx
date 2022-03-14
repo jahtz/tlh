@@ -59,7 +59,9 @@ export function MorphAnalysisOptionButtons({
           {determinativ && <span>, {t('determinativ')}:&nbsp;<span className="text-red-600">{determinativ}</span></span>})&nbsp;
         </div>
         {!isSingleAnalysisOption &&
-          <button className="p-2 rounded-r border-r border-y border-slate-500" onClick={enableEditMode}><IoSettingsOutline/></button>}
+          <button className="p-2 rounded-r border-r border-y border-slate-500" onClick={enableEditMode} title={t('editMorphologicalAnalyses')}>
+            <IoSettingsOutline/>
+          </button>}
       </div>
 
       {!isReduced && <div className="mt-2">

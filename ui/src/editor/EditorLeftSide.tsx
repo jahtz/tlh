@@ -60,12 +60,12 @@ export function EditorLeftSide({
 
         <div className="float-right">
 
-          <button type="button" className="px-2 border border-slate-500 rounded-l" onClick={() => setFontSize((value) => value - FONT_STEP)}>
-            -{FONT_STEP}%
+          <button type="button" className="px-2 border border-slate-500 rounded-l" onClick={() => setFontSize((value) => value - FONT_STEP)}
+                  title={t('decreaseFontSize')}>-{FONT_STEP}%
           </button>
           <button className="px-2 border border-slate-500" disabled>{fontSize}%</button>
-          <button type="button" className="mr-2 px-2 border border-slate-500 rounded-r" onClick={() => setFontSize((value) => value + FONT_STEP)}>
-            +{FONT_STEP}%
+          <button type="button" className="mr-2 px-2 border border-slate-500 rounded-r" onClick={() => setFontSize((value) => value + FONT_STEP)}
+                  title={t('increaseFontSize')}>+{FONT_STEP}%
           </button>
 
           {xmlSource
