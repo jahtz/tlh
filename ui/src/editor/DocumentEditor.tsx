@@ -174,34 +174,32 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
   }
 
   function updateNode(nextEditablePath?: number[]): void {
-    if (state.keyHandlingEnabled) {
-      let newEditorState: IEditNodeState<T> | undefined = undefined;
+    let newEditorState: IEditNodeState<T> | undefined = undefined;
 
-      if (nextEditablePath) {
-        const node = findElement(state.rootNode as XmlElementNode, nextEditablePath);
+    if (nextEditablePath) {
+      const node = findElement(state.rootNode as XmlElementNode, nextEditablePath);
 
-        if (state.editorState && 'path' in state.editorState) {
-          newEditorState = {
-            node, path: nextEditablePath, changed: false, data: (editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node)
-          };
-        }
+      if (state.editorState && 'path' in state.editorState) {
+        newEditorState = {
+          node, path: nextEditablePath, changed: false, data: (editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node)
+        };
       }
-
-      setState((state) =>
-        state.editorState && editorStateIsEditNodeState(state.editorState)
-          ? update(state, {
-            rootNode: state.editorState.path.reduceRight<Spec<XmlNode>>(
-              (acc, index) => ({children: {[index]: acc}}),
-              {$set: (editorConfig.nodeConfigs[state.editorState.node.tagName] as XmlSingleEditableNodeConfig<T>).writeNode(state.editorState.data, state.editorState.node)}
-            ),
-            editorState: newEditorState
-              ? {$set: newEditorState}
-              : {changed: {$set: false}},
-            changed: {$set: true}
-          })
-          : state
-      );
     }
+
+    setState((state) =>
+      state.editorState && editorStateIsEditNodeState(state.editorState)
+        ? update(state, {
+          rootNode: state.editorState.path.reduceRight<Spec<XmlNode>>(
+            (acc, index) => ({children: {[index]: acc}}),
+            {$set: (editorConfig.nodeConfigs[state.editorState.node.tagName] as XmlSingleEditableNodeConfig<T>).writeNode(state.editorState.data, state.editorState.node)}
+          ),
+          editorState: newEditorState
+            ? {$set: newEditorState}
+            : {changed: {$set: false}},
+          changed: {$set: true}
+        })
+        : state
+    );
   }
 
   function updateEditedNode(updateSpec: Spec<T>): void {
