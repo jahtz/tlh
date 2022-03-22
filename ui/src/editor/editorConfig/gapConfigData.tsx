@@ -17,7 +17,12 @@ export const gapConfig: XmlSingleEditableNodeConfig = {
   ),
   edit: (props) => <GapEditor {...props}/>,
   readNode: (n) => n,
-  writeNode: (n) => n
+  writeNode: (n) => n,
+  insertablePositions: {
+    beforeElement: ['w'],
+    afterElement: ['lb', 'w'],
+    asLastChildOf: ['div1']
+  }
 };
 
 function GapEditor({data, originalNode, updateNode, changed, initiateSubmit, deleteNode, initiateJumpElement}: XmlEditableNodeIProps): JSX.Element {
