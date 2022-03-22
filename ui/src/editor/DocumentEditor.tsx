@@ -301,8 +301,11 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
   }
 
   function initiateInsert(path: NodePath): void {
+
     if (state.editorState && 'tagName' in state.editorState) {
       const node: XmlElementNode = {tagName: state.editorState.tagName, attributes: {}, children: []};
+
+      console.info(node);
 
       setState((state) => update(state, {
         rootNode: path.slice(0, -1).reduceRight<Spec<XmlNode>>(

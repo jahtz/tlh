@@ -23,7 +23,7 @@ export function readWordNodeData(node: XmlElementNode): WordNodeData {
     node: node,
     lg: node.attributes.lg || '',
     morphologies: readMorphologiesFromNode(node, readSelectedMorphology(node.attributes.mrp0sel?.trim() || '')),
-    footNote: isXmlElementNode(lastChild) && lastChild.tagName === 'note'
+    footNote: lastChild && isXmlElementNode(lastChild) && lastChild.tagName === 'note'
       ? lastChild.attributes.c
       : undefined,
   };
