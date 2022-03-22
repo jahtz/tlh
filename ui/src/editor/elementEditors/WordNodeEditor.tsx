@@ -26,6 +26,7 @@ export function WordNodeEditor({
   changed,
   updateNode,
   deleteNode,
+  keyHandlingEnabled,
   setKeyHandlingEnabled,
   initiateJumpElement,
   initiateSubmit
@@ -44,7 +45,7 @@ export function WordNodeEditor({
   });
 
   function handleKey(event: KeyboardEvent) {
-    if (editorConfig.submitChangeKeys.includes(event.key)) {
+    if (keyHandlingEnabled && editorConfig.submitChangeKeys.includes(event.key)) {
       initiateSubmit();
     }
   }

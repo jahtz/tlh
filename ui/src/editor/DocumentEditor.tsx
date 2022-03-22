@@ -280,6 +280,7 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
       updateNode: (data) => updateEditedNode(data),
       deleteNode: () => deleteNode(path),
       initiateJumpElement: (forward) => jumpEditableNodes(node.tagName, forward),
+      keyHandlingEnabled: state.keyHandlingEnabled,
       setKeyHandlingEnabled: (value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}})),
       initiateSubmit: () => updateNode()
     });
