@@ -13,6 +13,7 @@ interface IProps {
   jumpElement?: (forward: boolean) => void;
 }
 
+// FIXME: reverse call hierarchy...
 export function NodeEditorRightSide({originalNode, children, changed, initiateSubmit, deleteNode, otherButtons, jumpElement}: IProps): JSX.Element {
 
   // FIXME: import editing question here for all elements?
