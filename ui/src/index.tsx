@@ -1,5 +1,4 @@
 import {StrictMode} from 'react';
-import {render} from 'react-dom';
 import './index.css';
 import {App} from './App';
 import {HashRouter} from 'react-router-dom';
@@ -15,6 +14,7 @@ import common_de from './locales/de/common.json';
 import common_en from './locales/en/common.json';
 import {AllManuscriptLanguagesDocument, AllManuscriptLanguagesQuery} from './graphql';
 import {newLanguagesAction} from './store/actions';
+import {createRoot} from 'react-dom/client';
 
 export const isDebug = process.env.NODE_ENV === 'development';
 
@@ -71,7 +71,9 @@ apolloClient.query<AllManuscriptLanguagesQuery>({query: AllManuscriptLanguagesDo
   .then(({data}) => store.dispatch(newLanguagesAction(data.manuscriptLanguages)))
   .catch(() => void 0);
 
-render(
+const root = createRoot(document.getElementById('root')!);
+
+root.render(
   <StrictMode>
     <I18nextProvider i18n={i18n}>
       <ApolloProvider client={apolloClient}>
@@ -82,8 +84,7 @@ render(
         </Provider>
       </ApolloProvider>
     </I18nextProvider>
-  </StrictMode>,
-  document.getElementById('root')
+  </StrictMode>
 );
 
 // If you want your app to work offline and load faster, you can change
