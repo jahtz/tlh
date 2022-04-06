@@ -122,7 +122,7 @@ export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
       isOnlySpaces(node)
         ? [isSelected ? selectedNodeClass : 'bg-gray-200']
         : {
-          'underline': !notMarked && hasNoMorphologySelected,
+          'bg-yellow-300': !notMarked && hasNoMorphologySelected,
           'bg-teal-400': isSelected,
           'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
           'bg-blue-300': hasEditingQuestion,
