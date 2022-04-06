@@ -114,7 +114,7 @@ export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
       .filter((name) => name.startsWith('mrp') && !name.startsWith('mrp0'))
       .length > 0;
 
-    const hasQuestion = !!node.attributes.editingQuestion;
+    const hasEditingQuestion = !!node.attributes.editingQuestion;
 
     // FIXME: colors / classes!
 
@@ -125,14 +125,14 @@ export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
           'underline': !notMarked && hasNoMorphologySelected,
           'bg-teal-400': isSelected,
           'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
-          'bg-blue-700': hasQuestion,
+          'bg-blue-300': hasEditingQuestion,
           [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,
           'has-text-weight-bold': isForeignLanguage,
           'has-text-danger': node.children.length === 0
         });
 
     return <>
-        <span className={classes} title={hasQuestion ? node.attributes.q : undefined}>
+        <span className={classes} title={hasEditingQuestion ? node.attributes.q : undefined}>
           {node.children.length === 0 ? <IoCloseSharp/> : renderedChildren}
         </span>
       &nbsp;&nbsp;
