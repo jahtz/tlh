@@ -123,7 +123,7 @@ export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
         ? [isSelected ? selectedNodeClass : 'bg-gray-200']
         : {
           'underline': !notMarked && hasNoMorphologySelected,
-          'bg-teal-400': !notMarked && isSelected,
+          'bg-teal-400': isSelected,
           'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
           'bg-blue-700': hasQuestion,
           [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,
