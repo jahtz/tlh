@@ -47,7 +47,8 @@ export function DocumentMergerContainer(): JSX.Element {
     if (isLeft(parseResult)) {
       alert(parseResult.value);
     } else {
-      const document = readMergeDocument(parseResult.value as XmlElementNode);
+      const document: MergeDocument = readMergeDocument(parseResult.value as XmlElementNode);
+
       setState((state) => update(state, {
         _type: {$set: 'FirstFileLoadedState'},
         firstFile: {$set: {filename: file.name, document}}
@@ -61,7 +62,8 @@ export function DocumentMergerContainer(): JSX.Element {
     if (isLeft(parseResult)) {
       alert(parseResult.value);
     } else {
-      const document = readMergeDocument(parseResult.value as XmlElementNode);
+      const document: MergeDocument = readMergeDocument(parseResult.value as XmlElementNode);
+
       setState((state) => update(state, {
         _type: {$set: 'SecondFileLoadedState'},
         secondFile: {$set: {filename: file.name, document}}

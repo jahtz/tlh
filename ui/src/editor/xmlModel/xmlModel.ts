@@ -29,5 +29,13 @@ export function findFirstXmlElementByTagName(node: XmlNode, tagName: string): Xm
     return node;
   }
 
-  return node.children.find((c) => findFirstXmlElementByTagName(c, tagName)) as XmlElementNode | undefined;
+  for (const child of node.children) {
+    const found: XmlElementNode | undefined = findFirstXmlElementByTagName(child, tagName);
+
+    if (found) {
+      return found;
+    }
+  }
+
+  return undefined;
 }

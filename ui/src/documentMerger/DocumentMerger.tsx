@@ -30,7 +30,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
   function performMerge(): void {
     onMerge(mergeLines(data));
   }
-
+ 
   return (
     <>
       <div className="grid grid-cols-5 mb-2">
