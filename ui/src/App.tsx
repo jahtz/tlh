@@ -4,6 +4,7 @@ import {
   documentMergerUrl,
   editDocumentUrl,
   homeUrl,
+  wysiwygUrl,
   loginUrl,
   manuscriptsUrlFragment,
   preferencesUrl,
@@ -18,6 +19,7 @@ import {DocumentEditorContainer} from './editor/DocumentEditorContainer';
 import {ManuscriptBase} from './manuscript/ManuscriptBase';
 import {XmlComparator} from './xmlComparator/XmlComparator';
 import {Preferences} from './Preferences';
+import {WysiwygEditor} from './wysiwygEditor/WysiwygEditor';
 import {DocumentMergerContainer} from './documentMerger/DocumentMergerContainer';
 import {RequireAuth} from './RequireAuth';
 import {NavBar} from './NavBar';
@@ -43,6 +45,8 @@ export function App(): JSX.Element {
           }/>
 
           <Route path={`/${manuscriptsUrlFragment}/:mainIdentifier`} element={<ManuscriptBase/>}/>
+
+          <Route path={wysiwygUrl} element={<WysiwygEditor/>}/>
 
           <Route path={editDocumentUrl} element={<DocumentEditorContainer/>}/>
 

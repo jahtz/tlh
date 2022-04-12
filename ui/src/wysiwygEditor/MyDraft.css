@@ -1,0 +1,11 @@
+div.DraftEditor-root {
+  padding: 0.5em;
+
+  font-size: 1.1em;
+  line-height: 1.5em;
+
+  border-radius: 0.25em;
+  border-width: 1px;
+  border-style: solid;
+  border-color: slategray;
+}
