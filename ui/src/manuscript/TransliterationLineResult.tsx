@@ -107,7 +107,7 @@ interface IProps {
 
 export function Transliteration({lines}: IProps): JSX.Element {
   return (
-    <div className="box">
+    <div className="p-2 rounded border border-slate-300 shadow shadow-slate-200">
       {lines.map((lineParseResult, lineIndex) =>
         <p key={lineIndex} className="hittite">{renderLine(lineParseResult)}</p>
       )}

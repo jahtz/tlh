@@ -35,7 +35,7 @@ export function ManuscriptBase(): JSX.Element {
         {(manuscript) => <Routes>
           <Route path={'/data'} element={<ManuscriptData manuscript={manuscript}/>}/>
           <Route path={uploadPicturesUrl} element={<UploadPicturesForm manuscript={manuscript}/>}/>
-          <Route path={createTransliterationUrl} element={<TransliterationInput manuscript={manuscript}/>}/>
+          <Route path={`/${createTransliterationUrl}`} element={<TransliterationInput manuscript={manuscript}/>}/>
         </Routes>
         }
       </WithNullableNavigate>}

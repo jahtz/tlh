@@ -3,7 +3,7 @@ import {FileLoader} from '../forms/FileLoader';
 import {useTranslation} from 'react-i18next';
 import {Change, diffLines} from 'diff';
 import {allXmlComparatorConfig, emptyXmlComparatorConfig, makeReplacements, XmlComparatorConfig} from './xmlComparatorConfig';
-import {BulmaObjectSelect, SelectOption} from '../forms/BulmaFields';
+import {ObjectSelect, SelectOption} from '../forms/BulmaFields';
 import classNames from 'classnames';
 
 interface IState {
@@ -74,8 +74,8 @@ export function XmlComparator(): JSX.Element {
           ? <div className={classNames('text-center', 'underline', leftColorClass)}>{state.firstFile.name}</div>
           : <FileLoader onLoad={setFirstFile}/>}
 
-        <BulmaObjectSelect label={t('xmlComparatorConfig')} id="xmlComparatorConfig" currentValue={state.config} options={xmlConfigOptions}
-                           onUpdate={updateXmlConfigOption}/>
+        <ObjectSelect label={t('xmlComparatorConfig')} id="xmlComparatorConfig" currentValue={state.config} options={xmlConfigOptions}
+                      onUpdate={updateXmlConfigOption}/>
         {state.secondFile
           ? <div className={classNames('text-center', 'underline', rightColorClass)}>{state.secondFile.name}</div>
           : <FileLoader onLoad={setSecondFile}/>}

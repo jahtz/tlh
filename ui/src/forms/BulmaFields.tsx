@@ -76,7 +76,7 @@ interface CustomSelectProps<T> {
   onUpdate: (t: T) => void;
 }
 
-export function BulmaObjectSelect<T>({label, id, currentValue, options, onUpdate}: CustomSelectProps<T>): JSX.Element {
+export function ObjectSelect<T>({label, id, currentValue, options, onUpdate}: CustomSelectProps<T>): JSX.Element {
   // FIXME: remove bulma stuff, make more generic!
 
   function onValueChange(event: ChangeEvent<HTMLSelectElement>) {
@@ -85,16 +85,14 @@ export function BulmaObjectSelect<T>({label, id, currentValue, options, onUpdate
 
   const currentValueLabel = options.find(({value}) => value === currentValue)?.label;
 
-  return <div className="field">
-    <label htmlFor={id} className="label">{label}:</label>
-    <div className="control">
-      <div className="select is-fullwidth">
-        <select id={id} onChange={onValueChange} defaultValue={currentValueLabel}>
-          {options.map(({/*value,*/ label}, index) =>
-            <option key={index}>{label}</option>
-          )}
-        </select>
-      </div>
+  return (
+    <div>
+      <label htmlFor={id} className="font-bold">{label}:</label>
+      <select id={id} onChange={onValueChange} defaultValue={currentValueLabel} className="mt-2 p-2 rounded bg-white border border-slate-500 w-full">
+        {options.map(({/*value,*/ label}, index) =>
+          <option key={index}>{label}</option>
+        )}
+      </select>
     </div>
-  </div>;
+  );
 }
