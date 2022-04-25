@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import classNames from 'classnames';
 
 export interface Tabs {
   [key: string]: {
     name: string;
     render: () => JSX.Element;
-  }
+  };
 }
 
 interface IProps {
@@ -18,14 +18,13 @@ export function BulmaTabs({tabs}: IProps): JSX.Element {
 
   return (
     <>
-      <div className="tabs is-centered">
-        <ul>
-          {Object.entries(tabs).map(([id, {name}]) =>
-            <li className={classNames({'is-active': activeTabId === id})} key={id}>
-              <a onClick={() => setActiveTabId(id)}>{name}</a>
-            </li>
-          )}
-        </ul>
+      <div className="flex mb-2">
+        {Object.entries(tabs).map(([id, {name}]) =>
+          <button type="button" key={id} onClick={() => setActiveTabId(id)}
+                  className={classNames('p-2', 'flex-grow', 'rounded-t', activeTabId === id ? ['bg-blue-500', 'text-white'] : ['border', 'border-slate-300'])}>
+            {name}
+          </button>
+        )}
       </div>
       {tabs[activeTabId].render()}
     </>
