@@ -2,11 +2,12 @@ import {useTranslation} from 'react-i18next';
 import {FileLoader} from '../forms/FileLoader';
 import {useState} from 'react';
 import update from 'immutability-helper';
-import {DocumentMerger, MergeDocumentLine} from './DocumentMerger';
+import {DocumentMerger} from './DocumentMerger';
 import {loadNewXml} from '../editor/xmlModel/xmlReading';
 import {MergeDocument, MergeLine, readMergeDocument} from './mergeDocument';
 import {XmlElementNode} from '../editor/xmlModel/xmlModel';
 import {isLeft} from '../editor/either';
+import {MergedDocumentView} from './MergedDocumentView';
 
 interface MergeFile {
   filename: string;
@@ -90,9 +91,7 @@ export function DocumentMergerContainer(): JSX.Element {
         || (state._type === 'FirstFileLoadedState' && <FileLoader onLoad={loadSecondDocument} accept={'text/xml'} text={t('loadSecondFile')}/>)
         || (state._type === 'SecondFileLoadedState' &&
           <DocumentMerger firstDocument={state.firstFile.document} secondDocument={state.secondFile.document} onMerge={onMerge}/>)
-        || (state._type === 'MergedState' && <>
-          {state.mergedLines.map((l, index) => <p key={index}><MergeDocumentLine line={l}/></p>)}
-        </>)}
+        || (state._type === 'MergedState' && <MergedDocumentView lines={state.mergedLines}/>)}
 
     </div>
   );

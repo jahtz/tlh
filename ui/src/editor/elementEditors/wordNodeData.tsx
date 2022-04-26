@@ -4,7 +4,6 @@ import {readSelectedMorphology, SelectedAnalysisOption, writeSelectedMorphologie
 import {getSelectedLetters} from '../../model/analysisOptions';
 import {XmlSingleEditableNodeConfig} from '../editorConfig/editorConfig';
 import classNames from 'classnames';
-import {IoCloseSharp} from 'react-icons/io5';
 import {WordNodeEditor} from './WordNodeEditor';
 import {SpacesEditor} from './SpacesEditor';
 import {selectedNodeClass} from '../editorConfig/tlhXmlEditorConfig';
@@ -128,12 +127,12 @@ export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
           'bg-blue-300': hasEditingQuestion,
           [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,
           'has-text-weight-bold': isForeignLanguage,
-          'has-text-danger': node.children.length === 0
+          'text-red-600': node.children.length === 0
         });
 
     return <>
         <span className={classes} title={hasEditingQuestion ? node.attributes.q : undefined}>
-          {node.children.length === 0 ? <IoCloseSharp/> : renderedChildren}
+          {node.children.length === 0 ? <span>&#x2715;</span> : renderedChildren}
         </span>
       &nbsp;&nbsp;
     </>;

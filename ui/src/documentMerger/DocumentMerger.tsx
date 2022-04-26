@@ -14,7 +14,7 @@ interface IProps {
 export function MergeDocumentLine({line}: { line: MergeLine }): JSX.Element {
   return (
     <>
-      <span className="text-gray-500">{line.lineNumber}</span>&nbsp;
+      <NodeDisplay node={line.lineNumberNode} isLeftSide={false}/>
       {line.rest.map((n, index) => <NodeDisplay key={index} node={n} isLeftSide={false}/>)}
     </>
   );
@@ -30,7 +30,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
   function performMerge(): void {
     onMerge(mergeLines(data));
   }
- 
+
   return (
     <>
       <div className="grid grid-cols-5 mb-2">
