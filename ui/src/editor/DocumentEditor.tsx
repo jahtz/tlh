@@ -43,6 +43,7 @@ interface IState<T> {
   editorState?: EditorState<T>;
   changed: boolean;
   author?: string;
+  rightSideFontSize: number;
 }
 
 function searchEditableNode(
@@ -122,7 +123,7 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);
-  const [state, setState] = useState<IState<T>>({keyHandlingEnabled: true, rootNode: initialNode, changed: false});
+  const [state, setState] = useState<IState<T>>({keyHandlingEnabled: true, rootNode: initialNode, changed: false, rightSideFontSize: 100});
 
   const editorConfig = tlhXmlEditorConfig;
 
@@ -282,7 +283,11 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
       initiateJumpElement: (forward) => jumpEditableNodes(node.tagName, forward),
       keyHandlingEnabled: state.keyHandlingEnabled,
       setKeyHandlingEnabled: (value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}})),
-      initiateSubmit: () => updateNode()
+      initiateSubmit: () => updateNode(),
+      fontSizeSelectorProps: {
+        currentFontSize: state.rightSideFontSize,
+        updateFontSize: (delta) => setState((state) => update(state, {rightSideFontSize: {$apply: (value) => value + delta}}))
+      }
     });
   }
 

@@ -29,7 +29,8 @@ export function WordNodeEditor({
   keyHandlingEnabled,
   setKeyHandlingEnabled,
   initiateJumpElement,
-  initiateSubmit
+  initiateSubmit,
+  fontSizeSelectorProps
 }: XmlEditableNodeIProps<WordNodeData>): JSX.Element {
 
   const {t} = useTranslation('common');
@@ -134,7 +135,7 @@ export function WordNodeEditor({
 
   return (
     <NodeEditorRightSide originalNode={originalNode} changed={changed} initiateSubmit={initiateSubmit} jumpElement={initiateJumpElement} deleteNode={deleteNode}
-                         otherButtons={otherButtons}>
+                         otherButtons={otherButtons} fontSizeSelectorProps={fontSizeSelectorProps}>
       {(state.editContent || typeof state.editContent === 'string')
         ? <WordContentEditor initialTransliteration={state.editContent} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>
         : <>

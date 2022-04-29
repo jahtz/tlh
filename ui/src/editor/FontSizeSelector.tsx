@@ -2,12 +2,12 @@ import {useTranslation} from 'react-i18next';
 
 const FONT_STEP = 10;
 
-interface IProps {
+export interface FontSizeSelectorProps {
   currentFontSize: number;
   updateFontSize: (delta: number) => void;
 }
 
-export function FontSizeSelector({currentFontSize, updateFontSize}: IProps): JSX.Element {
+export function FontSizeSelector({currentFontSize, updateFontSize}: FontSizeSelectorProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
