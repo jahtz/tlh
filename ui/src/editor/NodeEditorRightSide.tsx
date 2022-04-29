@@ -51,7 +51,7 @@ export function NodeEditorRightSide({
                                   title={t('nextTag')}>&rarr;</button>}
         </div>
       </div>
-      
+
       <div className="p-2 border border slate-300" style={{fontSize: `${fontSizeSelectorProps.currentFontSize}%`}}>
         {children}
       </div>

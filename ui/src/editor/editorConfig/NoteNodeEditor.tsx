@@ -4,14 +4,14 @@ import {useTranslation} from 'react-i18next';
 import {UpdatePrevNextButtons} from '../morphAnalysisOption/UpdatePrevNextButtons';
 import {isXmlTextNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
 
-export function reCountNoteNumbers(rootNode: XmlElementNode): void {
+export function reCountNodeNumbers(rootNode: XmlElementNode, tagName: string, attrName: string): void {
 
   function go(node: XmlNode, currentCount: number): number {
     if (isXmlTextNode(node)) {
       return currentCount;
     } else {
-      if (node.tagName === 'note') {
-        node.attributes.n = currentCount.toString();
+      if (node.tagName === tagName) {
+        node.attributes[attrName] = currentCount.toString();
         currentCount++;
       }
 

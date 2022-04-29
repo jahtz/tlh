@@ -1,4 +1,4 @@
-import {XmlEditorConfig} from './editorConfig/editorConfig';
+import {XmlEditorConfig, XmlInsertableSingleEditableNodeConfig} from './editorConfig/editorConfig';
 import {useTranslation} from 'react-i18next';
 import {InsertablePositions} from './insertablePositions';
 import {ActivatableButton} from '../bulmaHelpers/Buttons';
@@ -14,8 +14,8 @@ export function EditorEmptyRightSide({editorConfig, currentInsertedElement, togg
   const {t} = useTranslation('common');
 
   const insertableTags: [string, InsertablePositions][] = Object.entries(editorConfig.nodeConfigs)
-    .map<[string, InsertablePositions | undefined]>(([tagName, {insertablePositions}]) => [tagName, insertablePositions])
-    .filter((t): t is [string, InsertablePositions] => !!t[1]);
+    .filter((c): c is [string, XmlInsertableSingleEditableNodeConfig] => 'insertablePositions' in c[1])
+    .map<[string, InsertablePositions]>(([tagName, {insertablePositions}]) => [tagName, insertablePositions]);
 
   return (
     <div>

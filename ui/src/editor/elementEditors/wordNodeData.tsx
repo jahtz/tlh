@@ -2,7 +2,7 @@ import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue
 import {isXmlElementNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
 import {readSelectedMorphology, SelectedAnalysisOption, writeSelectedMorphologies} from '../selectedAnalysisOption';
 import {getSelectedLetters} from '../../model/analysisOptions';
-import {XmlSingleEditableNodeConfig} from '../editorConfig/editorConfig';
+import {XmlInsertableSingleEditableNodeConfig} from '../editorConfig/editorConfig';
 import classNames from 'classnames';
 import {WordNodeEditor} from './WordNodeEditor';
 import {SpacesEditor} from './SpacesEditor';
@@ -99,7 +99,7 @@ function isOnlySpaces({children}: XmlElementNode): boolean {
   return children.length === 1 && isXmlElementNode(children[0]) && children[0].tagName === 'space';
 }
 
-export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
+export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData> = {
   replace: (node, renderedChildren, isSelected) => {
 
     const notMarked = node.attributes.mrp0sel === 'DEL';
