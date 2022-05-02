@@ -4,7 +4,7 @@ import {allManuscriptLanguages, ManuscriptLanguage} from '../model/manuscriptPro
 import {useTranslation} from 'react-i18next';
 import {parseTransliterationLine} from '../transliterationParser/parser';
 import {defaultSideBasics, SideBasics, SideParseResult} from '../model/sideParseResult';
-import {BulmaObjectSelect, SelectOption} from '../forms/BulmaFields';
+import {ObjectSelect, SelectOption} from '../forms/BulmaFields';
 import {Transliteration} from './TransliterationLineResult';
 import {transliterationLine, TransliterationLine, xmlifyTransliterationLine} from '../model/transliterationLine';
 import {ManuscriptSide, TransliterationInput} from '../graphql';
@@ -51,7 +51,7 @@ function SideParseResultComponent({mainIdentifier, sideParseResult}: SideParseRe
     },
     asXml: {
       name: t('asXml'),
-      render: () => <div className="box">
+      render: () => <div className="p-2 rounded border border-slate-300 shadow shadow-slate-200">
         {exportAsXml(mainIdentifier, sideParseResult).map((line, index) => <p key={index}>{line}</p>)}
       </div>
     }
@@ -128,38 +128,31 @@ export function TransliterationSideInput({mainIdentifier, onTransliterationUpdat
   }
 
   return (
-    <div className="box">
+    <div className="p-2 rounded border border-slate-300 shadow-md shadow-slate-200">
+      <div className="grid grid-cols-4 gap-2">
+        <ObjectSelect label={t('manuscriptSide')} id={'manuscriptSide'} currentValue={state.sideBasics.side}
+                      options={manuscriptSideOptions} onUpdate={(side) => updateSideBasics({side})}/>
 
-      <div className="field">
-        <div className="field-body">
-          <BulmaObjectSelect
-            label={t('manuscriptSide')} id={'manuscriptSide'} currentValue={state.sideBasics.side}
-            options={manuscriptSideOptions} onUpdate={(side) => updateSideBasics({side})}/>
+        <ObjectSelect label={t('defaultLanguage')} id={'language'} currentValue={state.sideBasics.language}
+                      options={languageOptions} onUpdate={(language) => updateSideBasics({language})}/>
 
-          <BulmaObjectSelect
-            label={t('defaultLanguage')} id={'language'} currentValue={state.sideBasics.language}
-            options={languageOptions} onUpdate={(language) => updateSideBasics({language})}/>
+        <ObjectSelect label={t('manuscriptColumn')} id={'manuscriptColumn'} currentValue={state.sideBasics.column}
+                      options={columnOptions} onUpdate={(column) => updateSideBasics({column})}/>
 
-          <BulmaObjectSelect
-            label={t('manuscriptColumn')} id={'manuscriptColumn'} currentValue={state.sideBasics.column}
-            options={columnOptions} onUpdate={(column) => updateSideBasics({column})}/>
-
-          <BulmaObjectSelect
-            label={t('manuscriptColumnModifier')} id={'manuscriptColumnModifier'}
-            currentValue={state.sideBasics.columnModifier} options={columnModifierOptions}
-            onUpdate={(columnModifier) => updateSideBasics({columnModifier})}/>
-        </div>
+        <ObjectSelect label={t('manuscriptColumnModifier')} id={'manuscriptColumnModifier'}
+                      currentValue={state.sideBasics.columnModifier} options={columnModifierOptions}
+                      onUpdate={(columnModifier) => updateSideBasics({columnModifier})}/>
       </div>
 
-      <div className="columns">
-        <div className="column">
-          <label className="label">{t('transliteration')}:</label>
-          <textarea className="textarea" name="transliteration" placeholder={t('transliteration')}
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <div>
+          <label className="font-bold block text-center">{t('transliteration')}:</label>
+          <textarea className="mt-2 p-2 rounded border border-slate-500 w-full" name="transliteration" placeholder={t('transliteration')}
                     rows={20} onChange={(event) => updateTransliteration(event.target.value)}/>
         </div>
 
-        <div className="column">
-          <label className="label">{t('parseResult')}:</label>
+        <div>
+          <label className="font-bold block text-center">{t('parseResult')}:</label>
 
           {state.sideParseResult
             ? <SideParseResultComponent mainIdentifier={mainIdentifier} sideParseResult={state.sideParseResult}/>

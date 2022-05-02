@@ -1,4 +1,4 @@
-import {Dispatch, useState} from 'react';
+import {useState} from 'react';
 import {LoginMutationVariables, useLoginMutation} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
@@ -7,7 +7,7 @@ import {loginSchema} from './schemas';
 import {homeUrl} from '../urls';
 import {Navigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
-import {StoreAction, userLoggedInAction} from '../store/actions';
+import {userLoggedInAction} from '../store/actions';
 import {activeUserSelector} from '../store/store';
 
 const initialValues: LoginMutationVariables = {username: '', password: ''};
@@ -15,7 +15,7 @@ const initialValues: LoginMutationVariables = {username: '', password: ''};
 export function LoginForm(): JSX.Element {
 
   const {t} = useTranslation('common');
-  const dispatch = useDispatch<Dispatch<StoreAction>>();
+  const dispatch = useDispatch();
   const [invalidLoginTry, setInvalidLoginTry] = useState(false);
   const [login, {loading, error}] = useLoginMutation();
 

@@ -7,7 +7,7 @@ import {isLeft} from './either';
 
 const localStorageEditorStateKey = 'editorState';
 
-function handleSaveToPC(data: string, filename: string): void {
+export function handleSaveToPC(data: string, filename: string): void {
   const link = document.createElement('a');
   link.download = filename;
   link.href = URL.createObjectURL(

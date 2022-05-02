@@ -6,9 +6,10 @@ import {aoManuscriptsConfig} from '../elementEditors/aoManuscriptsConfigData';
 import {gapConfig} from './gapConfigData';
 import {paragraphSeparatorConfig} from './paragraphSeparatorConfig';
 import {XmlElementNode} from '../xmlModel/xmlModel';
-import {reCountNoteNumbers} from './NoteNodeEditor';
+import {reCountNodeNumbers} from './NoteNodeEditor';
+import {clbNodeConfig} from '../elementEditors/clbData';
 
-// FIXME: recount node numbers!
+// FIXME: recount footnote & clb node numbers!
 
 export const selectedNodeClass = 'bg-teal-400';
 
@@ -17,6 +18,8 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     docID: {replace: () => <span/>},
     'AO:Manuscripts': aoManuscriptsConfig,
     lb: lineBreakNodeConfig,
+
+    clb: clbNodeConfig,
 
     // Words
     w: wordNodeConfig,
@@ -50,7 +53,8 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     note: noteNodeConfig
   },
   beforeExport: (rootNode: XmlElementNode) => {
-    reCountNoteNumbers(rootNode);
+    reCountNodeNumbers(rootNode, 'node', 'n');
+    reCountNodeNumbers(rootNode, 'clb', 'nr');
     return rootNode;
   },
   afterExport: (exported: string) => exported

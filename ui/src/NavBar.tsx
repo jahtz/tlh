@@ -3,8 +3,7 @@ import {createManuscriptUrl, editDocumentUrl, homeUrl, loginUrl, preferencesUrl,
 import {useTranslation} from 'react-i18next';
 import {useDispatch, useSelector} from 'react-redux';
 import {activeUserSelector} from './store/store';
-import {Dispatch} from 'react';
-import {StoreAction, userLoggedOutAction} from './store/actions';
+import {userLoggedOutAction} from './store/actions';
 import i18next from 'i18next';
 
 // TODO: solve languages different?
@@ -14,7 +13,7 @@ export function NavBar(): JSX.Element {
 
   const {t} = useTranslation('common');
   const user = useSelector(activeUserSelector);
-  const dispatch = useDispatch<Dispatch<StoreAction>>();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   function logout() {

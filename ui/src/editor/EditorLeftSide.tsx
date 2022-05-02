@@ -10,6 +10,7 @@ import ReactCodeMirror from '@uiw/react-codemirror';
 import {writeXml} from './DocumentEditor';
 import {isLeft} from './either';
 import update from 'immutability-helper';
+import {FontSizeSelector} from './FontSizeSelector';
 
 export interface EditorLeftSideProps extends NodeDisplayIProps {
   filename: string;
@@ -20,7 +21,6 @@ export interface EditorLeftSideProps extends NodeDisplayIProps {
   setKeyHandlingEnabled: (value: boolean) => void;
 }
 
-const FONT_STEP = 10;
 
 interface IState {
   fontSize: number;
@@ -68,8 +68,8 @@ export function EditorLeftSide({
     }
   }
 
-  function changeFontSize(isIncrease: boolean): void {
-    setState((state) => update((state), {fontSize: {$apply: (value) => isIncrease ? (value + FONT_STEP) : (value - FONT_STEP)}}));
+  function changeFontSize(delta: number): void {
+    setState((state) => update((state), {fontSize: {$apply: (value) => value + delta}}));
   }
 
   return (
@@ -78,13 +78,7 @@ export function EditorLeftSide({
         <span className="font-bold">{filename}</span>
 
         <div className="float-right">
-          <button type="button" className="px-2 border border-slate-500 rounded-l" onClick={() => changeFontSize(false)} title={t('decreaseFontSize')}>
-            -{FONT_STEP}%
-          </button>
-          <button className="px-2 border border-slate-500" disabled>{state.fontSize}%</button>
-          <button type="button" className="mr-2 px-2 border border-slate-500 rounded-r" onClick={() => changeFontSize(true)} title={t('increaseFontSize')}>
-            +{FONT_STEP}%
-          </button>
+          <FontSizeSelector currentFontSize={state.fontSize} updateFontSize={changeFontSize}/>
 
           {state.xmlSource
             ? <>

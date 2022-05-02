@@ -2,9 +2,8 @@ import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue
 import {isXmlElementNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
 import {readSelectedMorphology, SelectedAnalysisOption, writeSelectedMorphologies} from '../selectedAnalysisOption';
 import {getSelectedLetters} from '../../model/analysisOptions';
-import {XmlSingleEditableNodeConfig} from '../editorConfig/editorConfig';
+import {XmlInsertableSingleEditableNodeConfig} from '../editorConfig/editorConfig';
 import classNames from 'classnames';
-import {IoCloseSharp} from 'react-icons/io5';
 import {WordNodeEditor} from './WordNodeEditor';
 import {SpacesEditor} from './SpacesEditor';
 import {selectedNodeClass} from '../editorConfig/tlhXmlEditorConfig';
@@ -100,7 +99,7 @@ function isOnlySpaces({children}: XmlElementNode): boolean {
   return children.length === 1 && isXmlElementNode(children[0]) && children[0].tagName === 'space';
 }
 
-export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
+export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData> = {
   replace: (node, renderedChildren, isSelected) => {
 
     const notMarked = node.attributes.mrp0sel === 'DEL';
@@ -128,12 +127,12 @@ export const wordNodeConfig: XmlSingleEditableNodeConfig<WordNodeData> = {
           'bg-blue-300': hasEditingQuestion,
           [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,
           'has-text-weight-bold': isForeignLanguage,
-          'has-text-danger': node.children.length === 0
+          'text-red-600': node.children.length === 0
         });
 
     return <>
         <span className={classes} title={hasEditingQuestion ? node.attributes.q : undefined}>
-          {node.children.length === 0 ? <IoCloseSharp/> : renderedChildren}
+          {node.children.length === 0 ? <span>&#x2715;</span> : renderedChildren}
         </span>
       &nbsp;&nbsp;
     </>;

@@ -2,6 +2,7 @@ import {NodeDisplay} from './NodeDisplay';
 import {XmlElementNode} from './xmlModel/xmlModel';
 import {ActivatableButton, DeleteButton} from '../bulmaHelpers/Buttons';
 import {useTranslation} from 'react-i18next';
+import {FontSizeSelector, FontSizeSelectorProps} from './FontSizeSelector';
 
 interface IProps {
   originalNode: XmlElementNode;
@@ -11,9 +12,19 @@ interface IProps {
   deleteNode?: () => void;
   otherButtons?: JSX.Element;
   jumpElement?: (forward: boolean) => void;
+  fontSizeSelectorProps: FontSizeSelectorProps;
 }
 
-export function NodeEditorRightSide({originalNode, children, changed, initiateSubmit, deleteNode, otherButtons, jumpElement}: IProps): JSX.Element {
+export function NodeEditorRightSide({
+  originalNode,
+  children,
+  changed,
+  initiateSubmit,
+  deleteNode,
+  otherButtons,
+  jumpElement,
+  fontSizeSelectorProps
+}: IProps): JSX.Element {
 
   // FIXME: import editing question here for all elements?
 
@@ -25,6 +36,7 @@ export function NodeEditorRightSide({originalNode, children, changed, initiateSu
         <NodeDisplay node={originalNode} isLeftSide={false}/>
 
         <div className="float-right">
+          <FontSizeSelector {...fontSizeSelectorProps}/>
 
           {otherButtons}
 
@@ -37,10 +49,10 @@ export function NodeEditorRightSide({originalNode, children, changed, initiateSu
 
           {jumpElement && <button type="button" className="ml-2 px-2 rounded border border-slate-500" onClick={() => jumpElement(true)}
                                   title={t('nextTag')}>&rarr;</button>}
-
         </div>
       </div>
-      <div className="p-2 border border slate-300">
+
+      <div className="p-2 border border slate-300" style={{fontSize: `${fontSizeSelectorProps.currentFontSize}%`}}>
         {children}
       </div>
     </div>

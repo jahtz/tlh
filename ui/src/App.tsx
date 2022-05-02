@@ -44,7 +44,7 @@ export function App(): JSX.Element {
             </RequireAuth>
           }/>
 
-          <Route path={`/${manuscriptsUrlFragment}/:mainIdentifier`} element={<ManuscriptBase/>}/>
+          <Route path={`${manuscriptsUrlFragment}/:mainIdentifier/*`} element={<ManuscriptBase/>}/>
 
           <Route path={wysiwygUrl} element={<WysiwygEditor/>}/>
 

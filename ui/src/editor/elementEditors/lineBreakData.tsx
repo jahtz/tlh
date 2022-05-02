@@ -1,4 +1,4 @@
-import {XmlSingleEditableNodeConfig} from '../editorConfig/editorConfig';
+import {XmlInsertableSingleEditableNodeConfig} from '../editorConfig/editorConfig';
 import classNames from 'classnames';
 import {LineBreakEditor} from './LineBreakEditor';
 import update from 'immutability-helper';
@@ -10,7 +10,7 @@ export interface LineBreakData {
   lg: string | undefined;
 }
 
-export const lineBreakNodeConfig: XmlSingleEditableNodeConfig<LineBreakData> = {
+export const lineBreakNodeConfig: XmlInsertableSingleEditableNodeConfig<LineBreakData> = {
   replace: (node, _renderedChildren, isSelected, isLeftSide) => (
     <>
       {isLeftSide && <br/>}

@@ -12,14 +12,15 @@ export function LineBreakEditor({
   deleteNode,
   setKeyHandlingEnabled,
   initiateSubmit,
-  initiateJumpElement
+  initiateJumpElement,
+  fontSizeSelectorProps
 }: XmlEditableNodeIProps<LineBreakData>): JSX.Element {
 
   const {t} = useTranslation('common');
 
   return (
     <NodeEditorRightSide originalNode={originalNode} changed={changed} initiateSubmit={initiateSubmit} jumpElement={initiateJumpElement}
-                         deleteNode={deleteNode}>
+                         deleteNode={deleteNode} fontSizeSelectorProps={fontSizeSelectorProps}>
       <div>
         <div className="mb-4">
           <label htmlFor="textId" className="font-bold">{t('textId')}:</label>

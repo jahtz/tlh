@@ -1,4 +1,4 @@
-import {XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from './editorConfig';
+import {XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from './editorConfig';
 import classNames from 'classnames';
 import {useTranslation} from 'react-i18next';
 import {XmlElementNode} from '../xmlModel/xmlModel';
@@ -8,7 +8,7 @@ function isLineGapNode(node: XmlElementNode): boolean {
   return 't' in node.attributes && node.attributes.t === 'line';
 }
 
-export const gapConfig: XmlSingleEditableNodeConfig = {
+export const gapConfig: XmlInsertableSingleEditableNodeConfig = {
   replace: (node, _renderedChildren, isSelected, isLeftSide) => (
     <>
       {isLineGapNode(node) && isLeftSide && <br/>}
@@ -25,13 +25,22 @@ export const gapConfig: XmlSingleEditableNodeConfig = {
   }
 };
 
-function GapEditor({data, originalNode, updateNode, changed, initiateSubmit, deleteNode, initiateJumpElement}: XmlEditableNodeIProps): JSX.Element {
+function GapEditor({
+  data,
+  originalNode,
+  updateNode,
+  changed,
+  initiateSubmit,
+  deleteNode,
+  initiateJumpElement,
+  fontSizeSelectorProps
+}: XmlEditableNodeIProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
   return (
     <NodeEditorRightSide originalNode={originalNode} changed={changed} initiateSubmit={initiateSubmit} deleteNode={deleteNode}
-                         jumpElement={initiateJumpElement}>
+                         jumpElement={initiateJumpElement} fontSizeSelectorProps={fontSizeSelectorProps}>
       <div>
         <label htmlFor="content" className="font-bold">{t('content')}:</label>
 

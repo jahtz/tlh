@@ -37,45 +37,45 @@ export function ManuscriptData({manuscript}: ManuscriptBaseIProps): JSX.Element 
     : undefined;
 
   return (
-    <div className="container">
-      <h1 className="title is-3 has-text-centered">
+    <div className="container mx-auto">
+      <h1 className="font-bold text-2xl text-center">
         {t('manuscript{{mainIdentifier}}', {mainIdentifier: manuscript.mainIdentifier.identifier})}: {t('generalData_plural')}
       </h1>
 
       <div className="my-3">
-        <h2 className="subtitle is-4">{t('data_plural')}</h2>
+        <h2 className="font-bold text-xl">{t('data_plural')}</h2>
 
-        <table className="table is-fullwidth">
+        <table className="w-full">
           <tbody>
             <tr>
-              <th>{t('otherIdentifier_plural')}</th>
-              <td>{renderOtherIdentifiers(manuscript.otherIdentifiers)}</td>
+              <th className="text-right px-4 py-2">{t('otherIdentifier_plural')}</th>
+              <td className="px-4 py-2">{renderOtherIdentifiers(manuscript.otherIdentifiers)}</td>
             </tr>
             <tr>
-              <th>{t('palaeographicClassification')}</th>
-              <td>
+              <th className="text-right px-4 py-2">{t('palaeographicClassification')}</th>
+              <td className="px-4 py-2">
                 {getNameForPalaeoClassification(manuscript.palaeographicClassification, t)}
                 {manuscript.palaeographicClassificationSure ? '' : '?'}
               </td>
             </tr>
             <tr>
-              <th>{t('(proposed)CthClassification')}</th>
-              <td>{manuscript.cthClassification || '--'}</td>
+              <th className="text-right px-4 py-2">{t('(proposed)CthClassification')}</th>
+              <td className="px-4 py-2">{manuscript.cthClassification || '--'}</td>
             </tr>
             <tr>
-              <th>{t('provenance')}</th>
-              <td>{manuscript.provenance || '--'}</td>
+              <th className="text-right px-4 py-2">{t('provenance')}</th>
+              <td className="px-4 py-2">{manuscript.provenance || '--'}</td>
             </tr>
             <tr>
-              <th>{t('bibliography')}</th>
-              <td>{manuscript.bibliography || '--'}</td>
+              <th className="text-right px-4 py-2">{t('bibliography')}</th>
+              <td className="px-4 py-2">{manuscript.bibliography || '--'}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <div className="my-3">
-        <h2 className="subtitle is-4">{t('picture_plural')}</h2>
+        <h2 className="font-bold text-xl">{t('picture_plural')}</h2>
 
         {manuscript.pictureUrls.length === 0
           ? <div className="notification is-info has-text-centered">
@@ -84,13 +84,13 @@ export function ManuscriptData({manuscript}: ManuscriptBaseIProps): JSX.Element 
           : <PicturesBlock mainIdentifier={manuscript.mainIdentifier.identifier} pictures={manuscript.pictureUrls}/>
         }
 
-        {createdByUser && <Link className="button is-link is-fullwidth" to={`./${uploadPicturesUrl}`}>
+        {createdByUser && <Link className="mt-2 p-2 block rounded bg-blue-500 text-white text-center w-full" to={`../${uploadPicturesUrl}`}>
           {t('uploadPicture_plural')}
         </Link>}
       </div>
 
       <div className="my-3">
-        <h2 className="subtitle is-4">{t('transliteration')}</h2>
+        <h2 className="font-bold text-xl">{t('transliteration')}</h2>
 
         {sideParseResults
           ? <div className="my-3">
@@ -101,9 +101,9 @@ export function ManuscriptData({manuscript}: ManuscriptBaseIProps): JSX.Element 
           </div>}
 
         {createdByUser &&
-        <Link className="button is-link is-fullwidth" to={`./${createTransliterationUrl}`}>
-          {t('createTransliteration')}
-        </Link>}
+          <Link className="mt-2 p-2 block rounded bg-blue-500 text-white text-center w-full" to={`../${createTransliterationUrl}`}>
+            {t('createTransliteration')}
+          </Link>}
       </div>
     </div>
   );

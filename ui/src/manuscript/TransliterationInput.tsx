@@ -7,6 +7,7 @@ import {TransliterationInput as TI, useUploadTransliterationMutation} from '../g
 import {ManuscriptBaseIProps} from './ManuscriptBase';
 import {TransliterationSideInput} from './TransliterationSideInput';
 import {Navigate} from 'react-router-dom';
+import update from 'immutability-helper';
 
 interface SideParseResultContainer {
   newSideParseResult?: TI;
@@ -42,44 +43,26 @@ export function TransliterationInput({manuscript}: ManuscriptBaseIProps): JSX.El
   }
 
   function addTransliterationSideInput(): void {
-    setState((state) => {
-      return {...state, sideParseResults: [...state.sideParseResults, {}]};
-    });
+    setState((state) => update(state, {sideParseResults: {$push: [{}]}}));
   }
 
   function updateTransliteration(index: number, result: TI): void {
-    setState((state) => {
-      return {
-        ...state,
-        sideParseResults: state.sideParseResults
-          .map((sprc, runningIndex) => index === runningIndex ? {newSideParseResult: result} : sprc),
-      };
-    });
+    setState((state) => update(state, {sideParseResults: {[index]: {newSideParseResult: {$set: result}}}}));
   }
 
   return (
-    <div className="container is-fluid">
-      <h1 className="subtitle is-3 has-text-centered">{t('createTransliteration')}</h1>
+    <div>
+      <h1 className="font-bold text-xl text-center">{t('createTransliteration')}</h1>
 
       {state.sideParseResults.map((_, index) =>
-        <TransliterationSideInput
-          key={index} mainIdentifier={mainIdentifier}
-          onTransliterationUpdate={(s) => updateTransliteration(index, s)}/>
+        <TransliterationSideInput key={index} mainIdentifier={mainIdentifier} onTransliterationUpdate={(s) => updateTransliteration(index, s)}/>
       )}
 
-      <div className="columns">
-        <div className="column">
-          <button className="button is-link is-fullwidth" onClick={addTransliterationSideInput}>
-            {t('additionalPage')}
-          </button>
-        </div>
-        <div className="column">
-          <button type="button" className="button is-link is-fullwidth" onClick={upload} disabled={loading}>
-            {t('uploadTransliteration')}
-          </button>
+      {error && <div className="mt-2 p-2 bg-red-500 text-white text-center">{error.message}</div>}
 
-          {error && <div className="notification is-danger has-text-centered my-3">{error.message}</div>}
-        </div>
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={addTransliterationSideInput}>{t('additionalPage')}</button>
+        <button type="button" className="p-2 rounded bg-blue-500 text-white w-full " onClick={upload} disabled={loading}>{t('uploadTransliteration')}</button>
       </div>
     </div>
   );
