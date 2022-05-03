@@ -32,6 +32,8 @@ export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXml
 
         const writtenValue = value
           .replaceAll(/&(?!amp;)/g, '&amp;')
+          .replaceAll('"', '&quot;')
+          .replaceAll('\'', '&apos;')
           .replaceAll('<', '&lt;')
           .replaceAll('>', '&gt;');
 
