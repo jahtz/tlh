@@ -357,7 +357,7 @@ export function DocumentEditor<T>({node: initialNode, download, filename, closeF
       <EditorLeftSide {...leftSideProps}/>
 
       {state.editorState && 'path' in state.editorState
-        ? <div className="max-h-full overflow-auto">{renderNodeEditor(state.editorState) /* don't convert to a component! */}</div>
+        ? <div className="max-h-full overflow-auto" key={state.editorState.path.join('.')}>{renderNodeEditor(state.editorState) /* don't convert to a component! */}</div>
         : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}/>}
     </div>
   );
