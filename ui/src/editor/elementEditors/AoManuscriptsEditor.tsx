@@ -13,10 +13,10 @@ function AoTextNumberField({source: {type, name}, updateType, updateText}: AoTex
   return (
     <>
       <select defaultValue={type} className="p-2 rounded-l border-l border-y border-slate-500 bg-gray-100"
-              onBlur={(event) => updateType(event.target.value as SourceType)}>
+              onChange={(event) => updateType(event.target.value as SourceType)}>
         {sourceTypes.map((st) => <option key={st}>{st}</option>)}
       </select>
-      <input type="text" className="flex-grow p-2 border border-slate-500" defaultValue={name} onBlur={(event) => updateText(event.target.value)}/>
+      <input type="text" className="flex-grow p-2 border border-slate-500" defaultValue={name} onChange={(event) => updateText(event.target.value)}/>
     </>
   );
 }
@@ -57,7 +57,7 @@ export function AoManuscriptsEditor({
           <div className="mt-2 flex" key={index}>
             {typeof source === 'string'
               ? <input key={index} className="flex-grow p-2 rounded-l border border-slate-500" type="text" defaultValue={source}
-                       onBlur={(event) => updatePlus(index, event.currentTarget.value)}/>
+                       onChange={(event) => updatePlus(index, event.currentTarget.value)}/>
               : <AoTextNumberField key={index} source={source} updateType={(value) => updateType(index, value)}
                                    updateText={(value) => updateText(index, value)}/>}
 

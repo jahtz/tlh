@@ -49,7 +49,7 @@ export function NoteNodeEditor({
       <div className="mb-4">
         <label htmlFor="content" className="font-bold">{t('content')}:</label>
         <input type="text" id="content" className="p-2 mt-2 rounded border border-slate-500 w-full" defaultValue={data.content} placeholder={t('content')}
-               onFocus={() => setKeyHandlingEnabled(false)} onBlur={(event) => updateNode({content: {$set: event.target.value}})}/>
+               onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateNode({content: {$set: event.target.value}})}/>
       </div>
 
       <div className="my-3">

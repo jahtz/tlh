@@ -45,7 +45,7 @@ function GapEditor({
         <label htmlFor="content" className="font-bold">{t('content')}:</label>
 
         <input type="text" defaultValue={data.attributes.c} id="content" className="mt-2 p-2 rounded border border-slate-500 w-full"
-               onBlur={(event) => updateNode({attributes: {c: {$set: event.target.value}}})}/>
+               onChange={(event) => updateNode({attributes: {c: {$set: event.target.value}}})}/>
       </div>
     </NodeEditorRightSide>
   );

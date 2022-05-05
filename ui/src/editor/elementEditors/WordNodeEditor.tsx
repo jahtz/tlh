@@ -140,7 +140,7 @@ export function WordNodeEditor({
         ? <WordContentEditor initialTransliteration={state.editContent} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>
         : <>
           <div className="mt-4">
-            <LanguageInput initialValue={data.lg} onBlur={updateLanguage}/>
+            <LanguageInput initialValue={data.lg} onChange={updateLanguage}/>
           </div>
 
           <div className="mt-4">

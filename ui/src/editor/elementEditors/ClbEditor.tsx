@@ -24,7 +24,7 @@ export function ClbEditor({
       <div className="mb-4">
         <label htmlFor="lineNumber" className="font-bold">{t('id')}:</label>
         <input type="text" id="lineNumber" className="p-2 rounded border border-slate-500 w-full mt-2" defaultValue={data.id.trim()}
-               onFocus={() => setKeyHandlingEnabled(false)} onBlur={(event) => updateNode({id: {$set: event.target.value}})}/>
+               onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateNode({id: {$set: event.target.value}})}/>
       </div>
 
     </NodeEditorRightSide>
