@@ -43,9 +43,15 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
     if (state.parseResult.status) {
       fetchMorphologicalAnalyses(writeNode(state.parseResult.value).join(''), 'Hit')
         .then((res) => {
-          res && setState((state) => update(state, {parseResult: {value: {attributes: {$set: res}}}}));
+          if (res) {
+            setState((state) => update(state, {parseResult: {value: {attributes: {$set: res}}}}));
+          } else {
+            alert('Could not find any morphological analyses...');
+          }
         })
         .catch((err) => console.error(err));
+    } else {
+      alert('Can\'t query for morphological anayses!');
     }
   }
 
