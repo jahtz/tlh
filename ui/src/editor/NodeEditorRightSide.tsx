@@ -4,12 +4,16 @@ import {ActivatableButton, DeleteButton} from '../bulmaHelpers/Buttons';
 import {useTranslation} from 'react-i18next';
 import {FontSizeSelector, FontSizeSelectorProps} from './FontSizeSelector';
 
-interface IProps {
+export interface NodeEditorRightSideProps {
   originalNode: XmlElementNode;
-  children: JSX.Element;
   changed: boolean;
   initiateSubmit: () => void;
   deleteNode?: () => void;
+  cancelSelection: () => void;
+}
+
+interface IProps extends NodeEditorRightSideProps {
+  children: JSX.Element;
   otherButtons?: JSX.Element;
   jumpElement?: (forward: boolean) => void;
   fontSizeSelectorProps: FontSizeSelectorProps;
@@ -23,7 +27,8 @@ export function NodeEditorRightSide({
   deleteNode,
   otherButtons,
   jumpElement,
-  fontSizeSelectorProps
+  fontSizeSelectorProps,
+  cancelSelection
 }: IProps): JSX.Element {
 
   // FIXME: import editing question here for all elements?
@@ -46,6 +51,8 @@ export function NodeEditorRightSide({
           {deleteNode && <DeleteButton onClick={deleteNode} otherClasses={['ml-2', 'px-2', 'rounded']}/>}
 
           <ActivatableButton text={t('update')} isActive={changed} onClick={initiateSubmit} otherClasses={['ml-2', 'px-2', 'rounded']}/>
+
+          <button type="button" className="ml-2 px-2 rounded border border-slate-500" onClick={cancelSelection} title={t('cancelSelection')}>&#x2715;</button>
 
           {jumpElement && <button type="button" className="ml-2 px-2 rounded border border-slate-500" onClick={() => jumpElement(true)}
                                   title={t('nextTag')}>&rarr;</button>}

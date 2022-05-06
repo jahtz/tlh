@@ -27,7 +27,8 @@ export function AoManuscriptsEditor({
   updateNode,
   changed,
   initiateSubmit,
-  fontSizeSelectorProps
+  fontSizeSelectorProps,
+  cancelSelection
 }: XmlEditableNodeIProps<AoManuscriptsData>): JSX.Element {
 
   function updateType(index: number, newType: SourceType): void {
@@ -51,7 +52,8 @@ export function AoManuscriptsEditor({
   }
 
   return (
-    <NodeEditorRightSide originalNode={originalNode} changed={changed} initiateSubmit={initiateSubmit} fontSizeSelectorProps={fontSizeSelectorProps}>
+    <NodeEditorRightSide originalNode={originalNode} changed={changed} initiateSubmit={initiateSubmit} fontSizeSelectorProps={fontSizeSelectorProps}
+                         cancelSelection={cancelSelection}>
       <div>
         {data.content.map((source, index) =>
           <div className="mt-2 flex" key={index}>

@@ -12,7 +12,8 @@ export function SpacesEditor({
   deleteNode,
   initiateSubmit,
   initiateJumpElement,
-  fontSizeSelectorProps
+  fontSizeSelectorProps,
+  cancelSelection
 }: XmlEditableNodeIProps<WordNodeData>): JSX.Element {
 
   const {t} = useTranslation('common');
@@ -23,7 +24,7 @@ export function SpacesEditor({
 
   return (
     <NodeEditorRightSide originalNode={originalNode} changed={changed} initiateSubmit={initiateSubmit} deleteNode={deleteNode} jumpElement={initiateJumpElement}
-                         fontSizeSelectorProps={fontSizeSelectorProps}>
+                         fontSizeSelectorProps={fontSizeSelectorProps} cancelSelection={cancelSelection}>
       <div>
         <label htmlFor="spacesCount" className="font-bold">{t('spacesCount')}:</label>
 

@@ -33,14 +33,15 @@ function GapEditor({
   initiateSubmit,
   deleteNode,
   initiateJumpElement,
-  fontSizeSelectorProps
+  fontSizeSelectorProps,
+  cancelSelection
 }: XmlEditableNodeIProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
   return (
     <NodeEditorRightSide originalNode={originalNode} changed={changed} initiateSubmit={initiateSubmit} deleteNode={deleteNode}
-                         jumpElement={initiateJumpElement} fontSizeSelectorProps={fontSizeSelectorProps}>
+                         jumpElement={initiateJumpElement} fontSizeSelectorProps={fontSizeSelectorProps} cancelSelection={cancelSelection}>
       <div>
         <label htmlFor="content" className="font-bold">{t('content')}:</label>
 
