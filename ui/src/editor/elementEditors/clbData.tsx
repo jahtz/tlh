@@ -10,8 +10,8 @@ export interface ClbData {
 
 export const clbNodeConfig: XmlInsertableSingleEditableNodeConfig<ClbData> = {
   // TODO: how to display <clb/> in xml editor?
-  replace: (_node, _element, isSelected) => <span>
-    <span className={classNames(isSelected ? [selectedNodeClass, 'text-black'] : ['text-amber-500'])}>&otimes;</span>&nbsp;
+  replace: (node, _element, isSelected) => <span>
+    <span className={classNames(isSelected ? selectedNodeClass : 'bg-amber-500')}>{node.attributes.id}</span>&nbsp;
   </span>,
   edit: (props) => <ClbEditor {...props}/>,
   readNode: (node): ClbData => ({id: node.attributes.id || ''}),
