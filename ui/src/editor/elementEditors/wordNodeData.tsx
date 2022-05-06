@@ -39,9 +39,9 @@ function addFootNote(children: XmlNode[], footNote: string): XmlNode[] {
 }
 
 function removeFootNote(children: XmlNode[]): XmlNode[] {
-  const lastElement = children[children.length - 1];
+  const lastElement: XmlNode | undefined = children[children.length - 1];
 
-  return isXmlElementNode(lastElement) && lastElement.tagName === 'note'
+  return lastElement && isXmlElementNode(lastElement) && lastElement.tagName === 'note'
     ? children.slice(0, -1)
     : children;
 }

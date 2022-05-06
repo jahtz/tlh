@@ -66,6 +66,8 @@ export function WordNodeEditor({
   }
 
   function enableEditWordState(): void {
+    setKeyHandlingEnabled(false);
+
     const newValue = data.node.children.map((c, index) => reconstructTransliteration(c, index === 0)).join('');
 
     setState((state) => update(state, {editContent: {$set: newValue}}));
@@ -77,6 +79,7 @@ export function WordNodeEditor({
   }
 
   function cancelEdit(): void {
+    setKeyHandlingEnabled(true);
     setState((state) => update(state, {editContent: {$set: undefined}}));
   }
 
