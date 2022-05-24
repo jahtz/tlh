@@ -24,11 +24,10 @@ const letterCorrections: LetterCorrection = [
   ['̮', '' /* Achtung, überzähliger Bogen unter Het! schlecht sichtbar */],
   ['〈', '〈' /* U+3008 aus CJK zu  U+2329 */], ['〉', '〉'],
   // Harmonizations
-  ['á', 'á'], ['à', 'à'], ['â', 'â'], ['ā', 'a'],
+  ['á', 'á'], ['à', 'à'], ['â', 'â'], ['ā', 'ā'],
   ['é', 'é'], ['è', 'è'], ['ê', 'ê'], ['ē', 'e'],
-  ['í', 'í'], ['ì', 'ì'], ['î', 'î'], ['ī', 'i'],
-  ['ú', 'ú'], ['ù', 'ù'], ['û', 'û'], ['ū', 'u'],
-  ['=', '-']
+  ['í', 'í'], ['ì', 'ì'], ['î', 'î'], ['ī', 'ī'],
+  ['ú', 'ú'], ['ù', 'ù'], ['û', 'û'], ['ū', 'ū'],
 ];
 
 export const tlhXmlReadConfig: XmlReadConfig = {
