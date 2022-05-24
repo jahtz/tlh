@@ -114,3 +114,8 @@ code {
   vertical-align: super;
   font-size: 80%;
 }
+
+.cl {
+  color: white;
+  background-color: black;
+}

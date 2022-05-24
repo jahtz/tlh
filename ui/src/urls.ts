@@ -16,6 +16,8 @@ export const preferencesUrl = '/preferences';
 
 export const editDocumentUrl = '/editDocument';
 
+export const transcriptioEditDocumentUrl = '/transcriptioEditDocument';
+
 export const xmlComparatorUrl = '/xmlComparator';
 
 export const documentMergerUrl = '/documentMerger';

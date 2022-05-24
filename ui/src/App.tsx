@@ -8,6 +8,7 @@ import {
   manuscriptsUrlFragment,
   preferencesUrl,
   registerUrl,
+  transcriptioEditDocumentUrl,
   xmlComparatorUrl
 } from './urls';
 import {Home} from './Home';
@@ -21,6 +22,7 @@ import {Preferences} from './Preferences';
 import {DocumentMergerContainer} from './documentMerger/DocumentMergerContainer';
 import {RequireAuth} from './RequireAuth';
 import {NavBar} from './NavBar';
+import { TranscriptionDocumentEditorContainer } from './transcriptioEditor/TranscriptioDocumentEditorContainer';
 
 export function App(): JSX.Element {
 
@@ -45,6 +47,8 @@ export function App(): JSX.Element {
           <Route path={`${manuscriptsUrlFragment}/:mainIdentifier/*`} element={<ManuscriptBase/>}/>
 
           <Route path={editDocumentUrl} element={<DocumentEditorContainer/>}/>
+
+          <Route path={transcriptioEditDocumentUrl} element={<TranscriptionDocumentEditorContainer/>}/>
 
           <Route path={xmlComparatorUrl} element={<XmlComparator/>}/>
 
