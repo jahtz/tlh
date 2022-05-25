@@ -1,9 +1,9 @@
-import {XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from './editorConfig';
+import {XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from './editorConfig';
 import classNames from 'classnames';
 import {useTranslation} from 'react-i18next';
 import {selectedNodeClass} from './tlhXmlEditorConfig';
 
-export const paragraphSeparatorConfig: XmlSingleEditableNodeConfig = {
+export const paragraphSeparatorConfig: XmlInsertableSingleEditableNodeConfig = {
   replace: (node, _renderedChildren, isSelected) => (
     <span className={isSelected ? selectedNodeClass : ''}>
       {node.tagName === 'parsep' ? '¬¬¬' : '==='}
@@ -12,6 +12,9 @@ export const paragraphSeparatorConfig: XmlSingleEditableNodeConfig = {
   edit: (props) => <ParagraphSeparatorEditor {...props}/>,
   readNode: (node) => node,
   writeNode: (node) => node,
+  insertablePositions: {
+    afterElement: ['lb', 'w']
+  }
 };
 
 const separatorTypes: string[] = ['parsep', 'parsep_dbl'];
