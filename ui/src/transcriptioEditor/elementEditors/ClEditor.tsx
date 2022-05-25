@@ -18,7 +18,7 @@ export const clEditorConfig: XmlInsertableSingleEditableNodeConfig = {
 };
 
 export function ClEditor({
-  data,
+  /*  data,*/
   originalNode,
   changed,
   updateNode,
