@@ -1,14 +1,12 @@
-import {XmlWriter} from '../../xmlEditor/transliterationEditor/xmlModel/xmlWriting';
 import {AOWordContent} from './wordContent';
+import {XmlWriter} from '../../xmlModel/xmlWriting';
 
 export interface AOKolonMark {
   type: 'AOKolonMark';
   content: string;
 }
 
-export const aoKolonMarkFormat: XmlWriter<AOKolonMark> = {
-  write: ({content}) => [`<AO:KolonMark>${content}</AO:KolonMark>`]
-};
+export const aoKolonMarkFormat: XmlWriter<AOKolonMark> = ({content}) => [`<AO:KolonMark>${content}</AO:KolonMark>`];
 
 export function aoKolonMark(content: string): AOKolonMark {
   return {type: 'AOKolonMark', content};

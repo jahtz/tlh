@@ -1,14 +1,12 @@
-import {XmlWriter} from '../../xmlEditor/transliterationEditor/xmlModel/xmlWriting';
 import {AOWordContent} from './wordContent';
+import {XmlWriter} from '../../xmlModel/xmlWriting';
 
 export interface AOSpace {
   type: 'AOSpace';
   c: string;
 }
 
-export const aoSpaceFormat: XmlWriter<AOSpace> = {
-  write: ({c}) => [`<space c="${c}"/>`]
-};
+export const aoSpaceFormat: XmlWriter<AOSpace> = ({c}) => [`<space c="${c}"/>`];
 
 export function aoSpace(c: string): AOSpace {
   return {type: 'AOSpace', c};

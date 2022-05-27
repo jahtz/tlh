@@ -1,5 +1,5 @@
-import {XmlWriter} from '../../xmlEditor/transliterationEditor/xmlModel/xmlWriting';
 import {AOWordContent} from './wordContent';
+import {XmlWriter} from '../../xmlModel/xmlWriting';
 
 export interface AOFootNote {
   type: 'AONote';
@@ -7,9 +7,7 @@ export interface AOFootNote {
   number: number;
 }
 
-export const aoNoteFormat: XmlWriter<AOFootNote> = {
-  write: ({content, number}) => [`<note c="${content}" n="${number}"/>`]
-};
+export const aoNoteFormat: XmlWriter<AOFootNote> = ({content, number}) => [`<note c="${content}" n="${number}"/>`];
 
 export function aoNote(content: string, number = -1): AOFootNote {
   return {type: 'AONote', content, number};

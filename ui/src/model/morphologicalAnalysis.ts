@@ -1,7 +1,7 @@
 import {LetteredAnalysisOption, parseMultiAnalysisString} from './analysisOptions';
 import {tlhAnalyzerUrl} from '../urls';
-import {XmlElementNode} from '../xmlEditor/transliterationEditor/xmlModel/xmlModel';
-import {SelectedAnalysisOption} from '../xmlEditor/transliterationEditor/selectedAnalysisOption';
+import {XmlElementNode} from '../xmlModel/xmlModel';
+import {SelectedAnalysisOption} from '../xmlEditor/selectedAnalysisOption';
 
 const morphologyAttributeNameRegex = /^mrp(\d+)$/;
 

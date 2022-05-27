@@ -1,10 +1,10 @@
 import {Field, Form, Formik} from 'formik';
 import {useTranslation} from 'react-i18next';
-import {EditorKeyConfig} from './xmlEditor/transliterationEditor/editorKeyConfig';
 import {useDispatch, useSelector} from 'react-redux';
 import {editorKeyConfigSelector} from './store/store';
 import {updatePreferencesAction} from './store/actions';
 import {useState} from 'react';
+import {EditorKeyConfig} from './xmlEditor/editorKeyConfig';
 
 const splitKey = ',';
 

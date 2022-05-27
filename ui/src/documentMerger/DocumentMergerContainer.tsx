@@ -3,11 +3,11 @@ import {FileLoader} from '../forms/FileLoader';
 import {useState} from 'react';
 import update from 'immutability-helper';
 import {DocumentMerger} from './DocumentMerger';
-import {loadNewXml} from '../xmlEditor/transliterationEditor/xmlModel/xmlReading';
+import {loadNewXml} from '../xmlModel/xmlReading';
 import {MergeDocument, MergeLine, readMergeDocument} from './mergeDocument';
-import {XmlElementNode} from '../xmlEditor/transliterationEditor/xmlModel/xmlModel';
-import {isLeft} from '../xmlEditor/transliterationEditor/either';
 import {MergedDocumentView} from './MergedDocumentView';
+import {isLeft} from '../xmlModel/either';
+import {XmlElementNode} from '../xmlModel/xmlModel';
 
 interface MergeFile {
   filename: string;

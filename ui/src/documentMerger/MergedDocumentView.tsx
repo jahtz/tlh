@@ -1,9 +1,9 @@
 import {MergeLine} from './mergeDocument';
 import {MergeDocumentLine} from './DocumentMerger';
 import {useTranslation} from 'react-i18next';
-import {XmlElementNode, XmlNode} from '../xmlEditor/transliterationEditor/xmlModel/xmlModel';
-import {handleSaveToPC} from '../xmlEditor/transliterationEditor/DocumentEditorContainer';
-import {writeNode} from '../xmlEditor/transliterationEditor/xmlModel/xmlWriting';
+import {XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
+import {writeNode} from '../xmlModel/xmlWriting';
+import {handleSaveToPC} from '../xmlEditor/TranscriptioDocumentEditorContainer';
 
 interface IProps {
   lines: MergeLine[];

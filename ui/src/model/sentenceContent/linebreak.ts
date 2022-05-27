@@ -1,5 +1,5 @@
-import {XmlWriter} from '../../xmlEditor/transliterationEditor/xmlModel/xmlWriting';
 import {AOWord, aoWordFormat} from './word';
+import {XmlWriter} from '../../xmlModel/xmlWriting';
 
 export interface AOLineBreak {
   type: 'AOLineBreak';
@@ -11,10 +11,8 @@ export interface AOLineBreak {
   words: AOWord[];
 }
 
-export const aoLineBreakFormat: XmlWriter<AOLineBreak> = {
-  write: ({textId, /*side, column,*/ lineNumber, language, words}) =>
-    [`<lb lg="${language}" lnr="${lineNumber}" txtid="${textId}"/>`, ...words.flatMap((w) => aoWordFormat.write(w))]
-};
+export const aoLineBreakFormat: XmlWriter<AOLineBreak> =  ({textId, /*side, column,*/ lineNumber, language, words}) =>
+    [`<lb lg="${language}" lnr="${lineNumber}" txtid="${textId}"/>`, ...words.flatMap((w) => aoWordFormat(w))];
 
 export function aoLineBreak(textId: string, lnr: string, language: string, words: AOWord[]): AOLineBreak {
   // TODO: split lnr in side, paragraphNumber, lineNumber and lineNumberIsAbsolute

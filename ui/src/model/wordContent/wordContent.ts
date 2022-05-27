@@ -10,12 +10,12 @@ import {AOFootNote, aoNoteFormat, isAoFootNote} from './footNote';
 import {AOKolonMark, aoKolonMarkFormat, isAoKolonMark} from './kolonMark';
 import {AOIllegibleContent} from './illegible';
 import {AOSpace, aoSpaceFormat, isSpace} from './space';
-import {XmlNode} from '../../xmlEditor/transliterationEditor/xmlModel/xmlModel';
-import {XmlWriter} from '../../xmlEditor/transliterationEditor/xmlModel/xmlWriting';
 import {InscribedLetter, inscribedLetterFormat, isInscribedLetter} from './inscribedLetter';
 import {Ellipsis, ellipsisFormat, isEllipsis} from './ellipsis';
 import {BasicText, isBasicText} from './basicText';
 import {IndexDigit, isIndexDigit} from './indexDigit';
+import {XmlNode} from '../../xmlModel/xmlModel';
+import {XmlWriter} from '../../xmlModel/xmlWriting';
 
 // Word content
 
@@ -68,40 +68,38 @@ export function xmlifyAoWordContent(c: AOWordContent): XmlNode {
   }
 }
 
-export const aoWordContentFormat: XmlWriter<AOWordContent> = {
-  write: (c) => {
-    if (isBasicText(c)) {
-      return [c.content];
-    } else if (isAkkadogramm(c)) {
-      return akkadogrammFormat.write(c);
-    } else if (isSumerogramm(c)) {
-      return sumerogrammFormat.write(c);
-    } else if (isDeterminativ(c)) {
-      return determinativFormat.write(c);
-    } else if (isMaterLectionis(c)) {
-      return materLectionisFormat.write(c);
-    } else if (isNumeralContent(c)) {
-      return numeralContentFormat.write(c);
-    } else if (isCorrectionContent(c)) {
-      return aoCorrFormat.write(c);
-    } else if (isDamageContent(c)) {
-      return xmlifyDamageContent(c);
-    } else if (isAoSign(c)) {
-      return aoSignFormat.write(c);
-    } else if (isAoFootNote(c)) {
-      return aoNoteFormat.write(c);
-    } else if (isAoKolonMark(c)) {
-      return aoKolonMarkFormat.write(c);
-    } else if (isSpace(c)) {
-      return aoSpaceFormat.write(c);
-    } else if (isInscribedLetter(c)) {
-      return inscribedLetterFormat.write(c);
-    } else if (isEllipsis(c)) {
-      return ellipsisFormat.write(c);
-    } else {
-      // Illegible content
-      // let y = c;
-      return ['x'];
-    }
+export const aoWordContentFormat: XmlWriter<AOWordContent> = (c) => {
+  if (isBasicText(c)) {
+    return [c.content];
+  } else if (isAkkadogramm(c)) {
+    return akkadogrammFormat(c);
+  } else if (isSumerogramm(c)) {
+    return sumerogrammFormat(c);
+  } else if (isDeterminativ(c)) {
+    return determinativFormat(c);
+  } else if (isMaterLectionis(c)) {
+    return materLectionisFormat(c);
+  } else if (isNumeralContent(c)) {
+    return numeralContentFormat(c);
+  } else if (isCorrectionContent(c)) {
+    return aoCorrFormat(c);
+  } else if (isDamageContent(c)) {
+    return xmlifyDamageContent(c);
+  } else if (isAoSign(c)) {
+    return aoSignFormat(c);
+  } else if (isAoFootNote(c)) {
+    return aoNoteFormat(c);
+  } else if (isAoKolonMark(c)) {
+    return aoKolonMarkFormat(c);
+  } else if (isSpace(c)) {
+    return aoSpaceFormat(c);
+  } else if (isInscribedLetter(c)) {
+    return inscribedLetterFormat(c);
+  } else if (isEllipsis(c)) {
+    return ellipsisFormat(c);
+  } else {
+    // Illegible content
+    // let y = c;
+    return ['x'];
   }
 };

@@ -2,27 +2,28 @@ import {Route, Routes} from 'react-router-dom';
 import {
   createManuscriptUrl,
   documentMergerUrl,
-  editDocumentUrl,
+  editTranscriptionDocumentUrl,
+  editTransliterationDocumentUrl,
   homeUrl,
   loginUrl,
   manuscriptsUrlFragment,
   preferencesUrl,
   registerUrl,
-  transcriptioEditDocumentUrl,
   xmlComparatorUrl
 } from './urls';
 import {Home} from './Home';
 import {RegisterForm} from './forms/RegisterForm';
 import {LoginForm} from './forms/LoginForm';
 import {CreateManuscriptForm} from './forms/CreateManuscriptForm';
-import {DocumentEditorContainer} from './xmlEditor/transliterationEditor/DocumentEditorContainer';
 import {ManuscriptBase} from './manuscript/ManuscriptBase';
 import {XmlComparator} from './xmlComparator/XmlComparator';
 import {Preferences} from './Preferences';
 import {DocumentMergerContainer} from './documentMerger/DocumentMergerContainer';
 import {RequireAuth} from './RequireAuth';
 import {NavBar} from './NavBar';
-import { TranscriptionDocumentEditorContainer } from './xmlEditor/transcriptioEditor/TranscriptioDocumentEditorContainer';
+import {DocumentEditorContainer} from './xmlEditor/TranscriptioDocumentEditorContainer';
+import {tlhTranscriptionXmlEditorConfig} from './xmlEditor/tlhTranscriptionXmlEditorConfig';
+import {tlhTransliterationEditorConfig} from './xmlEditor/tlhTransliterationEditorConfig';
 
 export function App(): JSX.Element {
 
@@ -46,9 +47,9 @@ export function App(): JSX.Element {
 
           <Route path={`${manuscriptsUrlFragment}/:mainIdentifier/*`} element={<ManuscriptBase/>}/>
 
-          <Route path={editDocumentUrl} element={<DocumentEditorContainer/>}/>
+          <Route path={editTransliterationDocumentUrl} element={<DocumentEditorContainer editorConfig={tlhTransliterationEditorConfig}/>}/>
 
-          <Route path={transcriptioEditDocumentUrl} element={<TranscriptionDocumentEditorContainer/>}/>
+          <Route path={editTranscriptionDocumentUrl} element={<DocumentEditorContainer editorConfig={tlhTranscriptionXmlEditorConfig}/>}/>
 
           <Route path={xmlComparatorUrl} element={<XmlComparator/>}/>
 

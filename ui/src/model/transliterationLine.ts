@@ -11,6 +11,6 @@ export function transliterationLine(lineInput: string, result?: AOLineBreak): Tr
 
 export function xmlifyTransliterationLine({lineInput, result}: TransliterationLine): string {
   return result
-    ? aoLineBreakFormat.write(result).join('\n')
+    ? aoLineBreakFormat(result).join('\n')
     : `<error>${lineInput}</error>`;
 }
