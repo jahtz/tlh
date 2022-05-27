@@ -1,6 +1,6 @@
 import {Field, Form, Formik} from 'formik';
 import {useTranslation} from 'react-i18next';
-import {EditorKeyConfig} from './editor/editorKeyConfig';
+import {EditorKeyConfig} from './xmlEditor/editorKeyConfig';
 import {useDispatch, useSelector} from 'react-redux';
 import {editorKeyConfigSelector} from './store/store';
 import {updatePreferencesAction} from './store/actions';

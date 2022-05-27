@@ -15,7 +15,7 @@ import {Home} from './Home';
 import {RegisterForm} from './forms/RegisterForm';
 import {LoginForm} from './forms/LoginForm';
 import {CreateManuscriptForm} from './forms/CreateManuscriptForm';
-import {DocumentEditorContainer} from './editor/DocumentEditorContainer';
+import {DocumentEditorContainer} from './xmlEditor/DocumentEditorContainer';
 import {ManuscriptBase} from './manuscript/ManuscriptBase';
 import {XmlComparator} from './xmlComparator/XmlComparator';
 import {Preferences} from './Preferences';

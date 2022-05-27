@@ -1,4 +1,4 @@
-import {XmlWriter} from '../../editor/xmlModel/xmlWriting';
+import {XmlWriter} from '../../xmlEditor/xmlModel/xmlWriting';
 import {AOWordContent} from './wordContent';
 
 export interface AOFootNote {

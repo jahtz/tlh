@@ -1,8 +1,8 @@
-import {XmlElementNode} from '../../editor/xmlModel/xmlModel';
+import {XmlElementNode} from '../../xmlEditor/xmlModel/xmlModel';
 import {AOWordContent, aoWordContentFormat, xmlifyAoWordContent} from '../wordContent/wordContent';
 import {MorphologicalAnalysis, writeMorphAnalysisAttribute} from '../morphologicalAnalysis';
 import {aoBasicText} from '../wordContent/basicText';
-import {indent, XmlWriter} from '../../editor/xmlModel/xmlWriting';
+import {indent, XmlWriter} from '../../xmlEditor/xmlModel/xmlWriting';
 
 export interface AOWord {
   content: AOWordContent[];

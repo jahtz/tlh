@@ -1,4 +1,4 @@
-import {findFirstXmlElementByTagName, isXmlElementNode, XmlElementNode, XmlNode} from '../editor/xmlModel/xmlModel';
+import {findFirstXmlElementByTagName, isXmlElementNode, XmlElementNode, XmlNode} from '../xmlEditor/xmlModel/xmlModel';
 import {ZipWithOffsetResult} from './zipWithOffset';
 
 const lineNumberRegex = /{€(?<fragment>\d)}\s*(?<lines>[\W\w]+)/;

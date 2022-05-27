@@ -3,7 +3,7 @@
 // - im Wortinnern durch vorausgehendes `--` markiert
 
 import {AOWordContent} from './wordContent';
-import {XmlWriter} from '../../editor/xmlModel/xmlWriting';
+import {XmlWriter} from '../../xmlEditor/xmlModel/xmlWriting';
 import {clearUpperMultiStringContent, UpperMultiStringContent, writeMultiWordContent} from './multiStringContent';
 
 export interface AOSumerogramm {

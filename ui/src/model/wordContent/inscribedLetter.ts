@@ -1,5 +1,5 @@
 import {AOWordContent} from './wordContent';
-import {XmlWriter} from '../../editor/xmlModel/xmlWriting';
+import {XmlWriter} from '../../xmlEditor/xmlModel/xmlWriting';
 
 export interface InscribedLetter {
   type: 'InscribedLetter';
