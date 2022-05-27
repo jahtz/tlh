@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import {parseNewXml} from '../xmlModel/xmlReading';
 import {xml} from '@codemirror/lang-xml';
 import ReactCodeMirror from '@uiw/react-codemirror';
-import {writeXml} from './DocumentEditor';
+import {writeXml} from './XmlDocumentEditor';
 import {isLeft} from '../xmlModel/either';
 import update from 'immutability-helper';
 import {FontSizeSelector} from './FontSizeSelector';

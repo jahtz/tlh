@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
 import {XmlNode} from '../xmlModel/xmlModel';
-import {DocumentEditor} from './DocumentEditor';
+import {XmlDocumentEditor} from './XmlDocumentEditor';
 import {loadNewXml} from '../xmlModel/xmlReading';
 import {isLeft} from '../xmlModel/either';
 import {XmlEditorConfig} from './editorConfig';
@@ -38,7 +38,7 @@ interface IProps {
   editorConfig: XmlEditorConfig;
 }
 
-export function DocumentEditorContainer({editorConfig}: IProps): JSX.Element {
+export function XmlDocumentEditorContainer({editorConfig}: IProps): JSX.Element {
 
   const [state, setState] = useState<LoadedDocument | undefined>(initialState());
 
@@ -64,8 +64,8 @@ export function DocumentEditorContainer({editorConfig}: IProps): JSX.Element {
   return (
     <div className="h-full max-h-full">
       {state
-        ? <DocumentEditor node={state.rootNode} download={download} filename={state.filename} closeFile={closeFile}
-                          autoSave={(node) => autoSave(state.filename, node)}/>
+        ? <XmlDocumentEditor node={state.rootNode} editorConfig={editorConfig} download={download} filename={state.filename} closeFile={closeFile}
+                             autoSave={(node) => autoSave(state.filename, node)}/>
         : <div className="container mx-auto">
           <FileLoader accept="text/xml" onLoad={readFile}/>
           {/* TODO: let users open recently closed files? */}

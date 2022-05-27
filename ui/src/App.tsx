@@ -21,7 +21,7 @@ import {Preferences} from './Preferences';
 import {DocumentMergerContainer} from './documentMerger/DocumentMergerContainer';
 import {RequireAuth} from './RequireAuth';
 import {NavBar} from './NavBar';
-import {DocumentEditorContainer} from './xmlEditor/TranscriptioDocumentEditorContainer';
+import {XmlDocumentEditorContainer} from './xmlEditor/XmlDocumentEditorContainer';
 import {tlhTranscriptionXmlEditorConfig} from './xmlEditor/tlhTranscriptionXmlEditorConfig';
 import {tlhTransliterationEditorConfig} from './xmlEditor/tlhTransliterationEditorConfig';
 
@@ -47,9 +47,9 @@ export function App(): JSX.Element {
 
           <Route path={`${manuscriptsUrlFragment}/:mainIdentifier/*`} element={<ManuscriptBase/>}/>
 
-          <Route path={editTransliterationDocumentUrl} element={<DocumentEditorContainer editorConfig={tlhTransliterationEditorConfig}/>}/>
+          <Route path={editTransliterationDocumentUrl} element={<XmlDocumentEditorContainer editorConfig={tlhTransliterationEditorConfig}/>}/>
 
-          <Route path={editTranscriptionDocumentUrl} element={<DocumentEditorContainer editorConfig={tlhTranscriptionXmlEditorConfig}/>}/>
+          <Route path={editTranscriptionDocumentUrl} element={<XmlDocumentEditorContainer editorConfig={tlhTranscriptionXmlEditorConfig}/>}/>
 
           <Route path={xmlComparatorUrl} element={<XmlComparator/>}/>
 

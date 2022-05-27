@@ -3,7 +3,7 @@ import {MergeDocumentLine} from './DocumentMerger';
 import {useTranslation} from 'react-i18next';
 import {XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
 import {writeNode} from '../xmlModel/xmlWriting';
-import {handleSaveToPC} from '../xmlEditor/TranscriptioDocumentEditorContainer';
+import {handleSaveToPC} from '../xmlEditor/XmlDocumentEditorContainer';
 
 interface IProps {
   lines: MergeLine[];

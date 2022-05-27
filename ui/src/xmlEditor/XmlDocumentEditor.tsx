@@ -13,6 +13,7 @@ import {calculateInsertablePositions, InsertablePositions, NodePath} from './ins
 
 interface IProps {
   node: XmlNode;
+  editorConfig: XmlEditorConfig;
   filename: string;
   download: (content: string) => void;
   closeFile: () => void;
@@ -119,13 +120,12 @@ export function writeXml(node: XmlElementNode, editorConfig: XmlEditorConfig = t
   return editorConfig.afterExport(exported.join('\n'));
 }
 
-export function DocumentEditor<T>({node: initialNode, download, filename, closeFile, autoSave}: IProps): JSX.Element {
+export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download, filename, closeFile, autoSave}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);
   const [state, setState] = useState<IState<T>>({keyHandlingEnabled: true, rootNode: initialNode, changed: false, rightSideFontSize: 100});
 
-  const editorConfig = tlhTranscriptionXmlEditorConfig;
 
   useEffect(() => {
     state.changed && autoSave(state.rootNode);
