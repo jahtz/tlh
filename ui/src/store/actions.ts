@@ -1,6 +1,6 @@
 import {Action} from 'redux';
 import {LoggedInUserFragment, ManuscriptLanguageFragment} from '../graphql';
-import {EditorKeyConfig} from '../xmlEditor/editorKeyConfig';
+import {EditorKeyConfig} from '../xmlEditor/transliterationEditor/editorKeyConfig';
 
 // User logged in
 

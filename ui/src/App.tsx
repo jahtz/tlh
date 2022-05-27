@@ -15,14 +15,14 @@ import {Home} from './Home';
 import {RegisterForm} from './forms/RegisterForm';
 import {LoginForm} from './forms/LoginForm';
 import {CreateManuscriptForm} from './forms/CreateManuscriptForm';
-import {DocumentEditorContainer} from './xmlEditor/DocumentEditorContainer';
+import {DocumentEditorContainer} from './xmlEditor/transliterationEditor/DocumentEditorContainer';
 import {ManuscriptBase} from './manuscript/ManuscriptBase';
 import {XmlComparator} from './xmlComparator/XmlComparator';
 import {Preferences} from './Preferences';
 import {DocumentMergerContainer} from './documentMerger/DocumentMergerContainer';
 import {RequireAuth} from './RequireAuth';
 import {NavBar} from './NavBar';
-import { TranscriptionDocumentEditorContainer } from './transcriptioEditor/TranscriptioDocumentEditorContainer';
+import { TranscriptionDocumentEditorContainer } from './xmlEditor/transcriptioEditor/TranscriptioDocumentEditorContainer';
 
 export function App(): JSX.Element {
 

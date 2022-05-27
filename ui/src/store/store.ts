@@ -1,7 +1,7 @@
 import {createStore} from 'redux';
 import {NEW_LANGUAGES, StoreAction, UPDATE_PREFERENCES, USER_LOGGED_IN, USER_LOGGED_OUT} from './actions';
 import {LoggedInUserFragment, ManuscriptLanguageFragment} from '../graphql';
-import {defaultEditorKeyConfig, EditorKeyConfig, OldEditorKeyConfig} from '../xmlEditor/editorKeyConfig';
+import {defaultEditorKeyConfig, EditorKeyConfig, OldEditorKeyConfig} from '../xmlEditor/transliterationEditor/editorKeyConfig';
 
 const localStorageUserKey = 'userId';
 const localStoragePreferencesKey = 'preferences';

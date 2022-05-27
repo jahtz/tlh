@@ -1,6 +1,6 @@
 import {MergeDocument, MergeLine, mergeLines} from './mergeDocument';
 import {useState} from 'react';
-import {NodeDisplay} from '../xmlEditor/NodeDisplay';
+import {NodeDisplay} from '../xmlEditor/transliterationEditor/NodeDisplay';
 import {zipWithOffset} from './zipWithOffset';
 import {useTranslation} from 'react-i18next';
 import {IoChevronDown, IoChevronUp} from 'react-icons/io5';

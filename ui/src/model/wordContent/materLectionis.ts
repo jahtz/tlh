@@ -1,4 +1,4 @@
-import {XmlWriter} from '../../xmlEditor/xmlModel/xmlWriting';
+import {XmlWriter} from '../../xmlEditor/transliterationEditor/xmlModel/xmlWriting';
 import {AOWordContent} from './wordContent';
 
 /**
