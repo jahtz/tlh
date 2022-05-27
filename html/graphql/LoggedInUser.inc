@@ -84,7 +84,7 @@ function resolveUser(): ?string {
 
   global $jwtSecret;
 
-  error_log(">>" . $jwt . "<<");
+  // error_log(">>" . $jwt . "<<");
 
   if (!Token::validate($jwt, $jwtSecret)) {
     throw new InvalidTokenException('Invalid login information. Maybe your login is expired? Try logging out and logging back in again.');

@@ -44,6 +44,7 @@ function execute_query(mysqli $connection, string $sql, ?Closure $bindParams, Cl
   try {
     $result = $f($statement);
   } catch (Exception $e) {
+    error_log($statement->error);
     $statement->close();
     throw $e;
   }
