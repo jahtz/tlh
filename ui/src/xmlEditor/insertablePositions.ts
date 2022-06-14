@@ -1,4 +1,4 @@
-import {isXmlTextNode, XmlNode} from '../xmlModel/xmlModel';
+import {isXmlTextNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
 
 export type NodePath = number[];
 
@@ -7,6 +7,7 @@ export interface InsertablePositions {
   beforeElement?: string[];
   afterElement?: string[];
   asLastChildOf?: string[];
+  newElement?: () => XmlElementNode;
 }
 
 export function calculateInsertablePositions(

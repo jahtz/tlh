@@ -11,8 +11,6 @@ import {reCountNodeNumbers} from './elementEditors/NoteNodeEditor';
 
 // FIXME: recount footnote & clb node numbers!
 
-export const selectedNodeClass = 'bg-teal-400';
-
 export const tlhTransliterationEditorConfig: XmlEditorConfig = {
   nodeConfigs: {
     docID: {replace: () => <span/>},

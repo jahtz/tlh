@@ -18,6 +18,7 @@ export const clbNodeConfig: XmlInsertableSingleEditableNodeConfig<ClbData> = {
   writeNode: ({id: newId}, node) => update(node, {attributes: {id: {$set: newId}}}),
   insertablePositions: {
     beforeElement: ['w', 'parsep', 'parsep_dbl'],
-    afterElement: ['w']
+    afterElement: ['w'],
+    newElement: () => ({tagName: 'clb', attributes: {id: 'CLB'}, children: []})
   }
 };
