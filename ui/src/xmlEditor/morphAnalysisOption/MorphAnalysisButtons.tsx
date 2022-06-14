@@ -1,6 +1,5 @@
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {IoSettingsOutline} from 'react-icons/io5';
 import {MultiMorphAnalysisSelection} from './MultiMorphAnalysisSelection';
 import {SingleMorphAnalysisOptionButton} from './SingleMorphAnalysisOptionButton';
 import {MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
@@ -52,22 +51,37 @@ export function MorphAnalysisOptionButtons({
         <button onClick={() => setIsReduced((value) => !value)} className="p-2 rounded-l border-l border-y border-slate-500 font-bold text-lg">
           {isReduced ? <span>&gt;</span> : <span>&or;</span>}
         </button>
+
         <div className={classNames('flex-grow', 'p-2', 'border', 'border-slate-500', 'bg-gray-100', {'rounded-r': isSingleAnalysisOption})}>
           &nbsp;
           {number})&nbsp;<span className="text-red-600">{translation}</span>&nbsp;({referenceWord},
           {t('paradigmClass')}:&nbsp;<span className="text-red-600">{paradigmClass}</span>
           {determinativ && <span>, {t('determinativ')}:&nbsp;<span className="text-red-600">{determinativ}</span></span>})&nbsp;
         </div>
+
+        {/* TODO: put select buttons here! */}
+        {!isSingleAnalysisOption && <>
+          <button type="button" className="p-2 border border-teal-300" onClick={() => selectAll(morphologicalAnalysis)} tabIndex={-1}>
+            {t('ALL')}
+          </button>
+          <button type="button" className="p-2 border border-teal-300" onClick={() => selectAll(morphologicalAnalysis, Numerus.Singular)} tabIndex={-1}>
+            {t('SG')}
+          </button>
+          <button type="button" className="p-2 border border-teal-300" onClick={() => selectAll(morphologicalAnalysis, Numerus.Plural)} tabIndex={-1}>
+            {t('PL')}
+          </button>
+        </>}
+
         {!isSingleAnalysisOption &&
-          <button className="p-2 rounded-r border-r border-y border-slate-500" onClick={enableEditMode} title={t('editMorphologicalAnalyses')}>
-            <IoSettingsOutline/>
+          <button type="button" className="p-2 rounded-r border border-slate-500" onClick={enableEditMode} title={t('editMorphologicalAnalyses')}>
+            &#x2699;
           </button>}
       </div>
 
       {!isReduced && <div className="mt-2">
         {!isSingleAnalysisOption && <MultiMorphAnalysisSelection ma={morphologicalAnalysis}/>}
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2">
 
           <div className={classNames({'col-span-2': !encliticsAnalysis || 'analysis' in encliticsAnalysis})}>
             {isSingleAnalysisOption
@@ -78,7 +92,7 @@ export function MorphAnalysisOptionButtons({
           {encliticsAnalysis && 'analysisOptions' in encliticsAnalysis &&
             <LetteredAnalysisOptionButtons analysisOptions={encliticsAnalysis.analysisOptions} toggleAnalysisSelection={toggleEncliticsSelection}/>}
 
-          {!isSingleAnalysisOption && <div>
+          {/*!isSingleAnalysisOption && <div>
             <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis)} tabIndex={-1}>
               {t('selectAll')}
             </button>
@@ -88,7 +102,7 @@ export function MorphAnalysisOptionButtons({
             <button type="button" className={buttonClasses} onClick={() => selectAll(morphologicalAnalysis, Numerus.Plural)} tabIndex={-1}>
               {t('selectAllPlural')}
             </button>
-          </div>}
+          </div>*/}
         </div>
 
         {encliticsAnalysis && 'analysis' in encliticsAnalysis && <div className="mt-2 p-2 text-center rounded border border-slate-300 shadow-md">
