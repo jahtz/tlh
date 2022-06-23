@@ -35,7 +35,7 @@
     "@types/codemirror": "^5.60.5",
     "@types/diff": "^5.0.0",
     "@types/jest": "^28.1.1",
-    "@types/node": "^17.0.25",
+    "@types/node": "^18.0.0",
     "@types/parsimmon": "^1.10.6",
     "@types/react": "^18.0.8",
     "@types/react-codemirror": "^1.0.6",

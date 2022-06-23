@@ -20,9 +20,6 @@ export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean
   return analysis.includes(numerus) || analysis.includes('ABL') || analysis.includes('INS') || analysis.includes('ALL');
 }
 
-
-const buttonClasses = 'mb-1 p-2 rounded border border-teal-300 w-full';
-
 export function MorphAnalysisOptionButtons({
   morphologicalAnalysis,
   toggleAnalysisSelection,

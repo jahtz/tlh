@@ -1,11 +1,19 @@
-import {MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
-import {getSelectedEnclitics} from '../SelectedAnalysisResult';
+import {MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
+import {getSelectedLetters} from '../../model/analysisOptions';
+
+export function getSelectedEnclitics(ma: MorphologicalAnalysis): string {
+  const selectedEncliticLetteredOptions = ma.encliticsAnalysis
+    ? 'analysis' in ma.encliticsAnalysis ? [] : ma.encliticsAnalysis.analysisOptions
+    : [];
+
+  return getSelectedLetters(selectedEncliticLetteredOptions).join('');
+}
 
 export function MultiMorphAnalysisSelection({ma}: { ma: MultiMorphologicalAnalysis }): JSX.Element | null {
 
-  const {number, translation, encliticsAnalysis} = ma;
+  const {number, translation, encliticsAnalysis, analysisOptions} = ma;
 
-  const selectedAnalyses = ma.analysisOptions.filter(({selected}) => selected);
+  const selectedAnalyses = analysisOptions.filter(({selected}) => selected);
 
   if (selectedAnalyses.length === 0) {
     return null;
