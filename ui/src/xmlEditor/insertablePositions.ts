@@ -1,4 +1,4 @@
-import {isXmlTextNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
+import {isXmlElementNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
 
 export type NodePath = number[];
 
@@ -18,7 +18,7 @@ export function calculateInsertablePositions(
 
   const {asFirstChildOf, beforeElement, afterElement, asLastChildOf} = positions;
 
-  if (isXmlTextNode(node)) {
+  if (!isXmlElementNode(node)) {
     return [];
   }
 

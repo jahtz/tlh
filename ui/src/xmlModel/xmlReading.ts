@@ -1,4 +1,4 @@
-import {isXmlElementNode, XmlNode, XmlTextNode} from './xmlModel';
+import {isXmlTextNode, XmlNode, XmlTextNode} from './xmlModel';
 import update from 'immutability-helper';
 import {Either} from './either';
 
@@ -53,8 +53,11 @@ function loadNode(el: ChildNode, xmlReadConfig: XmlReadConfig, parentLetterCorre
       children: Array.from(el.childNodes)
         .map((c) => loadNode(c, xmlReadConfig, nodeReadConfig?.letterCorrections))
         // Filter out empty text nodes
-        .filter((node) => isXmlElementNode(node) || (!!nodeReadConfig?.keepSpaces || node.textContent.trim().length > 0))
+        .filter((node) => !isXmlTextNode(node) || (!!nodeReadConfig?.keepSpaces || node.textContent.trim().length > 0))
     };
+  } else if (el instanceof Comment) {
+    // ignore...?
+    return {comment: el.textContent || ''};
   } else {
     throw new Error(`unexpected element: ${el.nodeType}`);
   }

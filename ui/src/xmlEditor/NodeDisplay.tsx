@@ -1,4 +1,4 @@
-import {isXmlTextNode, XmlNode} from '../xmlModel/xmlModel';
+import {isXmlCommentNode, isXmlTextNode, XmlNode} from '../xmlModel/xmlModel';
 import {EditTriggerFunc} from './editorConfig';
 import {tlhTranscriptionXmlEditorConfig} from './tlhTranscriptionXmlEditorConfig';
 import classNames from 'classnames';
@@ -27,6 +27,10 @@ function InsertButton({initiate}: { initiate: () => void }): JSX.Element {
 }
 
 export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIProps): JSX.Element {
+
+  if (isXmlCommentNode(node)) {
+    return <></>;
+  }
 
   if (isXmlTextNode(node)) {
     return <span>{node.textContent}</span>;

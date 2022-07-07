@@ -2,12 +2,12 @@ import {XmlEditableNodeIProps} from '../editorConfig';
 import {NoteData} from './noteData';
 import {useTranslation} from 'react-i18next';
 import {UpdatePrevNextButtons} from '../morphAnalysisOption/UpdatePrevNextButtons';
-import {isXmlTextNode, XmlElementNode, XmlNode} from '../../xmlModel/xmlModel';
+import {isXmlCommentNode, isXmlTextNode, XmlElementNode, XmlNode} from '../../xmlModel/xmlModel';
 
 export function reCountNodeNumbers(rootNode: XmlElementNode, tagName: string, attrName: string): void {
 
   function go(node: XmlNode, currentCount: number): number {
-    if (isXmlTextNode(node)) {
+    if (isXmlTextNode(node) || isXmlCommentNode(node)) {
       return currentCount;
     } else {
       if (node.tagName === tagName) {

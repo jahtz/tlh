@@ -1,4 +1,4 @@
-import {isXmlTextNode, XmlNode} from './xmlModel';
+import {isXmlCommentNode, isXmlTextNode, XmlNode} from './xmlModel';
 
 interface NodeWriteConfig {
   inlineChildren?: boolean;
@@ -17,7 +17,9 @@ export const tlhXmlWriteConfig: XmlWriteConfig = {
 };
 
 export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXmlWriteConfig, parentInline = false): string[] {
-  if (isXmlTextNode(node)) {
+  if (isXmlCommentNode(node)) {
+    return [`<!-- ${node.comment} -->`];
+  } else if (isXmlTextNode(node)) {
     return [node.textContent];
   } else {
     const {tagName, attributes, children} = node;

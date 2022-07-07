@@ -116,7 +116,6 @@ export function WordNodeEditor({
     updateNode((state) => update(state, {node: {attributes: {$unset: ['editingQuestion']}}}));
   }
 
-
   function setFootNote(value: string): void {
     updateNode((state) => update(state, {footNote: {$set: value}}));
   }

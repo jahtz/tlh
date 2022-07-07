@@ -1,25 +1,45 @@
-interface IMorphAnalysis {
+interface ISelectedMorphAnalysis {
   number: number;
 }
 
-interface SingleMorphAnalysis extends IMorphAnalysis {
-  _type: 'SingleMorphAnalysis';
+interface SelectedSingleMorphAnalysis extends ISelectedMorphAnalysis {
+  _type: 'SelectedSingleMorphAnalysis';
 }
 
-interface SingleMorphAnalysisWithEnclitic extends IMorphAnalysis {
-  _type: 'SingleMorphAnalysisWithEnclitic';
+export function selectedSingleMorphAnalysis(number: number): SelectedSingleMorphAnalysis {
+  return {_type: 'SelectedSingleMorphAnalysis', number};
+}
+
+interface SelectedSingleMorphAnalysisWithEnclitic extends ISelectedMorphAnalysis {
+  _type: 'SelectedSingleMorphAnalysisWithEnclitic';
   encLetter: string;
 }
 
-interface MultiMorphAnalysis extends IMorphAnalysis {
-  _type: 'MultiMorphAnalysis';
-  encLetter: string;
+export function selectedSingleMorphAnalysisWithEnclitic(number: number, encLetter: string): SelectedSingleMorphAnalysisWithEnclitic {
+  return {_type: 'SelectedSingleMorphAnalysisWithEnclitic', number, encLetter};
 }
 
-interface MultiMorphAnalysisWithEnclitic extends IMorphAnalysis {
-  _type: 'MultiMorphAnalysisWithEnclitic';
+interface SelectedMultiMorphAnalysis extends ISelectedMorphAnalysis {
+  _type: 'SelectedMultiMorphAnalysis';
+  morphLetter: string;
+}
+
+export function selectedMultiMorphAnalysisWithoutEnclitics(number: number, morphLetter: string): SelectedMultiMorphAnalysis {
+  return {_type: 'SelectedMultiMorphAnalysis', number, morphLetter};
+}
+
+interface SelectedMultiMorphAnalysisWithEnclitic extends ISelectedMorphAnalysis {
+  _type: 'SelectedMultiMorphAnalysisWithEnclitic';
   morphLetter: string;
   encLetter: string;
 }
 
-export type SelectedMorphAnalysis = SingleMorphAnalysis | SingleMorphAnalysisWithEnclitic | MultiMorphAnalysis | MultiMorphAnalysisWithEnclitic;
+export function selectedMultiMorphAnalysisWithEnclitics(number: number, morphLetter: string, encLetter: string): SelectedMultiMorphAnalysisWithEnclitic {
+  return {_type: 'SelectedMultiMorphAnalysisWithEnclitic', number, morphLetter, encLetter};
+}
+
+export type SelectedMorphAnalysis =
+  SelectedSingleMorphAnalysis
+  | SelectedSingleMorphAnalysisWithEnclitic
+  | SelectedMultiMorphAnalysis
+  | SelectedMultiMorphAnalysisWithEnclitic;

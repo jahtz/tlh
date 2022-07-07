@@ -1,6 +1,10 @@
-import {isXmlTextNode, XmlNode} from '../xmlModel/xmlModel';
+import {isXmlCommentNode, isXmlTextNode, XmlNode} from '../xmlModel/xmlModel';
 
 export function reconstructTransliteration(node: XmlNode, isFirstChild = false): string {
+
+  if (isXmlCommentNode(node)) {
+    return '';
+  }
 
   if (isXmlTextNode(node)) {
     return node.textContent;

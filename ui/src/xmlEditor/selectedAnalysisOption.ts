@@ -1,31 +1,53 @@
+import {
+  SelectedMorphAnalysis,
+  selectedMultiMorphAnalysisWithEnclitics,
+  selectedMultiMorphAnalysisWithoutEnclitics,
+  selectedSingleMorphAnalysis,
+  selectedSingleMorphAnalysisWithEnclitic
+} from '../model/selectedMorphologicalAnalysis';
+
+/**
+ * @deprecated
+ */
 export interface SelectedAnalysisOption {
   number: number;
   letter?: string;
   enclitics?: string[];
 }
 
-function stringifySelectedAnalysisOption({number, letter, enclitics}: SelectedAnalysisOption): string {
-  return number + (letter || '') + (enclitics?.join('') || '');
-}
+// Read
 
-const morphSplitCharacter = ' ';
+const morphRegex = /(\d+)([a-z]?)([R-Z]?)/;
 
-const morphRegex = /(\d+)([a-z]*)([R-Z]*)/;
-
-export function readSelectedMorphology(morph: string): SelectedAnalysisOption[] {
+export function readSelectedMorphology(morph: string): SelectedMorphAnalysis[] {
   return morph
-    .split(morphSplitCharacter)
+    .split(' ')
     .map((selOpt) => selOpt.match(morphRegex))
     .filter((m): m is RegExpMatchArray => m !== null)
-    .map((match) => ({
-      number: parseInt(match[1]),
-      letter: match[2].trim() === '' ? undefined : match[2],
-      enclitics: match[3].trim() === '' ? undefined : match[3].split('')
-    }));
+    .map(([, numStr, maybeMorphLetter, maybeEncLetter]) => {
+
+      const number = parseInt(numStr);
+
+      if (maybeMorphLetter && maybeEncLetter) {
+        return selectedMultiMorphAnalysisWithEnclitics(number, maybeMorphLetter, maybeEncLetter);
+      } else if (maybeMorphLetter) {
+        return selectedMultiMorphAnalysisWithoutEnclitics(number, maybeMorphLetter);
+      } else if (maybeEncLetter) {
+        return selectedSingleMorphAnalysisWithEnclitic(number, maybeEncLetter);
+      } else {
+        return selectedSingleMorphAnalysis(number);
+      }
+    });
+}
+
+// Write
+
+function stringifySelectedAnalysisOption({number, letter, enclitics}: SelectedAnalysisOption): string {
+  return number + (letter || '') + (enclitics?.join('') || '');
 }
 
 export function writeSelectedMorphologies(selectedMorphologies: SelectedAnalysisOption[]): string {
   return selectedMorphologies
     .map(stringifySelectedAnalysisOption)
-    .join(morphSplitCharacter);
+    .join(' ');
 }

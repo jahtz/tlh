@@ -2,16 +2,29 @@ import {MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/mor
 import {getSelectedLetters} from '../../model/analysisOptions';
 
 export function getSelectedEnclitics(ma: MorphologicalAnalysis): string {
-  const selectedEncliticLetteredOptions = ma.encliticsAnalysis
-    ? 'analysis' in ma.encliticsAnalysis ? [] : ma.encliticsAnalysis.analysisOptions
-    : [];
+
+  const encliticsAnalysis = 'encliticsAnalysis' in ma
+    ? ma.encliticsAnalysis
+    : undefined;
+
+  if (!encliticsAnalysis) {
+    return '';
+  }
+
+  const selectedEncliticLetteredOptions = 'analysis' in encliticsAnalysis
+    ? []
+    : encliticsAnalysis.analysisOptions;
 
   return getSelectedLetters(selectedEncliticLetteredOptions).join('');
 }
 
 export function MultiMorphAnalysisSelection({ma}: { ma: MultiMorphologicalAnalysis }): JSX.Element | null {
 
-  const {number, translation, encliticsAnalysis, analysisOptions} = ma;
+  const {number, translation, analysisOptions} = ma;
+
+  const encliticsAnalysis = 'encliticsAnalysis' in ma
+    ? ma.encliticsAnalysis
+    : undefined;
 
   const selectedAnalyses = analysisOptions.filter(({selected}) => selected);
 

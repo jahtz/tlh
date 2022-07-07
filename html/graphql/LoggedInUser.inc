@@ -80,11 +80,9 @@ function register(array $args): string {
  * @throws InvalidTokenException
  */
 function resolveUser(): ?string {
-  $jwt = $_SERVER['HTTP_AUTHORIZATION'];
-
   global $jwtSecret;
 
-  // error_log(">>" . $jwt . "<<");
+  $jwt = $_SERVER['HTTP_AUTHORIZATION'];
 
   if (!Token::validate($jwt, $jwtSecret)) {
     throw new InvalidTokenException('Invalid login information. Maybe your login is expired? Try logging out and logging back in again.');

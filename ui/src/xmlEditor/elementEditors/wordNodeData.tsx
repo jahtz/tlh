@@ -1,4 +1,4 @@
-import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue} from '../../model/morphologicalAnalysis';
+import {isMultiMorphologicalAnalysis, MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue} from '../../model/morphologicalAnalysis';
 import {isXmlElementNode, XmlElementNode, XmlNode} from '../../xmlModel/xmlModel';
 import {readSelectedMorphology, SelectedAnalysisOption, writeSelectedMorphologies} from '../selectedAnalysisOption';
 import {getSelectedLetters} from '../../model/analysisOptions';
@@ -18,10 +18,12 @@ export interface WordNodeData {
 export function readWordNodeData(node: XmlElementNode): WordNodeData {
   const lastChild = node.children[node.children.length - 1];
 
+  const selectedMorphologies = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
+
   return {
     node: node,
     lg: node.attributes.lg || '',
-    morphologies: readMorphologiesFromNode(node, readSelectedMorphology(node.attributes.mrp0sel?.trim() || '')),
+    morphologies: readMorphologiesFromNode(node, selectedMorphologies),
     footNote: lastChild && isXmlElementNode(lastChild) && lastChild.tagName === 'note'
       ? lastChild.attributes.c
       : undefined,
@@ -65,16 +67,19 @@ export function writeWordNodeData({node: originalNode, lg, morphologies, footNot
 
   const selectedAnalysisOptions: SelectedAnalysisOption[] = morphologies.flatMap((ma) => {
 
-    const enclitics = ma.encliticsAnalysis
+    const enclitics = 'encliticsAnalysis' in ma
       ? 'analysis' in ma.encliticsAnalysis ? undefined : getSelectedLetters(ma.encliticsAnalysis.analysisOptions)
       : undefined;
 
-    if ('analysisOptions' in ma) {
+    if (isMultiMorphologicalAnalysis(ma)) {
       return getSelectedLetters(ma.analysisOptions).map((letter) => ({number: ma.number, letter, enclitics}));
-    } else if (ma.selected) {
-      return [{number: ma.number, enclitics}];
     } else {
-      return [];
+      if ('selected' in ma && ma.selected) {
+        return [{number: ma.number, enclitics}];
+      } else {
+        // FIXME: single morph analysis with multi enclitics!
+        return [];
+      }
     }
   });
 

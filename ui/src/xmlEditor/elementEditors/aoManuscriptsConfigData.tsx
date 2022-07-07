@@ -1,5 +1,5 @@
 import {XmlSingleEditableNodeConfig} from '../editorConfig';
-import {isXmlElementNode, XmlElementNode, XmlTextNode} from '../../xmlModel/xmlModel';
+import {isXmlElementNode, isXmlTextNode, XmlElementNode, XmlTextNode} from '../../xmlModel/xmlModel';
 import {AoManuscriptsEditor} from './AoManuscriptsEditor';
 import update from 'immutability-helper';
 import {selectedNodeClass} from '../tlhTranscriptionXmlEditorConfig';
@@ -35,7 +35,17 @@ export interface AoManuscriptsData {
 export const aoManuscriptsConfig: XmlSingleEditableNodeConfig<AoManuscriptsData> = {
   replace: (node, renderedChildren, isSelected) => <span className={isSelected ? selectedNodeClass : ''}>{renderedChildren}</span>,
   edit: (props) => <AoManuscriptsEditor {...props}/>,
-  readNode: (node) => ({content: node.children.map((n) => isXmlElementNode(n) ? readSource(n) : n.textContent.trim())}),
+  readNode: (node) => ({
+    content: node.children.map((n) => {
+      if (isXmlElementNode(n)) {
+        return readSource(n);
+      } else if (isXmlTextNode(n)) {
+        return n.textContent.trim();
+      } else {
+        return `<!-- ${n.comment} -->`;
+      }
+    })
+  }),
   writeNode: (data, originalNode) => update(originalNode, {
     children: {
       $set: data.content.map((s) => typeof s === 'string' ? {textContent: ' ' + s + ' '} : writeSource(s))

@@ -16,12 +16,20 @@ export function isXmlTextNode(node: XmlNode): node is XmlTextNode {
   return 'textContent' in node;
 }
 
-export type XmlNode = XmlElementNode | XmlTextNode;
+export interface XmlCommentNode {
+  comment: string;
+}
+
+export function isXmlCommentNode(node: XmlNode): node is XmlCommentNode {
+  return 'comment' in node;
+}
+
+export type XmlNode = XmlElementNode | XmlTextNode | XmlCommentNode;
 
 // Helper functions
 
 export function findFirstXmlElementByTagName(node: XmlNode, tagName: string): XmlElementNode | undefined {
-  if (isXmlTextNode(node)) {
+  if (isXmlTextNode(node) || isXmlCommentNode(node)) {
     return undefined;
   }
 

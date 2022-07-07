@@ -1,45 +1,37 @@
-import {readSelectedMorphology, SelectedAnalysisOption} from './selectedAnalysisOption';
+import {readSelectedMorphology} from './selectedAnalysisOption';
+import {
+  SelectedMorphAnalysis,
+  selectedMultiMorphAnalysisWithEnclitics as multiWith,
+  selectedMultiMorphAnalysisWithoutEnclitics as multiWithout,
+  selectedSingleMorphAnalysis as singleWithout,
+  selectedSingleMorphAnalysisWithEnclitic as singleWith
+} from '../model/selectedMorphologicalAnalysis';
 
 describe('reading selected morphological analyses', () => {
 
-  const s1 = '4';
-  const sm1: SelectedAnalysisOption[] = [{number: 4}];
+  test.each<[string, ...SelectedMorphAnalysis[]]>([
+    // Single without enclitics
+    ['4', singleWithout(4)],
+    ['1 2', singleWithout(1), singleWithout(2)],
 
-  const s2 = '1 2';
-  const sm2: SelectedAnalysisOption[] = [{number: 1}, {number: 2}];
+    // Single with enclitics
+    ['1R', singleWith(1, 'R')],
+    ['1S 2R 2S 3R', singleWith(1, 'S'), singleWith(2, 'R'), singleWith(2, 'S'), singleWith(3, 'R')],
 
-  const s3 = '1a';
-  const sm3: SelectedAnalysisOption[] = [{number: 1, letter: 'a'}];
+    // Multi without enclitics
+    ['1a', multiWithout(1, 'a')],
+    ['2c 3', multiWithout(2, 'c'), singleWithout(3)],
 
-  const s4 = '2c 3';
-  const sm4: SelectedAnalysisOption[] = [{number: 2, letter: 'c'}, {number: 3}];
+    // Multi with enclitics
+    ['1aR', multiWith(1, 'a', 'R')],
+    ['2cR 2cS', multiWith(2, 'c', 'R'), multiWith(2, 'c', 'S')],
 
-  const s5 = '1aR';
-  const sm5: SelectedAnalysisOption[] = [{number: 1, letter: 'a', enclitics: ['R']}];
-
-  const s6 = '2cRS';
-  const sm6: SelectedAnalysisOption[] = [{number: 2, letter: 'c', enclitics: ['R', 'S']}];
-
-  const s7 = '1c 2aSU 3 4bRT';
-  const sm7: SelectedAnalysisOption[] = [
-    {number: 1, letter: 'c'}, {number: 2, letter: 'a', enclitics: ['S', 'U']}, {number: 3}, {number: 4, letter: 'b', enclitics: ['R', 'T']}
-  ];
-
-  const s8 = '1a 1b 1c';
-  const sm8: SelectedAnalysisOption[] = [{number: 1, letter: 'a'}, {number: 1, letter: 'b'}, {number: 1, letter: 'c'}];
-
-  test.each([
-    [s1, sm1],
-    [s2, sm2],
-    [s3, sm3],
-    [s4, sm4],
-    [s5, sm5],
-    [s6, sm6],
-    [s7, sm7],
-    [s8, sm8],
+    // Mixed
+    ['1a 1b 1c', multiWithout(1, 'a'), multiWithout(1, 'b'), multiWithout(1, 'c')],
+    ['1c 2aS 2aU 3 4bR 4bT', multiWithout(1, 'c'), multiWith(2, 'a', 'S'), multiWith(2, 'a', 'U'), singleWithout(3), multiWith(4, 'b', 'R'), multiWith(4, 'b', 'T')],
   ])(
     'it should read an mrp0sel analysis string "%s" as %j',
-    (toRead, awaited) => expect(readSelectedMorphology(toRead)).toEqual(awaited)
+    (toRead, ...awaited) => expect(readSelectedMorphology(toRead)).toEqual(awaited)
   );
 
 });
