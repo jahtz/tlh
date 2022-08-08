@@ -15,7 +15,8 @@ export function Home(): JSX.Element {
   const [page, setPage] = useState(0);
 
   if (!indexQuery.called) {
-    getIndexQuery({variables: {page, paginationSize}});
+    getIndexQuery({variables: {page, paginationSize}})
+      .catch((error) => console.error(error));
   }
 
   function previousPage(): void {
@@ -30,7 +31,8 @@ export function Home(): JSX.Element {
 
   function goToPage(pageNumber: number): void {
     setPage(pageNumber);
-    getIndexQuery({variables: {page: pageNumber, paginationSize}});
+    getIndexQuery({variables: {page: pageNumber, paginationSize}})
+      .catch((error) => console.error(error));
   }
 
   return (
@@ -40,7 +42,7 @@ export function Home(): JSX.Element {
       {indexQuery.called && <WithQuery query={indexQuery}>
         {({manuscriptCount, allManuscripts}) => {
           if (allManuscripts.length === 0) {
-            return <div className="notification is-primary has-text-centered">{t('noManuscriptsYet')}</div>;
+            return <div className="my-2 p-2 rounded bg-cyan-500 text-white text-center">{t('noManuscriptsYet')}</div>;
           }
 
           const pageCount = Math.ceil(manuscriptCount / paginationSize);
