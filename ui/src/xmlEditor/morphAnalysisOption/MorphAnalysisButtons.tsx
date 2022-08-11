@@ -8,8 +8,7 @@ import {MultiMorphAnalysisOptionButtons} from './MultiMorphAnalysisOptionButtons
 
 interface IProps {
   morphologicalAnalysis: MorphologicalAnalysis;
-  toggleAnalysisSelection: (index?: number) => void;
-  toggleEncliticsSelection: (index: number) => void;
+  toggleAnalysisSelection: (letterIndex: number | undefined, encLetterIndex: number | undefined) => void;
   enableEditMode: () => void;
 }
 
@@ -17,12 +16,7 @@ export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean
   return analysis.includes(numerus) || analysis.includes('ABL') || analysis.includes('INS') || analysis.includes('ALL');
 }
 
-export function MorphAnalysisOptionButtons({
-  morphologicalAnalysis,
-  toggleAnalysisSelection,
-  toggleEncliticsSelection,
-  enableEditMode
-}: IProps): JSX.Element {
+export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysisSelection, enableEditMode}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [isReduced, setIsReduced] = useState(false);
@@ -34,7 +28,7 @@ export function MorphAnalysisOptionButtons({
     ma.analysisOptions
       .forEach(({analysis}, index) => {
         if (!numerus || analysisIsInNumerus(analysis, numerus)) {
-          toggleAnalysisSelection(index);
+          toggleAnalysisSelection(index, undefined);
         }
       });
   }
@@ -75,8 +69,10 @@ export function MorphAnalysisOptionButtons({
 
       {!isReduced && <div className="mt-2">
         {isSingleAnalysisOption
-          ? <SingleMorphAnalysisOptionButton morphAnalysis={morphologicalAnalysis} toggleAnalysisSelection={() => toggleAnalysisSelection(undefined)}/>
-          : <MultiMorphAnalysisOptionButtons morphAnalysis={morphologicalAnalysis} toggleAnalysisSelection={toggleAnalysisSelection}/>}
+          ? <SingleMorphAnalysisOptionButton morphAnalysis={morphologicalAnalysis}
+                                             toggleAnalysisSelection={(encLetterIndex) => toggleAnalysisSelection(undefined, encLetterIndex)}/>
+          : <MultiMorphAnalysisOptionButtons morphAnalysis={morphologicalAnalysis}
+                                             toggleAnalysisSelection={(letterIndex, encLetterIndex) => toggleAnalysisSelection(letterIndex, encLetterIndex)}/>}
 
       </div>}
     </div>

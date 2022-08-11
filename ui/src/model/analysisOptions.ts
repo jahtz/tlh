@@ -4,16 +4,20 @@ const letteredAnalysesSplitRegex = /\s*(?={)/;
 export interface LetteredAnalysisOption {
   letter: string;
   analysis: string;
+
+}
+
+export interface SelectableLetteredAnalysisOption extends LetteredAnalysisOption {
   selected: boolean;
 }
 
-export function getSelectedLetters(laos: LetteredAnalysisOption[]): string[] {
+export function getSelectedLetters(laos: SelectableLetteredAnalysisOption[]): string[] {
   return laos
     .filter(({selected}) => selected)
     .map(({letter}) => letter);
 }
 
-function parseAnalysisOption(as: string, selectedLetters: string[]): LetteredAnalysisOption {
+function parseAnalysisOption(as: string): LetteredAnalysisOption {
   const [letter, analysis] = as
     // Remove curly braces
     .substring(1, as.length - 1)
@@ -21,11 +25,15 @@ function parseAnalysisOption(as: string, selectedLetters: string[]): LetteredAna
     .split('→')
     .map((s) => s.trim());
 
+  return {letter, analysis};
+}
+
+function parseSelectableAnalysisOption(as: string, selectedLetters: string[]): SelectableLetteredAnalysisOption {
+  const {letter, analysis} = parseAnalysisOption(as);
+
   return {letter, analysis, selected: selectedLetters.includes(letter)};
 }
 
-export function parseMultiAnalysisString(as: string, selectedLetters: string[]): LetteredAnalysisOption[] {
-  return as.split(letteredAnalysesSplitRegex).map((s) => parseAnalysisOption(s, selectedLetters));
+export function parseMultiAnalysisString(as: string, selectedLetters: string[]): SelectableLetteredAnalysisOption[] {
+  return as.split(letteredAnalysesSplitRegex).map((s) => parseSelectableAnalysisOption(s, selectedLetters));
 }
-
-

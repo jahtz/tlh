@@ -1,4 +1,4 @@
-import {LetteredAnalysisOption} from './analysisOptions';
+import {SelectableLetteredAnalysisOption} from './analysisOptions';
 
 interface IEncliticsAnalysis {
   enclitics: string;
@@ -10,7 +10,7 @@ export interface SingleEncliticsAnalysis extends IEncliticsAnalysis {
 }
 
 export interface MultiEncliticsAnalysis extends IEncliticsAnalysis {
-  analysisOptions: LetteredAnalysisOption[];
+  analysisOptions: SelectableLetteredAnalysisOption[];
 }
 
 export type EncliticsAnalysis = SingleEncliticsAnalysis | MultiEncliticsAnalysis;

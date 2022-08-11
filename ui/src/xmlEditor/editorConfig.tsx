@@ -20,7 +20,6 @@ export interface XmlEditableNodeIProps<T = XmlElementNode> extends NodeEditorRig
 export interface XmlSingleNodeConfig {
   replace?: (node: XmlElementNode, renderedChildren: JSX.Element, isSelected: boolean, isLeftSide: boolean) => JSX.Element;
   styling?: (node: XmlElementNode, isSelected: boolean, isLeftSide: boolean) => ClassNamesArgument;
-
 }
 
 export interface XmlSingleEditableNodeConfig<T = XmlElementNode> extends XmlSingleNodeConfig {

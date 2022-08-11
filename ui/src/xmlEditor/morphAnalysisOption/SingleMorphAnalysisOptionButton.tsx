@@ -1,56 +1,50 @@
-import classNames from 'classnames';
 import {singleMorphAnalysisIsWithoutEnclitics, singleMorphAnalysisIsWithSingleEnclitics, SingleMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
+import {SelectableButton} from '../../SelectableButton';
 
 interface IProps {
   morphAnalysis: SingleMorphologicalAnalysis;
-  toggleAnalysisSelection: () => void;
+  toggleAnalysisSelection: (encLetterIndex: number | undefined) => void;
 }
 
 export function EncliticsAnalysisDisplay({enclitics, analysis}: { enclitics: string, analysis: string }): JSX.Element {
   return (
-    <>{enclitics} @ {analysis}</>
+    <>&nbsp;+=&nbsp; {enclitics} @ {analysis}</>
   );
 }
 
-const selectedClasses = ['bg-blue-500', 'text-white'];
-const notSelectedClasses = ['border', 'border-slate-500'];
+const otherClasses = ['p-2', 'rounded', 'w-full'];
 
 export function SingleMorphAnalysisOptionButton({morphAnalysis, toggleAnalysisSelection}: IProps): JSX.Element {
 
   if (singleMorphAnalysisIsWithoutEnclitics(morphAnalysis)) {
     return (
-      <button className={classNames('p-2', 'rounded', 'w-full', morphAnalysis.selected ? selectedClasses : notSelectedClasses)}
-              onClick={toggleAnalysisSelection}>{morphAnalysis.number} - {morphAnalysis.analysis}
-      </button>
-    );
-
-  } else if (singleMorphAnalysisIsWithSingleEnclitics(morphAnalysis)) {
-
-    const encliticsAnalysis = morphAnalysis.encliticsAnalysis;
-
-    return (
-      <button className={classNames('p-2', 'rounded', 'w-full', morphAnalysis.selected ? selectedClasses : notSelectedClasses)}
-              onClick={toggleAnalysisSelection}>
-        {morphAnalysis.number} - {morphAnalysis.analysis}
-        {morphAnalysis.encliticsAnalysis && <>
-          &nbsp;+=&nbsp; <EncliticsAnalysisDisplay enclitics={encliticsAnalysis.enclitics} analysis={encliticsAnalysis.analysis}/>
-        </>}
-      </button>
-    );
-  } else {
-
-    const encliticsAnalysis = morphAnalysis.encliticsAnalysis;
-
-    return (
-      <>
-        {encliticsAnalysis.analysisOptions.map((ea) =>
-          <button key={ea.letter}
-                  className={classNames('mb-1', 'p-2', 'rounded', 'w-full', ea.selected ? selectedClasses : notSelectedClasses)}
-                  onClick={toggleAnalysisSelection}>
-            {morphAnalysis.number} - {morphAnalysis.analysis}&nbsp;&nbsp;+=&nbsp;&nbsp;{ea.letter} - <EncliticsAnalysisDisplay
-            enclitics={encliticsAnalysis.enclitics} analysis={ea.analysis}/>
-          </button>)}
-      </>
+      <SelectableButton selected={morphAnalysis.selected} className={otherClasses} onClick={() => toggleAnalysisSelection(undefined)}>
+        {morphAnalysis.analysis}
+      </SelectableButton>
     );
   }
+
+  if (singleMorphAnalysisIsWithSingleEnclitics(morphAnalysis)) {
+    const encliticsAnalysis = morphAnalysis.encliticsAnalysis;
+
+    return (
+      <SelectableButton selected={morphAnalysis.selected} className={otherClasses} onClick={() => toggleAnalysisSelection(undefined)}>
+        <>{morphAnalysis.analysis} <EncliticsAnalysisDisplay enclitics={encliticsAnalysis.enclitics} analysis={encliticsAnalysis.analysis}/></>
+      </SelectableButton>
+    );
+  }
+
+  const {analysisOptions, enclitics} = morphAnalysis.encliticsAnalysis;
+
+  // FIXME: toggleAnalysisSelection needs encLetter!
+
+  return (
+    <>
+      {analysisOptions.map(({letter, analysis, selected}, index) =>
+        <SelectableButton key={letter} selected={selected} className={['mb-1', ...otherClasses]} onClick={() => toggleAnalysisSelection(index)}>
+          <>{letter} - {analysis} <EncliticsAnalysisDisplay enclitics={enclitics} analysis={analysis}/></>
+        </SelectableButton>
+      )}
+    </>
+  );
 }

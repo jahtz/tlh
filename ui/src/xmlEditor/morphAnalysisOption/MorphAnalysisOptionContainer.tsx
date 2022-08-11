@@ -6,8 +6,7 @@ import {MorphAnalysisOptionEditor} from './MorphAnalysisOptionEditor';
 interface IProps {
   morphologicalAnalysis: MorphologicalAnalysis;
   updateMorphology: (ma: MorphologicalAnalysis) => void;
-  toggleAnalysisSelection: (index?: number) => void;
-  toggleEncliticsSelection: (index: number) => void;
+  toggleAnalysisSelection: (letterIndex: number | undefined, encLetterIndex: number | undefined) => void;
   setKeyHandlingEnabled: (b: boolean) => void;
 }
 
@@ -19,7 +18,6 @@ export function MorphAnalysisOptionContainer({
   morphologicalAnalysis,
   updateMorphology,
   toggleAnalysisSelection,
-  toggleEncliticsSelection,
   setKeyHandlingEnabled,
 }: IProps): JSX.Element {
 
@@ -50,5 +48,5 @@ export function MorphAnalysisOptionContainer({
   return isUpdateMode
     ? <MorphAnalysisOptionEditor morphologicalAnalysis={morphologicalAnalysis} onSubmit={onEditSubmit} cancelUpdate={disableUpdateMode}/>
     : <MorphAnalysisOptionButtons morphologicalAnalysis={morphologicalAnalysis} toggleAnalysisSelection={toggleAnalysisSelection}
-                                  toggleEncliticsSelection={toggleEncliticsSelection} enableEditMode={enableUpdateMode}/>;
+                                  enableEditMode={enableUpdateMode}/>;
 }

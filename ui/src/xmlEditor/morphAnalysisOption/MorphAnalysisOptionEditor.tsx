@@ -1,6 +1,6 @@
 import {Field, FieldArray, Form, Formik} from 'formik';
 import {MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
-import {LetteredAnalysisOption} from '../../model/analysisOptions';
+import {LetteredAnalysisOption, SelectableLetteredAnalysisOption} from '../../model/analysisOptions';
 import {useTranslation} from 'react-i18next';
 
 interface IProps {
@@ -15,7 +15,7 @@ export function MorphAnalysisOptionEditor({morphologicalAnalysis, onSubmit, canc
 
   const {t} = useTranslation('common');
 
-  function nextAnalysisOption(lma: MultiMorphologicalAnalysis): LetteredAnalysisOption {
+  function nextAnalysisOption(lma: MultiMorphologicalAnalysis): SelectableLetteredAnalysisOption {
     const usedLetters = lma.analysisOptions.map(({letter}) => letter);
 
     const letter = alphabet.find((l) => !usedLetters.includes(l));

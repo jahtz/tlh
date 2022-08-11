@@ -1,7 +1,7 @@
 import {XmlEditableNodeIProps} from '../editorConfig';
 import {useTranslation} from 'react-i18next';
 import {useEffect, useState} from 'react';
-import {MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
+import {MorphologicalAnalysis, MultiMorphologicalAnalysisWithMultiEnclitics} from '../../model/morphologicalAnalysis';
 import {MorphAnalysisOptionContainer} from '../morphAnalysisOption/MorphAnalysisOptionContainer';
 import {useSelector} from 'react-redux';
 import {editorKeyConfigSelector} from '../../store/store';
@@ -14,9 +14,14 @@ import {readWordNodeData, WordNodeData} from './wordNodeData';
 import {LanguageInput} from '../LanguageInput';
 import {NodeEditorRightSide} from '../NodeEditorRightSide';
 import {WordStringChildEditor} from './WordStringChildEditor';
+import {
+  SelectedMultiMorphAnalysisWithEnclitic,
+  selectedMultiMorphAnalysisWithEnclitics,
+  stringifyMultiMorphAnalysisWithEnclitics
+} from '../../model/selectedMorphologicalAnalysis';
 
 interface IState {
-  addMorphology?: boolean;
+  addMorphology: boolean;
   editContent?: string;
 }
 
@@ -37,9 +42,7 @@ export function WordNodeEditor({
   const {t} = useTranslation('common');
   const editorConfig = useSelector(editorKeyConfigSelector);
 
-  const [state, setState] = useState<IState>({});
-
-  const [isAddMorphologyState, setIsAddMorphologyState] = useState(false);
+  const [state, setState] = useState<IState>({addMorphology: false});
 
   useEffect(() => {
     document.addEventListener('keydown', handleKey);
@@ -52,19 +55,52 @@ export function WordNodeEditor({
     }
   }
 
-  function toggleAnalysisSelection(morphIndex: number, letterIndex?: number): void {
+  function toggleAnalysisSelection(morphIndex: number, letterIndex: number | undefined, encLetterIndex: number | undefined): void {
     const action: Spec<{ selected: boolean }> = {$toggle: ['selected']};
 
     if (letterIndex || letterIndex === 0) {
-      updateNode({morphologies: {[morphIndex]: {analysisOptions: {[letterIndex]: action}}}});
+      // Multi morph
+      if (encLetterIndex !== undefined) {
+        // TODO: Multi enclitics
+
+        const x = selectedMultiMorphAnalysisWithEnclitics(
+          morphIndex + 1,
+          String.fromCharCode('a'.charCodeAt(0) + letterIndex),
+          String.fromCharCode('R'.charCodeAt(0) + encLetterIndex)
+        );
+
+        const str = stringifyMultiMorphAnalysisWithEnclitics(x);
+
+        const innerSpec: Spec<MultiMorphologicalAnalysisWithMultiEnclitics> = {
+          selectedAnalysisCombinations: {
+            $apply: (selectedLetters: SelectedMultiMorphAnalysisWithEnclitic[]) => selectedLetters.map(stringifyMultiMorphAnalysisWithEnclitics).includes(str)
+              ? selectedLetters.filter((s) => stringifyMultiMorphAnalysisWithEnclitics(s) !== str)
+              : [...selectedLetters, x]
+          }
+        };
+
+        updateNode({morphologies: {[morphIndex]: innerSpec}});
+      } else {
+        // Single or no enclitics
+        updateNode({morphologies: {[morphIndex]: {analysisOptions: {[letterIndex]: action}}}});
+      }
     } else {
-      updateNode({morphologies: {[morphIndex]: action}});
+      // Single morph
+      if (encLetterIndex !== undefined) {
+        // Multi enclitics
+        updateNode({morphologies: {[morphIndex]: {encliticsAnalysis: {analysisOptions: {[encLetterIndex]: action}}}}});
+      } else {
+        // Single or no enclitics
+        updateNode({morphologies: {[morphIndex]: action}});
+      }
     }
   }
 
+  /*
   function toggleEncliticsSelection(morphIndex: number, letterIndex: number): void {
     updateNode({morphologies: {[morphIndex]: {encliticsAnalysis: {analysisOptions: {[letterIndex]: {$toggle: ['selected']}}}}}});
   }
+   */
 
   function enableEditWordState(): void {
     setKeyHandlingEnabled(false);
@@ -86,18 +122,18 @@ export function WordNodeEditor({
 
   function updateMorphology(index: number, newMa: MorphologicalAnalysis): void {
     updateNode({morphologies: {[index]: {$set: newMa}}});
-    setIsAddMorphologyState(false);
+    setState((state) => update(state, {addMorphology: {$set: false}}));
   }
 
   function toggleAddMorphology(): void {
-    setKeyHandlingEnabled(isAddMorphologyState);
-    setIsAddMorphologyState((value) => !value);
+    setKeyHandlingEnabled(state.addMorphology);
+    setState((state) => update(state, {$toggle: ['addMorphology']}));
   }
 
   function nextMorphAnalysis(): MorphologicalAnalysis {
     const number = Math.max(0, ...data.morphologies.map(({number}) => number)) + 1;
 
-    return {number, translation: '', referenceWord: '', analysisOptions: [], paradigmClass: ''};
+    return {number, translation: '', referenceWord: '', analysisOptions: [], encliticsAnalysis: undefined, determinativ: undefined, paradigmClass: ''};
   }
 
   function setSelectedMorphToDel(): void {
@@ -171,15 +207,14 @@ export function WordNodeEditor({
               : data.morphologies.map((m, index) => <div className="mt-2" key={m.number}>
                   <MorphAnalysisOptionContainer
                     morphologicalAnalysis={m}
-                    toggleAnalysisSelection={(letterIndex) => toggleAnalysisSelection(index, letterIndex)}
-                    toggleEncliticsSelection={(letterIndex) => toggleEncliticsSelection(index, letterIndex)}
+                    toggleAnalysisSelection={(letterIndex, encLetterIndex) => toggleAnalysisSelection(index, letterIndex, encLetterIndex)}
                     updateMorphology={(newMa) => updateMorphology(index, newMa)}
                     setKeyHandlingEnabled={setKeyHandlingEnabled}
                   />
                 </div>
               )}
 
-            {isAddMorphologyState && <MorphAnalysisOptionEditor
+            {state.addMorphology && <MorphAnalysisOptionEditor
               morphologicalAnalysis={nextMorphAnalysis()}
               onSubmit={(newMa) => updateMorphology(data.morphologies.length, newMa)}
               cancelUpdate={toggleAddMorphology}/>}

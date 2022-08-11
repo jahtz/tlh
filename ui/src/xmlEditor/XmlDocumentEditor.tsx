@@ -307,13 +307,10 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
   }
 
   function initiateInsert(path: NodePath): void {
-
     if (state.editorState && 'tagName' in state.editorState) {
       const node = state.editorState.insertablePositions.newElement !== undefined
         ? state.editorState.insertablePositions.newElement()
         : {tagName: state.editorState.tagName, attributes: {}, children: []};
-
-      console.info(node);
 
       setState((state) => update(state, {
         rootNode: path.slice(0, -1).reduceRight<Spec<XmlNode>>(

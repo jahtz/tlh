@@ -1,12 +1,18 @@
-import {isMultiMorphologicalAnalysis, MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue} from '../../model/morphologicalAnalysis';
+import {
+  isMultiMorphologicalAnalysis,
+  MorphologicalAnalysis,
+  multiMorphAnalysisIsWithMultiEnclitics,
+  readMorphologiesFromNode,
+  singleMorphAnalysisIsWithMultiEnclitics,
+  writeMorphAnalysisValue
+} from '../../model/morphologicalAnalysis';
 import {isXmlElementNode, XmlElementNode, XmlNode} from '../../xmlModel/xmlModel';
-import {readSelectedMorphology, SelectedAnalysisOption, writeSelectedMorphologies} from '../selectedAnalysisOption';
-import {getSelectedLetters} from '../../model/analysisOptions';
 import {XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {WordNodeEditor} from './WordNodeEditor';
 import {SpacesEditor} from './SpacesEditor';
 import {selectedNodeClass} from '../tlhTranscriptionXmlEditorConfig';
+import {readSelectedMorphology} from '../../model/selectedMorphologicalAnalysis';
 
 export interface WordNodeData {
   node: XmlElementNode;
@@ -20,10 +26,12 @@ export function readWordNodeData(node: XmlElementNode): WordNodeData {
 
   const selectedMorphologies = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
 
+  const morphologies = readMorphologiesFromNode(node, selectedMorphologies);
+
   return {
     node: node,
     lg: node.attributes.lg || '',
-    morphologies: readMorphologiesFromNode(node, selectedMorphologies),
+    morphologies,
     footNote: lastChild && isXmlElementNode(lastChild) && lastChild.tagName === 'note'
       ? lastChild.attributes.c
       : undefined,
@@ -65,27 +73,31 @@ export function writeWordNodeData({node: originalNode, lg, morphologies, footNot
     node.attributes[`mrp${ma.number}`] = writeMorphAnalysisValue(ma);
   }
 
-  const selectedAnalysisOptions: SelectedAnalysisOption[] = morphologies.flatMap((ma) => {
-
-    const enclitics = 'encliticsAnalysis' in ma
-      ? 'analysis' in ma.encliticsAnalysis ? undefined : getSelectedLetters(ma.encliticsAnalysis.analysisOptions)
-      : undefined;
+  const selectedAnalysisOptions: string[] = morphologies.flatMap((ma) => {
 
     if (isMultiMorphologicalAnalysis(ma)) {
-      return getSelectedLetters(ma.analysisOptions).map((letter) => ({number: ma.number, letter, enclitics}));
-    } else {
-      if ('selected' in ma && ma.selected) {
-        return [{number: ma.number, enclitics}];
+      if (multiMorphAnalysisIsWithMultiEnclitics(ma)) {
+        // FIXME!
+        return ma.selectedAnalysisCombinations.map(({number, morphLetter, encLetter}) => `${number}${morphLetter}${encLetter}`);
       } else {
-        // FIXME: single morph analysis with multi enclitics!
-        return [];
+        return ma.analysisOptions
+          .filter(({selected}) => selected)
+          .map(({letter}) => `${ma.number}${letter}`);
+      }
+    } else {
+      if (singleMorphAnalysisIsWithMultiEnclitics(ma)) {
+        return ma.encliticsAnalysis.analysisOptions
+          .filter(({selected}) => selected)
+          .map(({letter}) => `${ma.number}${letter}`);
+      } else {
+        return ma.number.toString();
       }
     }
   });
 
   if (selectedAnalysisOptions.length > 0) {
     node.attributes.mrp0sel = selectedAnalysisOptions.length > 0
-      ? writeSelectedMorphologies(selectedAnalysisOptions)
+      ? selectedAnalysisOptions.join(' ')
       : ' ';
   }
 

@@ -18,28 +18,36 @@ function normalizeString(value: string): string {
 }
 
 const selected = false;
+const determinativ = undefined;
+
+const number = 1;
 
 describe('morphologicalAnalysis', () => {
 
   // single morph, no enclitic
 
   const maString0 = 'wē-/uwa- @ kommen @ 3SG.PRS @ I.12 @ ';
-  const ma0: Omit<SingleMorphologicalAnalysisWithoutEnclitics, 'number'> = {
+  const ma0: SingleMorphologicalAnalysisWithoutEnclitics = {
+    number,
     referenceWord: 'wē-/uwa-',
     translation: 'kommen',
     analysis: '3SG.PRS',
+    determinativ,
     paradigmClass: 'I.12',
+    encliticsAnalysis: undefined,
     selected,
   };
 
   // single morph, single enclitic, no determinativ
 
   const maString1 = 'paršn=ā(e)- @ sich niederhocken @ VBN.GEN.SG @ I.9 += kkan @ OBPk @  @ ';
-  const ma1: Omit<SingleMorphologicalAnalysisWithSingleEnclitics, 'number'> = {
+  const ma1: SingleMorphologicalAnalysisWithSingleEnclitics = {
+    number,
     referenceWord: 'paršn=ā(e)-',
     translation: 'sich niederhocken',
     analysis: 'VBN.GEN.SG',
     paradigmClass: 'I.9',
+    determinativ,
     encliticsAnalysis: {enclitics: 'kkan', analysis: 'OBPk', selected},
     selected
   };
@@ -47,7 +55,8 @@ describe('morphologicalAnalysis', () => {
   // single morph, single enclitic, with determinativ
 
   const maString2 = 'parašnau=aš @ Mann des Niederhockens @ GENunh @ 30.12 += kkan @ OBPk @  @ (LÚ)';
-  const ma2: Omit<SingleMorphologicalAnalysisWithSingleEnclitics, 'number'> = {
+  const ma2: SingleMorphologicalAnalysisWithSingleEnclitics = {
+    number,
     referenceWord: 'parašnau=aš',
     translation: 'Mann des Niederhockens',
     analysis: 'GENunh',
@@ -63,11 +72,13 @@ describe('morphologicalAnalysis', () => {
 		   += aš @
 		{ R → PPRO.3SG.C.NOM}
 		{ S → PPRO.3PL.C.ACC} @  @ `;
-  const ma3: Omit<SingleMorphologicalAnalysisWithMultiEnclitics, 'number'> = {
+  const ma3: SingleMorphologicalAnalysisWithMultiEnclitics = {
+    number,
     referenceWord: 'gen=u-',
     translation: 'Knie',
     analysis: 'STF',
     paradigmClass: '3.1.1',
+    determinativ,
     encliticsAnalysis: {
       enclitics: 'aš',
       analysisOptions: [
@@ -81,7 +92,8 @@ describe('morphologicalAnalysis', () => {
   // multiple morphs, no enclitics
 
   const maString4 = 'gen=u- @ Knie @ { a → GEN.SG} { b → GEN.PL} { c → D/L.PL} @ 3.1.1 @ ';
-  const ma4: Omit<MultiMorphologicalAnalysis, 'number'> = {
+  const ma4: MultiMorphologicalAnalysis = {
+    number,
     referenceWord: 'gen=u-',
     translation: 'Knie',
     analysisOptions: [
@@ -89,13 +101,16 @@ describe('morphologicalAnalysis', () => {
       {letter: 'b', analysis: 'GEN.PL', selected},
       {letter: 'c', analysis: 'D/L.PL', selected}
     ],
+    encliticsAnalysis: undefined,
+    determinativ,
     paradigmClass: '3.1.1'
   };
 
   const multMorphNoEncStr2 = `① tamnaššar=a-   @   Dam(ma)naššareš   @         
         { a → DN.GEN.PL}       
         { b → DN.D/L.PL}   @   35.1.2   @   D`;
-  const multMorphNoEncRes2: Omit<MultiMorphologicalAnalysisWithoutEnclitics, 'number'> = {
+  const multMorphNoEncRes2: MultiMorphologicalAnalysisWithoutEnclitics = {
+    number,
     referenceWord: '① tamnaššar=a-',
     translation: 'Dam(ma)naššareš',
     analysisOptions: [
@@ -103,6 +118,7 @@ describe('morphologicalAnalysis', () => {
       {letter: 'b', analysis: 'DN.D/L.PL', selected}
     ],
     paradigmClass: '35.1.2',
+    encliticsAnalysis: undefined,
     determinativ: 'D'
   };
 
@@ -117,7 +133,8 @@ describe('morphologicalAnalysis', () => {
 		{ f → DN.INS(UNM)}
 		{ g → DN.VOC.SG} @ 35.1.1
 		   += ma @ CNJctr @  @ D`;
-  const ma5: Omit<MultiMorphologicalAnalysisWithSingleEnclitics, 'number'> = {
+  const ma5: MultiMorphologicalAnalysisWithSingleEnclitics = {
+    number,
     referenceWord: 'mezull=a-',
     translation: 'Mez(z)ul(l)a',
     analysisOptions: [
@@ -146,24 +163,27 @@ describe('morphologicalAnalysis', () => {
 		   += aš @
 		{ R → PPRO.3SG.C.NOM}
 		{ S → PPRO.3PL.C.ACC} @  @ `;
-  const ma6: Omit<MultiMorphologicalAnalysisWithMultiEnclitics, 'number'> = {
+  const ma6: MultiMorphologicalAnalysisWithMultiEnclitics = {
+    number,
     referenceWord: 'gen=u-',
     translation: 'Knie',
     analysisOptions: [
-      {letter: 'a', analysis: 'NOM.SG.N', selected},
-      {letter: 'b', analysis: 'ACC.SG.N', selected},
-      {letter: 'c', analysis: 'NOM.PL.N', selected},
-      {letter: 'd', analysis: 'ACC.PL.N', selected},
-      {letter: 'e', analysis: 'STF', selected}
+      {letter: 'a', analysis: 'NOM.SG.N'},
+      {letter: 'b', analysis: 'ACC.SG.N'},
+      {letter: 'c', analysis: 'NOM.PL.N'},
+      {letter: 'd', analysis: 'ACC.PL.N'},
+      {letter: 'e', analysis: 'STF'}
     ],
     paradigmClass: '3.1.2',
+    determinativ,
     encliticsAnalysis: {
       enclitics: 'aš',
       analysisOptions: [
         {letter: 'R', analysis: 'PPRO.3SG.C.NOM', selected},
         {letter: 'S', analysis: 'PPRO.3PL.C.ACC', selected}
       ]
-    }
+    },
+    selectedAnalysisCombinations: []
   };
 
   const multMorphMultEncStr2 = `②Ⓐ tamnaššar=a-   @   Dam(ma)naššareš   @         
@@ -178,19 +198,19 @@ describe('morphologicalAnalysis', () => {
            +=    aš   @         
         { R → PPRO.3SG.C.NOM}       
         { S → PPRO.3PL.C.ACC}   @   D`;
-  const multMorphMultEncRes2: Omit<MultiMorphologicalAnalysisWithMultiEnclitics, 'number'> = {
-
+  const multMorphMultEncRes2: MultiMorphologicalAnalysisWithMultiEnclitics = {
+    number,
     referenceWord: '②Ⓐ tamnaššar=a-',
     translation: 'Dam(ma)naššareš',
     analysisOptions: [
-      {letter: 'a', analysis: 'DN.NOM.PL(UNM)', selected},
-      {letter: 'b', analysis: 'DN.HURR.ABS', selected},
-      {letter: 'c', analysis: 'DN.ACC.PL(UNM)', selected},
-      {letter: 'd', analysis: 'DN.GEN.PL(UNM)', selected},
-      {letter: 'e', analysis: 'DN.D/L.PL(UNM)', selected},
-      {letter: 'f', analysis: 'DN.ABL(UNM)', selected},
-      {letter: 'g', analysis: 'DN.INS(UNM)', selected},
-      {letter: 'h', analysis: 'DN.VOC.PL(UNM)', selected}
+      {letter: 'a', analysis: 'DN.NOM.PL(UNM)'},
+      {letter: 'b', analysis: 'DN.HURR.ABS'},
+      {letter: 'c', analysis: 'DN.ACC.PL(UNM)'},
+      {letter: 'd', analysis: 'DN.GEN.PL(UNM)'},
+      {letter: 'e', analysis: 'DN.D/L.PL(UNM)'},
+      {letter: 'f', analysis: 'DN.ABL(UNM)'},
+      {letter: 'g', analysis: 'DN.INS(UNM)'},
+      {letter: 'h', analysis: 'DN.VOC.PL(UNM)'}
     ],
     determinativ: 'D',
     paradigmClass: '35.1.2',
@@ -201,9 +221,10 @@ describe('morphologicalAnalysis', () => {
         {letter: 'S', analysis: 'PPRO.3PL.C.ACC', selected}
       ]
     },
+    selectedAnalysisCombinations: []
   };
 
-  test.each<[string, Omit<MorphologicalAnalysis, 'number'>]>([
+  test.each<[string, MorphologicalAnalysis]>([
     [normalizeString(maString0), ma0],
     [normalizeString(maString1), ma1],
     [normalizeString(maString2), ma2],
@@ -219,7 +240,7 @@ describe('morphologicalAnalysis', () => {
   );
 
 
-  test.each([
+  test.each<[MorphologicalAnalysis, string]>([
     [ma0, normalizeString(maString0)],
     [ma1, normalizeString(maString1)],
     [ma2, normalizeString(maString2)],
@@ -230,9 +251,8 @@ describe('morphologicalAnalysis', () => {
   ])(
     'should write a morphological analysis %j to a string "%s"',
     (toWrite, expected) =>
-      expect(writeMorphAnalysisValue({...toWrite, number: 1}))
-        // FIXME: this replaces a (perhaps?) redundant @
-        .toEqual(expected.replace(/@\s*@/, '@'))
+      // FIXME: this replaces a (perhaps?) redundant @
+      expect(writeMorphAnalysisValue(toWrite)).toEqual(expected.replace(/@\s*@/, '@'))
   );
 
 
