@@ -4,17 +4,10 @@ const letteredAnalysesSplitRegex = /\s*(?={)/;
 export interface LetteredAnalysisOption {
   letter: string;
   analysis: string;
-
 }
 
 export interface SelectableLetteredAnalysisOption extends LetteredAnalysisOption {
   selected: boolean;
-}
-
-export function getSelectedLetters(laos: SelectableLetteredAnalysisOption[]): string[] {
-  return laos
-    .filter(({selected}) => selected)
-    .map(({letter}) => letter);
 }
 
 function parseAnalysisOption(as: string): LetteredAnalysisOption {

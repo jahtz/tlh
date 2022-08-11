@@ -16,9 +16,8 @@ export function MultiMorphAnalysisSelection({ma}: IProps): JSX.Element | null {
   const selectedAnalyses = analysisOptions.filter(({selected}) => selected);
 
   if (selectedAnalyses.length === 0) {
-    return null;
+    return <></>;
   }
-
 
   return (
     <div className="p-2 mb-2 bg-teal-200 rounded">

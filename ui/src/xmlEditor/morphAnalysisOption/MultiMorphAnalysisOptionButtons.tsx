@@ -1,6 +1,7 @@
 import {multiMorphAnalysisIsWithoutEnclitics, multiMorphAnalysisIsWithSingleEnclitics, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {EncliticsAnalysisDisplay} from './SingleMorphAnalysisOptionButton';
 import {MultiMorphAnalysisSelection} from './MultiMorphAnalysisSelection';
+import {MultiMorphMultiEncAnalysisSelection} from './MultiMorphMultiEncAnalysisSelection';
 import {SelectableButton} from '../../SelectableButton';
 import {MultiMorphMultiSelectionButton} from './MultiMorphMultiSelectionButton';
 
@@ -49,7 +50,7 @@ export function MultiMorphAnalysisOptionButtons({morphAnalysis, toggleAnalysisSe
 
   return (
     <div>
-      {/* TODO: <MultiMorphAnalysisSelection ma={morphAnalysis}/>*/}
+      <MultiMorphMultiEncAnalysisSelection ma={morphAnalysis}/>
 
       {morphAnalysis.analysisOptions.map((morphAnalysisOption, index) =>
         <MultiMorphMultiSelectionButton key={index} ma={morphAnalysis} morphAnalysisOption={morphAnalysisOption} enclitics={enclitics}
