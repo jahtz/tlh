@@ -26,18 +26,18 @@ interface IState {
 }
 
 export function WordNodeEditor({
-  data,
-  originalNode,
-  changed,
-  updateNode,
-  deleteNode,
-  keyHandlingEnabled,
-  setKeyHandlingEnabled,
-  initiateJumpElement,
-  initiateSubmit,
-  fontSizeSelectorProps,
-  cancelSelection
-}: XmlEditableNodeIProps<WordNodeData>): JSX.Element {
+                                 data,
+                                 originalNode,
+                                 changed,
+                                 updateNode,
+                                 deleteNode,
+                                 keyHandlingEnabled,
+                                 setKeyHandlingEnabled,
+                                 initiateJumpElement,
+                                 initiateSubmit,
+                                 fontSizeSelectorProps,
+                                 cancelSelection
+                               }: XmlEditableNodeIProps<WordNodeData>): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorConfig = useSelector(editorKeyConfigSelector);
@@ -95,12 +95,6 @@ export function WordNodeEditor({
       }
     }
   }
-
-  /*
-  function toggleEncliticsSelection(morphIndex: number, letterIndex: number): void {
-    updateNode({morphologies: {[morphIndex]: {encliticsAnalysis: {analysisOptions: {[letterIndex]: {$toggle: ['selected']}}}}}});
-  }
-   */
 
   function enableEditWordState(): void {
     setKeyHandlingEnabled(false);
