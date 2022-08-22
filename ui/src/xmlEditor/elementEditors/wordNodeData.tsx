@@ -143,6 +143,7 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
           'has-text-weight-bold': isForeignLanguage,
           'text-red-600': node.children.length === 0,
           'bg-yellow-300': !isSelected && !notMarked && hasNoMorphologySelected,
+          // TODO: backgrounds...
           'bg-blue-300': hasEditingQuestion,
           'bg-teal-400': isSelected,
         });
