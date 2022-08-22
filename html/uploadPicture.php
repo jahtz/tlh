@@ -63,6 +63,8 @@ function doUpload(string $manuscriptId): string {
 
 $manuscriptId = $_GET['id'];
 
+error_log($manuscriptId);
+
 try {
   $targetFileName = doUpload($manuscriptId);
 

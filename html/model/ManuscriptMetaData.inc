@@ -12,9 +12,11 @@ use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
  * @return string[]
  */
 function getPictures(string $manuscriptMainIdentifier): array {
-  $folder = "./uploads/$manuscriptMainIdentifier/";
+  $folder = __DIR__ . "/../uploads/$manuscriptMainIdentifier/";
 
-  if (!file_exists($folder) || is_dir($folder)) {
+  error_log($folder . ' :: ' . realpath($folder));
+
+  if (!file_exists($folder) || !is_dir($folder)) {
     return [];
   }
 
@@ -42,14 +44,14 @@ class ManuscriptMetaData
 
   function __construct(
     ManuscriptIdentifier $mainIdentifier,
-    ?array $otherIdentifiers,
-    string $palaeographicClassification,
-    bool $palaeographicClassificationSure,
-    ?string $provenance,
-    ?int $cthClassification,
-    ?string $bibliography,
-    string $status,
-    string $creatorUsername
+    ?array               $otherIdentifiers,
+    string               $palaeographicClassification,
+    bool                 $palaeographicClassificationSure,
+    ?string              $provenance,
+    ?int                 $cthClassification,
+    ?string              $bibliography,
+    string               $status,
+    string               $creatorUsername
   ) {
     $this->mainIdentifier = $mainIdentifier;
     $this->otherIdentifiers = $otherIdentifiers;
