@@ -138,13 +138,13 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
       isOnlySpaces(node)
         ? [isSelected ? selectedNodeClass : 'bg-gray-200']
         : {
-          'bg-yellow-300': !notMarked && hasNoMorphologySelected,
-          'bg-teal-400': isSelected,
           'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
-          'bg-blue-300': hasEditingQuestion,
           [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,
           'has-text-weight-bold': isForeignLanguage,
-          'text-red-600': node.children.length === 0
+          'text-red-600': node.children.length === 0,
+          'bg-yellow-300': !isSelected && !notMarked && hasNoMorphologySelected,
+          'bg-blue-300': hasEditingQuestion,
+          'bg-teal-400': isSelected,
         });
 
     return <>
