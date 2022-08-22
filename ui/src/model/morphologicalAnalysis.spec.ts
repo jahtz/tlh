@@ -32,7 +32,7 @@ describe('morphologicalAnalysis', () => {
     referenceWord: 'wē-/uwa-',
     translation: 'kommen',
     analysis: '3SG.PRS',
-    determinativ,
+    determinative: determinativ,
     paradigmClass: 'I.12',
     encliticsAnalysis: undefined,
     selected,
@@ -47,7 +47,7 @@ describe('morphologicalAnalysis', () => {
     translation: 'sich niederhocken',
     analysis: 'VBN.GEN.SG',
     paradigmClass: 'I.9',
-    determinativ,
+    determinative: determinativ,
     encliticsAnalysis: {enclitics: 'kkan', analysis: 'OBPk', selected},
     selected
   };
@@ -62,7 +62,7 @@ describe('morphologicalAnalysis', () => {
     analysis: 'GENunh',
     paradigmClass: '30.12',
     encliticsAnalysis: {enclitics: 'kkan', analysis: 'OBPk', selected},
-    determinativ: '(LÚ)',
+    determinative: '(LÚ)',
     selected
   };
 
@@ -78,7 +78,7 @@ describe('morphologicalAnalysis', () => {
     translation: 'Knie',
     analysis: 'STF',
     paradigmClass: '3.1.1',
-    determinativ,
+    determinative: determinativ,
     encliticsAnalysis: {
       enclitics: 'aš',
       analysisOptions: [
@@ -102,7 +102,7 @@ describe('morphologicalAnalysis', () => {
       {letter: 'c', analysis: 'D/L.PL', selected}
     ],
     encliticsAnalysis: undefined,
-    determinativ,
+    determinative: determinativ,
     paradigmClass: '3.1.1'
   };
 
@@ -119,7 +119,7 @@ describe('morphologicalAnalysis', () => {
     ],
     paradigmClass: '35.1.2',
     encliticsAnalysis: undefined,
-    determinativ: 'D'
+    determinative: 'D'
   };
 
   // multiple morphs, single enclitic
@@ -148,7 +148,7 @@ describe('morphologicalAnalysis', () => {
     ],
     paradigmClass: '35.1.1',
     encliticsAnalysis: {enclitics: 'ma', analysis: 'CNJctr', selected},
-    determinativ: 'D'
+    determinative: 'D'
   };
 
 
@@ -175,7 +175,7 @@ describe('morphologicalAnalysis', () => {
       {letter: 'e', analysis: 'STF'}
     ],
     paradigmClass: '3.1.2',
-    determinativ,
+    determinative: determinativ,
     encliticsAnalysis: {
       enclitics: 'aš',
       analysisOptions: [
@@ -212,7 +212,7 @@ describe('morphologicalAnalysis', () => {
       {letter: 'g', analysis: 'DN.INS(UNM)'},
       {letter: 'h', analysis: 'DN.VOC.PL(UNM)'}
     ],
-    determinativ: 'D',
+    determinative: 'D',
     paradigmClass: '35.1.2',
     encliticsAnalysis: {
       enclitics: 'aš',

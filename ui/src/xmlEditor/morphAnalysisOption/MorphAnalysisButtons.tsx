@@ -3,7 +3,6 @@ import {useTranslation} from 'react-i18next';
 import {SingleMorphAnalysisOptionButton} from './SingleMorphAnalysisOptionButton';
 import {isSingleMorphologicalAnalysis, MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {Numerus} from './MorphAnalysisOptionContainer';
-import classNames from 'classnames';
 import {MultiMorphAnalysisOptionButtons} from './MultiMorphAnalysisOptionButtons';
 
 interface IProps {
@@ -21,7 +20,7 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
   const {t} = useTranslation('common');
   const [isReduced, setIsReduced] = useState(false);
 
-  const {number, translation, referenceWord, paradigmClass, determinativ} = morphologicalAnalysis;
+  const {number, translation, referenceWord, paradigmClass, determinative} = morphologicalAnalysis;
   const isSingleAnalysisOption = isSingleMorphologicalAnalysis(morphologicalAnalysis);
 
   function selectAll(ma: MultiMorphologicalAnalysis, numerus?: Numerus): void {
@@ -42,10 +41,10 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
 
         <span className="p-2 border-l border-y border-slate-500">{number}</span>
 
-        <div className={classNames('flex-grow', 'p-2', 'border', 'border-slate-500', 'bg-gray-100', {'rounded-r': isSingleAnalysisOption})}>
+        <div className="flex-grow p-2 border-l border-y border-slate-500 bg-gray-100">
           <span className="text-red-600">{translation}</span>&nbsp;({referenceWord},&nbsp;
           {t('paradigmClass')}:&nbsp;<span className="text-red-600">{paradigmClass}</span>
-          {determinativ && <span>, {t('determinativ')}:&nbsp;<span className="text-red-600">{determinativ}</span></span>})&nbsp;
+          {determinative && <span>, {t('determinativ')}:&nbsp;<span className="text-red-600">{determinative}</span></span>})&nbsp;
         </div>
 
         {!isSingleAnalysisOption && <>
@@ -60,11 +59,9 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
           </button>
         </>}
 
-        {!isSingleAnalysisOption &&
-          /* FIXME: implement edit mode for single morph analysis! */
-          <button type="button" className="p-2 rounded-r border border-slate-500" onClick={enableEditMode} title={t('editMorphologicalAnalyses')}>
-            &#x2699;
-          </button>}
+        <button type="button" className="p-2 rounded-r border border-slate-500" onClick={enableEditMode} title={t('editMorphologicalAnalyses')}>
+          &#x2699;
+        </button>
       </div>
 
       {!isReduced && <div className="mt-2">

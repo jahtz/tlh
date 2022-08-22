@@ -18,7 +18,7 @@ interface IMorphologicalAnalysis {
   referenceWord: string;
   translation: string;
   paradigmClass: string;
-  determinativ: string | undefined;
+  determinative: string | undefined;
 }
 
 // Single analysis
@@ -193,7 +193,7 @@ export function readMorphologicalAnalysis(number: number, content: string | null
         analysisOptions,
         paradigmClass,
         encliticsAnalysis,
-        determinativ
+        determinative: determinativ
       } as MultiMorphologicalAnalysisWithoutEnclitics;
     } else if (isSingleEncliticsAnalysis(encliticsAnalysis)) {
       return {
@@ -203,7 +203,7 @@ export function readMorphologicalAnalysis(number: number, content: string | null
         analysisOptions,
         paradigmClass,
         encliticsAnalysis,
-        determinativ
+        determinative: determinativ
       } as MultiMorphologicalAnalysisWithSingleEnclitics;
     } else {
       const selectedAnalysisCombinations: SelectedMultiMorphAnalysisWithEnclitic[] = selectedAnalyses.map(({
@@ -219,7 +219,7 @@ export function readMorphologicalAnalysis(number: number, content: string | null
         analysisOptions,
         paradigmClass,
         encliticsAnalysis,
-        determinativ,
+        determinative: determinativ,
         selectedAnalysisCombinations
       };
     }
@@ -229,11 +229,11 @@ export function readMorphologicalAnalysis(number: number, content: string | null
     const analysis = analysesString;
 
     if (encliticsAnalysis == undefined) {
-      return {number, referenceWord, translation, paradigmClass, determinativ, analysis, encliticsAnalysis, selected};
+      return {number, referenceWord, translation, paradigmClass, determinative: determinativ, analysis, encliticsAnalysis, selected};
     } else if (isSingleEncliticsAnalysis(encliticsAnalysis)) {
-      return {number, referenceWord, translation, paradigmClass, determinativ, analysis, encliticsAnalysis, selected};
+      return {number, referenceWord, translation, paradigmClass, determinative: determinativ, analysis, encliticsAnalysis, selected};
     } else {
-      return {number, referenceWord, translation, paradigmClass, determinativ, analysis, encliticsAnalysis};
+      return {number, referenceWord, translation, paradigmClass, determinative: determinativ, analysis, encliticsAnalysis};
     }
   }
 }
@@ -254,7 +254,7 @@ export function readMorphologiesFromNode(node: XmlElementNode, initialSelectedMo
 
 export function writeMorphAnalysisValue(morphologicalAnalysis: MorphologicalAnalysis): string {
 
-  const {referenceWord, translation, paradigmClass, determinativ} = morphologicalAnalysis;
+  const {referenceWord, translation, paradigmClass, determinative} = morphologicalAnalysis;
 
   const enc = morphologicalAnalysis.encliticsAnalysis !== undefined
     ? writeEncliticsAnalysis(morphologicalAnalysis.encliticsAnalysis)
@@ -264,7 +264,7 @@ export function writeMorphAnalysisValue(morphologicalAnalysis: MorphologicalAnal
     ? morphologicalAnalysis.analysis
     : morphologicalAnalysis.analysisOptions.map(({letter, analysis}) => `{ ${letter} → ${analysis}}`).join(' ');
 
-  return [referenceWord, translation, analysisString, paradigmClass + (enc ? ' += ' + enc : ''), determinativ || ''].join(' @ ');
+  return [referenceWord, translation, analysisString, paradigmClass + (enc ? ' += ' + enc : ''), determinative || ''].join(' @ ');
 }
 
 function writeMorphologicalAnalysis(sma: MorphologicalAnalysis): string[] {

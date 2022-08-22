@@ -1,5 +1,5 @@
 import {Field, FieldArray, Form, Formik} from 'formik';
-import {MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
+import {isMultiMorphologicalAnalysis, MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {LetteredAnalysisOption, SelectableLetteredAnalysisOption} from '../../model/analysisOptions';
 import {useTranslation} from 'react-i18next';
 
@@ -11,68 +11,64 @@ interface IProps {
 
 const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
+function nextAnalysisOption(lma: MultiMorphologicalAnalysis): SelectableLetteredAnalysisOption {
+  const usedLetters = lma.analysisOptions.map(({letter}) => letter);
+
+  const letter = alphabet.find((l) => !usedLetters.includes(l));
+
+  if (!letter) {
+    throw new Error('All letters are used!');
+  }
+
+  return {letter, analysis: '', selected: false};
+}
+
 export function MorphAnalysisOptionEditor({morphologicalAnalysis, onSubmit, cancelUpdate}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
-  function nextAnalysisOption(lma: MultiMorphologicalAnalysis): SelectableLetteredAnalysisOption {
-    const usedLetters = lma.analysisOptions.map(({letter}) => letter);
-
-    const letter = alphabet.find((l) => !usedLetters.includes(l));
-
-    if (!letter) {
-      throw new Error('All letters are used!');
-    }
-
-    return {letter, analysis: '', selected: false};
-  }
-
-  if ('analysis' in morphologicalAnalysis) {
-    // TODO: disabled until further notice...
-    return <div className="notification is-warning has-text-centered">This should be disabled and not selectable...</div>;
-  }
-
-  // FIXME: validationSchema for morphological analysis?!
-
   return (
     <Formik initialValues={morphologicalAnalysis} onSubmit={onSubmit}>
-      {({values}) =>
-        <Form>
+      {({values}) => <Form>
 
-          <div className="flex flex-row">
-            <button type="button" className="px-4 py-2 rounded-l bg-gray-100 border-l border-y border-slate-500">{morphologicalAnalysis.number}</button>
+        <div className="flex flex-row">
+          <div className="px-4 py-2 rounded-l bg-gray-100 border-l border-y border-slate-500">{morphologicalAnalysis.number}</div>
 
-            <Field name="translation" className="flex-grow p-2 border border-slate-500" placeholder={t('translation')}/>
+          <Field name="translation" className="flex-grow p-2 border border-slate-500" placeholder={t('translation')}/>
 
-            <Field name="referenceWord" className="flex-grow p-2 border-r border-y border-slate-500" placeholder={t('referenceWord')}/>
+          <Field name="referenceWord" className="flex-grow p-2 border-r border-y border-slate-500" placeholder={t('referenceWord')}/>
 
-            <Field name="determinativ" className="flex-1 p-2 border-r border-y border-slate-500" placeholder={t('determinativ')}/>
+          <Field name="determinative" className="flex-1 p-2 border-r border-y border-slate-500" placeholder={t('determinative')}/>
 
-            <Field name="paradigmClass" className="flex-1 p-2 rounded-r border-r border-y border-slate-500" placeholder={t('paradigmClass')}/>
-          </div>
+          <Field name="paradigmClass" className="flex-1 p-2 rounded-r border-r border-y border-slate-500" placeholder={t('paradigmClass')}/>
+        </div>
 
+        {isMultiMorphologicalAnalysis(values) &&
           <FieldArray name={'analysisOptions'}>
             {(arrayHelpers) => <div>
 
               {(values.analysisOptions as LetteredAnalysisOption[]).map(({letter}, index) =>
                 <div className="mt-2 flex flex-row" key={letter}>
                   <button className="px-4 py-2 rounded-l bg-gray-100 border-l border-y border-slate-500">{letter}</button>
-                  <Field name={`analysisOptions.${index}.analysis`} className="flex-grow p-2 border-l border-y border-slate-500" placeholder={t('analysis')}/>
+                  <Field name={`analysisOptions.${index}.analysis`} className="flex-grow p-2 border-l border-y border-slate-500"
+                         placeholder={t('analysis')}/>
                   <button type="button" className="px-4 py-2 rounded-r bg-red-500 text-white" onClick={() => arrayHelpers.remove(index)}>-</button>
                 </div>
               )}
 
-              <div className="mt-2">
-                <button type="button" className="px-4 py-2 rounded bg-teal-500 text-white" onClick={() => arrayHelpers.push(nextAnalysisOption(values))}>+
-                </button>
-                <button type="button" className="ml-2 px-4 py-2 rounded bg-amber-400" onClick={cancelUpdate}>{t('cancelEdit')}</button>
-                <button type="submit" className="ml-2 px-4 py-2 rounded bg-blue-600 text-white">{t('updateAnalyses')}</button>
-              </div>
+              <button type="button" className="mt-2 px-4 py-2 rounded bg-teal-500 text-white" onClick={() => arrayHelpers.push(nextAnalysisOption(values))}>
+                +
+              </button>
             </div>}
 
           </FieldArray>
-        </Form>
-      }
+        }
+
+        <div className="mt-2">
+          <button type="button" className="px-4 py-2 rounded bg-amber-400" onClick={cancelUpdate}>{t('cancelEdit')}</button>
+          <button type="submit" className="ml-2 px-4 py-2 rounded bg-blue-600 text-white">{t('updateAnalyses')}</button>
+        </div>
+      </Form>}
     </Formik>
   );
 }

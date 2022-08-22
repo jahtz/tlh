@@ -127,7 +127,7 @@ export function WordNodeEditor({
   function nextMorphAnalysis(): MorphologicalAnalysis {
     const number = Math.max(0, ...data.morphologies.map(({number}) => number)) + 1;
 
-    return {number, translation: '', referenceWord: '', analysisOptions: [], encliticsAnalysis: undefined, determinativ: undefined, paradigmClass: ''};
+    return {number, translation: '', referenceWord: '', analysisOptions: [], encliticsAnalysis: undefined, determinative: undefined, paradigmClass: ''};
   }
 
   function setSelectedMorphToDel(): void {
