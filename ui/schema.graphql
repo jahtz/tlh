@@ -110,7 +110,6 @@ type Query {
 
 type Transliteration {
   input: String!
-  resultJson: String!
   resultXml: String!
   side: ManuscriptSide!
   version: Int!
@@ -118,7 +117,6 @@ type Transliteration {
 
 input TransliterationInput {
   input: String!
-  resultJson: String!
   resultXml: String!
   side: ManuscriptSide!
 }

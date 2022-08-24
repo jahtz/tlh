@@ -108,8 +108,8 @@ export function TransliterationSideInput({mainIdentifier, onTransliterationUpdat
     onTransliterationUpdate({
       side: state.sideBasics.side,
       input,
-      resultXml: exportAsXml(mainIdentifier, sideParseResult).join('\n'),
-      resultJson: JSON.stringify(sideParseResult) // FIXME: what to upload?
+      resultXml: exportAsXml(mainIdentifier, sideParseResult).join('\n')
+      /*resultJson: JSON.stringify(sideParseResult) // FIXME: what to upload?*/
     });
   }
 

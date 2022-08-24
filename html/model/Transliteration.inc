@@ -74,7 +74,6 @@ values (?, ?, ?, ?, ?, ?);";
   }
 }
 
-
 /**
  * @param string $mainIdentifier
  * @return ?Transliteration[]
@@ -100,7 +99,6 @@ function getTransliterations(string $mainIdentifier): ?array {
     return null;
   }
 }
-
 
 $manuscriptSideType = new EnumType([
   'name' => 'ManuscriptSide',
