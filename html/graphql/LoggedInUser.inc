@@ -35,7 +35,6 @@ LoggedInUser::$graphQLType = new ObjectType([
   ]
 ]);
 
-
 function verifyUser(string $username, string $password): ?LoggedInUser {
   global $jwtSecret, $jwtValidityTime;
 
@@ -50,7 +49,7 @@ function verifyUser(string $username, string $password): ?LoggedInUser {
       $user->username,
       $user->name,
       $user->affiliation,
-      Token::create($user->username, $jwtSecret, time() + $jwtValidityTime, 'localhost')
+      Token::create($user->username, $jwtSecret, time() + $jwtValidityTime, 'localhost'),
     );
   } else {
     return null;
