@@ -62,6 +62,8 @@ export function xmlifyAoWordContent(c: AOWordContent): XmlNode {
   }*/
   else if (isIndexDigit(c)) {
     return {textContent: c.content.toString()};
+  } else if (isNumeralContent(c)) {
+    return {textContent: c.content.toString()};
   } else {
     // FIXME: implement rest!
     throw new Error('TODO: implement: ' + c.type + '!');
