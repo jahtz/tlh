@@ -3,10 +3,13 @@ import {useEffect, useState} from 'react';
 import {MorphAnalysisOptionButtons} from './MorphAnalysisButtons';
 import {MorphAnalysisOptionEditor} from './MorphAnalysisOptionEditor';
 
-interface IProps {
+export interface CanToggleAnalysisSelection {
+  toggleAnalysisSelection: (letterIndex: number | undefined, encLetterIndex: number | undefined, targetState: boolean | undefined) => void;
+}
+
+interface IProps extends CanToggleAnalysisSelection {
   morphologicalAnalysis: MorphologicalAnalysis;
   updateMorphology: (ma: MorphologicalAnalysis) => void;
-  toggleAnalysisSelection: (letterIndex: number | undefined, encLetterIndex: number | undefined) => void;
   setKeyHandlingEnabled: (b: boolean) => void;
 }
 

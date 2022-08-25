@@ -2,12 +2,11 @@ import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {SingleMorphAnalysisOptionButton} from './SingleMorphAnalysisOptionButton';
 import {isSingleMorphologicalAnalysis, MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
-import {Numerus} from './MorphAnalysisOptionContainer';
+import {CanToggleAnalysisSelection, Numerus} from './MorphAnalysisOptionContainer';
 import {MultiMorphAnalysisOptionButtons} from './MultiMorphAnalysisOptionButtons';
 
-interface IProps {
+interface IProps extends CanToggleAnalysisSelection {
   morphologicalAnalysis: MorphologicalAnalysis;
-  toggleAnalysisSelection: (letterIndex: number | undefined, encLetterIndex: number | undefined) => void;
   enableEditMode: () => void;
 }
 
@@ -27,7 +26,7 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
     ma.analysisOptions
       .forEach(({analysis}, index) => {
         if (!numerus || analysisIsInNumerus(analysis, numerus)) {
-          toggleAnalysisSelection(index, undefined);
+          toggleAnalysisSelection(index, undefined, true);
         }
       });
   }
@@ -67,9 +66,9 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
       {!isReduced && <div className="mt-2">
         {isSingleAnalysisOption
           ? <SingleMorphAnalysisOptionButton morphAnalysis={morphologicalAnalysis}
-                                             toggleAnalysisSelection={(encLetterIndex) => toggleAnalysisSelection(undefined, encLetterIndex)}/>
+                                             toggleAnalysisSelection={(encLetterIndex) => toggleAnalysisSelection(undefined, encLetterIndex, undefined)}/>
           : <MultiMorphAnalysisOptionButtons morphAnalysis={morphologicalAnalysis}
-                                             toggleAnalysisSelection={(letterIndex, encLetterIndex) => toggleAnalysisSelection(letterIndex, encLetterIndex)}/>}
+                                             toggleAnalysisSelection={(letterIndex, encLetterIndex) => toggleAnalysisSelection(letterIndex, encLetterIndex, undefined)}/>}
 
       </div>}
     </div>

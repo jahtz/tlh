@@ -55,8 +55,10 @@ export function WordNodeEditor({
     }
   }
 
-  function toggleAnalysisSelection(morphIndex: number, letterIndex: number | undefined, encLetterIndex: number | undefined): void {
-    const action: Spec<{ selected: boolean }> = {$toggle: ['selected']};
+  function toggleAnalysisSelection(morphIndex: number, letterIndex: number | undefined, encLetterIndex: number | undefined, targetState: boolean | undefined): void {
+    const action: Spec<{ selected: boolean }> = targetState !== undefined
+      ? {selected: {$set: targetState}}
+      : {$toggle: ['selected']};
 
     if (letterIndex || letterIndex === 0) {
       // Multi morph
@@ -201,7 +203,7 @@ export function WordNodeEditor({
               : data.morphologies.map((m, index) => <div className="mt-2" key={m.number}>
                   <MorphAnalysisOptionContainer
                     morphologicalAnalysis={m}
-                    toggleAnalysisSelection={(letterIndex, encLetterIndex) => toggleAnalysisSelection(index, letterIndex, encLetterIndex)}
+                    toggleAnalysisSelection={(letterIndex, encLetterIndex,targetState) => toggleAnalysisSelection(index, letterIndex, encLetterIndex, targetState)}
                     updateMorphology={(newMa) => updateMorphology(index, newMa)}
                     setKeyHandlingEnabled={setKeyHandlingEnabled}
                   />
