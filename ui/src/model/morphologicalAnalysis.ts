@@ -244,7 +244,7 @@ export function readMorphologiesFromNode(node: XmlElementNode, initialSelectedMo
       const match = name.trim().match(morphologyAttributeNameRegex);
 
       return match
-        ? readMorphologicalAnalysis(parseInt(match[1]), value, initialSelectedMorphologies)
+        ? readMorphologicalAnalysis(parseInt(match[1]), value || '', initialSelectedMorphologies)
         : undefined;
     })
     .filter((m): m is MorphologicalAnalysis => !!m);

@@ -1,6 +1,6 @@
 export interface XmlElementNode {
   tagName: string;
-  attributes: Record<string, string>;
+  attributes: Record<string, string | undefined>;
   children: XmlNode[];
 }
 

@@ -98,7 +98,7 @@ export function writeWordNodeData({node: originalNode, lg, morphologies, footNot
   if (selectedAnalysisOptions.length > 0) {
     node.attributes.mrp0sel = selectedAnalysisOptions.length > 0
       ? selectedAnalysisOptions.join(' ')
-      : ' ';
+      : undefined;
   }
 
 
@@ -121,10 +121,12 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
 
     const notMarked = node.attributes.mrp0sel === 'DEL';
 
-    const isForeignLanguage = Object.keys(foreignLanguageColors).includes(node.attributes.mrp0sel);
+    const isForeignLanguage = node.attributes.mrp0sel
+      ? Object.keys(foreignLanguageColors).includes(node.attributes.mrp0sel)
+      : false;
 
     const needsMorphology = !!node.attributes.mrp0sel;
-    const hasNoMorphologySelected = needsMorphology && node.attributes.mrp0sel.trim().length === 0 || node.attributes.mrp0sel === '???';
+    const hasNoMorphologySelected = needsMorphology && node.attributes.mrp0sel && node.attributes.mrp0sel.trim().length === 0 || node.attributes.mrp0sel === '???';
 
     const hasMorphAnalyses = Object.keys(node.attributes)
       .filter((name) => name.startsWith('mrp') && !name.startsWith('mrp0'))
@@ -139,7 +141,7 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
         ? [isSelected ? selectedNodeClass : 'bg-gray-200']
         : {
           'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
-          [foreignLanguageColors[node.attributes.mrp0sel]]: isForeignLanguage,
+          [foreignLanguageColors[node.attributes.mrp0sel || '']]: isForeignLanguage,
           'has-text-weight-bold': isForeignLanguage,
           'text-red-600': node.children.length === 0,
           'bg-yellow-300': !isSelected && !notMarked && hasNoMorphologySelected,

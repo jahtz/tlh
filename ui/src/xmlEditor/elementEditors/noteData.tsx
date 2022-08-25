@@ -7,31 +7,19 @@ export interface NoteData {
   content: string;
 }
 
-function readNoteNodeData(node: XmlElementNode): NoteData {
-  return {
-    n: node.attributes.n,
-    content: node.attributes.c
-  };
-}
-
-function writeNoteNodeData({n, content}: NoteData, originalNode: XmlElementNode): XmlElementNode {
-  return {
+export const noteNodeConfig: XmlSingleEditableNodeConfig<NoteData> = {
+  replace: (node) => <sup title={node.attributes.c} className="has-text-weight-bold">x</sup>,
+  edit: (props) => <NoteNodeEditor {...props}/>,
+  readNode: (node) => ({
+    n: node.attributes.n || '',
+    content: node.attributes.c || ''
+  }),
+  writeNode: ({n, content}: NoteData, originalNode: XmlElementNode): XmlElementNode => ({
     ...originalNode,
     attributes: {
       ...originalNode.attributes,
       n,
       c: content
     }
-  };
-}
-
-
-export const noteNodeConfig: XmlSingleEditableNodeConfig<NoteData> = {
-  replace: (node) => <sup title={node.attributes.c} className="has-text-weight-bold">x</sup>,
-  edit: (props) => <NoteNodeEditor {...props}/>,
-  readNode: readNoteNodeData,
-  writeNode: writeNoteNodeData/*,
-  insertablePositions: {
-    asLastChildOf: ['w']
-  }*/
+  })
 };

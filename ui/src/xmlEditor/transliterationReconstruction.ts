@@ -33,7 +33,7 @@ export function reconstructTransliteration(node: XmlNode, isFirstChild = false):
     case 'num':
       return innerContent;
     case 'corr':
-      return node.attributes.c;
+      return node.attributes.c || '';
     case 'note':
       return `{F: ${node.attributes.c}}`;
     case 'subscr':

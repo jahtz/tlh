@@ -44,7 +44,7 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
 
     space: {
       replace: (node) => <>
-        {Array.from({length: parseInt(node.attributes.c) || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}
+        {Array.from({length: parseInt(node.attributes.c || '0') || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}
       </>
     },
 

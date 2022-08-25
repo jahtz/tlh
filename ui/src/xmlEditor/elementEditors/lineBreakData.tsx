@@ -20,8 +20,8 @@ export const lineBreakNodeConfig: XmlInsertableSingleEditableNodeConfig<LineBrea
   ),
   edit: (props) => <LineBreakEditor key={props.path.join('.')} {...props} />,
   readNode: (node) => ({
-    textId: node.attributes.txtid,
-    lineNumber: node.attributes.lnr,
+    textId: node.attributes.txtid || '',
+    lineNumber: node.attributes.lnr || '',
     lg: node.attributes.lg
   }),
   writeNode: ({textId, lineNumber, lg}, originalNode) => update(originalNode, {
