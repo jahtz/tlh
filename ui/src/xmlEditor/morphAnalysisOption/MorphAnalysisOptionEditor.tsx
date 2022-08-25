@@ -1,6 +1,8 @@
 import {Field, FieldArray, Form, Formik} from 'formik';
-import {isMultiMorphologicalAnalysis, MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
+import {isMultiMorphologicalAnalysis, MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
+import {isMultiEncliticsAnalysis, MultiEncliticsAnalysis} from '../../model/encliticsAnalysis';
 import {LetteredAnalysisOption, SelectableLetteredAnalysisOption} from '../../model/analysisOptions';
+import {LetteredAnalysisOptionEditor} from './LetteredAnalysisOptionEditor';
 import {useTranslation} from 'react-i18next';
 
 interface IProps {
@@ -9,10 +11,12 @@ interface IProps {
   cancelUpdate: () => void;
 }
 
-const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+const lowerAlphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
-function nextAnalysisOption(lma: MultiMorphologicalAnalysis): SelectableLetteredAnalysisOption {
-  const usedLetters = lma.analysisOptions.map(({letter}) => letter);
+const upperAlphabet = 'RSTUVWXYZ'.split('');
+
+function nextAnalysisOption(laos: LetteredAnalysisOption[], alphabet: string[]): SelectableLetteredAnalysisOption {
+  const usedLetters = laos.map(({letter}) => letter);
 
   const letter = alphabet.find((l) => !usedLetters.includes(l));
 
@@ -22,6 +26,7 @@ function nextAnalysisOption(lma: MultiMorphologicalAnalysis): SelectableLettered
 
   return {letter, analysis: '', selected: false};
 }
+
 
 export function MorphAnalysisOptionEditor({morphologicalAnalysis, onSubmit, cancelUpdate}: IProps): JSX.Element {
 
@@ -43,26 +48,35 @@ export function MorphAnalysisOptionEditor({morphologicalAnalysis, onSubmit, canc
           <Field name="paradigmClass" className="flex-1 p-2 rounded-r border-r border-y border-slate-500" placeholder={t('paradigmClass')}/>
         </div>
 
-        {isMultiMorphologicalAnalysis(values) &&
-          <FieldArray name={'analysisOptions'}>
-            {(arrayHelpers) => <div>
+        {isMultiMorphologicalAnalysis(values) && <FieldArray name="analysisOptions">
+          {(arrayHelpers) => <div>
 
-              {(values.analysisOptions as LetteredAnalysisOption[]).map(({letter}, index) =>
-                <div className="mt-2 flex flex-row" key={letter}>
-                  <button className="px-4 py-2 rounded-l bg-gray-100 border-l border-y border-slate-500">{letter}</button>
-                  <Field name={`analysisOptions.${index}.analysis`} className="flex-grow p-2 border-l border-y border-slate-500"
-                         placeholder={t('analysis')}/>
-                  <button type="button" className="px-4 py-2 rounded-r bg-red-500 text-white" onClick={() => arrayHelpers.remove(index)}>-</button>
-                </div>
-              )}
+            {(values.analysisOptions as LetteredAnalysisOption[]).map(({letter}, index) =>
+              <LetteredAnalysisOptionEditor key={letter} preName="analysisOptions" letter={letter} index={index} arrayHelpers={arrayHelpers}/>
+            )}
 
-              <button type="button" className="mt-2 px-4 py-2 rounded bg-teal-500 text-white" onClick={() => arrayHelpers.push(nextAnalysisOption(values))}>
-                +
-              </button>
-            </div>}
+            <button type="button" className="mt-2 px-4 py-2 rounded bg-teal-500 text-white"
+                    onClick={() => arrayHelpers.push(nextAnalysisOption(values.analysisOptions, lowerAlphabet))}>
+              + {t('newMorphAnalysisOption')}
+            </button>
+          </div>}
 
-          </FieldArray>
-        }
+        </FieldArray>}
+
+        {(values.encliticsAnalysis !== undefined && isMultiEncliticsAnalysis(values.encliticsAnalysis)) && <FieldArray name="encliticsAnalysis.analysisOptions">
+          {(arrayHelpers) => <div>
+            {/* FIXME: edit enclitics! */}
+
+            {(values.encliticsAnalysis as MultiEncliticsAnalysis).analysisOptions.map(({letter}, index) =>
+              <LetteredAnalysisOptionEditor key={index} preName="encliticsAnalysis.analysisOptions" letter={letter} index={index} arrayHelpers={arrayHelpers}/>
+            )}
+
+            <button type="button" className="mt-2 px-4 py-2 rounded bg-teal-500 text-white"
+                    onClick={() => arrayHelpers.push(nextAnalysisOption((values.encliticsAnalysis as MultiEncliticsAnalysis).analysisOptions, upperAlphabet))}>
+              + {t('newEncliticsAnalysisOption')}
+            </button>
+          </div>}
+        </FieldArray>}
 
         <div className="mt-2">
           <button type="button" className="px-4 py-2 rounded bg-amber-400" onClick={cancelUpdate}>{t('cancelEdit')}</button>
