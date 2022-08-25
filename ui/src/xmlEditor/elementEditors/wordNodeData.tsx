@@ -133,9 +133,7 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
       .length > 0;
 
     const hasEditingQuestion = !!node.attributes.editingQuestion;
-
-    // FIXME: colors / classes!
-
+    
     const classes = classNames(node.attributes.lg || '',
       isOnlySpaces(node)
         ? [isSelected ? selectedNodeClass : 'bg-gray-200']
