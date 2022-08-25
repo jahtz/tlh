@@ -26,7 +26,7 @@ export function MultiMorphMultiEncAnalysisSelection({ma}: IProps): JSX.Element |
       <table className="table w-full">
         <tbody>
           {selectedAnalyses
-            .map(([{letter, analysis}, encliticsAnalysisOption]) => <tr key={letter}>
+            .map(([{letter, analysis}, encliticsAnalysisOption]) => <tr key={letter + encliticsAnalysisOption.letter}>
               <td>{number}{letter}{encliticsAnalysisOption.letter}</td>
               <td>{translation}</td>
               <td>{analysis}</td>
