@@ -63,9 +63,11 @@ export function writeWordNodeData({node: originalNode, lg, morphologies, footNot
     ? addFootNote(originalChildren, footNote)
     : removeFootNote(originalChildren);
 
+  const {trans, mrp0sel, ...rest} = attributes;
+
   const node: XmlElementNode = {
     tagName,
-    attributes: {...attributes, lg},
+    attributes: {trans, mrp0sel, ...rest, lg},
     children
   };
 
@@ -101,7 +103,6 @@ export function writeWordNodeData({node: originalNode, lg, morphologies, footNot
       : undefined;
   }
 
-
   return node;
 }
 
@@ -133,7 +134,7 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
       .length > 0;
 
     const hasEditingQuestion = !!node.attributes.editingQuestion;
-    
+
     const classes = classNames(node.attributes.lg || '',
       isOnlySpaces(node)
         ? [isSelected ? selectedNodeClass : 'bg-gray-200']
