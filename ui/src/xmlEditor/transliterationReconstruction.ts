@@ -36,6 +36,8 @@ export function reconstructTransliteration(node: XmlNode, isFirstChild = false):
       return node.attributes.c;
     case 'note':
       return `{F: ${node.attributes.c}}`;
+    case 'subscr':
+      return `|${node.attributes.c}`;
     default:
       console.info(JSON.stringify(node));
       return 'XXX';
