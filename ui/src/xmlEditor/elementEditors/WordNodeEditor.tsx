@@ -26,18 +26,18 @@ interface IState {
 }
 
 export function WordNodeEditor({
-                                 data,
-                                 originalNode,
-                                 changed,
-                                 updateNode,
-                                 deleteNode,
-                                 keyHandlingEnabled,
-                                 setKeyHandlingEnabled,
-                                 initiateJumpElement,
-                                 initiateSubmit,
-                                 fontSizeSelectorProps,
-                                 cancelSelection
-                               }: XmlEditableNodeIProps<WordNodeData>): JSX.Element {
+  data,
+  originalNode,
+  changed,
+  updateNode,
+  deleteNode,
+  keyHandlingEnabled,
+  setKeyHandlingEnabled,
+  initiateJumpElement,
+  initiateSubmit,
+  fontSizeSelectorProps,
+  cancelSelection
+}: XmlEditableNodeIProps<WordNodeData>): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorConfig = useSelector(editorKeyConfigSelector);
@@ -203,7 +203,7 @@ export function WordNodeEditor({
               : data.morphologies.map((m, index) => <div className="mt-2" key={m.number}>
                   <MorphAnalysisOptionContainer
                     morphologicalAnalysis={m}
-                    toggleAnalysisSelection={(letterIndex, encLetterIndex,targetState) => toggleAnalysisSelection(index, letterIndex, encLetterIndex, targetState)}
+                    toggleAnalysisSelection={(letterIndex, encLetterIndex, targetState) => toggleAnalysisSelection(index, letterIndex, encLetterIndex, targetState)}
                     updateMorphology={(newMa) => updateMorphology(index, newMa)}
                     setKeyHandlingEnabled={setKeyHandlingEnabled}
                   />
