@@ -2,7 +2,7 @@ import {XmlSingleEditableNodeConfig} from '../editorConfig';
 import {isXmlElementNode, isXmlTextNode, XmlElementNode, XmlTextNode} from '../../xmlModel/xmlModel';
 import {AoManuscriptsEditor} from './AoManuscriptsEditor';
 import update from 'immutability-helper';
-import {selectedNodeClass} from '../tlhTranscriptionXmlEditorConfig';
+import {selectedNodeClass} from '../tlhXmlEditorConfig';
 
 export type SourceType = 'AO:TxtPubl' | 'AO:InvNr';
 export const sourceTypes: SourceType[] = ['AO:TxtPubl', 'AO:InvNr'];

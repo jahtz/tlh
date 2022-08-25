@@ -1,8 +1,8 @@
 import {isXmlCommentNode, isXmlTextNode, XmlNode} from '../xmlModel/xmlModel';
 import {EditTriggerFunc} from './editorConfig';
-import {tlhTranscriptionXmlEditorConfig} from './tlhTranscriptionXmlEditorConfig';
 import classNames from 'classnames';
 import {NodePath} from './insertablePositions';
+import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
 
 export interface InsertStuff {
   insertablePaths: string[];
@@ -18,7 +18,6 @@ export interface NodeDisplayIProps {
   insertStuff?: InsertStuff;
   isLeftSide: boolean;
 }
-
 
 function InsertButton({initiate}: { initiate: () => void }): JSX.Element {
   return (
@@ -38,7 +37,7 @@ export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIPr
 
   const {currentSelectedPath, onSelect, insertStuff, isLeftSide} = inheritedProps;
 
-  const currentConfig = tlhTranscriptionXmlEditorConfig.nodeConfigs[node.tagName];
+  const currentConfig = tlhXmlEditorConfig.nodeConfigs[node.tagName];
 
   const renderedChildren = <>
     {node.children.map((c, i) => <NodeDisplay key={i} node={c} path={[...path, i]} {...inheritedProps}/>)}

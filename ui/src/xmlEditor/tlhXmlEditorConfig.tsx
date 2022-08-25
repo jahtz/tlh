@@ -1,27 +1,27 @@
 import {XmlEditorConfig} from './editorConfig';
-import {wordNodeConfig} from './elementEditors/wordNodeData';
-import {lineBreakNodeConfig} from './elementEditors/lineBreakData';
-import {noteNodeConfig} from './elementEditors/noteData';
-import {aoManuscriptsConfig} from './elementEditors/aoManuscriptsConfigData';
-import {gapConfig} from './elementEditors/gapConfigData';
-import {paragraphSeparatorConfig} from './elementEditors/paragraphSeparatorConfig';
 import {XmlElementNode} from '../xmlModel/xmlModel';
 import {reCountNodeNumbers} from './elementEditors/NoteNodeEditor';
+import {aoManuscriptsConfig} from './elementEditors/aoManuscriptsConfigData';
+import {lineBreakNodeConfig} from './elementEditors/lineBreakData';
 import {clbNodeConfig} from './elementEditors/clbData';
+import {wordNodeConfig} from './elementEditors/wordNodeData';
+import {gapConfig} from './elementEditors/gapConfigData';
+import {paragraphSeparatorConfig} from './elementEditors/paragraphSeparatorConfig';
+import {noteNodeConfig} from './elementEditors/noteData';
 import {clEditorConfig} from './elementEditors/ClEditor';
-
-// FIXME: recount footnote & clb node numbers!
 
 export const selectedNodeClass = 'bg-teal-400';
 
-export const tlhTranscriptionXmlEditorConfig: XmlEditorConfig = {
+export const tlhXmlEditorConfig: XmlEditorConfig = {
   nodeConfigs: {
     docID: {replace: () => <span/>},
     'AO:Manuscripts': aoManuscriptsConfig,
+    'AO:ParagrNr': {
+      replace: (node) => <div className="mt-4 font-bold italic">{node.attributes.c}</div>
+    },
     lb: lineBreakNodeConfig,
 
     clb: clbNodeConfig,
-
     cl: clEditorConfig,
 
     // Words
@@ -43,13 +43,9 @@ export const tlhTranscriptionXmlEditorConfig: XmlEditorConfig = {
     subscr: {replace: (node) => <sub>{node.attributes.c}</sub>},
 
     space: {
-      replace: (node) => (
-        <>
-          {Array.from({length: parseInt(node.attributes.c) || 0}).map((_, i) => (
-            <span key={i}>&nbsp;</span>
-          ))}
-        </>
-      ),
+      replace: (node) => <>
+        {Array.from({length: parseInt(node.attributes.c) || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}
+      </>
     },
 
     parsep: paragraphSeparatorConfig,
@@ -57,23 +53,23 @@ export const tlhTranscriptionXmlEditorConfig: XmlEditorConfig = {
 
     corr: {
       styling: () => ['corr'],
-      replace: (node) => <span>{node.attributes.c}</span>,
+      replace: (node) => <span>{node.attributes.c}</span>
     },
-    note: noteNodeConfig,
+    note: noteNodeConfig
   },
   beforeExport: (rootNode: XmlElementNode) => {
     reCountNodeNumbers(rootNode, 'node', 'n');
     reCountNodeNumbers(rootNode, 'clb', 'nr');
     return rootNode;
   },
-  afterExport: (exported: string) =>
-    exported
-      .replaceAll('®', '\n\t')
-      // FIXME: collides with fragments! {€1}
-      .replaceAll('{', '\n\t\t{')
-      .replaceAll('+=', '\n\t\t   += ')
-      .replaceAll('<w', '\n <w')
-      .replaceAll('<lb', '\n\n<lb')
-      .replaceAll(' mrp', '\n\tmrp')
-      .replaceAll('@', ' @ '),
+  afterExport: (exported: string) => exported
+    .replaceAll('®', '\n\t')
+    // FIXME: collides with fragments! {€1}
+    .replaceAll('{', '\n\t\t{')
+    .replaceAll('+=', '\n\t\t   += ')
+    .replaceAll('<w', '\n <w')
+    .replaceAll('<lb', '\n\n<lb')
+    .replaceAll(' mrp', '\n\tmrp')
+    .replaceAll('@', ' @ ')
+
 };

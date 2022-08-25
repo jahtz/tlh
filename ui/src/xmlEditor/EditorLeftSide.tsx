@@ -21,7 +21,6 @@ export interface EditorLeftSideProps extends NodeDisplayIProps {
   setKeyHandlingEnabled: (value: boolean) => void;
 }
 
-
 interface IState {
   fontSize: number;
   useSerifFont: boolean;

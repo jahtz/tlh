@@ -2,7 +2,7 @@ import {XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {LineBreakEditor} from './LineBreakEditor';
 import update from 'immutability-helper';
-import {selectedNodeClass} from '../tlhTranscriptionXmlEditorConfig';
+import {selectedNodeClass} from '../tlhXmlEditorConfig';
 
 export interface LineBreakData {
   textId: string;

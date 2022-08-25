@@ -11,8 +11,8 @@ import {XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {WordNodeEditor} from './WordNodeEditor';
 import {SpacesEditor} from './SpacesEditor';
-import {selectedNodeClass} from '../tlhTranscriptionXmlEditorConfig';
 import {readSelectedMorphology} from '../../model/selectedMorphologicalAnalysis';
+import {selectedNodeClass} from '../tlhXmlEditorConfig';
 
 export interface WordNodeData {
   node: XmlElementNode;
@@ -145,7 +145,7 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
           'bg-yellow-300': !isSelected && !notMarked && hasNoMorphologySelected,
           // TODO: backgrounds...
           'bg-blue-300': hasEditingQuestion,
-          'bg-teal-400': isSelected,
+          [selectedNodeClass]: isSelected,
         });
 
     return <>

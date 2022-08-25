@@ -1,7 +1,6 @@
 import {useEffect, useState} from 'react';
 import {findFirstXmlElementByTagName, isXmlElementNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
 import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './editorConfig';
-import {tlhTranscriptionXmlEditorConfig} from './tlhTranscriptionXmlEditorConfig';
 import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
 import {editorKeyConfigSelector} from '../store/store';
@@ -10,6 +9,7 @@ import update, {Spec} from 'immutability-helper';
 import {EditorLeftSide, EditorLeftSideProps} from './EditorLeftSide';
 import {EditorEmptyRightSide} from './EditorEmptyRightSide';
 import {calculateInsertablePositions, InsertablePositions, NodePath} from './insertablePositions';
+import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
 
 interface IProps {
   node: XmlNode;
@@ -112,7 +112,7 @@ function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode
 }
 
 
-export function writeXml(node: XmlElementNode, editorConfig: XmlEditorConfig = tlhTranscriptionXmlEditorConfig): string {
+export function writeXml(node: XmlElementNode, editorConfig: XmlEditorConfig = tlhXmlEditorConfig): string {
   const nodeToExport = editorConfig.beforeExport(node);
 
   const exported = writeNode(nodeToExport);

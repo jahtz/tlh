@@ -2,7 +2,7 @@ import {ClbEditor} from './ClbEditor';
 import {XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import update from 'immutability-helper';
 import classNames from 'classnames';
-import {selectedNodeClass} from '../tlhTranscriptionXmlEditorConfig';
+import {selectedNodeClass} from '../tlhXmlEditorConfig';
 
 export interface ClbData {
   id: string;
