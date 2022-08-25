@@ -19,7 +19,7 @@ export function SingleMorphAnalysisOptionButton({morphAnalysis, toggleAnalysisSe
   if (singleMorphAnalysisIsWithoutEnclitics(morphAnalysis)) {
     return (
       <SelectableButton selected={morphAnalysis.selected} className={otherClasses} onClick={() => toggleAnalysisSelection(undefined)}>
-        {morphAnalysis.analysis}
+        {morphAnalysis.analysis || morphAnalysis.number.toString()}
       </SelectableButton>
     );
   }
@@ -35,8 +35,6 @@ export function SingleMorphAnalysisOptionButton({morphAnalysis, toggleAnalysisSe
   }
 
   const {analysisOptions, enclitics} = morphAnalysis.encliticsAnalysis;
-
-  // FIXME: toggleAnalysisSelection needs encLetter!
 
   return (
     <>
