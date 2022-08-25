@@ -49,7 +49,7 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
 
         {!isSingleAnalysisOption && <>
           <button type="button" className="p-2 border border-teal-300" onClick={() => selectAll(morphologicalAnalysis)} tabIndex={-1}>
-            {t('ALL')}
+            {t('all')}
           </button>
           <button type="button" className="p-2 border border-teal-300" onClick={() => selectAll(morphologicalAnalysis, Numerus.Singular)} tabIndex={-1}>
             {t('SG')}
