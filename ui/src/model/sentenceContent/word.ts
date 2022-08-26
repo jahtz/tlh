@@ -1,8 +1,8 @@
-import {XmlElementNode} from '../../editor/xmlModel/xmlModel';
 import {AOWordContent, aoWordContentFormat, xmlifyAoWordContent} from '../wordContent/wordContent';
 import {MorphologicalAnalysis, writeMorphAnalysisAttribute} from '../morphologicalAnalysis';
 import {aoBasicText} from '../wordContent/basicText';
-import {indent, XmlWriter} from '../../editor/xmlModel/xmlWriting';
+import {indent, XmlWriter} from '../../xmlModel/xmlWriting';
+import {XmlElementNode} from '../../xmlModel/xmlModel';
 
 export interface AOWord {
   content: AOWordContent[];
@@ -12,15 +12,12 @@ export interface AOWord {
   transliteration?: string;
 }
 
-export const aoWordFormat: XmlWriter<AOWord> = {
-  write: ({content, mrp0sel, transliteration, morphologies, language}) =>
-    [
-      '<w' + (transliteration ? ` trans="${transliteration}"` : '') + (mrp0sel ? ` mrp0sel="${mrp0sel || ''}"` : ''),
-      ...(language ? [indent(`lg="${language}"`)] : []),
-      ...(morphologies || []).flatMap(writeMorphAnalysisAttribute).map(indent),
-      `>${content.map(aoWordContentFormat.write).join('')}</w>`
-    ]
-};
+export const aoWordFormat: XmlWriter<AOWord> = ({content, mrp0sel, transliteration, morphologies, language}) => [
+  '<w' + (transliteration ? ` trans="${transliteration}"` : '') + (mrp0sel ? ` mrp0sel="${mrp0sel || ''}"` : ''),
+  ...(language ? [indent(`lg="${language}"`)] : []),
+  ...(morphologies || []).flatMap(writeMorphAnalysisAttribute).map(indent),
+  `>${content.map(aoWordContentFormat).join('')}</w>`
+];
 
 export function xmlifyAoWord({transliteration, content, language, mrp0sel, morphologies}: AOWord): XmlElementNode {
 

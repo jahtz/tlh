@@ -7,18 +7,12 @@ interface IProps {
 
 export function PicturesBlock({mainIdentifier, pictures}: IProps): JSX.Element {
   return (
-    <div className="columns">
+    <div className="grid grid-cols-4 gap-2">
       {pictures.map((pictureName) =>
-        <div key={pictureName} className="column is-2">
-          <div className="card">
-            <div className="card-image">
-              <figure className="image">
-                <img src={`${pictureBaseUrl(mainIdentifier)}/${pictureName}`} alt={pictureName}/>
-              </figure>
-            </div>
-            <div className="card-content">{pictureName}</div>
-          </div>
-        </div>
+        <figure key={pictureName} className="image">
+          <img src={`${pictureBaseUrl(mainIdentifier)}/${pictureName}`} alt={pictureName}/>
+          <figcaption>{pictureName}</figcaption>
+        </figure>
       )}
     </div>
   );

@@ -71,7 +71,14 @@ apolloClient.query<AllManuscriptLanguagesQuery>({query: AllManuscriptLanguagesDo
   .then(({data}) => store.dispatch(newLanguagesAction(data.manuscriptLanguages)))
   .catch(() => void 0);
 
-const root = createRoot(document.getElementById('root')!);
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  alert('Error in page...');
+  throw new Error('Error in page...');
+}
+
+const root = createRoot(rootElement);
 
 root.render(
   <StrictMode>

@@ -2,7 +2,8 @@ import {Route, Routes} from 'react-router-dom';
 import {
   createManuscriptUrl,
   documentMergerUrl,
-  editDocumentUrl,
+  editTranscriptionDocumentUrl,
+  editTransliterationDocumentUrl,
   homeUrl,
   wysiwygUrl,
   loginUrl,
@@ -15,7 +16,6 @@ import {Home} from './Home';
 import {RegisterForm} from './forms/RegisterForm';
 import {LoginForm} from './forms/LoginForm';
 import {CreateManuscriptForm} from './forms/CreateManuscriptForm';
-import {DocumentEditorContainer} from './editor/DocumentEditorContainer';
 import {ManuscriptBase} from './manuscript/ManuscriptBase';
 import {XmlComparator} from './xmlComparator/XmlComparator';
 import {Preferences} from './Preferences';
@@ -23,6 +23,8 @@ import {WysiwygEditor} from './wysiwygEditor/WysiwygEditor';
 import {DocumentMergerContainer} from './documentMerger/DocumentMergerContainer';
 import {RequireAuth} from './RequireAuth';
 import {NavBar} from './NavBar';
+import {XmlDocumentEditorContainer} from './xmlEditor/XmlDocumentEditorContainer';
+import {tlhXmlEditorConfig} from './xmlEditor/tlhXmlEditorConfig';
 
 export function App(): JSX.Element {
 
@@ -48,7 +50,9 @@ export function App(): JSX.Element {
 
           <Route path={wysiwygUrl} element={<WysiwygEditor/>}/>
 
-          <Route path={editDocumentUrl} element={<DocumentEditorContainer/>}/>
+          <Route path={editTransliterationDocumentUrl} element={<XmlDocumentEditorContainer editorConfig={tlhXmlEditorConfig}/>}/>
+
+          <Route path={editTranscriptionDocumentUrl} element={<XmlDocumentEditorContainer editorConfig={tlhXmlEditorConfig}/>}/>
 
           <Route path={xmlComparatorUrl} element={<XmlComparator/>}/>
 

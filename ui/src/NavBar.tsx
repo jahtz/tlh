@@ -1,5 +1,5 @@
 import {NavLink, useNavigate} from 'react-router-dom';
-import {createManuscriptUrl, editDocumentUrl, homeUrl, loginUrl, preferencesUrl, registerUrl, xmlComparatorUrl} from './urls';
+import {createManuscriptUrl, editTransliterationDocumentUrl, homeUrl, loginUrl, preferencesUrl, registerUrl, editTranscriptionDocumentUrl, xmlComparatorUrl} from './urls';
 import {useTranslation} from 'react-i18next';
 import {useDispatch, useSelector} from 'react-redux';
 import {activeUserSelector} from './store/store';
@@ -26,7 +26,8 @@ export function NavBar(): JSX.Element {
       <NavLink className="p-4 hover:bg-slate-700 font-extrabold" to={homeUrl}>TLH<sup>dig</sup></NavLink>
 
       {user && <NavLink className="p-4 ml-4 hover:bg-slate-700" to={createManuscriptUrl}>{t('createManuscript')}</NavLink>}
-      <NavLink className="p-4 ml-4 hover:bg-slate-700" to={editDocumentUrl}>{t('editDocument')}</NavLink>
+      <NavLink className="p-4 ml-4 hover:bg-slate-700" to={editTransliterationDocumentUrl}>{t('editDocument')}</NavLink>
+      <NavLink className="p-4 ml-2 hover:bg-slate-700" to={editTranscriptionDocumentUrl}>{t('editTranscriptioDocument')}</NavLink>
       <NavLink className="p-4 ml-4 hover:bg-slate-700" to={xmlComparatorUrl}>{t('xmlComparator')}</NavLink>
 
       <div className="flex-grow"/>

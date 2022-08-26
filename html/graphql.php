@@ -18,9 +18,7 @@ use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
 use tlh_dig\graphql\{LoggedInUser, MySafeGraphQLException};
 use tlh_dig\model\{ManuscriptLanguage, ManuscriptMetaData, Transliteration, User};
-use function tlh_dig\graphql\register;
-use function tlh_dig\graphql\resolveUser;
-use function tlh_dig\graphql\verifyUser;
+use function tlh_dig\graphql\{register, resolveUser, verifyUser};
 use function tlh_dig\model\allManuscriptLanguages;
 
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``

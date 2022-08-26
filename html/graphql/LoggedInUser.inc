@@ -35,7 +35,6 @@ LoggedInUser::$graphQLType = new ObjectType([
   ]
 ]);
 
-
 function verifyUser(string $username, string $password): ?LoggedInUser {
   global $jwtSecret, $jwtValidityTime;
 
@@ -50,7 +49,7 @@ function verifyUser(string $username, string $password): ?LoggedInUser {
       $user->username,
       $user->name,
       $user->affiliation,
-      Token::create($user->username, $jwtSecret, time() + $jwtValidityTime, 'localhost')
+      Token::create($user->username, $jwtSecret, time() + $jwtValidityTime, 'localhost'),
     );
   } else {
     return null;
@@ -80,11 +79,9 @@ function register(array $args): string {
  * @throws InvalidTokenException
  */
 function resolveUser(): ?string {
-  $jwt = $_SERVER['HTTP_AUTHORIZATION'];
-
   global $jwtSecret;
 
-  error_log(">>" . $jwt . "<<");
+  $jwt = $_SERVER['HTTP_AUTHORIZATION'];
 
   if (!Token::validate($jwt, $jwtSecret)) {
     throw new InvalidTokenException('Invalid login information. Maybe your login is expired? Try logging out and logging back in again.');

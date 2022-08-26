@@ -5,7 +5,7 @@ app/
 vendor/
 !vendor/.htaccess
 
-uploads/*
-!uploads/.gitkeep
+html/uploads/*
+!html/uploads/.gitkeep
 
 html/public/*

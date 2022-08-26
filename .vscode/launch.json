@@ -1,0 +1,29 @@
+{
+  // Verwendet IntelliSense zum Ermitteln möglicher Attribute.
+  // Zeigen Sie auf vorhandene Attribute, um die zugehörigen Beschreibungen anzuzeigen.
+  // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Built-in web server",
+      "type": "php",
+      "request": "launch",
+      "runtimeArgs": ["-dxdebug.mode=debug", "-dxdebug.start_with_request=yes", "-S", "localhost:8066"],
+      "program": "",
+      "cwd": "${workspaceRoot}/html",
+      "port": 8066,
+      "serverReadyAction": {
+        "pattern": "Development Server \\(http://localhost:([0-9]+)\\) started",
+        "uriFormat": "http://localhost:%s",
+        "action": "openExternally"
+      }
+    },
+    {
+      "command": "npm start",
+      "name": "Run npm start",
+      "request": "launch",
+      "type": "node-terminal",
+      "cwd": "${workspaceFolder}/ui"
+    }
+  ]
+}

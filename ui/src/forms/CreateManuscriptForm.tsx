@@ -102,7 +102,7 @@ export function CreateManuscriptForm(): JSX.Element {
           </div>
 
 
-          {error && <div className="notification is-danger has-text-centered">{error.message}</div>}
+          {error && <div className="my-2 p-2 rounded bg-red-600 text-white text-center">{error.message}</div>}
 
           <button type="submit" disabled={loading || !!createdManuscript}
                   className={classNames('mt-2', 'p-2', 'rounded', 'bg-blue-600', 'text-white', 'w-full', {'is-loading': loading})}>

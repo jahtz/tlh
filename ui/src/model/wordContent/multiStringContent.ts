@@ -19,11 +19,11 @@ export function clearUpperMultiStringContent(c: UpperMultiStringContent | string
  */
 export function writeMultiWordContent(c: UpperMultiStringContent): string[] {
   if (isCorrectionContent(c)) {
-    return aoCorrFormat.write(c);
+    return aoCorrFormat(c);
   } else if (isDamageContent(c)) {
     return xmlifyDamageContent(c);
   } else if (isInscribedLetter(c)) {
-    return inscribedLetterFormat.write(c);
+    return inscribedLetterFormat(c);
   } else if (isBasicText(c)) {
     return [c.content];
   } else {

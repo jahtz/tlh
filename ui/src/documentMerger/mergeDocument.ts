@@ -1,4 +1,4 @@
-import {findFirstXmlElementByTagName, isXmlElementNode, XmlElementNode, XmlNode} from '../editor/xmlModel/xmlModel';
+import {findFirstXmlElementByTagName, isXmlElementNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
 import {ZipWithOffsetResult} from './zipWithOffset';
 
 const lineNumberRegex = /{€(?<fragment>\d)}\s*(?<lines>[\W\w]+)/;
@@ -55,19 +55,29 @@ const mergeSeparatorElement: XmlElementNode = {
   children: []
 };
 
+function computeNewLineNumber(lnr: string | undefined, rnr: string | undefined): string | undefined {
+  if (lnr === undefined || rnr === undefined) {
+    return undefined;
+  }
+
+  const leftMatch = lnr.match(lineNumberRegex);
+  const rightMatch = rnr.match(lineNumberRegex);
+
+  // TODO: make lineNumber a node!
+  return leftMatch && leftMatch.groups && rightMatch && rightMatch.groups
+    ? `{€${leftMatch.groups.fragment}+${rightMatch.groups.fragment}} ${leftMatch.groups.lines} / ${rightMatch.groups.lines}`
+    : undefined;
+}
+
 function mergeLine(
   {lineNumberNode: leftLineNumberNode, rest: leftRest}: MergeLine,
   {lineNumberNode: rightLineNumberNode, rest: rightRest}: MergeLine
 ): MergeLine {
 
-  const leftMatch = leftLineNumberNode.attributes.lnr.match(lineNumberRegex);
+  const lnr = leftLineNumberNode.attributes.lnr || '';
+  const rnr = rightLineNumberNode.attributes.lnr || '';
 
-  const rightMatch = rightLineNumberNode.attributes.lnr.match(lineNumberRegex);
-
-  // TODO: make lineNumber a node!
-  const lineNumber = (!leftMatch || !leftMatch.groups || !rightMatch || !rightMatch.groups)
-    ? leftLineNumberNode.attributes.lnr + rightLineNumberNode.attributes.lnr
-    : `{€${leftMatch.groups.fragment}+${rightMatch.groups.fragment}} ${leftMatch.groups.lines} / ${rightMatch.groups.lines}`;
+  const lineNumber = computeNewLineNumber(lnr, rnr) || (lnr + rnr);
 
   const lineNumberNode: XmlElementNode = {
     tagName: 'lb', children: [], attributes: {'lnr': lineNumber}

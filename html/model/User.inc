@@ -37,11 +37,11 @@ class User
     }
 
     return new User(
-      $username = $graphQLInputObject['username'],
-      $pwHash = password_hash($password, PASSWORD_DEFAULT),
-      $name = $graphQLInputObject['name'],
-      $affiliation = $graphQLInputObject['affiliation'] ?? null,
-      $email = $graphQLInputObject['email']
+      $graphQLInputObject['username'],
+      password_hash($password, PASSWORD_DEFAULT),
+      $graphQLInputObject['name'],
+      $graphQLInputObject['affiliation'] ?? null,
+      $graphQLInputObject['email']
     );
   }
 }
