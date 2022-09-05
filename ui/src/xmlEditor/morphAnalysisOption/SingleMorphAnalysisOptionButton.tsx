@@ -19,7 +19,7 @@ export function SingleMorphAnalysisOptionButton({morphAnalysis, toggleAnalysisSe
   if (singleMorphAnalysisIsWithoutEnclitics(morphAnalysis)) {
     return (
       <SelectableButton selected={morphAnalysis.selected} className={otherClasses} onClick={() => toggleAnalysisSelection(undefined)}>
-        {morphAnalysis.analysis || morphAnalysis.number.toString()}
+        {morphAnalysis.analysis || morphAnalysis.paradigmClass}
       </SelectableButton>
     );
   }
