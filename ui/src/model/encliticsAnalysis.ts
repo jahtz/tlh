@@ -6,7 +6,6 @@ interface IEncliticsAnalysis {
 
 export interface SingleEncliticsAnalysis extends IEncliticsAnalysis {
   analysis: string;
-  selected: boolean;
 }
 
 export interface MultiEncliticsAnalysis extends IEncliticsAnalysis {

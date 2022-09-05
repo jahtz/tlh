@@ -48,7 +48,7 @@ describe('morphologicalAnalysis', () => {
     analysis: 'VBN.GEN.SG',
     paradigmClass: 'I.9',
     determinative: determinativ,
-    encliticsAnalysis: {enclitics: 'kkan', analysis: 'OBPk', selected},
+    encliticsAnalysis: {enclitics: 'kkan', analysis: 'OBPk'},
     selected
   };
 
@@ -61,7 +61,7 @@ describe('morphologicalAnalysis', () => {
     translation: 'Mann des Niederhockens',
     analysis: 'GENunh',
     paradigmClass: '30.12',
-    encliticsAnalysis: {enclitics: 'kkan', analysis: 'OBPk', selected},
+    encliticsAnalysis: {enclitics: 'kkan', analysis: 'OBPk'},
     determinative: '(LÚ)',
     selected
   };
@@ -147,7 +147,7 @@ describe('morphologicalAnalysis', () => {
       {letter: 'g', analysis: 'DN.VOC.SG', selected}
     ],
     paradigmClass: '35.1.1',
-    encliticsAnalysis: {enclitics: 'ma', analysis: 'CNJctr', selected},
+    encliticsAnalysis: {enclitics: 'ma', analysis: 'CNJctr'},
     determinative: 'D'
   };
 

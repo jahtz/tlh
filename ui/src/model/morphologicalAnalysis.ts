@@ -13,7 +13,7 @@ import {SelectedMorphAnalysis, SelectedMultiMorphAnalysisWithEnclitic, selectedM
 
 const morphologyAttributeNameRegex = /^mrp(\d+)$/;
 
-interface IMorphologicalAnalysis {
+export interface IMorphologicalAnalysis {
   number: number;
   referenceWord: string;
   translation: string;
@@ -23,7 +23,7 @@ interface IMorphologicalAnalysis {
 
 // Single analysis
 
-interface ISingleMorphologicalAnalysis extends IMorphologicalAnalysis {
+export interface ISingleMorphologicalAnalysis extends IMorphologicalAnalysis {
   analysis: string;
 }
 
@@ -64,7 +64,7 @@ export function isSingleMorphologicalAnalysis(ma: MorphologicalAnalysis): ma is 
 
 // Multi analysis
 
-type IMultiMorphologicalAnalysis = IMorphologicalAnalysis;
+export type IMultiMorphologicalAnalysis = IMorphologicalAnalysis;
 
 export interface MultiMorphologicalAnalysisWithoutEnclitics extends IMultiMorphologicalAnalysis {
   analysisOptions: SelectableLetteredAnalysisOption[];
@@ -86,6 +86,7 @@ export function multiMorphAnalysisIsWithSingleEnclitics(ma: MultiMorphologicalAn
 
 export interface MultiMorphologicalAnalysisWithMultiEnclitics extends IMultiMorphologicalAnalysis {
   analysisOptions: LetteredAnalysisOption[];
+  // FIXME: MultiEncliticsAnalysis should not be selectable here!
   encliticsAnalysis: MultiEncliticsAnalysis;
   selectedAnalysisCombinations: SelectedMultiMorphAnalysisWithEnclitic[];
 }
@@ -130,7 +131,7 @@ function readEncliticsChain(encliticsChain: string, selectedEnclitics: string[])
 
   return analysesString.includes('{')
     ? {enclitics, analysisOptions: parseMultiAnalysisString(splitEncliticsChain[1], selectedEnclitics)}
-    : {enclitics, analysis: analysesString, selected: false};
+    : {enclitics, analysis: analysesString};
 }
 
 export function readMorphologicalAnalysis(number: number, content: string | null, initialSelectedMorphologies: SelectedMorphAnalysis[]): MorphologicalAnalysis | undefined {

@@ -1,9 +1,17 @@
 import {
   isMultiMorphologicalAnalysis,
   MorphologicalAnalysis,
-  multiMorphAnalysisIsWithMultiEnclitics,
+  multiMorphAnalysisIsWithoutEnclitics,
+  multiMorphAnalysisIsWithSingleEnclitics,
+  MultiMorphologicalAnalysisWithMultiEnclitics,
+  MultiMorphologicalAnalysisWithoutEnclitics,
+  MultiMorphologicalAnalysisWithSingleEnclitics,
   readMorphologiesFromNode,
-  singleMorphAnalysisIsWithMultiEnclitics,
+  singleMorphAnalysisIsWithoutEnclitics,
+  singleMorphAnalysisIsWithSingleEnclitics,
+  SingleMorphologicalAnalysisWithMultiEnclitics,
+  SingleMorphologicalAnalysisWithoutEnclitics,
+  SingleMorphologicalAnalysisWithSingleEnclitics,
   writeMorphAnalysisValue
 } from '../../model/morphologicalAnalysis';
 import {isXmlElementNode, XmlElementNode, XmlNode} from '../../xmlModel/xmlModel';
@@ -56,6 +64,57 @@ function removeFootNote(children: XmlNode[]): XmlNode[] {
     : children;
 }
 
+
+export function extractSelMorphAnalysesFromSingleMorphWithoutEnc({selected, number}: SingleMorphologicalAnalysisWithoutEnclitics): string[] {
+  return selected ? [number.toString()] : [];
+}
+
+export function extractSelMorphAnalysesFromSingleMorphWithSingleEnc({selected, number}: SingleMorphologicalAnalysisWithSingleEnclitics): string[] {
+  return selected ? [number.toString()] : [];
+}
+
+export function extractSelMorphAnalysesFromSingleMorphWithMultiEnc({
+  number,
+  encliticsAnalysis: {analysisOptions}
+}: SingleMorphologicalAnalysisWithMultiEnclitics): string[] {
+  return analysisOptions.filter(({selected}) => selected).map(({letter}) => `${number}${letter}`);
+}
+
+export function extractSelMorphAnalysesFromMultiMorphWithoutEnc({number, analysisOptions}: MultiMorphologicalAnalysisWithoutEnclitics): string[] {
+  return analysisOptions.filter(({selected}) => selected).map(({letter}) => `${number}${letter}`);
+}
+
+export function extractSelMorphAnalysesFromMultiMorphWithSingleEnc({number, analysisOptions}: MultiMorphologicalAnalysisWithSingleEnclitics): string[] {
+  return analysisOptions.filter(({selected}) => selected).map(({letter}) => `${number}${letter}`);
+}
+
+export function extractSelMorphAnalysesFromMultiMorphWithMultiEnc({
+  number,
+  selectedAnalysisCombinations
+}: MultiMorphologicalAnalysisWithMultiEnclitics): string[] {
+  return selectedAnalysisCombinations.map(({morphLetter, encLetter}) => `${number}${morphLetter}${encLetter}`);
+}
+
+function extractSelectedMorphologicalAnalyses(ma: MorphologicalAnalysis): string[] {
+  if (isMultiMorphologicalAnalysis(ma)) {
+    if (multiMorphAnalysisIsWithoutEnclitics(ma)) {
+      return extractSelMorphAnalysesFromMultiMorphWithoutEnc(ma);
+    } else if (multiMorphAnalysisIsWithSingleEnclitics(ma)) {
+      return extractSelMorphAnalysesFromMultiMorphWithSingleEnc(ma);
+    } else {
+      return extractSelMorphAnalysesFromMultiMorphWithMultiEnc(ma);
+    }
+  } else {
+    if (singleMorphAnalysisIsWithoutEnclitics(ma)) {
+      return extractSelMorphAnalysesFromSingleMorphWithoutEnc(ma);
+    } else if (singleMorphAnalysisIsWithSingleEnclitics(ma)) {
+      return extractSelMorphAnalysesFromSingleMorphWithSingleEnc(ma);
+    } else {
+      return extractSelMorphAnalysesFromSingleMorphWithMultiEnc(ma);
+    }
+  }
+}
+
 export function writeWordNodeData({node: originalNode, lg, morphologies, footNote}: WordNodeData): XmlElementNode {
   const {tagName, attributes, children: originalChildren} = originalNode;
 
@@ -75,33 +134,13 @@ export function writeWordNodeData({node: originalNode, lg, morphologies, footNot
     node.attributes[`mrp${ma.number}`] = writeMorphAnalysisValue(ma);
   }
 
-  const selectedAnalysisOptions: string[] = morphologies.flatMap((ma) => {
+  const selectedAnalysisOptions: string[] = morphologies.flatMap(extractSelectedMorphologicalAnalyses);
 
-    if (isMultiMorphologicalAnalysis(ma)) {
-      if (multiMorphAnalysisIsWithMultiEnclitics(ma)) {
-        // FIXME!
-        return ma.selectedAnalysisCombinations.map(({number, morphLetter, encLetter}) => `${number}${morphLetter}${encLetter}`);
-      } else {
-        return ma.analysisOptions
-          .filter(({selected}) => selected)
-          .map(({letter}) => `${ma.number}${letter}`);
-      }
-    } else {
-      if (singleMorphAnalysisIsWithMultiEnclitics(ma)) {
-        return ma.encliticsAnalysis.analysisOptions
-          .filter(({selected}) => selected)
-          .map(({letter}) => `${ma.number}${letter}`);
-      } else {
-        return ma.number.toString();
-      }
-    }
-  });
+  console.info(selectedAnalysisOptions);
 
-  if (selectedAnalysisOptions.length > 0) {
-    node.attributes.mrp0sel = selectedAnalysisOptions.length > 0
-      ? selectedAnalysisOptions.join(' ')
-      : undefined;
-  }
+  node.attributes.mrp0sel = selectedAnalysisOptions.length > 0
+    ? selectedAnalysisOptions.join(' ')
+    : undefined;
 
   return node;
 }
@@ -120,14 +159,18 @@ function isOnlySpaces({children}: XmlElementNode): boolean {
 export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData> = {
   replace: (node, renderedChildren, isSelected) => {
 
-    const notMarked = node.attributes.mrp0sel === 'DEL';
+    const selectedMorph = 'mrp0sel' in node.attributes
+      ? node.attributes.mrp0sel
+      : undefined;
 
-    const isForeignLanguage = node.attributes.mrp0sel
-      ? Object.keys(foreignLanguageColors).includes(node.attributes.mrp0sel)
+    const notMarked = selectedMorph === 'DEL';
+
+    const isForeignLanguage = selectedMorph !== undefined
+      ? Object.keys(foreignLanguageColors).includes(selectedMorph)
       : false;
 
-    const needsMorphology = !!node.attributes.mrp0sel;
-    const hasNoMorphologySelected = needsMorphology && node.attributes.mrp0sel && node.attributes.mrp0sel.trim().length === 0 || node.attributes.mrp0sel === '???';
+    const needsMorphology = selectedMorph !== undefined && selectedMorph.trim().length > 0;
+    const hasNoMorphologySelected = needsMorphology && selectedMorph !== undefined && selectedMorph.trim().length === 0 || selectedMorph === '???';
 
     const hasMorphAnalyses = Object.keys(node.attributes)
       .filter((name) => name.startsWith('mrp') && !name.startsWith('mrp0'))
