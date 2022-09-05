@@ -2,12 +2,17 @@ import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {SingleMorphAnalysisOptionButton} from './SingleMorphAnalysisOptionButton';
 import {isSingleMorphologicalAnalysis, MorphologicalAnalysis, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
-import {CanToggleAnalysisSelection, Numerus} from './MorphAnalysisOptionContainer';
+import {CanToggleAnalysisSelection} from './MorphAnalysisOptionContainer';
 import {MultiMorphAnalysisOptionButtons} from './MultiMorphAnalysisOptionButtons';
+import classNames from 'classnames';
 
 interface IProps extends CanToggleAnalysisSelection {
   morphologicalAnalysis: MorphologicalAnalysis;
   enableEditMode: () => void;
+}
+
+enum Numerus {
+  Singular = 'SG', Plural = 'PL'
 }
 
 export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean {
@@ -22,6 +27,8 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
 
   const {number, translation, referenceWord, paradigmClass, determinative} = morphologicalAnalysis;
   const isSingleAnalysisOption = isSingleMorphologicalAnalysis(morphologicalAnalysis);
+
+  console.info(lastAllSelected);
 
   function selectAll(ma: MultiMorphologicalAnalysis, numerus?: Numerus): void {
 
@@ -55,13 +62,15 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
         </div>
 
         {!isSingleAnalysisOption && <>
-          <button type="button" className="p-2 border border-teal-300" onClick={() => selectAll(morphologicalAnalysis)} tabIndex={-1}>
+          <button type="button" className={classNames('p-2', 'border', 'border-teal-300')} onClick={() => selectAll(morphologicalAnalysis)} tabIndex={-1}>
             {t('all')}
           </button>
-          <button type="button" className="p-2 border border-teal-300" onClick={() => selectAll(morphologicalAnalysis, Numerus.Singular)} tabIndex={-1}>
+          <button type="button" className={classNames('p-2', 'border', 'border-teal-300', {'bg-teal-300': lastAllSelected === Numerus.Singular})}
+                  onClick={() => selectAll(morphologicalAnalysis, Numerus.Singular)} tabIndex={-1}>
             {t('SG')}
           </button>
-          <button type="button" className="p-2 border border-teal-300" onClick={() => selectAll(morphologicalAnalysis, Numerus.Plural)} tabIndex={-1}>
+          <button type="button" className={classNames('p-2', 'border', 'border-teal-300', {'bg-teal-300': lastAllSelected === Numerus.Plural})}
+                  onClick={() => selectAll(morphologicalAnalysis, Numerus.Plural)} tabIndex={-1}>
             {t('PL')}
           </button>
         </>}

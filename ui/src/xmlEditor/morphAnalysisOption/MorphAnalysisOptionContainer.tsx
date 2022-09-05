@@ -13,10 +13,6 @@ interface IProps extends CanToggleAnalysisSelection {
   setKeyHandlingEnabled: (b: boolean) => void;
 }
 
-export enum Numerus {
-  Singular = 'SG', Plural = 'PL'
-}
-
 export function MorphAnalysisOptionContainer({
   morphologicalAnalysis,
   updateMorphology,
