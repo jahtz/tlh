@@ -18,15 +18,23 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
 
   const {t} = useTranslation('common');
   const [isReduced, setIsReduced] = useState(false);
+  const [lastAllSelected, setLastAllSelected] = useState<Numerus>();
 
   const {number, translation, referenceWord, paradigmClass, determinative} = morphologicalAnalysis;
   const isSingleAnalysisOption = isSingleMorphologicalAnalysis(morphologicalAnalysis);
 
   function selectAll(ma: MultiMorphologicalAnalysis, numerus?: Numerus): void {
+
+    const targetState = lastAllSelected !== undefined
+      ? lastAllSelected !== numerus
+      : undefined;
+
+    setLastAllSelected((current) => current === numerus ? undefined : numerus);
+
     ma.analysisOptions
       .forEach(({analysis}, index) => {
         if (!numerus || analysisIsInNumerus(analysis, numerus)) {
-          toggleAnalysisSelection(index, undefined, true);
+          toggleAnalysisSelection(index, undefined, targetState);
         }
       });
   }
