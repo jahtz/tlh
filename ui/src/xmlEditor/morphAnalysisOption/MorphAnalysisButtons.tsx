@@ -32,8 +32,6 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
   const {number, translation, referenceWord, paradigmClass, determinative} = morphologicalAnalysis;
   const isSingleAnalysisOption = isSingleMorphologicalAnalysis(morphologicalAnalysis);
 
-  console.info(lastAllSelected);
-
   function selectAll(ma: MultiMorphologicalAnalysis, numerus?: Numerus): void {
 
     const targetState = lastAllSelected !== undefined

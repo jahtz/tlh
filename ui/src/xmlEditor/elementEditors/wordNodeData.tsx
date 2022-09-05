@@ -136,8 +136,6 @@ export function writeWordNodeData({node: originalNode, lg, morphologies, footNot
 
   const selectedAnalysisOptions: string[] = morphologies.flatMap(extractSelectedMorphologicalAnalyses);
 
-  console.info(selectedAnalysisOptions);
-
   node.attributes.mrp0sel = selectedAnalysisOptions.length > 0
     ? selectedAnalysisOptions.join(' ')
     : undefined;
@@ -159,9 +157,7 @@ function isOnlySpaces({children}: XmlElementNode): boolean {
 export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData> = {
   replace: (node, renderedChildren, isSelected) => {
 
-    const selectedMorph = 'mrp0sel' in node.attributes
-      ? node.attributes.mrp0sel
-      : undefined;
+    const selectedMorph = node.attributes.mrp0sel;
 
     const notMarked = selectedMorph === 'DEL';
 
@@ -169,8 +165,9 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
       ? Object.keys(foreignLanguageColors).includes(selectedMorph)
       : false;
 
-    const needsMorphology = selectedMorph !== undefined && selectedMorph.trim().length > 0;
-    const hasNoMorphologySelected = needsMorphology && selectedMorph !== undefined && selectedMorph.trim().length === 0 || selectedMorph === '???';
+    const needsMorphology = selectedMorph === undefined || selectedMorph.trim().length === 0;
+
+    const hasNoMorphologySelected = needsMorphology && selectedMorph !== '???';
 
     const hasMorphAnalyses = Object.keys(node.attributes)
       .filter((name) => name.startsWith('mrp') && !name.startsWith('mrp0'))
@@ -182,12 +179,12 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
       isOnlySpaces(node)
         ? [isSelected ? selectedNodeClass : 'bg-gray-200']
         : {
-          'has-background-warning': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
+          // FIXME: convert classes to tailwind!
+          'bg-yellow-500': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
           [foreignLanguageColors[node.attributes.mrp0sel || '']]: isForeignLanguage,
-          'has-text-weight-bold': isForeignLanguage,
+          'font-bold': isForeignLanguage,
           'text-red-600': node.children.length === 0,
           'bg-yellow-300': !isSelected && !notMarked && hasNoMorphologySelected,
-          // TODO: backgrounds...
           'bg-blue-300': hasEditingQuestion,
           [selectedNodeClass]: isSelected,
         });
