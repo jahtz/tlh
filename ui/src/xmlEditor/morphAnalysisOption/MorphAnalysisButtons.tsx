@@ -16,7 +16,11 @@ enum Numerus {
 }
 
 export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean {
-  return analysis.includes(numerus) || analysis.includes('ABL') || analysis.includes('INS') || analysis.includes('ALL');
+  const firstAnalysisPart = analysis.includes('_')
+    ? analysis.split('_')[0]
+    : analysis;
+
+  return firstAnalysisPart.includes(numerus) || firstAnalysisPart.includes('ABL') || firstAnalysisPart.includes('INS') || firstAnalysisPart.includes('ALL');
 }
 
 export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysisSelection, enableEditMode}: IProps): JSX.Element {
