@@ -1,10 +1,19 @@
 import {useRegisterMutation, UserInput} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
-import {registerSchema} from './schemas';
 import {MyField} from './BulmaFields';
+import {object as yupObject, SchemaOf, string as yupString} from 'yup';
 
 const initialValues: UserInput = {username: '', password: '', passwordRepeat: '', name: '', email: '', affiliation: ''};
+
+const validationSchema: SchemaOf<UserInput> = yupObject({
+  username: yupString().min(4).max(50).required(),
+  password: yupString().min(4).max(50).required(),
+  passwordRepeat: yupString().min(4).max(50).required(),
+  name: yupString().required(),
+  email: yupString().email().required(),
+  affiliation: yupString().notRequired()
+}).required();
 
 export function RegisterForm(): JSX.Element {
 
@@ -20,7 +29,7 @@ export function RegisterForm(): JSX.Element {
     <div className="container mx-auto">
       <h1 className="font-bold text-2xl text-center mb-4">{t('register')}</h1>
 
-      <Formik initialValues={initialValues} validationSchema={registerSchema} onSubmit={onSubmit}>
+      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
         <Form>
           <Field name="username" id="username" label={t('username')} component={MyField}/>
 

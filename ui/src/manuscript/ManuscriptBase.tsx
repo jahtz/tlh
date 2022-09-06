@@ -23,11 +23,7 @@ export function ManuscriptBase(): JSX.Element {
     return <Navigate to={homeUrl}/>;
   }
 
-  const manuscriptQuery = useManuscriptQuery({
-    variables: {
-      mainIdentifier: decodeURIComponent(params.mainIdentifier)
-    }
-  });
+  const manuscriptQuery = useManuscriptQuery({variables: {mainIdentifier: decodeURIComponent(params.mainIdentifier)}});
 
   return (
     <WithQuery query={manuscriptQuery}>
@@ -36,8 +32,7 @@ export function ManuscriptBase(): JSX.Element {
           <Route path={'/data'} element={<ManuscriptData manuscript={manuscript}/>}/>
           <Route path={uploadPicturesUrl} element={<UploadPicturesForm manuscript={manuscript}/>}/>
           <Route path={`/${createTransliterationUrl}`} element={<TransliterationInput manuscript={manuscript}/>}/>
-        </Routes>
-        }
+        </Routes>}
       </WithNullableNavigate>}
     </WithQuery>
   );

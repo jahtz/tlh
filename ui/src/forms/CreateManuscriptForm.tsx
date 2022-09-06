@@ -7,7 +7,7 @@ import {
   useCreateManuscriptMutation
 } from '../graphql';
 import {Field, FieldArray, FieldArrayRenderProps, Form, Formik, FormikErrors} from 'formik';
-import {manuscriptSchema} from './schemas';
+import {manuscriptSchema} from './manuscriptSchema';
 import classNames from 'classnames';
 import {ManuscriptIdInputField} from './ManuscriptIdInputField';
 import {Navigate} from 'react-router-dom';
@@ -53,7 +53,6 @@ export function CreateManuscriptForm(): JSX.Element {
       <h1 className="mb-4 font-bold text-2xl text-center">{t('createManuscript')}</h1>
 
       <Formik initialValues={initialValues} validationSchema={manuscriptSchema} onSubmit={handleSubmit}>
-
         {({errors, touched, setFieldValue, values}) => <Form>
 
           <div className="mt-2">

@@ -3,14 +3,19 @@ import {LoginMutationVariables, useLoginMutation} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
 import {MyField} from './BulmaFields';
-import {loginSchema} from './schemas';
 import {homeUrl} from '../urls';
 import {Navigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {userLoggedInAction} from '../store/actions';
 import {activeUserSelector} from '../store/store';
+import {object as yupObject, SchemaOf, string as yupString} from 'yup';
 
 const initialValues: LoginMutationVariables = {username: '', password: ''};
+
+const validationSchema: SchemaOf<LoginMutationVariables> = yupObject({
+  username: yupString().min(4).max(50).required(),
+  password: yupString().min(4).max(50).required()
+}).required();
 
 export function LoginForm(): JSX.Element {
 
@@ -19,7 +24,8 @@ export function LoginForm(): JSX.Element {
   const [invalidLoginTry, setInvalidLoginTry] = useState(false);
   const [login, {loading, error}] = useLoginMutation();
 
-  if (useSelector(activeUserSelector)) { // User is already logged in
+  if (useSelector(activeUserSelector)) {
+    // User is already logged in
     return <Navigate to={homeUrl}/>;
   }
 
@@ -43,7 +49,7 @@ export function LoginForm(): JSX.Element {
     <div className="container mx-auto">
       <h1 className="font-bold text-2xl text-center mb-4">{t('login')}</h1>
 
-      <Formik initialValues={initialValues} validationSchema={loginSchema} onSubmit={handleSubmit}>
+      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
         <Form>
           <Field name="username" id="username" label={t('username')} component={MyField}/>
 
