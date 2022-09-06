@@ -14,8 +14,6 @@ use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
 function getPictures(string $manuscriptMainIdentifier): array {
   $folder = __DIR__ . "/../uploads/$manuscriptMainIdentifier/";
 
-  error_log($folder . ' :: ' . realpath($folder));
-
   if (!file_exists($folder) || !is_dir($folder)) {
     return [];
   }
