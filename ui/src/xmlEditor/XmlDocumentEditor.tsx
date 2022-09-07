@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {findFirstXmlElementByTagName, isXmlElementNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
+import {buildActionSpec, findFirstXmlElementByTagName, isXmlElementNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
 import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './editorConfig';
 import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
@@ -292,7 +292,6 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
     });
   }
 
-
   function toggleElementInsert(tagName: string, insertablePositions: InsertablePositions): void {
     setState((state) => {
         if (!state.editorState) {
@@ -308,16 +307,27 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
 
   function initiateInsert(path: NodePath): void {
     if (state.editorState && 'tagName' in state.editorState) {
-      const node = state.editorState.insertablePositions.newElement !== undefined
-        ? state.editorState.insertablePositions.newElement()
+
+      const {newElement, insertAction} = state.editorState.insertablePositions;
+
+      const newNode = newElement !== undefined
+        ? newElement()
         : {tagName: state.editorState.tagName, attributes: {}, children: []};
 
+      const actionSpec: Spec<XmlNode> = insertAction
+        ? insertAction(path, newNode, state.rootNode as XmlElementNode)
+        : buildActionSpec({children: {$splice: [[path[path.length - 1], 0, newNode]]}}, path.slice(0, -1));
+
       setState((state) => update(state, {
-        rootNode: path.slice(0, -1).reduceRight<Spec<XmlNode>>(
-          (acc, index) => ({children: {[index]: acc}}),
-          {children: {$splice: [[path[path.length - 1], 0, node]]}}
-        ),
-        editorState: {$set: {path, changed: false, node, data: (editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node)}},
+        rootNode: actionSpec,
+        editorState: {
+          $set: {
+            path,
+            changed: false,
+            node: newNode,
+            data: (editorConfig.nodeConfigs[newNode.tagName] as XmlSingleEditableNodeConfig<T>).readNode(newNode)
+          }
+        },
         changed: {$set: true}
       }));
     }

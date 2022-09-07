@@ -1,4 +1,5 @@
 import {isXmlElementNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
+import {Spec} from 'immutability-helper';
 
 export type NodePath = number[];
 
@@ -8,6 +9,7 @@ export interface InsertablePositions {
   afterElement?: string[];
   asLastChildOf?: string[];
   newElement?: () => XmlElementNode;
+  insertAction?: (path: number[], newNode: XmlElementNode, rootNode: XmlElementNode) => Spec<XmlNode>;
 }
 
 export function calculateInsertablePositions(

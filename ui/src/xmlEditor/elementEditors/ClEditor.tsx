@@ -1,6 +1,7 @@
 import {XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import {useTranslation} from 'react-i18next';
 import {NodeEditorRightSide} from '../NodeEditorRightSide';
+import {buildActionSpec, getElementByPath, XmlElementNode} from '../../xmlModel/xmlModel';
 
 export const clEditorConfig: XmlInsertableSingleEditableNodeConfig = {
   replace: (node, renderedChildren, isSelected, isLeftSide) => (
@@ -14,6 +15,22 @@ export const clEditorConfig: XmlInsertableSingleEditableNodeConfig = {
   insertablePositions: {
     beforeElement: ['cl', 'w'],
     afterElement: ['cl', 'w'],
+    insertAction: (path, newNode, rootNode) => {
+      const parentNode: XmlElementNode = getElementByPath(rootNode, path.slice(0, -1));
+
+      if (parentNode.tagName !== 'cl') {
+        return buildActionSpec({children: {$splice: [[path[path.length - 1], 0, newNode]]}}, path.slice(0, -1));
+      }
+
+      // inside <cl/> node, split!
+      const clIndex = path[path.length - 2];
+      const splitIndex = path[path.length - 1];
+
+      const firstNewNode = {...parentNode, children: parentNode.children.slice(0, splitIndex)};
+      const secondNewNode = {...parentNode, children: parentNode.children.slice(splitIndex)};
+
+      return buildActionSpec({children: {$splice: [[clIndex, 1, firstNewNode, secondNewNode]]}}, path.slice(0, -2));
+    }
   }
 };
 
