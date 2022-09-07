@@ -1,6 +1,6 @@
 import {NodeDisplay} from './NodeDisplay';
 import {XmlElementNode} from '../xmlModel/xmlModel';
-import {ActivatableButton, DeleteButton} from '../bulmaHelpers/Buttons';
+import {SelectableButton, DeleteButton} from '../genericElements/Buttons';
 import {useTranslation} from 'react-i18next';
 import {FontSizeSelector, FontSizeSelectorProps} from './FontSizeSelector';
 
@@ -50,7 +50,9 @@ export function NodeEditorRightSide({
 
           {deleteNode && <DeleteButton onClick={deleteNode} otherClasses={['ml-2', 'px-2', 'rounded']}/>}
 
-          <ActivatableButton text={t('update')} isActive={changed} onClick={initiateSubmit} otherClasses={['ml-2', 'px-2', 'rounded']}/>
+          <SelectableButton selected={changed} onClick={initiateSubmit} otherClasses={['ml-2', 'px-2', 'rounded']}>
+            <>{t('update')}</>
+          </SelectableButton>
 
           <button type="button" className="ml-2 px-2 rounded border border-slate-500" onClick={cancelSelection} title={t('cancelSelection')}>&#x2715;</button>
 

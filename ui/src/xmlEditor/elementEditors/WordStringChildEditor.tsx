@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {DeleteButton, EditButton} from '../../bulmaHelpers/Buttons';
+import {DeleteButton, EditButton} from '../../genericElements/Buttons';
 import classNames from 'classnames';
 import {WordStringChildEditForm} from './WordStringChildEditForm';
 

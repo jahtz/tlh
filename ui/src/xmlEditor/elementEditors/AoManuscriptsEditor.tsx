@@ -1,6 +1,6 @@
 import {XmlEditableNodeIProps} from '../editorConfig';
 import {AoManuscriptsData, AoSource, SourceType, sourceTypes} from './aoManuscriptsConfigData';
-import {DeleteButton} from '../../bulmaHelpers/Buttons';
+import {DeleteButton} from '../../genericElements/Buttons';
 import {NodeEditorRightSide} from '../NodeEditorRightSide';
 
 interface AoTextNumberFieldProps {

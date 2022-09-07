@@ -1,5 +1,5 @@
 import {LetteredAnalysisOption, SelectableLetteredAnalysisOption} from '../../model/analysisOptions';
-import {SelectableButton} from '../../SelectableButton';
+import {SelectableButton} from '../../genericElements/Buttons';
 import {selectedMultiMorphAnalysisWithEnclitics, stringifyMultiMorphAnalysisWithEnclitics} from '../../model/selectedMorphologicalAnalysis';
 import {EncliticsAnalysisDisplay} from './SingleMorphAnalysisOptionButton';
 import {MultiMorphologicalAnalysisWithMultiEnclitics} from '../../model/morphologicalAnalysis';
@@ -33,12 +33,12 @@ export function MultiMorphMultiSelectionButton({ma, morphAnalysisOption, encliti
 
   return (
     <div className="my-1 flex">
-      <SelectableButton selected={morphLetterIsSelected} className={otherClasses} onClick={selectAllEncLetters}>
+      <SelectableButton selected={morphLetterIsSelected} otherClasses={otherClasses} onClick={selectAllEncLetters}>
         <>{letter} - {analysis}</>
       </SelectableButton>
 
       {encliticsAnalysisOptions.map(({analysis: encAnalysis, letter: encLetter}, letterIndex) =>
-        <SelectableButton key={encLetter} selected={encLetterIsSelected(encLetter)} className={['ml-1', otherClasses]}
+        <SelectableButton key={encLetter} selected={encLetterIsSelected(encLetter)} otherClasses={['ml-1', ...otherClasses]}
                           onClick={() => toggleAnalysisSelection(letterIndex)}>
           <>{encLetter} <EncliticsAnalysisDisplay enclitics={enclitics} analysis={encAnalysis}/></>
         </SelectableButton>

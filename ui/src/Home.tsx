@@ -4,7 +4,7 @@ import {ManuscriptBasicDataFragment, useIndexLazyQuery} from './graphql';
 import {Link} from 'react-router-dom';
 import {WithQuery} from './WithQuery';
 import {createManuscriptUrl} from './urls';
-import {MyPagination} from './bulmaHelpers/pagination';
+import {MyPagination} from './genericElements/pagination';
 
 const initialPage = 0;
 const paginationSize = 10;

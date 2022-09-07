@@ -1,5 +1,5 @@
 import {singleMorphAnalysisIsWithoutEnclitics, singleMorphAnalysisIsWithSingleEnclitics, SingleMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
-import {SelectableButton} from '../../SelectableButton';
+import {SelectableButton} from '../../genericElements/Buttons';
 
 interface IProps {
   morphAnalysis: SingleMorphologicalAnalysis;
@@ -18,8 +18,8 @@ export function SingleMorphAnalysisOptionButton({morphAnalysis, toggleAnalysisSe
 
   if (singleMorphAnalysisIsWithoutEnclitics(morphAnalysis)) {
     return (
-      <SelectableButton selected={morphAnalysis.selected} className={otherClasses} onClick={() => toggleAnalysisSelection(undefined)}>
-        {morphAnalysis.analysis || morphAnalysis.paradigmClass}
+      <SelectableButton selected={morphAnalysis.selected} otherClasses={otherClasses} onClick={() => toggleAnalysisSelection(undefined)}>
+        <>{morphAnalysis.analysis || morphAnalysis.paradigmClass}</>
       </SelectableButton>
     );
   }
@@ -28,7 +28,7 @@ export function SingleMorphAnalysisOptionButton({morphAnalysis, toggleAnalysisSe
     const encliticsAnalysis = morphAnalysis.encliticsAnalysis;
 
     return (
-      <SelectableButton selected={morphAnalysis.selected} className={otherClasses} onClick={() => toggleAnalysisSelection(undefined)}>
+      <SelectableButton selected={morphAnalysis.selected} otherClasses={otherClasses} onClick={() => toggleAnalysisSelection(undefined)}>
         <>{morphAnalysis.analysis} <EncliticsAnalysisDisplay enclitics={encliticsAnalysis.enclitics} analysis={encliticsAnalysis.analysis}/></>
       </SelectableButton>
     );
@@ -39,7 +39,7 @@ export function SingleMorphAnalysisOptionButton({morphAnalysis, toggleAnalysisSe
   return (
     <>
       {analysisOptions.map(({letter, analysis, selected}, index) =>
-        <SelectableButton key={letter} selected={selected} className={['mb-1', ...otherClasses]} onClick={() => toggleAnalysisSelection(index)}>
+        <SelectableButton key={letter} selected={selected} otherClasses={['mb-1', ...otherClasses]} onClick={() => toggleAnalysisSelection(index)}>
           <>{letter} - {analysis} <EncliticsAnalysisDisplay enclitics={enclitics} analysis={analysis}/></>
         </SelectableButton>
       )}
