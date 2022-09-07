@@ -23,22 +23,40 @@ describe('textReconstruction', () => {
   test.each<[XmlNode, boolean, string]>([
     // "Normal" text
     [{textContent: 'text'}, false, 'text'],
+
     // Sumerogramme
-    [sumGrm, false, '-GAL'], [sumGrm, true, 'GAL'],
+    [sumGrm, false, '-GAL'],
+    [sumGrm, true, 'GAL'],
+
     // Akadogramme
-    [akGrm, false, '--GAL'], [akGrm, true, '_GAL'],
+    [akGrm, false, '--GAL'],
+    [akGrm, true, '_GAL'],
+
     // Deletions
-    [laes_in, false, '⸢'], [laes_in, true, '⸢'],
-    [laes_fin, false, '⸣'], [laes_fin, true, '⸣'],
-    [ras_in, true, '*'], [ras_in, false, '*'],
-    [ras_fin, true, '*'], [ras_fin, false, '*'],
+    [laes_in, false, '⸢'],
+    [laes_in, true, '⸢'],
+
+    [laes_fin, false, '⸣'],
+    [laes_fin, true, '⸣'],
+
+    [ras_in, true, '*'],
+    [ras_in, false, '*'],
+
+    [ras_fin, true, '*'],
+    [ras_fin, false, '*'],
+
     // Corrections
-    [corrEx, false, '!'], [corrEx, true, '!'],
-    [corrQm, false, '?'], [corrQm, true, '?'],
+    [corrEx, false, '!'],
+    [corrEx, true, '!'],
+
+    [corrQm, false, '?'],
+    [corrQm, true, '?'],
+
     // Footnotes
-    [fn, false, '{F: Text: ME.}'], [fn, true, '{F: Text: ME.}']
+    [fn, false, '{F: Text: ME.}'],
+    [fn, true, '{F: Text: ME.}']
   ])(
-    'should reconstruct %o (as first: %s) as %o',
+    'should reconstruct %j (as first: %s) as %o',
     (toReconstruct, isFirstChild, reconstructed) => {
       expect(reconstructTransliteration(toReconstruct, isFirstChild)).toEqual(reconstructed);
     }
