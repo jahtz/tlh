@@ -1,6 +1,5 @@
 import {ChangeEvent, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import classNames from 'classnames';
 
 interface IProps {
   accept?: string;
@@ -25,8 +24,8 @@ export function FileLoader({accept, onLoad, text}: IProps): JSX.Element {
 
   return (
     <>
-      <button type="button" className={classNames('p-2', 'rounded', 'border', 'border-slate-500', 'w-full', {'is-loading': loading /*TODO!*/})}
-              onClick={() => fileInput.current && fileInput.current.click()} disabled={loading}>
+      <button type="button" className="p-2 rounded border border-slate-500 w-full" onClick={() => fileInput.current && fileInput.current.click()}
+              disabled={loading}>
         {text || t('chooseFile')}
       </button>
 

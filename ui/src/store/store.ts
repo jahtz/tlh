@@ -59,8 +59,6 @@ function initialState(): StoreState {
   const localStoragePreferences = localStorage.getItem(localStoragePreferencesKey);
   const localStorageLanguages = localStorage.getItem(localStorageLanguagesKey);
 
-  // FIXME: also load languages from localStorage..
-
   return {
     currentUser: localStorageUser ? JSON.parse(localStorageUser) : undefined,
     editorKeyConfig: localStoragePreferences ? sanitizePreferences(JSON.parse(localStoragePreferences)) : undefined,

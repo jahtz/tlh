@@ -1,12 +1,20 @@
 import {NavLink, useNavigate} from 'react-router-dom';
-import {createManuscriptUrl, editTransliterationDocumentUrl, homeUrl, loginUrl, preferencesUrl, registerUrl, editTranscriptionDocumentUrl, xmlComparatorUrl} from './urls';
+import {
+  createManuscriptUrl,
+  editTransliterationDocumentUrl,
+  homeUrl,
+  loginUrl,
+  preferencesUrl,
+  registerUrl,
+  editTranscriptionDocumentUrl,
+  xmlComparatorUrl
+} from './urls';
 import {useTranslation} from 'react-i18next';
 import {useDispatch, useSelector} from 'react-redux';
 import {activeUserSelector} from './store/store';
 import {userLoggedOutAction} from './store/actions';
 import i18next from 'i18next';
 
-// TODO: solve languages different?
 const languages: string[] = ['de', 'en'];
 
 export function NavBar(): JSX.Element {

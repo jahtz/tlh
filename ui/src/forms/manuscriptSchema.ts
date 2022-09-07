@@ -14,7 +14,6 @@ const manuscriptIdentifierSchema: SchemaOf<ManuscriptIdentifierInput> = yupObjec
 
 export const manuscriptSchema: SchemaOf<CreateManuscriptMutationVariables> = yupObject()
   .shape({
-    // TODO: other fields!
     mainIdentifier: manuscriptIdentifierSchema.required(),
     otherIdentifiers: yupArray(manuscriptIdentifierSchema).notRequired(),
     palaeographicClassification: yupMixed<PalaeographicClassification>()
@@ -33,5 +32,5 @@ export const manuscriptSchema: SchemaOf<CreateManuscriptMutationVariables> = yup
     palaeographicClassificationSure: yupBoolean().required(),
     cthClassification: yupNumber().notRequired(),
     provenance: yupString().notRequired(),
-    bibliography: yupString().notRequired()
+    bibliography: yupString().notRequired(),
   }).required();

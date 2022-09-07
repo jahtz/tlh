@@ -44,7 +44,6 @@ const apolloAuthMiddleware = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
-// FIXME: solve differently?
 const versionModifier = window.location.href.includes('stable')
   ? '/stable'
   : window.location.href.includes('release')
@@ -54,7 +53,6 @@ const versionModifier = window.location.href.includes('stable')
 const apolloUri = `${serverUrl}${versionModifier}/graphql.php`;
 
 const apolloClient = new ApolloClient({
-  // TODO: remove serverUrl!
   cache: new InMemoryCache(),
   link: concat(
     apolloAuthMiddleware,
