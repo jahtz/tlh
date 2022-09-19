@@ -11,6 +11,3 @@ tab_width = 4
 
 [{*.ts, *.tsx}]
 ij_typescript_align_multiline_parameters = false
-
-[*.json]
-indent_size = 4
