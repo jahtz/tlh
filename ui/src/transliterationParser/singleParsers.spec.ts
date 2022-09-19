@@ -25,25 +25,23 @@ const curlyBraceCases: [string][] = [['AN'], ['Anderer Text!'], ['Text : mit : D
 
 export function testParseDamages(parser: Parser<AOWordContent>): void {
 
- /*
-   ${'<<'} | ${DamageType.SurplusStart}
-  ${'>>'} | ${DamageType.SurplusEnd}
-  ${'〈〈'} | ${DamageType.SurplusStart}
-  ${'〉〉'} | ${DamageType.SurplusEnd}
-  ${'<'}  | ${DamageType.SupplementStart}
-  ${'>'}  | ${DamageType.SupplementEnd}
-  ${'〈'}  | ${DamageType.SupplementStart}
-  ${'〉'}  | ${DamageType.SupplementEnd}
-  ${'('}  | ${DamageType.UnknownDamageStart}
-  ${')'}  | ${DamageType.UnknownDamageEnd}
-  */
+  /*
+    ${'<<'} | ${DamageType.SurplusStart}
+   ${'>>'} | ${DamageType.SurplusEnd}
+   ${'〈〈'} | ${DamageType.SurplusStart}
+   ${'〉〉'} | ${DamageType.SurplusEnd}
+   ${'<'}  | ${DamageType.SupplementStart}
+   ${'>'}  | ${DamageType.SupplementEnd}
+   ${'〈'}  | ${DamageType.SupplementStart}
+   ${'〉'}  | ${DamageType.SupplementEnd}
+   */
 
-  test.each`
-  toParse | expected
-  ${'['}  | ${'del_in'}
-  ${']'}  | ${'del_fin'}
-  ${'⸢'}  | ${'les_in'}
-  ${'⸣'}  | ${'les_fin'}`(
+  test.each<{ toParse: string, expected: DamageType }>([
+    {toParse: '[', expected: 'del_in'},
+    {toParse: ']', expected: 'del_fin'},
+    {toParse: '⸢', expected: 'laes_in'},
+    {toParse: '⸣', expected: 'laes_fin'}
+  ])(
     'should parse $toParse as Damage Content with Damage Type $expected',
     ({toParse, expected}) => expect(parser.tryParse(toParse)).toEqual(damageContent(expected))
   );

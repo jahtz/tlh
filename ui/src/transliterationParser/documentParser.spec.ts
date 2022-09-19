@@ -8,7 +8,6 @@ import {numeralContent as nc} from '../model/wordContent/numeralContent';
 import {aoIllegibleContent as illeg} from '../model/wordContent/illegible';
 import {de, ds, le, ls, ue, us} from './testHelpers';
 import {indexDigit} from '../model/wordContent/indexDigit';
-import { paragraphSeparator } from '../model/paragraph';
 
 const completeInput = `
 $Publikationsnummer: KBo 71.53, Grabungsnummer: Bo 2018/6, Paläographische Klassifizierung: junghethitisch

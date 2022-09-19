@@ -1,8 +1,8 @@
-import {parsedWord as w} from "../model/sentenceContent/word";
-import {sumerogramm as sg} from "../model/wordContent/sumerogramm";
-import {transliteration} from "./parser";
-import {determinativ as d} from "../model/wordContent/determinativ";
-import {de, le, ls} from "./testHelpers";
+import {parsedWord as w} from '../model/sentenceContent/word';
+import {sumerogramm as sg} from '../model/wordContent/sumerogramm';
+import {transliteration} from './parser';
+import {determinativ as d} from '../model/wordContent/determinativ';
+import {de, le, ls} from './testHelpers';
 
 describe('', () => {
 

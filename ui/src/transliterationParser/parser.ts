@@ -108,7 +108,7 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
   ellipsis: () => alt(string('…'), string('...')).result(aoEllipsis),
 
   basicText: () => alt(
-    regexp(/[\p{Ll}()〈<〉>˽]+/u),
+    regexp(/[\p{Ll}〈<〉>˽]+/u),
     string('-').notFollowedBy(string('-')),
     oneOf('×ₓ')
   ).atLeast(1).tie().map(aoBasicText),
