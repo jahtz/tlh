@@ -11,8 +11,8 @@ import {I18nextProvider, initReactI18next} from 'react-i18next';
 import {AllManuscriptLanguagesDocument, AllManuscriptLanguagesQuery} from './graphql';
 import {createRoot} from 'react-dom/client';
 import {newLanguages, newStore} from './newStore';
-import common_de from './locales/de/common.json';
-import common_en from './locales/en/common.json';
+import common_de from './locales/common_de.json';
+import common_en from './locales/common_en.json';
 
 // noinspection JSIgnoredPromiseFromCall
 i18n
