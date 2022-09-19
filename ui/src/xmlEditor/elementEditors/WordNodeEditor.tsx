@@ -4,7 +4,7 @@ import {useEffect, useState} from 'react';
 import {MorphologicalAnalysis, MultiMorphologicalAnalysisWithMultiEnclitics} from '../../model/morphologicalAnalysis';
 import {MorphAnalysisOptionContainer} from '../morphAnalysisOption/MorphAnalysisOptionContainer';
 import {useSelector} from 'react-redux';
-import {editorKeyConfigSelector} from '../../store/store';
+import {editorKeyConfigSelector} from '../../newStore';
 import {XmlElementNode} from '../../xmlModel/xmlModel';
 import {MorphAnalysisOptionEditor} from '../morphAnalysisOption/MorphAnalysisOptionEditor';
 import {reconstructTransliteration} from '../transliterationReconstruction';

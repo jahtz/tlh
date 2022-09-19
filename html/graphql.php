@@ -16,7 +16,7 @@ use GraphQL\Error\{DebugFlag, FormattedError};
 use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
-use tlh_dig\graphql\{LoggedInUser, MySafeGraphQLException};
+use tlh_dig\graphql\{MySafeGraphQLException};
 use tlh_dig\model\{ManuscriptLanguage, ManuscriptMetaData, Transliteration, User};
 use function tlh_dig\graphql\{register, resolveUser, verifyUser};
 use function tlh_dig\model\allManuscriptLanguages;
@@ -145,7 +145,7 @@ $mutationType = new ObjectType([
         'username' => Type::nonNull(Type::string()),
         'password' => Type::nonNull(Type::string())
       ],
-      'type' => LoggedInUser::$graphQLType,
+      'type' => Type::string(),
       'resolve' => fn($rootValue, array $args) => verifyUser($args['username'], $args['password'])
     ],
     'me' => [

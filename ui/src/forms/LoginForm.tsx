@@ -2,13 +2,13 @@ import {useState} from 'react';
 import {LoginMutationVariables, useLoginMutation} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
-import {MyField} from './BulmaFields';
 import {homeUrl} from '../urls';
 import {Navigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
-import {userLoggedInAction} from '../store/actions';
-import {activeUserSelector} from '../store/store';
+import {activeUserSelector, login} from '../newStore';
 import {object as yupObject, SchemaOf, string as yupString} from 'yup';
+import {borderColors} from './colors';
+import classNames from 'classnames';
 
 const initialValues: LoginMutationVariables = {username: '', password: ''};
 
@@ -17,12 +17,13 @@ const validationSchema: SchemaOf<LoginMutationVariables> = yupObject({
   password: yupString().min(4).max(50).required()
 }).required();
 
+
 export function LoginForm(): JSX.Element {
 
   const {t} = useTranslation('common');
   const dispatch = useDispatch();
   const [invalidLoginTry, setInvalidLoginTry] = useState(false);
-  const [login, {loading, error}] = useLoginMutation();
+  const [loginMutation, {loading, error}] = useLoginMutation();
 
   if (useSelector(activeUserSelector)) {
     // User is already logged in
@@ -30,11 +31,11 @@ export function LoginForm(): JSX.Element {
   }
 
   function handleSubmit(values: LoginMutationVariables): void {
-    login({variables: values})
+    loginMutation({variables: values})
       .then(({data}) => {
         if (data && data.login) {
           setInvalidLoginTry(false);
-          dispatch(userLoggedInAction(data.login));
+          dispatch(login(data.login));
         } else {
           setInvalidLoginTry(true);
         }
@@ -50,10 +51,21 @@ export function LoginForm(): JSX.Element {
       <h1 className="font-bold text-2xl text-center mb-4">{t('login')}</h1>
 
       <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
-        <Form>
-          <Field name="username" id="username" label={t('username')} component={MyField}/>
+        {({touched, errors}) => <Form>
 
-          <Field type="password" name="password" id="password" label={t('password')} component={MyField}/>
+          <div className="my-4">
+            <label htmlFor="username" className="font-bold">{t('username')}:</label>
+            <Field name="username" id="username" placeholder={t('username')} required autoFocus
+                   className={classNames('mt-2', 'p-2', 'rounded', 'border', 'w-full',
+                     touched.username ? (errors.username ? borderColors.error : borderColors.success) : borderColors.default)}/>
+          </div>
+
+          <div className="my-4">
+            <label htmlFor="password" className="font-bold">{t('password')}</label>
+            <Field type="password" name="password" id="password" placeholder={t('password')} required
+                   className={classNames('mt-2', 'p-2', 'rounded', 'border', 'w-full',
+                     touched.password ? (errors.password ? borderColors.error : borderColors.success) : borderColors.default)}/>
+          </div>
 
           {invalidLoginTry && <div className="p-4 rounded border border-red-600 bg-red-500 text-white text-center">
             {t('invalidUsernamePasswordCombination')}.
@@ -64,7 +76,7 @@ export function LoginForm(): JSX.Element {
           <button type="submit" disabled={loading} className="mt-4 p-2 rounded border w-full bg-blue-500 text-white">
             {t('login')}
           </button>
-        </Form>
+        </Form>}
       </Formik>
     </div>
   );

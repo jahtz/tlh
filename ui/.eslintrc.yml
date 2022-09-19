@@ -5,6 +5,7 @@ env:
 extends:
   - 'eslint:recommended'
   - 'plugin:react/recommended'
+  - 'plugin:react/jsx-runtime'
   - 'plugin:@typescript-eslint/recommended'
 
 parser: '@typescript-eslint/parser'
@@ -14,15 +15,15 @@ parserOptions:
     jsx: true
   ecmaVersion: 12
   sourceType: module
+
 plugins:
   - react
   - '@typescript-eslint'
+
 rules:
   indent: [ 'off', 2 ]
-  linebreak-style: [ 'error' , 'unix' ]
+  linebreak-style: [ 'error', 'unix' ]
   quotes: [ 'warn', 'single' ]
   semi: [ 'warn', 'always' ]
-  react/display-name: [ 'off' ]
+  # react/display-name: [ 'off' ]
   '@typescript-eslint/no-extra-non-null-assertion': [ 'warn' ]
-  '@typescript-eslint/no-empty-function': [ 'warn' ]
-  'react/react-in-jsx-scope': [ 'off' ]

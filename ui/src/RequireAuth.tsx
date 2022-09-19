@@ -1,12 +1,11 @@
 import {Navigate} from 'react-router-dom';
 import {useSelector} from 'react-redux';
-import {activeUserSelector} from './store/store';
+import {activeUserSelector, User} from './newStore';
 import {loginUrl} from './urls';
-import {LoggedInUserFragment} from './graphql';
 
 interface IProps {
   to?: string,
-  children: (user: LoggedInUserFragment) => JSX.Element
+  children: (user: User) => JSX.Element
 }
 
 export function RequireAuth({to = loginUrl, children}: IProps): JSX.Element {

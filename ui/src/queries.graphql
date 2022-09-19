@@ -23,17 +23,15 @@ mutation Register($userInput: UserInput!) {
 }
 
 # /login
-fragment LoggedInUser on LoggedInUser {
-  username
-  name
-  jwt
-  affiliation
-}
+# fragment LoggedInUser on LoggedInUser {
+#   username
+#   name
+#   jwt
+#   affiliation
+# }
 
 mutation Login($username: String!, $password: String!) {
-  login(username: $username, password: $password) {
-    ...LoggedInUser
-  }
+  login(username: $username, password: $password)
 }
 
 # /

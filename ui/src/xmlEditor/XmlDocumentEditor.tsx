@@ -3,7 +3,7 @@ import {buildActionSpec, findFirstXmlElementByTagName, isXmlElementNode, XmlElem
 import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './editorConfig';
 import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
-import {editorKeyConfigSelector} from '../store/store';
+import {editorKeyConfigSelector} from '../newStore';
 import {writeNode} from '../xmlModel/xmlWriting';
 import update, {Spec} from 'immutability-helper';
 import {EditorLeftSide, EditorLeftSideProps} from './EditorLeftSide';

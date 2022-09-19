@@ -1,18 +1,17 @@
 import {NavLink, useNavigate} from 'react-router-dom';
 import {
   createManuscriptUrl,
+  editTranscriptionDocumentUrl,
   editTransliterationDocumentUrl,
   homeUrl,
   loginUrl,
   preferencesUrl,
   registerUrl,
-  editTranscriptionDocumentUrl,
   xmlComparatorUrl
 } from './urls';
 import {useTranslation} from 'react-i18next';
 import {useDispatch, useSelector} from 'react-redux';
-import {activeUserSelector} from './store/store';
-import {userLoggedOutAction} from './store/actions';
+import {activeUserSelector, logout} from './newStore';
 import i18next from 'i18next';
 
 const languages: string[] = ['de', 'en'];
@@ -24,8 +23,8 @@ export function NavBar(): JSX.Element {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  function logout() {
-    dispatch(userLoggedOutAction);
+  function onLogout() {
+    dispatch(logout());
     navigate(loginUrl);
   }
 
@@ -47,11 +46,13 @@ export function NavBar(): JSX.Element {
       </select>
 
       {user
-        ? <button className="p-4 ml-4 hover:bg-slate-700" onClick={logout}>{t('logout')} {user.name}</button>
-        : <>
-          <NavLink className="p-4 ml-4 hover:bg-slate-700" to={registerUrl}>{t('register')}</NavLink>
-          <NavLink className="p-4 ml-4 hover:bg-slate-700" to={loginUrl}>{t('login')}</NavLink>
-        </>
+        ? <button className="p-4 ml-4 hover:bg-slate-700" onClick={onLogout}>{t('logout')} {user.user_id}</button>
+        : (
+          <>
+            <NavLink className="p-4 ml-4 hover:bg-slate-700" to={registerUrl}>{t('register')}</NavLink>
+            <NavLink className="p-4 ml-4 hover:bg-slate-700" to={loginUrl}>{t('login')}</NavLink>
+          </>
+        )
       }
     </nav>
   );

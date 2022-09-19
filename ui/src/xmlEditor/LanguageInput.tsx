@@ -1,6 +1,6 @@
 import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
-import {allManuscriptLanguagesSelector} from '../store/store';
+import {allManuscriptLanguagesSelector} from '../newStore';
 
 interface IProps {
   initialValue: string | undefined;

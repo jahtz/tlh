@@ -1,8 +1,7 @@
 import {Field, Form, Formik} from 'formik';
 import {useTranslation} from 'react-i18next';
 import {useDispatch, useSelector} from 'react-redux';
-import {editorKeyConfigSelector} from './store/store';
-import {updatePreferencesAction} from './store/actions';
+import {editorKeyConfigSelector, updatePreferences} from './newStore';
 import {useState} from 'react';
 import {EditorKeyConfig} from './xmlEditor/editorKeyConfig';
 
@@ -72,7 +71,7 @@ export function Preferences(): JSX.Element {
     }
 
     dispatch(
-      updatePreferencesAction({
+      updatePreferences({
         updateAndNextEditableNodeKeys,
         nextEditableNodeKeys,
         updateAndPreviousEditableNodeKeys,
@@ -91,7 +90,7 @@ export function Preferences(): JSX.Element {
       <h2 className="font-bold text-xl">{t('xmlEditor')}</h2>
 
       <Formik initialValues={initialValues} onSubmit={onSubmit}>
-        <Form>
+        {() => <Form>
 
           <div className="mt-4">
             <label htmlFor="updateAndNextNodeKeys" className="font-bold">{t('updateAndNextEditableNode')}</label>
@@ -121,7 +120,7 @@ export function Preferences(): JSX.Element {
           {updated && <div className="mt-4 p-2 rounded bg-green-500 text-white text-center">{t('preferencesUpdated')}</div>}
 
           <button type="submit" className="mt-4 p-2 rounded bg-blue-600 text-white w-full">{t('updatePreferences')}</button>
-        </Form>
+        </Form>}
       </Formik>
 
     </div>

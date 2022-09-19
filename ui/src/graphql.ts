@@ -15,14 +15,6 @@ export type Scalars = {
   Float: number;
 };
 
-export type LoggedInUser = {
-  __typename?: 'LoggedInUser';
-  affiliation?: Maybe<Scalars['String']>;
-  jwt: Scalars['String'];
-  name: Scalars['String'];
-  username: Scalars['String'];
-};
-
 export type LoggedInUserMutations = {
   __typename?: 'LoggedInUserMutations';
   createManuscript?: Maybe<Scalars['String']>;
@@ -123,7 +115,7 @@ export enum ManuscriptStatus {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  login?: Maybe<LoggedInUser>;
+  login?: Maybe<Scalars['String']>;
   me?: Maybe<LoggedInUserMutations>;
   register?: Maybe<Scalars['String']>;
 };
@@ -211,15 +203,13 @@ export type RegisterMutationVariables = Exact<{
 
 export type RegisterMutation = { __typename?: 'Mutation', register?: string | null };
 
-export type LoggedInUserFragment = { __typename?: 'LoggedInUser', username: string, name: string, jwt: string, affiliation?: string | null };
-
 export type LoginMutationVariables = Exact<{
   username: Scalars['String'];
   password: Scalars['String'];
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login?: { __typename?: 'LoggedInUser', username: string, name: string, jwt: string, affiliation?: string | null } | null };
+export type LoginMutation = { __typename?: 'Mutation', login?: string | null };
 
 export type ManuscriptBasicDataFragment = { __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
@@ -275,14 +265,6 @@ export const ManuscriptLanguageFragmentDoc = gql`
     fragment ManuscriptLanguage on ManuscriptLanguage {
   name
   abbreviation
-}
-    `;
-export const LoggedInUserFragmentDoc = gql`
-    fragment LoggedInUser on LoggedInUser {
-  username
-  name
-  jwt
-  affiliation
 }
     `;
 export const ManuscriptIdentifierFragmentDoc = gql`
@@ -400,11 +382,9 @@ export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
 export const LoginDocument = gql`
     mutation Login($username: String!, $password: String!) {
-  login(username: $username, password: $password) {
-    ...LoggedInUser
-  }
+  login(username: $username, password: $password)
 }
-    ${LoggedInUserFragmentDoc}`;
+    `;
 export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
 /**

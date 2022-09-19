@@ -5,9 +5,18 @@ import {ChangeEvent} from 'react';
 interface CustomFieldProps extends FieldProps {
   label: string;
   id: string;
-  asTextArea?: boolean;
 }
 
+/**
+ * @deprecated
+ *
+ * @param label
+ * @param id
+ * @param field
+ * @param form
+ * @param props
+ * @constructor
+ */
 export function MyField({label, id, field, form, ...props}: CustomFieldProps): JSX.Element {
 
   const classes = classNames(

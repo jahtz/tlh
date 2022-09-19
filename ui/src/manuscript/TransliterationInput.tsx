@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
-import {activeUserSelector} from '../store/store';
+import {activeUserSelector} from '../newStore';
 import {homeUrl} from '../urls';
 import {TransliterationInput as TI, useUploadTransliterationMutation} from '../graphql';
 import {ManuscriptBaseIProps} from './ManuscriptBase';
@@ -27,7 +27,7 @@ export function TransliterationInput({manuscript}: ManuscriptBaseIProps): JSX.El
 
   const mainIdentifier = manuscript.mainIdentifier.identifier;
 
-  if (!currentUser || currentUser.username !== manuscript.creatorUsername) {
+  if (!currentUser || currentUser.user_id !== manuscript.creatorUsername) {
     return <Navigate to={homeUrl}/>;
   }
 

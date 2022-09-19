@@ -5,39 +5,31 @@ import {HashRouter} from 'react-router-dom';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import {ApolloClient, ApolloLink, ApolloProvider, concat, HttpLink, InMemoryCache} from '@apollo/client';
 import {serverUrl} from './urls';
-import {Provider} from 'react-redux';
-import {store} from './store/store';
+import {Provider as StoreProvider} from 'react-redux';
 import i18n from 'i18next';
 import {I18nextProvider, initReactI18next} from 'react-i18next';
-
+import {AllManuscriptLanguagesDocument, AllManuscriptLanguagesQuery} from './graphql';
+import {createRoot} from 'react-dom/client';
+import {newLanguages, newStore} from './newStore';
 import common_de from './locales/de/common.json';
 import common_en from './locales/en/common.json';
-import {AllManuscriptLanguagesDocument, AllManuscriptLanguagesQuery} from './graphql';
-import {newLanguagesAction} from './store/actions';
-import {createRoot} from 'react-dom/client';
-
-export const isDebug = process.env.NODE_ENV === 'development';
 
 // noinspection JSIgnoredPromiseFromCall
 i18n
   .use(initReactI18next)
   .init({
+    fallbackLng: 'de',
     resources: {
       de: {common: common_de},
       en: {common: common_en}
     },
-    lng: 'de',
-    fallbackLng: 'de',
-    interpolation: {
-      escapeValue: false
-    }
   });
 
 
 const apolloAuthMiddleware = new ApolloLink((operation, forward) => {
   operation.setContext({
     headers: {
-      Authorization: store.getState().currentUser?.jwt || null
+      Authorization: newStore.getState().user?.user?.token || null
     }
   });
 
@@ -66,27 +58,20 @@ const apolloClient = new ApolloClient({
 });
 
 apolloClient.query<AllManuscriptLanguagesQuery>({query: AllManuscriptLanguagesDocument})
-  .then(({data}) => store.dispatch(newLanguagesAction(data.manuscriptLanguages)))
+  .then(({data}) => newStore.dispatch(newLanguages(data.manuscriptLanguages)))
   .catch(() => void 0);
 
-const rootElement = document.getElementById('root');
-
-if (!rootElement) {
-  alert('Error in page...');
-  throw new Error('Error in page...');
-}
-
-const root = createRoot(rootElement);
+const root = createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(
   <StrictMode>
     <I18nextProvider i18n={i18n}>
       <ApolloProvider client={apolloClient}>
-        <Provider store={store}>
+        <StoreProvider store={newStore}>
           <HashRouter>
             <App/>
           </HashRouter>
-        </Provider>
+        </StoreProvider>
       </ApolloProvider>
     </I18nextProvider>
   </StrictMode>

@@ -1,8 +1,8 @@
 import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
-import {LoggedInUserFragment, ManuscriptIdentifierFragment} from '../graphql';
+import {ManuscriptIdentifierFragment} from '../graphql';
 import {useSelector} from 'react-redux';
-import {activeUserSelector} from '../store/store';
+import {activeUserSelector, User} from '../newStore';
 import {getNameForPalaeoClassification} from '../palaeoClassification';
 import {createTransliterationUrl, ManuscriptBaseIProps, uploadPicturesUrl} from './ManuscriptBase';
 import {PicturesBlock} from './PicturesBlock';
@@ -12,9 +12,9 @@ import {Transliteration} from './TransliterationLineResult';
 export function ManuscriptData({manuscript}: ManuscriptBaseIProps): JSX.Element {
 
   const {t} = useTranslation('common');
-  const activeUser: LoggedInUserFragment | undefined = useSelector(activeUserSelector);
+  const activeUser: User | null = useSelector(activeUserSelector);
 
-  const createdByUser: boolean = !!activeUser && activeUser.username === manuscript.creatorUsername;
+  const createdByUser: boolean = !!activeUser && activeUser.user_id === manuscript.creatorUsername;
 
   function renderOtherIdentifiers(otherIdentifiers: ManuscriptIdentifierFragment[]): JSX.Element {
     if (otherIdentifiers.length === 0) {
