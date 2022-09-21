@@ -25,5 +25,6 @@ rules:
   linebreak-style: [ 'error', 'unix' ]
   quotes: [ 'warn', 'single' ]
   semi: [ 'warn', 'always' ]
-  # react/display-name: [ 'off' ]
+  semi-spacing: [ 'warn', { before: false, after: true } ]
+  block-spacing: [ 'warn', 'always' ]
   '@typescript-eslint/no-extra-non-null-assertion': [ 'warn' ]
