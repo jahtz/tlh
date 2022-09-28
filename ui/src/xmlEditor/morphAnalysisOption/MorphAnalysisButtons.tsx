@@ -60,7 +60,7 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
         <div className="flex-grow p-2 border-l border-y border-slate-500 bg-gray-100">
           <span className="text-red-600">{translation}</span>&nbsp;({referenceWord},&nbsp;
           {t('paradigmClass')}:&nbsp;<span className="text-red-600">{paradigmClass}</span>
-          {determinative && <span>, {t('determinativ')}:&nbsp;<span className="text-red-600">{determinative}</span></span>})&nbsp;
+          {determinative && <span>, {t('determinative')}:&nbsp;<span className="text-red-600">{determinative}</span></span>})&nbsp;
         </div>
 
         {!isSingleAnalysisOption && <>
