@@ -159,7 +159,7 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
 
     const selectedMorph = node.attributes.mrp0sel;
 
-    const notMarked = selectedMorph === 'DEL';
+    const isDeletion = selectedMorph === 'DEL';
 
     const isForeignLanguage = selectedMorph !== undefined
       ? Object.keys(foreignLanguageColors).includes(selectedMorph)
@@ -180,11 +180,11 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
         ? [isSelected ? selectedNodeClass : 'bg-gray-200']
         : {
           // FIXME: convert classes to tailwind!
-          'bg-yellow-500': !notMarked && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
+          'bg-yellow-500': !isDeletion && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
           [foreignLanguageColors[node.attributes.mrp0sel || '']]: isForeignLanguage,
           'font-bold': isForeignLanguage,
           'text-red-600': node.children.length === 0,
-          'bg-yellow-300': !isSelected && !notMarked && hasNoMorphologySelected,
+          'bg-yellow-300': !isSelected && !isDeletion && hasNoMorphologySelected,
           'bg-blue-300': hasEditingQuestion,
           [selectedNodeClass]: isSelected,
         });
