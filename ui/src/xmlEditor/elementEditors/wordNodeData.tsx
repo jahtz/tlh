@@ -154,6 +154,10 @@ function isOnlySpaces({children}: XmlElementNode): boolean {
   return children.length === 1 && isXmlElementNode(children[0]) && children[0].tagName === 'space';
 }
 
+const editingQuestionBgColor = 'bg-blue-300';
+const emptyNodeTextColor = 'text-red-600';
+const needsMorphologySelectionBgColor = 'bg-yellow-300';
+
 export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData> = {
   replace: (node, renderedChildren, isSelected) => {
 
@@ -165,29 +169,24 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
       ? Object.keys(foreignLanguageColors).includes(selectedMorph)
       : false;
 
-    const needsMorphology = selectedMorph === undefined || selectedMorph.trim().length === 0;
+    const hasNoMorphologySelected = 'mrp0sel' in node.attributes && (selectedMorph === undefined || selectedMorph.trim().length === 0 && selectedMorph !== '???');
 
-    const hasNoMorphologySelected = needsMorphology && selectedMorph !== '???';
-
-    const hasMorphAnalyses = Object.keys(node.attributes)
-      .filter((name) => name.startsWith('mrp') && !name.startsWith('mrp0'))
-      .length > 0;
-
-    const hasEditingQuestion = !!node.attributes.editingQuestion;
+    const hasEditingQuestion = node.attributes.editingQuestion !== undefined;
 
     const classes = classNames(node.attributes.lg || '',
       isOnlySpaces(node)
         ? [isSelected ? selectedNodeClass : 'bg-gray-200']
-        : {
-          // FIXME: convert classes to tailwind!
-          'bg-yellow-500': !isDeletion && !isForeignLanguage && needsMorphology && !hasMorphAnalyses,
-          [foreignLanguageColors[node.attributes.mrp0sel || '']]: isForeignLanguage,
-          'font-bold': isForeignLanguage,
-          'text-red-600': node.children.length === 0,
-          'bg-yellow-300': !isSelected && !isDeletion && hasNoMorphologySelected,
-          'bg-blue-300': hasEditingQuestion,
-          [selectedNodeClass]: isSelected,
-        });
+        : (
+          {
+            [needsMorphologySelectionBgColor]: !isSelected && !isDeletion && hasNoMorphologySelected,
+            [emptyNodeTextColor]: node.children.length === 0,
+            [foreignLanguageColors[node.attributes.mrp0sel || '']]: isForeignLanguage,
+            'font-bold': isForeignLanguage,
+            [editingQuestionBgColor]: hasEditingQuestion,
+            [selectedNodeClass]: isSelected,
+          }
+        )
+    );
 
     return <>
         <span className={classes} title={hasEditingQuestion ? node.attributes.q : undefined}>
