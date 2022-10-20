@@ -7,7 +7,7 @@ describe('xmlReader', () => {
     tagName: 'w',
     attributes: {trans: '%-nan~', mrp0sel: 'DEL'},
     children: [
-      emptyNode('del_in'), textNode('x-'), emptyNode('laes_in'), textNode('na-an'), emptyNode('laes_fin'), textNode('-'), emptyNode('del_in')
+      emptyNode('del_fin'), textNode('x-'), emptyNode('laes_in'), textNode('na-an'), emptyNode('laes_fin'), textNode('-'), emptyNode('del_in')
     ]
   };
 

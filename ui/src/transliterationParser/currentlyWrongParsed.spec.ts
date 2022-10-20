@@ -4,7 +4,10 @@ import {transliteration} from './parser';
 import {determinativ as d} from '../model/wordContent/determinativ';
 import {de, le, ls} from './testHelpers';
 
-describe('', () => {
+/**
+ * TODO: disabled until further notice...
+ */
+describe.skip('', () => {
 
   test.each([
     ['DUMU°MEŠ°].⸢É⸣.GAL-ma-an', w(sg('DUMU'), d('MEŠ'), sg(de, '.', ls, 'É', le, '.', 'GAL'), '-ma-an')]
