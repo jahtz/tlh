@@ -24,7 +24,6 @@ import {selectedNodeClass} from '../tlhXmlEditorConfig';
 
 export interface WordNodeData {
   node: XmlElementNode;
-  lg: string;
   morphologies: MorphologicalAnalysis[];
   footNote?: string;
 }
@@ -38,7 +37,6 @@ export function readWordNodeData(node: XmlElementNode): WordNodeData {
 
   return {
     node: node,
-    lg: node.attributes.lg || '',
     morphologies,
     footNote: lastChild && isXmlElementNode(lastChild) && lastChild.tagName === 'note'
       ? lastChild.attributes.c
@@ -115,32 +113,37 @@ function extractSelectedMorphologicalAnalyses(ma: MorphologicalAnalysis): string
   }
 }
 
-export function writeWordNodeData({node: originalNode, lg, morphologies, footNote}: WordNodeData): XmlElementNode {
-  const {tagName, attributes, children: originalChildren} = originalNode;
-
-  const children = footNote
-    ? addFootNote(originalChildren, footNote)
-    : removeFootNote(originalChildren);
-
-  const {trans, mrp0sel, ...rest} = attributes;
-
-  const node: XmlElementNode = {
-    tagName,
-    attributes: {trans, mrp0sel, ...rest, lg},
-    children
-  };
-
-  for (const ma of morphologies) {
-    node.attributes[`mrp${ma.number}`] = writeMorphAnalysisValue(ma);
-  }
+export function writeWordNodeData({node: originalNode, morphologies, footNote}: WordNodeData): XmlElementNode {
+  const {tagName, attributes: originalAttributes, children: originalChildren} = originalNode;
 
   const selectedAnalysisOptions: string[] = morphologies.flatMap(extractSelectedMorphologicalAnalyses);
 
-  node.attributes.mrp0sel = selectedAnalysisOptions.length > 0
-    ? selectedAnalysisOptions.join(' ')
-    : undefined;
+  let mrp0sel = originalAttributes.mrp0sel;
 
-  return node;
+  if (mrp0sel === undefined || mrp0sel.trim() !== 'DEL') {
+    mrp0sel = selectedAnalysisOptions.length > 0
+      ? selectedAnalysisOptions.join(' ')
+      : undefined;
+  }
+
+  const attributes: Record<string, string | undefined> = {
+    // put attributes trans and mrp0sel at start of tag...
+    trans: originalAttributes.trans,
+    mrp0sel,
+    ...originalAttributes
+  };
+
+  for (const ma of morphologies) {
+    attributes[`mrp${ma.number}`] = writeMorphAnalysisValue(ma);
+  }
+
+  return {
+    tagName,
+    attributes,
+    children: footNote
+      ? addFootNote(originalChildren, footNote)
+      : removeFootNote(originalChildren)
+  };
 }
 
 const foreignLanguageColors: { [key: string]: string } = {

@@ -82,7 +82,6 @@ const languages = createSlice({
   initialState: () => ({languages: loadFromLocalStorage<ManuscriptLanguage[]>(languagesKey, [])}),
   reducers: {
     newLanguages(state, {payload}: PayloadAction<ManuscriptLanguage[]>) {
-      console.info(JSON.stringify(payload.map((value) => value.abbreviation)));
       state.languages = payload;
     }
   }

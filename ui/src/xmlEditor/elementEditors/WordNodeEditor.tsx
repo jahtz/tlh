@@ -132,21 +132,12 @@ export function WordNodeEditor({
     return {number, translation: '', referenceWord: '', analysisOptions: [], encliticsAnalysis: undefined, determinative: undefined, paradigmClass: ''};
   }
 
-  function setSelectedMorphToDel(): void {
-    updateNode((state) => update(state, {node: {attributes: {mrp0sel: {$set: 'DEL'}}}}));
+  function updateAttribute(name: string, value: string | undefined): void {
+    updateNode((state) => update(state, {node: {attributes: {[name]: {$set: value}}}}));
   }
 
-  function updateLanguage(lg: string): void {
-    updateNode((state) => update(state, {lg: {$set: lg.trim() || ''}}));
-  }
-
-  function setEditingQuestion(value: string): void {
-    updateNode((state) => update(state, {node: {attributes: {editingQuestion: {$set: value}}}}));
-  }
-
-  function removeEditingQuestion(): void {
-    updateNode((state) => update(state, {node: {attributes: {$unset: ['editingQuestion']}}}));
-  }
+  const setEditingQuestion = (value: string | undefined) => updateAttribute('editingQuestion', value);
+  const removeEditingQuestion = () => setEditingQuestion(undefined);
 
   function setFootNote(value: string): void {
     updateNode((state) => update(state, {footNote: {$set: value}}));
@@ -173,49 +164,54 @@ export function WordNodeEditor({
                          otherButtons={otherButtons} fontSizeSelectorProps={fontSizeSelectorProps} cancelSelection={cancelSelection}>
       {(state.editContent || typeof state.editContent === 'string')
         ? <WordContentEditor initialTransliteration={state.editContent} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>
-        : <>
-          <div className="mt-4">
-            <LanguageInput initialValue={data.lg} onChange={updateLanguage}/>
-          </div>
+        : (
+          <>
+            <div className="mt-4">
+              <LanguageInput initialValue={data.node.attributes.lg} onChange={(lg) => updateAttribute('lg', lg.trim() || '')}/>
+            </div>
 
-          <div className="mt-4">
-            <WordStringChildEditor value={data.node.attributes.editingQuestion} set={setEditingQuestion} remove={removeEditingQuestion}
-                                   isEditingQuestion={true} setKeyHandlingEnabled={setKeyHandlingEnabled}
-                                   strings={{add: t('addEditingQuestion'), placeHolder: t('editingQuestion')}}/>
-          </div>
+            <div className="mt-4">
+              <WordStringChildEditor value={data.node.attributes.editingQuestion} set={setEditingQuestion} remove={removeEditingQuestion}
+                                     isEditingQuestion={true} setKeyHandlingEnabled={setKeyHandlingEnabled}
+                                     strings={{add: t('addEditingQuestion'), placeHolder: t('editingQuestion')}}/>
+            </div>
 
-          <div className="mt-4">
-            <WordStringChildEditor value={data.footNote} set={setFootNote} remove={removeFootNote} setKeyHandlingEnabled={setKeyHandlingEnabled}
-                                   isEditingQuestion={false} strings={{add: t('addFootNote'), placeHolder: t('footNote')}}/>
-          </div>
+            <div className="mt-4">
+              <WordStringChildEditor value={data.footNote} set={setFootNote} remove={removeFootNote} setKeyHandlingEnabled={setKeyHandlingEnabled}
+                                     isEditingQuestion={false} strings={{add: t('addFootNote'), placeHolder: t('footNote')}}/>
+            </div>
 
-          <div className="mt-4">
-            {data.morphologies.length === 0
-              ? <div>
-                <div className="p-4 rounded bg-amber-400 text-center">{t('noMorphologicalAnalysesFound')}</div>
+            <div className="mt-4">
+              {data.morphologies.length === 0
+                ? <div>
+                  <div className="p-4 rounded bg-amber-400 text-center">{t('noMorphologicalAnalysesFound')}</div>
 
-                {data.node.attributes.mrp0sel === 'DEL'
-                  ? <div className="mt-2 p-2 rounded bg-blue-600 text-white text-center w-full">mrp0sel=&quot;DEL&quot;</div>
-                  : <button type="button" className="mt-2 p-2 rounded border border-slate-500 text-center w-full" onClick={setSelectedMorphToDel}>
-                    {t('set_mrp0sel=DEL')}
-                  </button>}
-              </div>
-              : data.morphologies.map((m, index) => <div className="mt-2" key={m.number}>
-                  <MorphAnalysisOptionContainer
-                    morphologicalAnalysis={m}
-                    toggleAnalysisSelection={(letterIndex, encLetterIndex, targetState) => toggleAnalysisSelection(index, letterIndex, encLetterIndex, targetState)}
-                    updateMorphology={(newMa) => updateMorphology(index, newMa)}
-                    setKeyHandlingEnabled={setKeyHandlingEnabled}
-                  />
+                  {data.node.attributes.mrp0sel === 'DEL'
+                    ? <div className="mt-2 p-2 rounded bg-blue-600 text-white text-center w-full">mrp0sel=&quot;DEL&quot;</div>
+                    : (
+                      <button type="button" className="mt-2 p-2 rounded border border-slate-500 text-center w-full"
+                              onClick={() => updateAttribute('mrp0sel', 'DEL')}>
+                        {t('set_mrp0sel=DEL')}
+                      </button>
+                    )}
                 </div>
-              )}
+                : data.morphologies.map((m, index) => <div className="mt-2" key={m.number}>
+                    <MorphAnalysisOptionContainer
+                      morphologicalAnalysis={m}
+                      toggleAnalysisSelection={(letterIndex, encLetterIndex, targetState) => toggleAnalysisSelection(index, letterIndex, encLetterIndex, targetState)}
+                      updateMorphology={(newMa) => updateMorphology(index, newMa)}
+                      setKeyHandlingEnabled={setKeyHandlingEnabled}
+                    />
+                  </div>
+                )}
 
-            {state.addMorphology && <MorphAnalysisOptionEditor
-              morphologicalAnalysis={nextMorphAnalysis()}
-              onSubmit={(newMa) => updateMorphology(data.morphologies.length, newMa)}
-              cancelUpdate={toggleAddMorphology}/>}
-          </div>
-        </>}
+              {state.addMorphology && <MorphAnalysisOptionEditor
+                morphologicalAnalysis={nextMorphAnalysis()}
+                onSubmit={(newMa) => updateMorphology(data.morphologies.length, newMa)}
+                cancelUpdate={toggleAddMorphology}/>}
+            </div>
+          </>
+        )}
     </NodeEditorRightSide>
   );
 }
