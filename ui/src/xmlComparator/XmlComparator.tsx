@@ -89,7 +89,7 @@ export function XmlComparator(): JSX.Element {
           .split('\n')
           .map((line, lineIndex) =>
             <p style={{wordBreak: 'break-all'}} className={className} key={state.config.name + '_' + index + '_' + lineIndex}>
-              {line.replaceAll(' ', '\u00a0')}
+              {line.replace(/ /g, '\u00a0')}
             </p>
           );
       })}

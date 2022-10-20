@@ -63,13 +63,12 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     return rootNode;
   },
   afterExport: (exported: string) => exported
-    .replaceAll('®', '\n\t')
+    .replace(/®/g, '\n\t')
     // FIXME: collides with fragments! {€1}
-    .replaceAll('{', '\n\t\t{')
-    .replaceAll('+=', '\n\t\t   += ')
-    .replaceAll('<w', '\n <w')
-    .replaceAll('<lb', '\n\n<lb')
-    .replaceAll(' mrp', '\n\tmrp')
-    .replaceAll('@', ' @ ')
-
+    .replace(/{/g, '\n\t\t{')
+    .replace(/\+=/g, '\n\t\t   += ')
+    .replace(/<w/g, '\n <w')
+    .replace(/<lb/g, '\n\n<lb')
+    .replace(/ mrp/g, '\n\tmrp')
+    .replace(/@/g, ' @ ')
 };

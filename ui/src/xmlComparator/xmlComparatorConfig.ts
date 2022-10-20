@@ -26,5 +26,5 @@ export const allXmlComparatorConfig: XmlComparatorConfig[] = [
 
 export function makeReplacements(xmlContent: string, config: XmlComparatorConfig = defaultXmlComparatorConfig): string {
   return Object.entries(config.replacements)
-    .reduce<string>((acc, [key, value]) => acc.replaceAll(key, value), xmlContent);
+    .reduce<string>((acc, [key, value]) => acc.replace(new RegExp(key, 'g'), value), xmlContent);
 }

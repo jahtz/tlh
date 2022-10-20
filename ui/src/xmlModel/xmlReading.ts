@@ -14,7 +14,7 @@ export interface XmlReadConfig {
 }
 
 function performCorrections(text: string, corrections: LetterCorrection): string {
-  return corrections.reduce<string>((acc, [key, value]) => acc.replaceAll(key, value), text);
+  return corrections.reduce<string>((acc, [key, value]) => acc.replace(new RegExp(key, 'g'), value), text);
 }
 
 const letterCorrections: LetterCorrection = [
@@ -80,7 +80,7 @@ export function parseNewXml(content: string, xmlReadConfig: XmlReadConfig = tlhX
 export async function loadNewXml(file: File, xmlReadConfig: XmlReadConfig = tlhXmlReadConfig): Promise<ParseResult> {
   return parseNewXml(
     // non-breakable space to normal space
-    (await file.text()).replaceAll('\xa0', ''),
+    (await file.text()).replace(/\xa0/g, ''),
     xmlReadConfig
   );
 }
