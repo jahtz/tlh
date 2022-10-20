@@ -1,23 +1,21 @@
 export interface XmlComparatorConfig {
   name: string;
-  replacements: {
-    [key: string]: string
-  };
+  replacements: [RegExp, string][];
 }
 
 export const emptyXmlComparatorConfig: XmlComparatorConfig = {
-  name: 'empty', replacements: {}
+  name: 'empty', replacements: []
 };
 
 export const defaultXmlComparatorConfig: XmlComparatorConfig = {
   name: 'tlhDig',
-  replacements: {
-    '®': '\n\t',
-    '{': '\n\t\t{',
-    '+=': '\n\t\t   += ',
-    '<w ': '\n<w ',
-    '@': ' @ '
-  }
+  replacements: [
+    [/®/g, '\n\t'],
+    [/{/g, '\n\t\t{'],
+    [/\+=/g, '\n\t\t   += '],
+    [/<w /g, '\n<w '],
+    [/@/g, ' @ ']
+  ]
 };
 
 export const allXmlComparatorConfig: XmlComparatorConfig[] = [
@@ -25,6 +23,11 @@ export const allXmlComparatorConfig: XmlComparatorConfig[] = [
 ];
 
 export function makeReplacements(xmlContent: string, config: XmlComparatorConfig = defaultXmlComparatorConfig): string {
-  return Object.entries(config.replacements)
-    .reduce<string>((acc, [key, value]) => acc.replace(new RegExp(key, 'g'), value), xmlContent);
+  return config.replacements.reduce<string>(
+    (acc, [key, value]) => {
+      const regexp = new RegExp(key, 'g');
+      return acc.replace(regexp, value);
+    },
+    xmlContent
+  );
 }
