@@ -63,7 +63,7 @@ function loadNode(el: ChildNode, xmlReadConfig: XmlReadConfig, parentLetterCorre
   }
 }
 
-type ParseResult = Either<string, XmlNode>;
+export type ParseResult = Either<string, XmlNode>;
 
 export function parseNewXml(content: string, xmlReadConfig: XmlReadConfig = tlhXmlReadConfig): ParseResult {
   const doc = new DOMParser().parseFromString(content, 'text/xml');

@@ -6,12 +6,20 @@ export interface XmlElementNode {
   children: XmlNode[];
 }
 
+export function emptyNode(tagName: string, attributes: Record<string, string | undefined> = {}): XmlElementNode {
+  return {tagName, attributes, children: []};
+}
+
 export function isXmlElementNode(node: XmlNode): node is XmlElementNode {
   return 'tagName' in node;
 }
 
 export interface XmlTextNode {
   textContent: string;
+}
+
+export function textNode(textContent: string): XmlTextNode {
+  return {textContent};
 }
 
 export function isXmlTextNode(node: XmlNode): node is XmlTextNode {
