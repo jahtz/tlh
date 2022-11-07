@@ -5,6 +5,7 @@ import {indent, XmlWriter} from '../../xmlModel/xmlWriting';
 import {XmlElementNode} from '../../xmlModel/xmlModel';
 
 export interface AOWord {
+  _type: 'AoWord';
   content: AOWordContent[];
   language?: string;
   mrp0sel?: string;
@@ -49,5 +50,5 @@ export function xmlifyAoWord({transliteration, content, language, mrp0sel, morph
 }
 
 export function parsedWord(...content: (AOWordContent | string)[]): AOWord {
-  return {content: content.map((c) => typeof c === 'string' ? aoBasicText(c) : c)};
+  return {_type: 'AoWord', content: content.map((c) => typeof c === 'string' ? aoBasicText(c) : c)};
 }

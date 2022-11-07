@@ -1,10 +1,11 @@
 import {damageContent, DamageContent} from '../model/wordContent/damages';
 import {AOCorr, aoCorr} from '../model/wordContent/corrections';
 
-export const de: DamageContent = damageContent('del_fin');
-export const ds: DamageContent = damageContent('del_in');
-export const le: DamageContent = damageContent('laes_fin');
-export const ls: DamageContent = damageContent('laes_in');
+export const del_fin: DamageContent = damageContent('del_fin');
+export const del_in: DamageContent = damageContent('del_in');
+export const laes_fin: DamageContent = damageContent('laes_fin');
+export const laes_in: DamageContent = damageContent('laes_in');
+
 export const rs: DamageContent = damageContent('ras_in');
 export const re: DamageContent = damageContent('ras_fin');
 export const supE: DamageContent = damageContent('del_in' /* DamageType.SupplementEnd*/);

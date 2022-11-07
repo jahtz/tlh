@@ -1,9 +1,22 @@
-import {alt, createLanguage, end, oneOf, optWhitespace, Parser, regexp, Result as ParsimmonResult, seq, string, TypedLanguage} from 'parsimmon';
+import {
+  alt,
+  createLanguage,
+  end,
+  oneOf,
+  optWhitespace,
+  Parser,
+  regexp,
+  Result as ParsimmonResult,
+  seq,
+  string,
+  Success as ParsimmonSuccess,
+  TypedLanguage
+} from 'parsimmon';
 import {lineParseResult, LineParseResult} from '../model/lineParseResult';
 import {AOSign, aoSign} from '../model/wordContent/sign';
 import {damageContent, DamageContent, DamageType} from '../model/wordContent/damages';
 import {aoCorr, AOCorr} from '../model/wordContent/corrections';
-import {paragraphSeparator, ParagraphSeparator, paragraphSeparatorDouble, ParagraphSeparatorDouble} from '../model/paragraph';
+import {paragraphSeparator, ParagraphSeparator, paragraphSeparatorDouble} from '../model/paragraphSeparator';
 import {AODeterminativ, determinativ,} from '../model/wordContent/determinativ';
 import {akkadogramm, AOAkkadogramm} from '../model/wordContent/akkadogramm';
 import {AOSumerogramm, sumerogramm} from '../model/wordContent/sumerogramm';
@@ -23,10 +36,10 @@ import {indexDigit, IndexDigit} from '../model/wordContent/indexDigit';
 
 // Other
 
-const lowerTextRegex = /\p{Ll}+/u;
-const upperTextRegex = /\p{Lu}+/u;
-
 type LanguageSpec = {
+  lowerText: string;
+  upperText: string;
+
   indexDigit: IndexDigit;
 
   // Multi string content
@@ -39,14 +52,13 @@ type LanguageSpec = {
 
   // Other content
   paragraphSeparator: ParagraphSeparator,
-  paragraphSeparatorDouble: ParagraphSeparatorDouble,
   ellipsis: Ellipsis,
 
   gap: AOGap;
 
   // Simple word content
-  specialDeterminativContent: string;
-  determinativ: AODeterminativ;
+  specialDeterminativeContent: string;
+  determinative: AODeterminativ;
   materLectionis: AOMaterLectionis | AODeterminativ;
   numeralContent: AONumeralContent;
   footNote: AOFootNote;
@@ -64,7 +76,7 @@ type LanguageSpec = {
 
   wordContent: AOWordContent;
 
-  wordContents: AOWordContent[];
+  word: AOWord;
 }
 
 interface LinePreParseResult {
@@ -85,6 +97,9 @@ const lineParser: Parser<LinePreParseResult> = seq(
 ).map(([number, , , , content]) => newLinePreParseResult(number, content));
 
 export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<LanguageSpec>({
+  lowerText: () => regexp(/\p{Ll}+/u),
+  upperText: () => regexp(/\p{Lu}+/u),
+
   damages: () => alt<DamageType>(
     string('[').result('del_in'),
     string(']').result('del_fin'),
@@ -100,10 +115,12 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
     string('!?'),
     string('!'),
     string('sic'),
-  ).map(x => aoCorr(x)),
+  ).map(aoCorr),
 
-  paragraphSeparator: () => alt(string('§'), string('¬¬¬')).result(paragraphSeparator),
-  paragraphSeparatorDouble: () => alt(string('§§'), string('===')).result(paragraphSeparatorDouble),
+  paragraphSeparator: () => alt(
+    alt(string('§'), string('¬¬¬')).result(paragraphSeparator),
+    alt(string('§§'), string('===')).result(paragraphSeparatorDouble)
+  ),
 
   ellipsis: () => alt(string('…'), string('...')).result(aoEllipsis),
 
@@ -113,10 +130,10 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
     oneOf('×ₓ')
   ).atLeast(1).tie().map(aoBasicText),
 
-  materLectionis: () => seq(
+  materLectionis: (r) => seq(
     string('°'),
     alt(
-      regexp(lowerTextRegex),
+      r.lowerText,
       string('.')
     ).atLeast(1).tie(),
     string('°')
@@ -138,9 +155,9 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
   gap: () => seq(string('{G:'), optWhitespace, regexp(/[^}]*/), string('}'))
     .map(([, , content,]) => aoGap(content)),
 
-  inscribedLetter: () => seq(
+  inscribedLetter: (r) => seq(
     string('x'),
-    regexp(upperTextRegex).times(0, 1)
+    r.upperText.times(0, 1)
   ).map(([, result]) => result.length === 0 ? indexDigit('x') : inscribedLetter(result[0])),
 
   indexDigit: () => alt(
@@ -160,38 +177,47 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
     r.kolonMark,
     r.basicText,
     // Do not change order of parsers!
-    alt(r.determinativ, r.materLectionis, r.numeralContent),
+    alt(r.determinative, r.materLectionis, r.numeralContent),
   ),
 
-  contentOfMultiStringContent: r => alt<UpperMultiStringContent>(
+  contentOfMultiStringContent: (r) => alt<UpperMultiStringContent>(
     r.corrections,
     r.damages,
     r.inscribedLetter,
-    regexp(upperTextRegex).map(aoBasicText)
+    r.upperText.map(aoBasicText)
   ),
 
   foreignCharacter: r => seq(
-    regexp(upperTextRegex).map(aoBasicText),
+    r.upperText.map(aoBasicText),
     r.contentOfMultiStringContent.many(),
     r.indexDigit.times(0, 1)
   ).map(([first, rest, indexDigit]) => [first, ...rest, ...indexDigit]),
 
-  specialDeterminativContent: () => seq(
+  specialDeterminativeContent: (r) => seq(
     oneOf('mf'),
-    seq(string('.'), regexp(upperTextRegex)).tie().times(0, 1)
+    seq(
+      string('.'),
+      r.upperText
+    ).tie().times(0, 1)
   ).map(([genus, rest]) => rest ? (genus + rest) : genus),
 
-  determinativ: r => seq(
+  determinative: r => seq(
     string('°'),
     alt<string>(
-      alt(regexp(upperTextRegex), string('.')).atLeast(1).tie(),
-      r.specialDeterminativContent
+      seq(
+        r.upperText,
+        seq(string('.'), r.upperText,).many().tie()
+      ).tie(),
+      r.specialDeterminativeContent
     ),
     string('°')
   ).map(([, content,]) => determinativ(aoBasicText(content))),
 
   akkadogramm: r => seq(
-    oneOf('_-').map((m) => m === '-' ? [m] : []),
+    alt(
+      string('_').result([]),
+      string('-').notFollowedBy(string('-')).result(['-']),
+    ),
     r.foreignCharacter,
     seq(
       string('-'),
@@ -201,31 +227,29 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
 
   sumerogramm: r => seq(
     string('--').times(0, 1),
-    // r.foreignCharacter,
-    alt(
+    r.foreignCharacter,
+    seq(
       string('.'),
       r.foreignCharacter
-    ).atLeast(1),
-  ).map(([, rest]) => sumerogramm(...rest.flat().flat())),
+    ).many(),
+  ).map(([, first, rest]) => sumerogramm(...first, ...rest.flat().flat())),
 
+  wordContent: r => alt(r.akkadogramm, r.sumerogramm, r.simpleWordContent),
 
-  wordContent: r => alt(r.akkadogramm, r.sumerogramm, r.simpleWordContent, r.paragraphSeparatorDouble, r.paragraphSeparator),
-
-  wordContents: r => alt<AOWordContent[]>(
+  word: r => alt(
     r.illegible.result([aoIllegibleContent]),
     r.wordContent.atLeast(1)
-  )
+  ).map((x) => parsedWord(...x)),
+
 });
 
 const spaceNotInAccoladesRegex = /\s+(?![^{]*})/;
 
+// FIXME: return some kind of result(s?)...
 export function parseTransliterationLine(transliterationLineInput: string): LineParseResult | undefined {
 
-  // step 0: trim line content
-  const trimmedLine = transliterationLineInput.trim();
-
-  // step 1: extract line number and actual content
-  const linePreParsingResult: ParsimmonResult<LinePreParseResult> = lineParser.parse(trimmedLine);
+  // extract line number and actual content
+  const linePreParsingResult: ParsimmonResult<LinePreParseResult> = lineParser.parse(transliterationLineInput.trim());
 
   if (!linePreParsingResult.status) {
     return undefined;
@@ -233,15 +257,36 @@ export function parseTransliterationLine(transliterationLineInput: string): Line
 
   const {lineNumber, content} = linePreParsingResult.value;
 
-  // step 2: split by spaces not in accolades to get single words
-  const words: string[] = content.split(spaceNotInAccoladesRegex);
+  // split by spaces not in accolades to get single contents (word, parsep or parsep_dbl)
+  const stringContents: string[] = content.split(spaceNotInAccoladesRegex);
 
-  // step 4: parse words
-  const newContent: AOWord[] = words.map((input) => {
-    const wordParseResult: ParsimmonResult<AOWordContent[]> = transliteration.wordContents.parse(input);
+// remove last element for special processing
+  const lastStringContent: string | undefined = stringContents.pop();
 
-    return parsedWord(...(wordParseResult.status ? wordParseResult.value : []));
+  if (lastStringContent === undefined) {
+    // empty line...
+    return lineParseResult(lineNumber, [], undefined);
+  }
+
+  // FIXME: return result!
+  const words: AOWord[] = stringContents.map((input) => {
+    const wordParseResult: ParsimmonResult<AOWord> = transliteration.word.parse(input);
+
+    if (wordParseResult.status) {
+      return wordParseResult.value;
+    } else {
+      throw new Error('TODO!');
+    }
   });
 
-  return lineParseResult(lineNumber, newContent);
+  const lastContentParSepParseResult = transliteration.paragraphSeparator.parse(lastStringContent.trim());
+
+  if (lastContentParSepParseResult.status) {
+    return lineParseResult(lineNumber, words, lastContentParSepParseResult.value);
+  }
+
+  // FIXME: remove cast!
+  const lastWord = (transliteration.word.parse(lastStringContent) as ParsimmonSuccess<AOWord>).value;
+
+  return lineParseResult(lineNumber, [...words, lastWord], undefined);
 }
