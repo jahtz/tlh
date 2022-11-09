@@ -1,8 +1,7 @@
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {transliteration as transliterationLanguage} from '../../transliterationParser/parser';
-import {AOWordContent} from '../../model/wordContent/wordContent';
-import {xmlifyAoWord} from '../../model/sentenceContent/word';
+import {AOWord, xmlifyAoWord} from '../../model/sentenceContent/word';
 import {Result} from 'parsimmon';
 import {XmlElementNode} from '../../xmlModel/xmlModel';
 import classNames from 'classnames';
@@ -22,10 +21,10 @@ interface IState {
 }
 
 function readTransliteration(transliteration: string): IState {
-  const parseResult: Result<AOWordContent[]> = transliterationLanguage.wordContents.parse(transliteration);
+  const parseResult: Result<AOWord> = transliterationLanguage.word.parse(transliteration);
 
   return parseResult.status
-    ? {parseResult: {status: true, value: xmlifyAoWord({content: parseResult.value})}}
+    ? {parseResult: {status: true, value: xmlifyAoWord(parseResult.value)}}
     : {parseResult};
 }
 
