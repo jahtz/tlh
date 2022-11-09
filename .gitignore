@@ -9,3 +9,12 @@ html/uploads/*
 !html/uploads/.gitkeep
 
 html/public/*
+
+# Eclipse
+/.classpath
+/.loadpath
+/.metadata/
+/.project
+/.settings/
+/bin/
+/build/
