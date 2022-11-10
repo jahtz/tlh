@@ -26,6 +26,10 @@ export const documentMergerUrl = '/documentMerger';
 
 export const manuscriptsUrlFragment = 'manuscripts';
 
+export const uploadPicturesUrl = 'uploadPictures';
+
+export const createTransliterationUrl = 'createTransliteration';
+
 // Foreign urls
 
 const tlhAnalyzerServerUrl = /*process.env.NODE_ENV === 'development' ? 'http://localhost:8057' :*/ 'https://www.hethport3.uni-wuerzburg.de/TLHaly';

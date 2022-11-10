@@ -1,5 +1,6 @@
-import { gql } from '@apollo/client';
+import {gql} from '@apollo/client';
 import * as Apollo from '@apollo/client';
+
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -262,66 +263,66 @@ export type UploadTransliterationMutationVariables = Exact<{
 export type UploadTransliterationMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', manuscript?: { __typename?: 'ManuscriptMutations', updateTransliteration: boolean } | null } | null };
 
 export const ManuscriptLanguageFragmentDoc = gql`
-    fragment ManuscriptLanguage on ManuscriptLanguage {
-  name
-  abbreviation
-}
-    `;
+  fragment ManuscriptLanguage on ManuscriptLanguage {
+    name
+    abbreviation
+  }
+`;
 export const ManuscriptIdentifierFragmentDoc = gql`
-    fragment ManuscriptIdentifier on ManuscriptIdentifier {
-  identifierType
-  identifier
-}
-    `;
+  fragment ManuscriptIdentifier on ManuscriptIdentifier {
+    identifierType
+    identifier
+  }
+`;
 export const ManuscriptBasicDataFragmentDoc = gql`
-    fragment ManuscriptBasicData on ManuscriptMetaData {
-  mainIdentifier {
-    ...ManuscriptIdentifier
+  fragment ManuscriptBasicData on ManuscriptMetaData {
+    mainIdentifier {
+      ...ManuscriptIdentifier
+    }
+    status
+    creatorUsername
   }
-  status
-  creatorUsername
-}
-    ${ManuscriptIdentifierFragmentDoc}`;
+${ManuscriptIdentifierFragmentDoc}`;
 export const ManuscriptMetaDataFragmentDoc = gql`
-    fragment ManuscriptMetaData on ManuscriptMetaData {
-  mainIdentifier {
-    ...ManuscriptIdentifier
+  fragment ManuscriptMetaData on ManuscriptMetaData {
+    mainIdentifier {
+      ...ManuscriptIdentifier
+    }
+    otherIdentifiers {
+      ...ManuscriptIdentifier
+    }
+    bibliography
+    cthClassification
+    palaeographicClassification
+    palaeographicClassificationSure
+    provenance
+    creatorUsername
+    pictureUrls
+    transliterations {
+      side
+      version
+      input
+      resultXml
+      resultJson
+    }
   }
-  otherIdentifiers {
-    ...ManuscriptIdentifier
-  }
-  bibliography
-  cthClassification
-  palaeographicClassification
-  palaeographicClassificationSure
-  provenance
-  creatorUsername
-  pictureUrls
-  transliterations {
-    side
-    version
-    input
-    resultXml
-    resultJson
-  }
-}
-    ${ManuscriptIdentifierFragmentDoc}`;
+${ManuscriptIdentifierFragmentDoc}`;
 export const ManuscriptIdentWithCreatorFragmentDoc = gql`
-    fragment ManuscriptIdentWithCreator on ManuscriptMetaData {
-  mainIdentifier {
-    ...ManuscriptIdentifier
+  fragment ManuscriptIdentWithCreator on ManuscriptMetaData {
+    mainIdentifier {
+      ...ManuscriptIdentifier
+    }
+    pictureUrls
+    creatorUsername
   }
-  pictureUrls
-  creatorUsername
-}
-    ${ManuscriptIdentifierFragmentDoc}`;
+${ManuscriptIdentifierFragmentDoc}`;
 export const AllManuscriptLanguagesDocument = gql`
-    query AllManuscriptLanguages {
-  manuscriptLanguages {
-    ...ManuscriptLanguage
+  query AllManuscriptLanguages {
+    manuscriptLanguages {
+      ...ManuscriptLanguage
+    }
   }
-}
-    ${ManuscriptLanguageFragmentDoc}`;
+${ManuscriptLanguageFragmentDoc}`;
 
 /**
  * __useAllManuscriptLanguagesQuery__
@@ -339,21 +340,23 @@ export const AllManuscriptLanguagesDocument = gql`
  * });
  */
 export function useAllManuscriptLanguagesQuery(baseOptions?: Apollo.QueryHookOptions<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>(AllManuscriptLanguagesDocument, options);
-      }
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>(AllManuscriptLanguagesDocument, options);
+}
+
 export function useAllManuscriptLanguagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>(AllManuscriptLanguagesDocument, options);
-        }
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>(AllManuscriptLanguagesDocument, options);
+}
+
 export type AllManuscriptLanguagesQueryHookResult = ReturnType<typeof useAllManuscriptLanguagesQuery>;
 export type AllManuscriptLanguagesLazyQueryHookResult = ReturnType<typeof useAllManuscriptLanguagesLazyQuery>;
 export type AllManuscriptLanguagesQueryResult = Apollo.QueryResult<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>;
 export const RegisterDocument = gql`
-    mutation Register($userInput: UserInput!) {
-  register(userInput: $userInput)
-}
-    `;
+  mutation Register($userInput: UserInput!) {
+    register(userInput: $userInput)
+  }
+`;
 export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
 
 /**
@@ -374,17 +377,18 @@ export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, Regis
  * });
  */
 export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<RegisterMutation, RegisterMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument, options);
-      }
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument, options);
+}
+
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
 export const LoginDocument = gql`
-    mutation Login($username: String!, $password: String!) {
-  login(username: $username, password: $password)
-}
-    `;
+  mutation Login($username: String!, $password: String!) {
+    login(username: $username, password: $password)
+  }
+`;
 export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
 /**
@@ -406,20 +410,21 @@ export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutati
  * });
  */
 export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
-      }
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
+}
+
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const IndexDocument = gql`
-    query Index($paginationSize: Int! = 10, $page: Int! = 0) {
-  manuscriptCount
-  allManuscripts(paginationSize: $paginationSize, page: $page) {
-    ...ManuscriptBasicData
+  query Index($paginationSize: Int! = 10, $page: Int! = 0) {
+    manuscriptCount
+    allManuscripts(paginationSize: $paginationSize, page: $page) {
+      ...ManuscriptBasicData
+    }
   }
-}
-    ${ManuscriptBasicDataFragmentDoc}`;
+${ManuscriptBasicDataFragmentDoc}`;
 
 /**
  * __useIndexQuery__
@@ -439,23 +444,25 @@ export const IndexDocument = gql`
  * });
  */
 export function useIndexQuery(baseOptions?: Apollo.QueryHookOptions<IndexQuery, IndexQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<IndexQuery, IndexQueryVariables>(IndexDocument, options);
-      }
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<IndexQuery, IndexQueryVariables>(IndexDocument, options);
+}
+
 export function useIndexLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<IndexQuery, IndexQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<IndexQuery, IndexQueryVariables>(IndexDocument, options);
-        }
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<IndexQuery, IndexQueryVariables>(IndexDocument, options);
+}
+
 export type IndexQueryHookResult = ReturnType<typeof useIndexQuery>;
 export type IndexLazyQueryHookResult = ReturnType<typeof useIndexLazyQuery>;
 export type IndexQueryResult = Apollo.QueryResult<IndexQuery, IndexQueryVariables>;
 export const CreateManuscriptDocument = gql`
-    mutation CreateManuscript($manuscriptMetaData: ManuscriptMetaDataInput) {
-  me {
-    createManuscript(values: $manuscriptMetaData)
+  mutation CreateManuscript($manuscriptMetaData: ManuscriptMetaDataInput) {
+    me {
+      createManuscript(values: $manuscriptMetaData)
+    }
   }
-}
-    `;
+`;
 export type CreateManuscriptMutationFn = Apollo.MutationFunction<CreateManuscriptMutation, CreateManuscriptMutationVariables>;
 
 /**
@@ -476,19 +483,20 @@ export type CreateManuscriptMutationFn = Apollo.MutationFunction<CreateManuscrip
  * });
  */
 export function useCreateManuscriptMutation(baseOptions?: Apollo.MutationHookOptions<CreateManuscriptMutation, CreateManuscriptMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateManuscriptMutation, CreateManuscriptMutationVariables>(CreateManuscriptDocument, options);
-      }
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useMutation<CreateManuscriptMutation, CreateManuscriptMutationVariables>(CreateManuscriptDocument, options);
+}
+
 export type CreateManuscriptMutationHookResult = ReturnType<typeof useCreateManuscriptMutation>;
 export type CreateManuscriptMutationResult = Apollo.MutationResult<CreateManuscriptMutation>;
 export type CreateManuscriptMutationOptions = Apollo.BaseMutationOptions<CreateManuscriptMutation, CreateManuscriptMutationVariables>;
 export const ManuscriptDocument = gql`
-    query Manuscript($mainIdentifier: String!) {
-  manuscript(mainIdentifier: $mainIdentifier) {
-    ...ManuscriptMetaData
+  query Manuscript($mainIdentifier: String!) {
+    manuscript(mainIdentifier: $mainIdentifier) {
+      ...ManuscriptMetaData
+    }
   }
-}
-    ${ManuscriptMetaDataFragmentDoc}`;
+${ManuscriptMetaDataFragmentDoc}`;
 
 /**
  * __useManuscriptQuery__
@@ -507,23 +515,25 @@ export const ManuscriptDocument = gql`
  * });
  */
 export function useManuscriptQuery(baseOptions: Apollo.QueryHookOptions<ManuscriptQuery, ManuscriptQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ManuscriptQuery, ManuscriptQueryVariables>(ManuscriptDocument, options);
-      }
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<ManuscriptQuery, ManuscriptQueryVariables>(ManuscriptDocument, options);
+}
+
 export function useManuscriptLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ManuscriptQuery, ManuscriptQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ManuscriptQuery, ManuscriptQueryVariables>(ManuscriptDocument, options);
-        }
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<ManuscriptQuery, ManuscriptQueryVariables>(ManuscriptDocument, options);
+}
+
 export type ManuscriptQueryHookResult = ReturnType<typeof useManuscriptQuery>;
 export type ManuscriptLazyQueryHookResult = ReturnType<typeof useManuscriptLazyQuery>;
 export type ManuscriptQueryResult = Apollo.QueryResult<ManuscriptQuery, ManuscriptQueryVariables>;
 export const UploadPicturesDocument = gql`
-    query UploadPictures($mainIdentifier: String!) {
-  manuscript(mainIdentifier: $mainIdentifier) {
-    ...ManuscriptIdentWithCreator
+  query UploadPictures($mainIdentifier: String!) {
+    manuscript(mainIdentifier: $mainIdentifier) {
+      ...ManuscriptIdentWithCreator
+    }
   }
-}
-    ${ManuscriptIdentWithCreatorFragmentDoc}`;
+${ManuscriptIdentWithCreatorFragmentDoc}`;
 
 /**
  * __useUploadPicturesQuery__
@@ -542,25 +552,27 @@ export const UploadPicturesDocument = gql`
  * });
  */
 export function useUploadPicturesQuery(baseOptions: Apollo.QueryHookOptions<UploadPicturesQuery, UploadPicturesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<UploadPicturesQuery, UploadPicturesQueryVariables>(UploadPicturesDocument, options);
-      }
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<UploadPicturesQuery, UploadPicturesQueryVariables>(UploadPicturesDocument, options);
+}
+
 export function useUploadPicturesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UploadPicturesQuery, UploadPicturesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<UploadPicturesQuery, UploadPicturesQueryVariables>(UploadPicturesDocument, options);
-        }
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<UploadPicturesQuery, UploadPicturesQueryVariables>(UploadPicturesDocument, options);
+}
+
 export type UploadPicturesQueryHookResult = ReturnType<typeof useUploadPicturesQuery>;
 export type UploadPicturesLazyQueryHookResult = ReturnType<typeof useUploadPicturesLazyQuery>;
 export type UploadPicturesQueryResult = Apollo.QueryResult<UploadPicturesQuery, UploadPicturesQueryVariables>;
 export const TransliterationInputDocument = gql`
-    query TransliterationInput($mainIdentifier: String!) {
-  manuscript(mainIdentifier: $mainIdentifier) {
-    mainIdentifier {
-      ...ManuscriptIdentifier
+  query TransliterationInput($mainIdentifier: String!) {
+    manuscript(mainIdentifier: $mainIdentifier) {
+      mainIdentifier {
+        ...ManuscriptIdentifier
+      }
     }
   }
-}
-    ${ManuscriptIdentifierFragmentDoc}`;
+${ManuscriptIdentifierFragmentDoc}`;
 
 /**
  * __useTransliterationInputQuery__
@@ -579,25 +591,27 @@ export const TransliterationInputDocument = gql`
  * });
  */
 export function useTransliterationInputQuery(baseOptions: Apollo.QueryHookOptions<TransliterationInputQuery, TransliterationInputQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<TransliterationInputQuery, TransliterationInputQueryVariables>(TransliterationInputDocument, options);
-      }
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useQuery<TransliterationInputQuery, TransliterationInputQueryVariables>(TransliterationInputDocument, options);
+}
+
 export function useTransliterationInputLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TransliterationInputQuery, TransliterationInputQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<TransliterationInputQuery, TransliterationInputQueryVariables>(TransliterationInputDocument, options);
-        }
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useLazyQuery<TransliterationInputQuery, TransliterationInputQueryVariables>(TransliterationInputDocument, options);
+}
+
 export type TransliterationInputQueryHookResult = ReturnType<typeof useTransliterationInputQuery>;
 export type TransliterationInputLazyQueryHookResult = ReturnType<typeof useTransliterationInputLazyQuery>;
 export type TransliterationInputQueryResult = Apollo.QueryResult<TransliterationInputQuery, TransliterationInputQueryVariables>;
 export const UploadTransliterationDocument = gql`
-    mutation uploadTransliteration($mainIdentifier: String!, $values: [TransliterationInput!]!) {
-  me {
-    manuscript(mainIdentifier: $mainIdentifier) {
-      updateTransliteration(values: $values)
+  mutation uploadTransliteration($mainIdentifier: String!, $values: [TransliterationInput!]!) {
+    me {
+      manuscript(mainIdentifier: $mainIdentifier) {
+        updateTransliteration(values: $values)
+      }
     }
   }
-}
-    `;
+`;
 export type UploadTransliterationMutationFn = Apollo.MutationFunction<UploadTransliterationMutation, UploadTransliterationMutationVariables>;
 
 /**
@@ -619,9 +633,10 @@ export type UploadTransliterationMutationFn = Apollo.MutationFunction<UploadTran
  * });
  */
 export function useUploadTransliterationMutation(baseOptions?: Apollo.MutationHookOptions<UploadTransliterationMutation, UploadTransliterationMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UploadTransliterationMutation, UploadTransliterationMutationVariables>(UploadTransliterationDocument, options);
-      }
+  const options = {...defaultOptions, ...baseOptions};
+  return Apollo.useMutation<UploadTransliterationMutation, UploadTransliterationMutationVariables>(UploadTransliterationDocument, options);
+}
+
 export type UploadTransliterationMutationHookResult = ReturnType<typeof useUploadTransliterationMutation>;
 export type UploadTransliterationMutationResult = Apollo.MutationResult<UploadTransliterationMutation>;
 export type UploadTransliterationMutationOptions = Apollo.BaseMutationOptions<UploadTransliterationMutation, UploadTransliterationMutationVariables>;

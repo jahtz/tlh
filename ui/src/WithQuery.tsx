@@ -13,11 +13,13 @@ export function WithQuery<T, U>({query: {data, loading, error, called}, children
   const {t} = useTranslation('common');
 
   if (!data) {
-    return <div className={classNames('notification', 'has-text-centered', {'is-info': loading, 'is-warning': !!error, 'is-primary': !called})}>
-      {loading && <span>{t('loading_data')}...</span>}
-      {error && error.message}
-      {!called && (notCalledMessage || <p>{t('mutationNotYetCalled')}</p>)}
-    </div>;
+    return (
+      <div className={classNames('notification', 'has-text-centered', {'is-info': loading, 'is-warning': !!error, 'is-primary': !called})}>
+        {loading && <span>{t('loading_data')}...</span>}
+        {error && error.message}
+        {!called && (notCalledMessage || <p>{t('mutationNotYetCalled')}</p>)}
+      </div>
+    );
   } else {
     return children(data);
   }

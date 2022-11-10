@@ -3,10 +3,9 @@ import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
 import {activeUserSelector} from '../newStore';
 import {homeUrl} from '../urls';
-import {TransliterationInput as TI, useUploadTransliterationMutation} from '../graphql';
-import {ManuscriptBaseIProps} from './ManuscriptBase';
+import {ManuscriptMetaDataFragment, TransliterationInput as TI, useUploadTransliterationMutation} from '../graphql';
 import {TransliterationSideInput} from './TransliterationSideInput';
-import {Navigate} from 'react-router-dom';
+import {Navigate, useLoaderData} from 'react-router-dom';
 import update from 'immutability-helper';
 
 interface SideParseResultContainer {
@@ -17,13 +16,19 @@ interface IState {
   sideParseResults: SideParseResultContainer[];
 }
 
-export function TransliterationInput({manuscript}: ManuscriptBaseIProps): JSX.Element {
+export function TransliterationInput(): JSX.Element {
+
+  const manuscript = useLoaderData() as ManuscriptMetaDataFragment | undefined;
 
   const {t} = useTranslation('common');
   const [state, setState] = useState<IState>({sideParseResults: [{}]});
   const currentUser = useSelector(activeUserSelector);
 
   const [uploadTransliteration, {data, loading, error}] = useUploadTransliterationMutation();
+
+  if (!manuscript) {
+    return <Navigate to={homeUrl}/>;
+  }
 
   const mainIdentifier = manuscript.mainIdentifier.identifier;
 

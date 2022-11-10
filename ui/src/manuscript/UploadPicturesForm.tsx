@@ -1,8 +1,9 @@
 import {ChangeEvent, createRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {serverUrl} from '../urls';
-import {ManuscriptBaseIProps} from './ManuscriptBase';
+import {homeUrl, serverUrl} from '../urls';
 import {PicturesBlock} from './PicturesBlock';
+import {Navigate, useLoaderData} from 'react-router-dom';
+import {ManuscriptMetaDataFragment} from '../graphql';
 
 interface IState {
   selectedFile?: File;
@@ -11,11 +12,18 @@ interface IState {
 
 type UploadResponse = { fileName: string; } | { error: string; };
 
-export function UploadPicturesForm({manuscript}: ManuscriptBaseIProps): JSX.Element {
+export function UploadPicturesForm(): JSX.Element {
+
+  const manuscript = useLoaderData() as ManuscriptMetaDataFragment | undefined;
+
+  if (!manuscript) {
+    return <Navigate to={homeUrl}/>;
+  }
 
   const {t} = useTranslation('common');
   const [state, setState] = useState<IState>({allPictures: [...manuscript.pictureUrls]});
   const fileUploadRef = createRef<HTMLInputElement>();
+
 
   const uploadUrl = `${serverUrl}/uploadPicture.php?id=${encodeURIComponent(manuscript.mainIdentifier.identifier)}`;
 

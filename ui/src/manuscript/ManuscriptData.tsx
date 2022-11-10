@@ -1,18 +1,24 @@
 import {useTranslation} from 'react-i18next';
-import {Link} from 'react-router-dom';
-import {ManuscriptIdentifierFragment} from '../graphql';
+import {Link, Navigate, useLoaderData} from 'react-router-dom';
+import {ManuscriptIdentifierFragment, ManuscriptMetaDataFragment} from '../graphql';
 import {useSelector} from 'react-redux';
 import {activeUserSelector, User} from '../newStore';
 import {getNameForPalaeoClassification} from '../palaeoClassification';
-import {createTransliterationUrl, ManuscriptBaseIProps, uploadPicturesUrl} from './ManuscriptBase';
 import {PicturesBlock} from './PicturesBlock';
 import {SideParseResult} from '../model/sideParseResult';
 import {Transliteration} from './TransliterationLineResult';
+import {createTransliterationUrl, homeUrl, uploadPicturesUrl} from '../urls';
 
-export function ManuscriptData({manuscript}: ManuscriptBaseIProps): JSX.Element {
+export function ManuscriptData(/*{manuscript}: ManuscriptBaseIProps*/): JSX.Element {
 
   const {t} = useTranslation('common');
   const activeUser: User | null = useSelector(activeUserSelector);
+
+  const manuscript = useLoaderData() as ManuscriptMetaDataFragment | undefined;
+
+  if (!manuscript) {
+    return <Navigate to={homeUrl}/>;
+  }
 
   const createdByUser: boolean = !!activeUser && activeUser.user_id === manuscript.creatorUsername;
 
