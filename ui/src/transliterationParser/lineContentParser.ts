@@ -1,18 +1,4 @@
-import {
-  alt,
-  createLanguage,
-  end,
-  oneOf,
-  optWhitespace,
-  Parser,
-  regexp,
-  Result as ParsimmonResult,
-  seq,
-  string,
-  Success as ParsimmonSuccess,
-  TypedLanguage
-} from 'parsimmon';
-import {lineParseResult, LineParseResult} from '../model/lineParseResult';
+import {alt, createLanguage, end, Failure, oneOf, optWhitespace, regexp, Result, Result as ParsimmonResult, seq, string, TypedLanguage} from 'parsimmon';
 import {AOSign, aoSign} from '../model/wordContent/sign';
 import {damageContent, DamageContent, DamageType} from '../model/wordContent/damages';
 import {aoCorr, AOCorr} from '../model/wordContent/corrections';
@@ -79,22 +65,16 @@ type LanguageSpec = {
   word: AOWord;
 }
 
-interface LinePreParseResult {
-  lineNumber: string;
-  content: string;
-}
 
-function newLinePreParseResult(lineNumber: string, content: string): LinePreParseResult {
-  return {lineNumber, content};
+function partitionResults<T>(ts: ParsimmonResult<T>[]): [T[], Failure[]] {
+  return ts.reduce<[T[], Failure[]]>(
+    ([ss, fs], t) =>
+      t.status
+        ? [[...ss, t.value], fs] as [T[], Failure[]]
+        : [ss, [...fs, t]] as [T[], Failure []],
+    [[], []]
+  );
 }
-
-const lineParser: Parser<LinePreParseResult> = seq(
-  regexp(/\d+'?/),
-  optWhitespace,
-  string('#'),
-  optWhitespace,
-  regexp(/[\w\W]+/)
-).map(([number, , , , content]) => newLinePreParseResult(number, content));
 
 export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<LanguageSpec>({
   lowerText: () => regexp(/\p{Ll}+/u),
@@ -245,48 +225,42 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
 
 const spaceNotInAccoladesRegex = /\s+(?![^{]*})/;
 
-// FIXME: return some kind of result(s?)...
-export function parseTransliterationLine(transliterationLineInput: string): LineParseResult | undefined {
+interface ContentParseError {
+  type: 'ContentParseError';
+  errors: Failure[];
+}
 
-  // extract line number and actual content
-  const linePreParsingResult: ParsimmonResult<LinePreParseResult> = lineParser.parse(transliterationLineInput.trim());
+interface ContentParseSuccess {
+  type: 'ContentParseSuccess';
+  words: AOWord[];
+  maybeParSep: ParagraphSeparator | undefined;
+}
 
-  if (!linePreParsingResult.status) {
-    return undefined;
-  }
+export type ContentParseResult = ContentParseError | ContentParseSuccess;
 
-  const {lineNumber, content} = linePreParsingResult.value;
-
+export function parseTransliterationLineContent(content: string): ContentParseResult {
   // split by spaces not in accolades to get single contents (word, parsep or parsep_dbl)
   const stringContents: string[] = content.split(spaceNotInAccoladesRegex);
 
-// remove last element for special processing
-  const lastStringContent: string | undefined = stringContents.pop();
-
-  if (lastStringContent === undefined) {
-    // empty line...
-    return lineParseResult(lineNumber, [], undefined);
+  if (stringContents.length === 0) {
+    // no words or other content in line
+    return {type: 'ContentParseSuccess', words: [], maybeParSep: undefined};
   }
 
-  // FIXME: return result!
-  const words: AOWord[] = stringContents.map((input) => {
-    const wordParseResult: ParsimmonResult<AOWord> = transliteration.word.parse(input);
+  // check last element for special processing (paragraphSeparator)
+  const lastContentParSepParseResult: Result<ParagraphSeparator> = transliteration.paragraphSeparator.parse(stringContents[stringContents.length - 1].trim());
 
-    if (wordParseResult.status) {
-      return wordParseResult.value;
-    } else {
-      throw new Error('TODO!');
-    }
-  });
+  const [wordContents, maybeParSep] = lastContentParSepParseResult.status
+    ? [stringContents.slice(0, stringContents.length - 1), lastContentParSepParseResult.value]
+    : [stringContents, undefined];
 
-  const lastContentParSepParseResult = transliteration.paragraphSeparator.parse(lastStringContent.trim());
+  const wordResults = wordContents.map((input) => transliteration.word.parse(input));
 
-  if (lastContentParSepParseResult.status) {
-    return lineParseResult(lineNumber, words, lastContentParSepParseResult.value);
-  }
+  const [words, errors] = partitionResults(wordResults);
 
-  // FIXME: remove cast!
-  const lastWord = (transliteration.word.parse(lastStringContent) as ParsimmonSuccess<AOWord>).value;
-
-  return lineParseResult(lineNumber, [...words, lastWord], undefined);
+  return errors.length > 0
+    ? {type: 'ContentParseError', errors}
+    : {type: 'ContentParseSuccess', words, maybeParSep};
 }
+
+

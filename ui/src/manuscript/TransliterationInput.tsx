@@ -55,7 +55,7 @@ export function TransliterationInput({manuscript}: ManuscriptBaseIProps): JSX.El
       <h1 className="font-bold text-xl text-center">{t('createTransliteration')}</h1>
 
       {state.sideParseResults.map((_, index) =>
-        <TransliterationSideInput key={index} mainIdentifier={mainIdentifier} onTransliterationUpdate={(s) => updateTransliteration(index, s)}/>
+        <TransliterationSideInput key={index} textId={mainIdentifier} onTransliterationUpdate={(s) => updateTransliteration(index, s)}/>
       )}
 
       {error && <div className="mt-2 p-2 bg-red-500 text-white text-center">{error.message}</div>}

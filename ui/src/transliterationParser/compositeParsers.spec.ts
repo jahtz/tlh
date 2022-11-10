@@ -1,4 +1,4 @@
-import {transliteration} from './parser';
+import {transliteration} from './lineContentParser';
 import {akkadogramm} from '../model/wordContent/akkadogramm';
 import {sumerogramm} from '../model/wordContent/sumerogramm';
 import {inscribedLetter} from '../model/wordContent/inscribedLetter';

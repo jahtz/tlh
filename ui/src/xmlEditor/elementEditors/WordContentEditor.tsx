@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {transliteration as transliterationLanguage} from '../../transliterationParser/parser';
+import {transliteration as transliterationLanguage} from '../../transliterationParser/lineContentParser';
 import {AOWord, xmlifyAoWord} from '../../model/sentenceContent/word';
 import {Result} from 'parsimmon';
 import {XmlElementNode} from '../../xmlModel/xmlModel';
@@ -50,7 +50,7 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
         })
         .catch((err) => console.error(err));
     } else {
-      alert('Can\'t query for morphological anayses!');
+      alert('Can\'t query for morphological analyses!');
     }
   }
 
@@ -69,20 +69,22 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
         <div className={classNames('p-2', 'rounded-t', state.parseResult.status ? 'bg-green-500' : 'bg-red-600', 'text-white', 'font-bold')}>{t('result')}</div>
         <div className={classNames('p-4', state.parseResult.status ? 'bg-green-50' : 'bg-red-200')}>
           {state.parseResult.status
-            ? <>
-              <div className="p-2 rounded bg-white">
-                <NodeDisplay node={state.parseResult.value} currentSelectedPath={undefined} isLeftSide={false}/>
-              </div>
-              <div className="mt-2 p-2 rounded bg-white">{writeNode(state.parseResult.value).join('')}</div>
-            </>
+            ? (
+              <>
+                <div className="p-2 rounded bg-white">
+                  <NodeDisplay node={state.parseResult.value} currentSelectedPath={undefined} isLeftSide={false}/>
+                </div>
+                <div className="mt-2 p-2 rounded bg-white">{writeNode(state.parseResult.value).join('')}</div>
+              </>
+            )
             : <pre>{JSON.stringify(state, null, 2)}</pre>
           }
         </div>
       </div>
 
-      {state.parseResult.status && <>
-        <button type="button" className="mt-4 p-2 rounded bg-blue-600 text-white w-full" onClick={updateMorphologies}>{t('fetchMorphologicalAnalyses')}</button>
-      </>}
+      {state.parseResult.status && <button type="button" className="mt-4 p-2 rounded bg-blue-600 text-white w-full" onClick={updateMorphologies}>
+        {t('fetchMorphologicalAnalyses')}
+      </button>}
 
       <div className="mt-4 grid grid-cols-2 gap-2">
         <button type="button" onClick={cancelEdit} className="p-2 rounded bg-amber-400">{t('cancelEdit')}</button>

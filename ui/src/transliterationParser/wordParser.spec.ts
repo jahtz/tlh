@@ -1,4 +1,4 @@
-import {transliteration} from './parser';
+import {transliteration} from './lineContentParser';
 import {del_fin, del_in, laes_fin, laes_in, uc, ue, us} from './testHelpers';
 import {determinativ as d} from '../model/wordContent/determinativ';
 import {sumerogramm as sg} from '../model/wordContent/sumerogramm';

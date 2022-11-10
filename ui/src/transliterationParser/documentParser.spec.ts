@@ -1,5 +1,4 @@
-import {parseTransliterationLine} from './parser';
-import {LineParseResult, lineParseResult} from '../model/lineParseResult';
+import {LineParseResult, lineParseSuccess, parseTransliterationLine} from '../model/lineParseResult';
 import {parsedWord as w} from '../model/sentenceContent/word';
 import {sumerogramm as sg} from '../model/wordContent/sumerogramm';
 import {determinativ as d} from '../model/wordContent/determinativ';
@@ -99,64 +98,64 @@ describe('DocumentParser', () => {
     {
       toParse: '1 # ti-e-ez-zi nu LÚ°MEŠ° x [x x (x)]',
       //
-      expected: lineParseResult('1', [w('ti-e-ez-zi'), w('nu'), w(sg('LÚ'), d('MEŠ')), w(illeg), w(del_in, illeg), w(illeg), w(us, illeg, ue, del_fin)])
+      expected: lineParseSuccess('1', [w('ti-e-ez-zi'), w('nu'), w(sg('LÚ'), d('MEŠ')), w(illeg), w(del_in, illeg), w(illeg), w(us, illeg, ue, del_fin)])
     },
     {
       toParse: '2 # ḫa-an-te-ez-zi ti-an-zi',
-      expected: lineParseResult('2', [w('ḫa-an-te-ez-zi'), w('ti-an-zi')]),
+      expected: lineParseSuccess('2', [w('ḫa-an-te-ez-zi'), w('ti-an-zi')]),
     },
     {
       toParse: '3 # _IT-TI GUNNI-at a-ra-an-zi',
-      expected: lineParseResult('3', [w(ag('IT', '-', 'TI')), w(sg('GUNNI', '-', 'at')), w('a-ra-an-zi')])
+      expected: lineParseSuccess('3', [w(ag('IT', '-', 'TI')), w(sg('GUNNI', '-', 'at')), w('a-ra-an-zi')])
     },
     {
       toParse: '4 # [n]a-at-kán GUNNI pé-ra-an ar-ḫa',
-      expected: lineParseResult('4', [w(del_in, 'n', del_fin, 'a-at-kán'), w(sg('GUNNI')), w('pé-ra-an'), w('ar-ḫa')])
+      expected: lineParseSuccess('4', [w(del_in, 'n', del_fin, 'a-at-kán'), w(sg('GUNNI')), w('pé-ra-an'), w('ar-ḫa')])
     },
     {
       toParse: '5 # [pa-a]n-zi 1 °MUN°pu-ú-ti-in',
-      expected: lineParseResult('5', [w(del_in, 'pa-a', del_fin, 'n-zi'), w(nc('1')), w(d('MUN'), 'pu-ú-ti-in')])
+      expected: lineParseSuccess('5', [w(del_in, 'pa-a', del_fin, 'n-zi'), w(nc('1')), w(d('MUN'), 'pu-ú-ti-in')])
     },
     {
       toParse: '6 # [x x] x ḫa-an-te-ez-zi še-er',
-      expected: lineParseResult('6', [w(del_in, illeg), w(illeg, del_fin), w(illeg), w('ḫa-an-te-ez-zi'), w('še-er')])
+      expected: lineParseSuccess('6', [w(del_in, illeg), w(illeg, del_fin), w(illeg), w('ḫa-an-te-ez-zi'), w('še-er')])
     },
     {
       toParse: '7 # [x x x x]-nu-zi §',
-      expected: lineParseResult('7', [w(del_in, illeg), w(illeg, illeg), w(illeg, del_fin, '-nu-zi')], paragraphSeparator)
+      expected: lineParseSuccess('7', [w(del_in, illeg), w(illeg, illeg), w(illeg, del_fin, '-nu-zi')], paragraphSeparator)
     },
     {
       toParse: '8 # [1 NINDA.GUR4.RA KU₇ °LÚ°Š]U.I ú-da-i',
-      expected: lineParseResult('8', [w(del_in, nc('1')), w(sg('NINDA', '.', 'GUR', indexDigit(4), '.', 'RA')), w(sg('KU', indexDigit(7))), w(d('LÚ'), sg('Š', del_fin, 'U', '.', 'I')), w('ú-da-i')])
+      expected: lineParseSuccess('8', [w(del_in, nc('1')), w(sg('NINDA', '.', 'GUR', indexDigit(4), '.', 'RA')), w(sg('KU', indexDigit(7))), w(d('LÚ'), sg('Š', del_fin, 'U', '.', 'I')), w('ú-da-i')])
     },
     {
       toParse: '9 # [na-an _A-NA DUMU].⸢É⸣.GAL pa-a-i', // <lb txtid="KBo 71.53" lnr="Vs. III 9" lg="Hit"/> <w><del_in/>na-an</w> <w><aGr>A-NA</aGr></w> <w><sGr>DUMU<del_fin/>.<laes_in/>É<laes_fin/>.GAL</sGr></w> <w>pa-a-i</w>
-      expected: lineParseResult('9', [w(del_in, 'na-an'), w(ag('A', '-', 'NA')), w(sg('DUMU', del_in, '.', laes_in, 'É', laes_fin, '.', 'GAL')), w('pa-a-i')])
+      expected: lineParseSuccess('9', [w(del_in, 'na-an'), w(ag('A', '-', 'NA')), w(sg('DUMU', del_in, '.', laes_in, 'É', laes_fin, '.', 'GAL')), w('pa-a-i')])
     },
     {
       toParse: '10 # [DUMU.É.GAL-ma-an _A-N]A GAL DUMU°MEŠ°.É.GAL', // <lb txtid="KBo 71.53" lnr="Vs. III 10" lg="Hit"/> <w><sGr><del_in/>DUMU.É.GAL</sGr>-ma-an</w> <w><aGr>A-N<del_fin/>A</aGr></w> <w><sGr>GAL</sGr></w> <w><sGr>DUMU</sGr><d>MEŠ</d><sGr>.É.GAL</sGr></w> */
-      expected: lineParseResult('10', [w(sg(del_in, 'DUMU', '.', 'É', '.', 'GAL'), '-ma-an'), w(ag('A', '-', 'N', del_fin, 'A')), w(sg('GAL')), w(sg('DUMU'), d('MEŠ'), sg('.', 'É', '.', 'GAL'))])
+      expected: lineParseSuccess('10', [w(sg(del_in, 'DUMU', '.', 'É', '.', 'GAL'), '-ma-an'), w(ag('A', '-', 'N', del_fin, 'A')), w(sg('GAL')), w(sg('DUMU'), d('MEŠ'), sg('.', 'É', '.', 'GAL'))])
     },
     {
       toParse: '11 # [pa-a-i GAL DUMU°MEŠ°].⸢É⸣.GAL-ma-an', // <lb txtid="KBo 71.53" lnr="Vs. III 11" lg="Hit"/> <w><del_in/>pa-a-i</w> <w><sGr>GAL</sGr></w> <w><sGr>DUMU</sGr><d>MEŠ</d><sGr><del_fin/>.<laes_in/>É<laes_fin/>.GAL</sGr>-ma-an</w>
-      expected: lineParseResult('11', [w(del_in, 'pa-a-i'), w(sg('GAL')), w(sg('DUMU'), d('MEŠ'), sg(del_fin, '.', laes_in, 'É', laes_fin, '.', 'GAL'), '-ma-an')])
+      expected: lineParseSuccess('11', [w(del_in, 'pa-a-i'), w(sg('GAL')), w(sg('DUMU'), d('MEŠ'), sg(del_fin, '.', laes_in, 'É', laes_fin, '.', 'GAL'), '-ma-an')])
     },
     {
       toParse: '12 # [_A-NA °GIŠ°ŠUKUR °D°KA]L pár-ši-ia',
-      expected: lineParseResult('12', [w(ag(del_in, 'A', '-', 'NA')), w(d('GIŠ'), sg('ŠUKUR')), w(d('D'), sg('KA', del_fin, 'L')), w('pár-ši-ia')])
+      expected: lineParseSuccess('12', [w(ag(del_in, 'A', '-', 'NA')), w(d('GIŠ'), sg('ŠUKUR')), w(d('D'), sg('KA', del_fin, 'L')), w('pár-ši-ia')])
       // TODO: parsed as lineParseResult('12', [w(ds, ag('A', '-', 'NA')), w(d('GIŠ'), sg('ŠUKUR')), w(d('D'), sg('KA', de, 'L')), w('pár-ši-ia')])
     },
     {
       toParse: '13 # [na-an EGIR-pa _A-N]A DUMU.É.GAL', // <lb txtid="KBo 71.53" lnr="Vs. III 13" lg="Hit"/> <w><del_in/>na-an</w> <w><sGr>EGIR</sGr>-pa</w> <w><aGr>A-N<del_fin/>A</aGr></w> <w><sGr>DUMU.É.GAL</sGr></w>
-      expected: lineParseResult('13', [w(del_in, 'na-an'), w(sg('EGIR'), '-pa'), w(ag('A', '-', 'N', del_fin, 'A')), w(sg('DUMU', '.', 'É', '.', 'GAL'))])
+      expected: lineParseSuccess('13', [w(del_in, 'na-an'), w(sg('EGIR'), '-pa'), w(ag('A', '-', 'N', del_fin, 'A')), w(sg('DUMU', '.', 'É', '.', 'GAL'))])
     },
     {
       toParse: '14 # [pa-a-i DUMU.É.GAL-ma-an E]GIR-pa', // <lb txtid="KBo 71.53" lnr="Vs. III 14" lg="Hit"/> <w><del_in/>pa-a-i</w> <w><sGr>DUMU.É.GAL</sGr>-ma-an</w> <w><sGr>E<del_fin/>GIR</sGr>-pa</w>
-      expected: lineParseResult('14', [w(del_in, 'pa-a-i'), w(sg('DUMU', '.', 'É', '.', 'GAL'), '-ma-an'), w(sg('E', del_fin, 'GIR'), '-pa')])
+      expected: lineParseSuccess('14', [w(del_in, 'pa-a-i'), w(sg('DUMU', '.', 'É', '.', 'GAL'), '-ma-an'), w(sg('E', del_fin, 'GIR'), '-pa')])
     },
     {
       toParse: '15 # [_A-NA °LÚ°ŠU.I pa-a]-⸢i⸣ §', // <lb txtid="KBo 71.53" lnr="Vs. III 15" lg="Hit"/> <w><aGr><del_in/>A-NA</aGr></w> <w><d>LÚ</d><sGr>ŠU.I</sGr></w> <w>pa-a<del_fin/>-<laes_in/>i<laes_fin/></w> </s></p><parsep/><p><s>
-      expected: lineParseResult('15', [w(ag(del_in, 'A', '-', 'NA')), w(d('LÚ'), sg('ŠU', '.', 'I')), w('pa-a', del_fin, '-', laes_in, 'i', laes_fin)/*, w(paragraphSeparator)*/])
+      expected: lineParseSuccess('15', [w(ag(del_in, 'A', '-', 'NA')), w(d('LÚ'), sg('ŠU', '.', 'I')), w('pa-a', del_fin, '-', laes_in, 'i', laes_fin)/*, w(paragraphSeparator)*/])
       // TODO: parsed as lineParseResult('15', [w(ds, ag('A', '-', 'NA')), w(d('LÚ'), sg('ŠU', '.', 'I')), w('pa-a', de, '-', ls, 'i', le), w(paragraphSeparator)])
     }/*,
     [

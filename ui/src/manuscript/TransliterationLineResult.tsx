@@ -83,17 +83,21 @@ export function WordComponent({word: {transliteration, content}, onClick}: WordC
 
 export function renderLine({lineInput, result}: TransliterationLine): JSX.Element {
   if (result) {
-    const {lineNumber, words} = result;
+    const {lnr, words, maybeParagraphSeparator} = result;
 
-    return <>
-      <sup>{lineNumber}</sup>
-      &nbsp;
-      {words.map((wordInput, index) => <span key={index}><WordComponent word={wordInput}/>&nbsp;</span>)}
-    </>;
+    return (
+      <>
+        <sup>{lnr}</sup>
+        &nbsp;
+        {words.map((wordInput, index) => <span key={index}><WordComponent word={wordInput}/>&nbsp;</span>)}
+
+        {/* FIXME: render maybeParSep: maybeParagraphSeparator && <NodeDisplay node={maybeParagraphSeparator} isLeftSide={false}/> */}
+      </>
+    );
   } else {
     return (
       <span className="has-text-danger">
-        {lineInput.length > 100 ? `${lineInput.substr(0, 100)}...` : lineInput}
+        {lineInput.length > 100 ? `${lineInput.substring(0, 100)}...` : lineInput}
       </span>
     );
   }

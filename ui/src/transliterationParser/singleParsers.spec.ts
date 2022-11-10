@@ -1,4 +1,4 @@
-import {transliteration} from './parser';
+import {transliteration} from './lineContentParser';
 import {determinativ} from '../model/wordContent/determinativ';
 import {materLectionis} from '../model/wordContent/materLectionis';
 import {damageContent, DamageType} from '../model/wordContent/damages';

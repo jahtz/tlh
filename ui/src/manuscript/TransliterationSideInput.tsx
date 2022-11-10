@@ -2,7 +2,6 @@ import {useState} from 'react';
 import {ManuscriptColumn, ManuscriptColumnModifier, manuscriptColumnModifiers, manuscriptColumns,} from '../model/manuscriptProperties/manuscriptProperties';
 import {allManuscriptLanguages, ManuscriptLanguage} from '../model/manuscriptProperties/manuscriptLanugage';
 import {useTranslation} from 'react-i18next';
-import {parseTransliterationLine} from '../transliterationParser/parser';
 import {defaultSideBasics, SideBasics, SideParseResult} from '../model/sideParseResult';
 import {ObjectSelect, SelectOption} from '../forms/BulmaFields';
 import {Transliteration} from './TransliterationLineResult';
@@ -10,11 +9,10 @@ import {transliterationLine, TransliterationLine, xmlifyTransliterationLine} fro
 import {ManuscriptSide, TransliterationInput} from '../graphql';
 import {BulmaTabs, Tabs} from '../genericElements/BulmaTabs';
 import {getNameForManuscriptSide, manuscriptSides} from '../model/manuscriptProperties/manuscriptSide';
-import {LineParseResult} from '../model/lineParseResult';
-import {aoLineBreak} from '../model/sentenceContent/linebreak';
+import {LineParseResult, parseTransliterationLine} from '../model/lineParseResult';
 
 interface IProps {
-  mainIdentifier: string;
+  textId: string;
   onTransliterationUpdate: (t: TransliterationInput) => void;
 }
 
@@ -60,7 +58,7 @@ function SideParseResultComponent({mainIdentifier, sideParseResult}: SideParseRe
   return <BulmaTabs tabs={tabConfigs}/>;
 }
 
-export function TransliterationSideInput({mainIdentifier, onTransliterationUpdate}: IProps): JSX.Element {
+export function TransliterationSideInput({textId, onTransliterationUpdate}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [state, setState] = useState<IState>({sideBasics: defaultSideBasics});
@@ -85,15 +83,22 @@ export function TransliterationSideInput({mainIdentifier, onTransliterationUpdat
     const lineResults: TransliterationLine[] = input
       .split('\n')
       .map((lineInput) => {
-        const parseResult: LineParseResult | undefined = parseTransliterationLine(lineInput);
 
-        if (!parseResult) {
+        const parseResult: LineParseResult = parseTransliterationLine(lineInput);
+
+        if ('error' in parseResult) {
+          // TODO: pre parsing error
           return transliterationLine(lineInput);
         }
 
-        const {lineNumber, words} = parseResult;
+        if ('errors' in parseResult) {
+          // TODO: word parser errors
+          return transliterationLine(lineInput);
+        }
 
-        return transliterationLine(lineInput, aoLineBreak(mainIdentifier, lineNumber, language, words));
+        const {lnr, words, maybeParagraphSeparator} = parseResult;
+
+        return transliterationLine(lineInput, {type: 'AOLineBreak', textId, lnr, language, words, maybeParagraphSeparator});
       });
 
     const sideParseResult = {
@@ -108,7 +113,7 @@ export function TransliterationSideInput({mainIdentifier, onTransliterationUpdat
     onTransliterationUpdate({
       side: state.sideBasics.side,
       input,
-      resultXml: exportAsXml(mainIdentifier, sideParseResult).join('\n'),
+      resultXml: exportAsXml(textId, sideParseResult).join('\n'),
       resultJson: JSON.stringify(sideParseResult) // FIXME: what to upload?
     });
   }
@@ -155,7 +160,7 @@ export function TransliterationSideInput({mainIdentifier, onTransliterationUpdat
           <label className="font-bold block text-center">{t('parseResult')}:</label>
 
           {state.sideParseResult
-            ? <SideParseResultComponent mainIdentifier={mainIdentifier} sideParseResult={state.sideParseResult}/>
+            ? <SideParseResultComponent mainIdentifier={textId} sideParseResult={state.sideParseResult}/>
             : <div className="notification is-info has-text-centered">{t('no_result_yet')}</div>}
         </div>
       </div>
