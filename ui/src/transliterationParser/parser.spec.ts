@@ -1,4 +1,4 @@
-import {lineParseSuccess, LineParseResult, parseTransliterationLine} from '../model/lineParseResult';
+import {lineParseSuccess, LineParseResult, parseTransliterationLine} from './lineParser';
 import {parsedWord as w} from '../model/sentenceContent/word';
 import {determinativ as dt} from '../model/wordContent/determinativ';
 import {numeralContent as nc} from '../model/wordContent/numeralContent';

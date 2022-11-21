@@ -1,8 +1,8 @@
-import {ParagraphSeparator} from './paragraphSeparator';
-import {AOWord} from './sentenceContent/word';
+import {ParagraphSeparator} from '../model/paragraphSeparator';
+import {AOWord} from '../model/sentenceContent/word';
 import {Failure, Result} from 'parsimmon';
-import {LinePreParseResult, preParseLine} from '../transliterationParser/linePreParser';
-import {parseTransliterationLineContent} from '../transliterationParser/lineContentParser';
+import {LinePreParseResult, preParseLine} from './linePreParser';
+import {parseTransliterationLineContent} from './lineContentParser';
 
 export interface LinePreParsingError {
   type: 'LinePreParsingError';

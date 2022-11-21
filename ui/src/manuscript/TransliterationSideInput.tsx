@@ -9,7 +9,7 @@ import {transliterationLine, TransliterationLine, xmlifyTransliterationLine} fro
 import {ManuscriptSide, TransliterationInput} from '../graphql';
 import {BulmaTabs, Tabs} from '../genericElements/BulmaTabs';
 import {getNameForManuscriptSide, manuscriptSides} from '../model/manuscriptProperties/manuscriptSide';
-import {LineParseResult, parseTransliterationLine} from '../model/lineParseResult';
+import {LineParseResult, parseTransliterationLine} from '../transliterationParser/lineParser';
 
 interface IProps {
   textId: string;
