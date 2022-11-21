@@ -15,7 +15,7 @@ import {
   writeMorphAnalysisValue
 } from '../../model/morphologicalAnalysis';
 import {isXmlElementNode, XmlElementNode, XmlNode} from '../../xmlModel/xmlModel';
-import {XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {displayReplace, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {WordNodeEditor} from './WordNodeEditor';
 import {SpacesEditor} from './SpacesEditor';
@@ -191,12 +191,14 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
         )
     );
 
-    return <>
+    return displayReplace(
+      <>
         <span className={classes} title={hasEditingQuestion ? node.attributes.q : undefined}>
           {node.children.length === 0 ? <span>&#x2715;</span> : renderedChildren}
         </span>
-      &nbsp;&nbsp;
-    </>;
+        &nbsp;&nbsp;
+      </>
+    );
   },
   edit: (props) => isOnlySpaces(props.data.node)
     ? <SpacesEditor {...props}/>

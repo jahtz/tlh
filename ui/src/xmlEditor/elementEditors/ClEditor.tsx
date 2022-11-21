@@ -1,17 +1,19 @@
-import {XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {displayReplace, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import {useTranslation} from 'react-i18next';
 import {NodeEditorRightSide} from '../NodeEditorRightSide';
 import {buildActionSpec, getElementByPath, XmlElementNode} from '../../xmlModel/xmlModel';
 
 export const clEditorConfig: XmlInsertableSingleEditableNodeConfig = {
-  replace: (node, renderedChildren, isSelected, isLeftSide) => (
-    <div>
-      <span className="px-1 cl">{node.attributes.id || ' '}</span>&nbsp;{isLeftSide && renderedChildren}
-    </div>
+  replace: (node, renderedChildren, isSelected, isLeftSide) => displayReplace(
+    <>
+      <span className="px-1 cl">{node.attributes.id || ' '}</span>&nbsp;
+    </>,
+    isLeftSide ? <>{renderedChildren}<br/></> : undefined
   ),
   edit: (props) => <ClEditor {...props} />,
   readNode: (n) => n,
   writeNode: (n) => n,
+  dontRenderChildrenInline: true,
   insertablePositions: {
     beforeElement: ['cl', 'w'],
     afterElement: ['cl', 'w'],

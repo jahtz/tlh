@@ -1,5 +1,5 @@
 import {XmlElementNode} from '../../xmlModel/xmlModel';
-import {XmlSingleEditableNodeConfig} from '../editorConfig';
+import {displayReplace, XmlSingleEditableNodeConfig} from '../editorConfig';
 import {NoteNodeEditor} from './NoteNodeEditor';
 
 export interface NoteData {
@@ -8,7 +8,9 @@ export interface NoteData {
 }
 
 export const noteNodeConfig: XmlSingleEditableNodeConfig<NoteData> = {
-  replace: (node) => <sup title={node.attributes.c} className="has-text-weight-bold">x</sup>,
+  replace: (node) => displayReplace(
+    <sup title={node.attributes.c} className="has-text-weight-bold">x</sup>
+  ),
   edit: (props) => <NoteNodeEditor {...props}/>,
   readNode: (node) => ({
     n: node.attributes.n || '',

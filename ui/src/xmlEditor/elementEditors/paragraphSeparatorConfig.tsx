@@ -1,10 +1,10 @@
-import {XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from '../editorConfig';
+import {displayReplace, XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {useTranslation} from 'react-i18next';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 
 export const paragraphSeparatorConfig: XmlSingleEditableNodeConfig = {
-  replace: (node, _renderedChildren, isSelected) => (
+  replace: (node, _renderedChildren, isSelected) => displayReplace(
     <span className={isSelected ? selectedNodeClass : ''}>
       {node.tagName === 'parsep' ? '¬¬¬' : '==='}
     </span>

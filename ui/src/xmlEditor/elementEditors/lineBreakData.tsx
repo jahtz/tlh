@@ -1,4 +1,4 @@
-import {XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {displayReplace, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {LineBreakEditor} from './LineBreakEditor';
 import update from 'immutability-helper';
@@ -11,7 +11,7 @@ export interface LineBreakData {
 }
 
 export const lineBreakNodeConfig: XmlInsertableSingleEditableNodeConfig<LineBreakData> = {
-  replace: (node, _renderedChildren, isSelected, isLeftSide) => (
+  replace: (node, _renderedChildren, isSelected, isLeftSide) => displayReplace(
     <>
       {isLeftSide && <br/>}
       <span className={classNames(isSelected ? [selectedNodeClass, 'text-black'] : ['text-gray-500'])}>{node.attributes.lnr}:</span>

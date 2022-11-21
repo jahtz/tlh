@@ -1,4 +1,4 @@
-import {XmlEditorConfig} from './editorConfig';
+import {displayReplace, XmlEditorConfig} from './editorConfig';
 import {XmlElementNode} from '../xmlModel/xmlModel';
 import {reCountNodeNumbers} from './elementEditors/NoteNodeEditor';
 import {aoManuscriptsConfig} from './elementEditors/aoManuscriptsConfigData';
@@ -14,10 +14,12 @@ export const selectedNodeClass = 'bg-teal-400';
 
 export const tlhXmlEditorConfig: XmlEditorConfig = {
   nodeConfigs: {
-    docID: {replace: () => <span/>},
+    docID: {
+      replace: () => displayReplace(<span/>)
+    },
     'AO:Manuscripts': aoManuscriptsConfig,
     'AO:ParagrNr': {
-      replace: (node) => <div className="mt-4 font-bold italic">{node.attributes.c}</div>
+      replace: (node) => displayReplace(<div className="mt-4 font-bold italic">{node.attributes.c}</div>)
     },
     lb: lineBreakNodeConfig,
 
@@ -32,20 +34,20 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     sGr: {styling: () => ['sumerogramm']},
     d: {styling: () => ['determinativ']},
 
-    del_in: {replace: () => <span>[</span>},
-    del_fin: {replace: () => <span>]</span>},
-    ras_in: {replace: () => <span>*</span>},
-    ras_fin: {replace: () => <span>*</span>},
-    laes_in: {replace: () => <span>⸢</span>},
-    laes_fin: {replace: () => <span>⸣</span>},
+    del_in: {replace: () => displayReplace(<span>[</span>)},
+    del_fin: {replace: () => displayReplace(<span>]</span>)},
+    ras_in: {replace: () => displayReplace(<span>*</span>)},
+    ras_fin: {replace: () => displayReplace(<span>*</span>)},
+    laes_in: {replace: () => displayReplace(<span>⸢</span>)},
+    laes_fin: {replace: () => displayReplace(<span>⸣</span>)},
 
     gap: gapConfig,
-    subscr: {replace: (node) => <sub>{node.attributes.c}</sub>},
+    subscr: {replace: (node) => displayReplace(<sub>{node.attributes.c}</sub>)},
 
     space: {
-      replace: (node) => <>
-        {Array.from({length: parseInt(node.attributes.c || '0') || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}
-      </>
+      replace: (node) => displayReplace(
+        <>{Array.from({length: parseInt(node.attributes.c || '0') || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}</>
+      )
     },
 
     parsep: paragraphSeparatorConfig,
@@ -53,7 +55,7 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
 
     corr: {
       styling: () => ['corr'],
-      replace: (node) => <span>{node.attributes.c}</span>
+      replace: (node) => displayReplace(<span>{node.attributes.c}</span>)
     },
     note: noteNodeConfig
   },

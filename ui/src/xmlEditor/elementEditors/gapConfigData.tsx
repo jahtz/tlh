@@ -1,4 +1,4 @@
-import {XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {displayReplace, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {useTranslation} from 'react-i18next';
 import {XmlElementNode} from '../../xmlModel/xmlModel';
@@ -9,7 +9,7 @@ function isLineGapNode(node: XmlElementNode): boolean {
 }
 
 export const gapConfig: XmlInsertableSingleEditableNodeConfig = {
-  replace: (node, _renderedChildren, isSelected, isLeftSide) => (
+  replace: (node, _renderedChildren, isSelected, isLeftSide) => displayReplace(
     <>
       {isLineGapNode(node) && isLeftSide && <br/>}
       <span className={classNames('gap', {'marked': isSelected})}>{node.attributes.c}</span>

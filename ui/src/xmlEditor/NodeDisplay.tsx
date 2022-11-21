@@ -1,5 +1,5 @@
 import {isXmlCommentNode, isXmlTextNode, XmlNode} from '../xmlModel/xmlModel';
-import {EditTriggerFunc} from './editorConfig';
+import {EditTriggerFunc, isXmlEditableNodeConfig, XmlEditorNodeConfig} from './editorConfig';
 import classNames from 'classnames';
 import {NodePath} from './insertablePositions';
 import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
@@ -26,41 +26,39 @@ function InsertButton({initiate}: { initiate: () => void }): JSX.Element {
 }
 
 export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIProps): JSX.Element {
-
   if (isXmlCommentNode(node)) {
     return <></>;
-  }
-
-  if (isXmlTextNode(node)) {
+  } else if (isXmlTextNode(node)) {
     return <span>{node.textContent}</span>;
   }
 
   const {currentSelectedPath, onSelect, insertStuff, isLeftSide} = inheritedProps;
 
-  const currentConfig = tlhXmlEditorConfig.nodeConfigs[node.tagName];
+  const currentConfig: XmlEditorNodeConfig | undefined = tlhXmlEditorConfig.nodeConfigs[node.tagName];
 
-  const renderedChildren = <>
-    {node.children.map((c, i) => <NodeDisplay key={i} node={c} path={[...path, i]} {...inheritedProps}/>)}
-  </>;
+  const renderedChildren = (
+    <>{node.children.map((c, i) => <NodeDisplay key={i} node={c} path={[...path, i]} {...inheritedProps}/>)}</>
+  );
 
   const isSelected = !!currentSelectedPath && path.join('.') === currentSelectedPath.join('.');
 
-  const display = currentConfig && currentConfig.replace
+  const {clickable, notClickable} = currentConfig?.replace
     ? currentConfig.replace(node, renderedChildren, isSelected, isLeftSide)
-    : renderedChildren;
+    : {clickable: renderedChildren, notClickable: undefined};
 
-  const classes = currentConfig && currentConfig.styling
+  const classes = currentConfig?.styling
     ? currentConfig.styling(node, isSelected, isLeftSide)
     : [];
 
-  const onClick = currentConfig && 'edit' in currentConfig && onSelect
+  const onClick = currentConfig && isXmlEditableNodeConfig(currentConfig) && onSelect
     ? () => onSelect(node, path)
     : undefined;
 
   return (
     <>
       {insertStuff && insertStuff.insertablePaths.includes(path.join('.')) && <InsertButton initiate={() => insertStuff.initiateInsert(path)}/>}
-      <span className={classNames(classes)} onClick={onClick}>{display}</span>
+      <span className={classNames(classes)} onClick={onClick}>{clickable}</span>
+      {notClickable && <span className={classNames(classes)}>{notClickable}</span>}
       {insertStuff && insertStuff.insertAsLastChildOf.includes(node.tagName) &&
         <InsertButton initiate={() => insertStuff.initiateInsert([...path, node.children.length])}/>}
     </>

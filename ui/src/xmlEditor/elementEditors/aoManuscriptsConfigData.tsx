@@ -1,4 +1,4 @@
-import {XmlSingleEditableNodeConfig} from '../editorConfig';
+import {displayReplace, XmlSingleEditableNodeConfig} from '../editorConfig';
 import {isXmlElementNode, isXmlTextNode, XmlElementNode, XmlTextNode} from '../../xmlModel/xmlModel';
 import {AoManuscriptsEditor} from './AoManuscriptsEditor';
 import update from 'immutability-helper';
@@ -33,7 +33,9 @@ export interface AoManuscriptsData {
 }
 
 export const aoManuscriptsConfig: XmlSingleEditableNodeConfig<AoManuscriptsData> = {
-  replace: (node, renderedChildren, isSelected) => <span className={isSelected ? selectedNodeClass : ''}>{renderedChildren}</span>,
+  replace: (node, renderedChildren, isSelected) => displayReplace(
+    <span className={isSelected ? selectedNodeClass : ''}>{renderedChildren}</span>
+  ),
   edit: (props) => <AoManuscriptsEditor {...props}/>,
   readNode: (node) => ({
     content: node.children.map((n) => {
