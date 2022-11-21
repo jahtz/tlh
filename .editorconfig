@@ -11,3 +11,6 @@ tab_width = 4
 
 [{*.ts, *.tsx}]
 ij_typescript_align_multiline_parameters = false
+
+[*.html]
+ij_html_do_not_indent_children_of_tags = none
