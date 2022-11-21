@@ -39,7 +39,7 @@ export type XmlNode = XmlElementNode | XmlTextNode | XmlCommentNode;
 // Helper functions
 
 export function getElementByPath(rootNode: XmlElementNode, path: number[]): XmlElementNode {
-  return path.reduceRight(
+  return path.reduce(
     (acc, index) => acc.children[index] as XmlElementNode,
     rootNode
   );
