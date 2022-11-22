@@ -7,7 +7,7 @@ import {ObjectSelect, SelectOption} from '../forms/BulmaFields';
 import {Transliteration} from './TransliterationLineResult';
 import {transliterationLine, TransliterationLine, xmlifyTransliterationLine} from '../model/transliterationLine';
 import {ManuscriptSide, TransliterationInput} from '../graphql';
-import {BulmaTabs, Tabs} from '../genericElements/BulmaTabs';
+import {BulmaTabs} from '../genericElements/BulmaTabs';
 import {getNameForManuscriptSide, manuscriptSides} from '../model/manuscriptProperties/manuscriptSide';
 import {LineParseResult, parseTransliterationLine} from '../transliterationParser/lineParser';
 
@@ -42,20 +42,20 @@ function SideParseResultComponent({mainIdentifier, sideParseResult}: SideParseRe
 
   const {t} = useTranslation('common');
 
-  const tabConfigs: Tabs = {
+  return <BulmaTabs tabs={{
     rendered: {
       name: t('rendered'),
       render: () => <Transliteration lines={sideParseResult.lineResults}/>
     },
     asXml: {
       name: t('asXml'),
-      render: () => <div className="p-2 rounded border border-slate-300 shadow shadow-slate-200">
-        {exportAsXml(mainIdentifier, sideParseResult).map((line, index) => <p key={index}>{line}</p>)}
-      </div>
+      render: () => (
+        <div className="p-2 rounded border border-slate-300 shadow shadow-slate-200">
+          {exportAsXml(mainIdentifier, sideParseResult).map((line, index) => <p key={index}>{line}</p>)}
+        </div>
+      )
     }
-  };
-
-  return <BulmaTabs tabs={tabConfigs}/>;
+  }}/>;
 }
 
 export function TransliterationSideInput({textId, onTransliterationUpdate}: IProps): JSX.Element {

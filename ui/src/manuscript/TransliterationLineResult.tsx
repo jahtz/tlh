@@ -5,7 +5,6 @@ import {getSymbolForDamageType, isDamageContent} from '../model/wordContent/dama
 import {isCorrectionContent} from '../model/wordContent/corrections';
 import {isAkkadogramm} from '../model/wordContent/akkadogramm';
 import {isSumerogramm} from '../model/wordContent/sumerogramm';
-import {AOWord} from '../model/sentenceContent/word';
 import {isMaterLectionis} from '../model/wordContent/materLectionis';
 import {isNumeralContent} from '../model/wordContent/numeralContent';
 import {isAoFootNote} from '../model/wordContent/footNote';
@@ -15,6 +14,9 @@ import {isIllegibleContent} from '../model/wordContent/illegible';
 import {isSpace} from '../model/wordContent/space';
 import {isEllipsis} from '../model/wordContent/ellipsis';
 import {isBasicText} from '../model/wordContent/basicText';
+import {AOLineBreak} from '../model/sentenceContent/linebreak';
+import {NodeDisplay} from '../xmlEditor/NodeDisplay';
+import {paragraphSeparatorDoubleXmlNode, paragraphSeparatorXmlNode} from '../model/paragraphSeparator';
 
 function renderSimpleWordContent(content: AOSimpleWordContent): JSX.Element {
   if (isMaterLectionis(content)) {
@@ -42,21 +44,21 @@ function renderSimpleWordContent(content: AOSimpleWordContent): JSX.Element {
 
 export function WordContentDisplay({content}: { content: AOWordContent }): JSX.Element {
   if (isAkkadogramm(content)) {
-    return <span className="akkadogramm">
-      {content.contents.map((c, index) => <WordContentDisplay content={c} key={index}/>)}
-    </span>;
+    return (
+      <span className="akkadogramm">{content.contents.map((c, index) => <WordContentDisplay content={c} key={index}/>)}</span>
+    );
   } else if (isSumerogramm(content)) {
-    return <span className="sumerogramm">
-      {content.contents.map((c, index) => <WordContentDisplay content={c} key={index}/>)}
-    </span>;
+    return (
+      <span className="sumerogramm">{content.contents.map((c, index) => <WordContentDisplay content={c} key={index}/>)}</span>
+    );
   } else if (isDeterminativ(content)) {
-    return <span className="determinativ">
-      {content.content.map((c, index) => <WordContentDisplay content={c} key={index}/>)}
-    </span>;
+    return (
+      <span className="determinativ">{content.content.map((c, index) => <WordContentDisplay content={c} key={index}/>)}</span>
+    );
   } else if (isNumeralContent(content)) {
-    return <span className="numberal">
-      {content.content.map((c, index) => <WordContentDisplay content={c} key={index}/>)}
-    </span>;
+    return (
+      <span className="numberal">{content.content.map((c, index) => <WordContentDisplay content={c} key={index}/>)}</span>
+    );
   } else if (isIllegibleContent(content)) {
     return <span>x</span>;
   } else {
@@ -64,43 +66,21 @@ export function WordContentDisplay({content}: { content: AOWordContent }): JSX.E
   }
 }
 
-// Single word
-
-interface WordComponentIProps {
-  word: AOWord;
-  onClick?: () => void;
-}
-
-export function WordComponent({word: {transliteration, content}, onClick}: WordComponentIProps): JSX.Element {
-  return <span onClick={onClick}>
-    {content.length > 0
-      ? content.map((c, i) => <WordContentDisplay content={c} key={i}/>)
-      : <span className="has-text-danger">{transliteration}</span>}
-  </span>;
-}
-
 // Single line
 
-export function renderLine({lineInput, result}: TransliterationLine): JSX.Element {
-  if (result) {
-    const {lnr, words, maybeParagraphSeparator} = result;
+function TransliterationLineDisplay({result: {lnr, words, maybeParagraphSeparator}}: { result: AOLineBreak }): JSX.Element {
+  return (
+    <>
+      <sup>{lnr}</sup>
+      &nbsp;
+      {words.map(({/*transliteration,*/ content}, index) =>
+        <span key={index}>{content.map((c, i) => <WordContentDisplay content={c} key={i}/>)}&nbsp;</span>
+      )}
 
-    return (
-      <>
-        <sup>{lnr}</sup>
-        &nbsp;
-        {words.map((wordInput, index) => <span key={index}><WordComponent word={wordInput}/>&nbsp;</span>)}
-
-        {/* FIXME: render maybeParSep: maybeParagraphSeparator && <NodeDisplay node={maybeParagraphSeparator} isLeftSide={false}/> */}
-      </>
-    );
-  } else {
-    return (
-      <span className="has-text-danger">
-        {lineInput.length > 100 ? `${lineInput.substring(0, 100)}...` : lineInput}
-      </span>
-    );
-  }
+      {maybeParagraphSeparator &&
+        <NodeDisplay node={maybeParagraphSeparator.double ? paragraphSeparatorDoubleXmlNode : paragraphSeparatorXmlNode} isLeftSide={false}/>}
+    </>
+  );
 }
 
 // All lines
@@ -112,9 +92,10 @@ interface IProps {
 export function Transliteration({lines}: IProps): JSX.Element {
   return (
     <div className="p-2 rounded border border-slate-300 shadow shadow-slate-200">
-      {lines.map((lineParseResult, lineIndex) =>
-        <p key={lineIndex} className="hittite">{renderLine(lineParseResult)}</p>
-      )}
+      {lines.map(({lineInput, result}, lineIndex) =>
+        result
+          ? <p key={lineIndex} className="hittite"><TransliterationLineDisplay result={result}/></p>
+          : <p key={lineIndex} className="text-red-600">{lineInput.length > 100 ? `${lineInput.substring(0, 100)}...` : lineInput}</p>)}
     </div>
   );
 }
