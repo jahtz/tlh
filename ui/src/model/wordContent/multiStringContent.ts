@@ -1,7 +1,7 @@
 import {DamageContent, isDamageContent, xmlifyDamageContent} from './damages';
 import {aoBasicText, BasicText, isBasicText} from './basicText';
-import {AOCorr, aoCorrFormat, isCorrectionContent} from './corrections';
-import {InscribedLetter, inscribedLetterFormat, isInscribedLetter} from './inscribedLetter';
+import {AOCorr, convertAoCorrToXmlStrings, isCorrectionContent} from './corrections';
+import {InscribedLetter, isInscribedLetter} from './inscribedLetter';
 import {IndexDigit} from './indexDigit';
 
 export type UpperMultiStringContent = AOCorr | DamageContent | InscribedLetter | BasicText | IndexDigit;
@@ -19,11 +19,11 @@ export function clearUpperMultiStringContent(c: UpperMultiStringContent | string
  */
 export function writeMultiWordContent(c: UpperMultiStringContent): string[] {
   if (isCorrectionContent(c)) {
-    return aoCorrFormat(c);
+    return convertAoCorrToXmlStrings(c);
   } else if (isDamageContent(c)) {
     return xmlifyDamageContent(c);
   } else if (isInscribedLetter(c)) {
-    return inscribedLetterFormat(c);
+    return ['x'];
   } else if (isBasicText(c)) {
     return [c.content];
   } else {

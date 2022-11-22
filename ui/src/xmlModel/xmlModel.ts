@@ -1,13 +1,15 @@
 import {Spec} from 'immutability-helper';
 
+export type Attributes = Record<string, string | undefined>;
+
 export interface XmlElementNode {
   tagName: string;
-  attributes: Record<string, string | undefined>;
+  attributes: Attributes;
   children: XmlNode[];
 }
 
-export function emptyNode(tagName: string, attributes: Record<string, string | undefined> = {}): XmlElementNode {
-  return {tagName, attributes, children: []};
+export function xmlElementNode(tagName: string, attributes: Attributes = {}, children: XmlNode[] = []): XmlElementNode {
+  return {tagName, attributes, children};
 }
 
 export function isXmlElementNode(node: XmlNode): node is XmlElementNode {

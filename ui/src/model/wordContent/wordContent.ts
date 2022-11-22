@@ -1,24 +1,24 @@
-import {akkadogrammFormat, AOAkkadogramm, isAkkadogramm,} from './akkadogramm';
-import {AOSumerogramm, isSumerogramm, sumerogrammFormat} from './sumerogramm';
-import {AONumeralContent, isNumeralContent, numeralContentFormat} from './numeralContent';
-import {AODeterminativ, determinativFormat, isDeterminativ} from './determinativ';
-import {AOMaterLectionis, isMaterLectionis, materLectionisFormat} from './materLectionis';
-import {AOCorr, aoCorrFormat, isCorrectionContent} from './corrections';
+import {AOAkkadogramm, convertAoAkkadogrammToXmlStrings, isAkkadogramm,} from './akkadogramm';
+import {AOSumerogramm, convertAoSumerogrammToXmlStrings, isSumerogramm} from './sumerogramm';
+import {AONumeralContent, convertAoNumeralContentToXmlStrings, isNumeralContent} from './numeralContent';
+import {AODeterminativ, convertAoDeterminativToXmlStrings, isDeterminativ} from './determinativ';
+import {AOMaterLectionis, convertAoMaterLectionisToXmlStrings, isMaterLectionis} from './materLectionis';
+import {AOCorr, convertAoCorrToXmlStrings, isCorrectionContent} from './corrections';
 import {DamageContent, isDamageContent, xmlifyDamageContent} from './damages';
-import {AOSign, aoSignFormat, isAoSign} from './sign';
-import {AOFootNote, aoNoteFormat, isAoFootNote} from './footNote';
-import {AOKolonMark, aoKolonMarkFormat, isAoKolonMark} from './kolonMark';
+import {AOSign, convertAoSignToXmlString, isAoSign} from './sign';
+import {AOFootNote, convertAoFootNoteToXmlStrings, isAoFootNote} from './footNote';
+import {AOKolonMark, convertAoKolonMarkToXmlStrings, isAoKolonMark} from './kolonMark';
 import {AOIllegibleContent} from './illegible';
-import {AOSpace, aoSpaceFormat, isSpace} from './space';
-import {InscribedLetter, inscribedLetterFormat, isInscribedLetter} from './inscribedLetter';
-import {Ellipsis, ellipsisFormat, isEllipsis} from './ellipsis';
+import {AOSpace, convertAoSpaceToXmlStrings, isSpace} from './space';
+import {InscribedLetter, isInscribedLetter} from './inscribedLetter';
+import {AOEllipsis, isEllipsis} from './ellipsis';
 import {BasicText, isBasicText} from './basicText';
 import {IndexDigit, isIndexDigit} from './indexDigit';
-import {XmlNode} from '../../xmlModel/xmlModel';
-import {XmlWriter} from '../../xmlModel/xmlWriting';
+import {textNode, xmlElementNode, XmlNode} from '../../xmlModel/xmlModel';
 
 // Word content
 
+// FIXME: replace with xml nodes!?!
 export type AOSimpleWordContent =
   AOCorr
   | DamageContent
@@ -29,7 +29,7 @@ export type AOSimpleWordContent =
   | AOSign
   | AOKolonMark
   | AOSpace
-  | Ellipsis
+  | AOEllipsis
   | IndexDigit;
 
 export type AOWordContent =
@@ -40,68 +40,65 @@ export type AOWordContent =
   | AONumeralContent
   | AOIllegibleContent;
 
-export function xmlifyAoWordContent(c: AOWordContent): XmlNode {
+export function convertAoWordContentToXmlNode(c: AOWordContent): XmlNode {
   if (isBasicText(c)) {
-    return {textContent: c.content};
+    return textNode(c.content);
   } else if (isAkkadogramm(c)) {
-    return {tagName: 'aGr', attributes: {}, children: c.contents.map(xmlifyAoWordContent)};
+    return xmlElementNode('aGr', {}, c.contents.map(convertAoWordContentToXmlNode));
   } else if (isSumerogramm(c)) {
-    return {tagName: 'sGr', attributes: {}, children: c.contents.map(xmlifyAoWordContent)};
+    return xmlElementNode('sGr', {}, c.contents.map(convertAoWordContentToXmlNode));
   } else if (isDeterminativ(c)) {
-    return {tagName: 'd', attributes: {}, children: c.content.map(xmlifyAoWordContent)};
+    return xmlElementNode('d', {}, c.content.map(convertAoWordContentToXmlNode));
   } else if (isCorrectionContent(c)) {
-    return {tagName: 'corr', attributes: {c: c.c}, children: []};
+    return xmlElementNode('corr', {c: c.c});
   } else if (isSpace(c)) {
-    return {tagName: 'space', attributes: {c: c.c}, children: []};
+    return xmlElementNode('space', {c: c.c});
   } else if (isDamageContent(c)) {
-    return {tagName: c.damageType, attributes: {}, children: []};
+    return xmlElementNode(c.damageType);
   } else if (isAoFootNote(c)) {
-    return {tagName: 'note', attributes: {n: c.number.toString(), c: c.content}, children: []};
-  }/* else if (isNumeralContent(c)) {
-    return c.content;
-  }*/
-  else if (isIndexDigit(c)) {
-    return {textContent: c.content.toString()};
+    return xmlElementNode('note', {n: c.number.toString(), c: c.content});
+  } else if (isIndexDigit(c)) {
+    return textNode(c.content.toString());
   } else if (isNumeralContent(c)) {
-    return {textContent: c.content.toString()};
+    return textNode(c.content.toString());
   } else {
     // FIXME: implement rest!
     throw new Error('TODO: implement: ' + c.type + '!');
   }
 }
 
-export const aoWordContentFormat: XmlWriter<AOWordContent> = (c) => {
+export function convertAoWordToXmlString(c: AOWordContent): string[] {
   if (isBasicText(c)) {
     return [c.content];
   } else if (isAkkadogramm(c)) {
-    return akkadogrammFormat(c);
+    return convertAoAkkadogrammToXmlStrings(c);
   } else if (isSumerogramm(c)) {
-    return sumerogrammFormat(c);
+    return convertAoSumerogrammToXmlStrings(c);
   } else if (isDeterminativ(c)) {
-    return determinativFormat(c);
+    return convertAoDeterminativToXmlStrings(c);
   } else if (isMaterLectionis(c)) {
-    return materLectionisFormat(c);
+    return convertAoMaterLectionisToXmlStrings(c);
   } else if (isNumeralContent(c)) {
-    return numeralContentFormat(c);
+    return convertAoNumeralContentToXmlStrings(c);
   } else if (isCorrectionContent(c)) {
-    return aoCorrFormat(c);
+    return convertAoCorrToXmlStrings(c);
   } else if (isDamageContent(c)) {
     return xmlifyDamageContent(c);
   } else if (isAoSign(c)) {
-    return aoSignFormat(c);
+    return convertAoSignToXmlString(c);
   } else if (isAoFootNote(c)) {
-    return aoNoteFormat(c);
+    return convertAoFootNoteToXmlStrings(c);
   } else if (isAoKolonMark(c)) {
-    return aoKolonMarkFormat(c);
+    return convertAoKolonMarkToXmlStrings(c);
   } else if (isSpace(c)) {
-    return aoSpaceFormat(c);
+    return convertAoSpaceToXmlStrings(c);
   } else if (isInscribedLetter(c)) {
-    return inscribedLetterFormat(c);
+    return ['x'];
   } else if (isEllipsis(c)) {
-    return ellipsisFormat(c);
+    return ['…'];
   } else {
     // Illegible content
     // let y = c;
     return ['x'];
   }
-};
+}

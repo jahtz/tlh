@@ -30,8 +30,8 @@ export function LineBreakEditor({
 
         <div className="mb-4">
           <label htmlFor="lineNumber" className="font-bold">{t('lineNumber')}:</label>
-          <input type="text" id="lineNumber" className="p-2 rounded border border-slate-500 w-full mt-2" defaultValue={data.lineNumber?.trim()}
-                 onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateNode({lineNumber: {$set: event.target.value}})}/>
+          <input type="text" id="lineNumber" className="p-2 rounded border border-slate-500 w-full mt-2" defaultValue={data.lnr?.trim()}
+                 onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateNode({lnr: {$set: event.target.value}})}/>
         </div>
 
         <div className="mb-4">

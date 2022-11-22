@@ -1,12 +1,13 @@
 import {AOWordContent} from './wordContent';
-import {XmlWriter} from '../../xmlModel/xmlWriting';
 
 export interface AOCorr {
   type: 'AOCorr',
   c: string;
 }
 
-export const aoCorrFormat: XmlWriter<AOCorr> = ({c}) => [`<corr c="${c}"/>`];
+export function convertAoCorrToXmlStrings({c}: AOCorr): string[] {
+  return [`<corr c="${c}"/>`];
+}
 
 export function aoCorr(c: string): AOCorr {
   return {type: 'AOCorr', c};

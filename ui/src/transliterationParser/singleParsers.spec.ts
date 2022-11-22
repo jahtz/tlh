@@ -7,13 +7,12 @@ import {aoEllipsis} from '../model/wordContent/ellipsis';
 import {aoSign} from '../model/wordContent/sign';
 import {aoKolonMark} from '../model/wordContent/kolonMark';
 import {aoNote} from '../model/wordContent/footNote';
-import {aoGap} from '../model/sentenceContent/gap';
+import {AOGap, aoGap} from '../model/sentenceContent/gap';
 import {aoIllegibleContent} from '../model/wordContent/illegible';
 import {Parser} from 'parsimmon';
 import {AOWordContent} from '../model/wordContent/wordContent';
 import {numeralContent} from '../model/wordContent/numeralContent';
 import {aoBasicText} from '../model/wordContent/basicText';
-import {AOSentenceContent} from '../model/sentence';
 import {ParagraphSeparator, paragraphSeparator, paragraphSeparatorDouble} from '../model/paragraphSeparator';
 
 const determinativSpecialGenusCases: [string][] = [['m'], ['f']];
@@ -175,7 +174,7 @@ describe('signParser', () => testParseSignContent(transliteration.sign));
 
 // Gaps
 
-export function testParseGapContent(parser: Parser<AOSentenceContent>): void {
+export function testParseGapContent(parser: Parser<AOGap>): void {
   test.each(curlyBraceCases)(
     'should parse {G:%p} as a gap',
     (toParse) => expect(parser.tryParse(`{G:${toParse}}`)).toEqual(aoGap(toParse))

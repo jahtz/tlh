@@ -1,17 +1,19 @@
-import {AOWord, aoWordFormat} from './word';
-import {XmlWriter} from '../../xmlModel/xmlWriting';
+import {AOWord, convertAoWord2XmlStrings} from './word';
 import {ParagraphSeparator} from '../paragraphSeparator';
+import {LineBreakData} from '../../xmlEditor/elementEditors/lineBreakData';
 
 export interface AOLineBreak {
   type: 'AOLineBreak';
-  textId: string;
-  lnr: string;
-  language: string;
+  lb: LineBreakData;
+  // => <w/>[]
   words: AOWord[];
+  // => <parsep/> or <parsep_dbl/>
   maybeParagraphSeparator: ParagraphSeparator | undefined;
 }
 
-export const aoLineBreakFormat: XmlWriter<AOLineBreak> = ({textId, lnr, language, words}) => [
-  `<lb lg="${language}" lnr="${lnr}" txtid="${textId}"/>`,
-  ...words.flatMap((w) => aoWordFormat(w))
-];
+export function convertAoLineBreakToXmlString({lb: {textId, lnr, lg}, words}: AOLineBreak): string[] {
+  return [
+    `<lb lg="${lg}" lnr="${lnr}" txtid="${textId}"/>`,
+    ...words.flatMap((w) => convertAoWord2XmlStrings(w))
+  ];
+}

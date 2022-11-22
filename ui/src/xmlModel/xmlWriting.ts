@@ -1,11 +1,9 @@
 import {isXmlCommentNode, isXmlTextNode, XmlNode} from './xmlModel';
 
-interface NodeWriteConfig {
-  inlineChildren?: boolean;
-}
-
 export interface XmlWriteConfig {
-  [tagName: string]: NodeWriteConfig;
+  [tagName: string]: {
+    inlineChildren: boolean
+  };
 }
 
 export const tlhXmlWriteConfig: XmlWriteConfig = {
@@ -16,6 +14,15 @@ export const tlhXmlWriteConfig: XmlWriteConfig = {
   w: {inlineChildren: true},
 };
 
+function writeAttributeValue(value: string): string {
+  return value
+    .replace(/&(?!amp;)/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXmlWriteConfig, parentInline = false): string[] {
   if (isXmlCommentNode(node)) {
     return [`<!-- ${node.comment} -->`];
@@ -24,23 +31,13 @@ export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXml
   } else {
     const {tagName, attributes, children} = node;
 
-    const writeConfig: NodeWriteConfig | undefined = xmlWriteConfig[tagName] || undefined;
+    const writeConfig = xmlWriteConfig[tagName] || undefined;
 
     const writtenAttributes = Object.entries(attributes)
-      .flatMap(([name, value]) => {
-        if (value === undefined) {
-          return [];
-        }
-
-        const writtenValue = value
-          .replace(/&(?!amp;)/g, '&amp;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&apos;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;');
-
-        return `${name}="${writtenValue}"`;
-      })
+      .flatMap<string>(([name, value]) =>
+        value !== undefined
+          ? `${name}="${writeAttributeValue(value)}"`
+          : [])
       .join(' ');
 
     if (children.length === 0) {
@@ -63,8 +60,6 @@ export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXml
 }
 
 // Old version
-
-export type XmlWriter<T> = (t: T) => string[];
 
 export function indent(s: string): string {
   return ' '.repeat(2) + s;

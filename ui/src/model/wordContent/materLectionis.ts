@@ -1,5 +1,4 @@
 import {AOWordContent} from './wordContent';
-import {XmlWriter} from '../../xmlModel/xmlWriting';
 
 /**
  * Mater lectionis:
@@ -14,7 +13,9 @@ export function materLectionis(content: string): AOMaterLectionis {
   return {type: 'AOMaterLectionis', content};
 }
 
-export const materLectionisFormat: XmlWriter<AOMaterLectionis> = ({content}) => [`<SP___AO_3a_MaterLect>${content}</SP___AO_3a_MaterLect>`];
+export function convertAoMaterLectionisToXmlStrings({content}: AOMaterLectionis): string[] {
+  return [`<SP___AO_3a_MaterLect>${content}</SP___AO_3a_MaterLect>`];
+}
 
 export function isMaterLectionis(c: AOWordContent): c is AOMaterLectionis {
   return c.type === 'AOMaterLectionis';

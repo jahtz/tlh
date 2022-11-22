@@ -1,14 +1,11 @@
 import {AOWordContent} from './wordContent';
-import {XmlWriter} from '../../xmlModel/xmlWriting';
 
-export interface Ellipsis {
+export interface AOEllipsis {
   type: 'AOEllipsis';
 }
 
-export const aoEllipsis: Ellipsis = {type: 'AOEllipsis'};
+export const aoEllipsis: AOEllipsis = {type: 'AOEllipsis'};
 
-export function isEllipsis(c: AOWordContent): c is Ellipsis {
+export function isEllipsis(c: AOWordContent): c is AOEllipsis {
   return c.type === 'AOEllipsis';
 }
-
-export const ellipsisFormat: XmlWriter<Ellipsis> = () => ['…'];

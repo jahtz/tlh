@@ -5,11 +5,12 @@ import {useTranslation} from 'react-i18next';
 import {defaultSideBasics, SideBasics, SideParseResult} from '../model/sideParseResult';
 import {ObjectSelect, SelectOption} from '../forms/BulmaFields';
 import {Transliteration} from './TransliterationLineResult';
-import {transliterationLine, TransliterationLine, xmlifyTransliterationLine} from '../model/transliterationLine';
+import {transliterationLine, TransliterationLine} from '../model/transliterationLine';
 import {ManuscriptSide, TransliterationInput} from '../graphql';
 import {BulmaTabs} from '../genericElements/BulmaTabs';
 import {getNameForManuscriptSide, manuscriptSides} from '../model/manuscriptProperties/manuscriptSide';
 import {LineParseResult, parseTransliterationLine} from '../transliterationParser/lineParser';
+import {convertAoLineBreakToXmlString} from '../model/sentenceContent/linebreak';
 
 interface IProps {
   textId: string;
@@ -35,7 +36,9 @@ interface SideParseResultComponentIProps {
 
 
 function exportAsXml(mainIdentifier: string, {lineResults}: SideParseResult): string[] {
-  return lineResults.map(xmlifyTransliterationLine);
+  return lineResults.map(({lineInput, result}) => result
+    ? convertAoLineBreakToXmlString(result).join('\n')
+    : `<error>${lineInput}</error>`);
 }
 
 function SideParseResultComponent({mainIdentifier, sideParseResult}: SideParseResultComponentIProps): JSX.Element {
@@ -78,7 +81,7 @@ export function TransliterationSideInput({textId, onTransliterationUpdate}: IPro
     .map((columnModifier) => ({value: columnModifier, label: columnModifier}));
 
   function updateTransliteration(input: string): void {
-    const language = state.sideBasics.language;
+    const lg = state.sideBasics.language;
 
     const lineResults: TransliterationLine[] = input
       .split('\n')
@@ -96,9 +99,9 @@ export function TransliterationSideInput({textId, onTransliterationUpdate}: IPro
           return transliterationLine(lineInput);
         }
 
-        const {lnr, words, maybeParagraphSeparator} = parseResult;
+        const {lnr, words, maybeParagraphSeparator} = parseResult.data;
 
-        return transliterationLine(lineInput, {type: 'AOLineBreak', textId, lnr, language, words, maybeParagraphSeparator});
+        return transliterationLine(lineInput, {type: 'AOLineBreak', lb: {textId, lnr, lg}, words, maybeParagraphSeparator});
       });
 
     const sideParseResult = {

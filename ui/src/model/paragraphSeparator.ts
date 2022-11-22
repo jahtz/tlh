@@ -1,4 +1,4 @@
-import {emptyNode, XmlElementNode} from '../xmlModel/xmlModel';
+import {xmlElementNode, XmlElementNode} from '../xmlModel/xmlModel';
 
 export interface ParagraphSeparator {
   type: 'ParagraphSeparator';
@@ -15,6 +15,6 @@ export const paragraphSeparatorDouble: ParagraphSeparator = {
   double: true
 };
 
-export const paragraphSeparatorXmlNode: XmlElementNode = emptyNode('parsep');
+export const paragraphSeparatorXmlNode: XmlElementNode = xmlElementNode('parsep');
 
-export const paragraphSeparatorDoubleXmlNode: XmlElementNode = emptyNode('parsep_dbl');
+export const paragraphSeparatorDoubleXmlNode: XmlElementNode = xmlElementNode('parsep_dbl');

@@ -21,7 +21,7 @@ export function BulmaTabs({tabs}: IProps): JSX.Element {
       <div className="flex mb-2">
         {Object.entries(tabs).map(([id, {name}]) =>
           <button type="button" key={id} onClick={() => setActiveTabId(id)}
-                  className={classNames('p-2', 'flex-grow', 'rounded-t', activeTabId === id ? ['bg-blue-500', 'text-white'] : ['border', 'border-slate-300'])}>
+                  className={classNames('p-2 flex-grow rounded-t', activeTabId === id ? ['bg-blue-500', 'text-white'] : ['border', 'border-slate-300'])}>
             {name}
           </button>
         )}

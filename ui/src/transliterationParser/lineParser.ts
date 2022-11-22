@@ -4,25 +4,28 @@ import {Failure, Result} from 'parsimmon';
 import {LinePreParseResult, preParseLine} from './linePreParser';
 import {parseTransliterationLineContent} from './lineContentParser';
 
-export interface LinePreParsingError {
+interface LinePreParsingError {
   type: 'LinePreParsingError';
   error: Failure;
 }
 
-export interface LineWordParsingError {
+interface LineWordParsingError {
   type: 'LineWordParsingError';
   errors: Failure[];
 }
 
-export interface LineParseSuccess {
+interface LineParseSuccess {
   type: 'LineParseSuccess';
-  lnr: string;
-  words: AOWord[];
-  maybeParagraphSeparator: ParagraphSeparator | undefined;
+  data: {
+    // make object?
+    lnr: string;
+    words: AOWord[];
+    maybeParagraphSeparator: ParagraphSeparator | undefined;
+  };
 }
 
 export function lineParseSuccess(lnr: string, words: AOWord[], maybeParagraphSeparator: ParagraphSeparator | undefined = undefined): LineParseSuccess {
-  return {type: 'LineParseSuccess', lnr, words, maybeParagraphSeparator};
+  return {type: 'LineParseSuccess', data: {lnr, words, maybeParagraphSeparator}};
 }
 
 export type LineParseResult = LinePreParsingError | LineWordParsingError | LineParseSuccess;

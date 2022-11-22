@@ -68,7 +68,7 @@ export function WordContentDisplay({content}: { content: AOWordContent }): JSX.E
 
 // Single line
 
-function TransliterationLineDisplay({result: {lnr, words, maybeParagraphSeparator}}: { result: AOLineBreak }): JSX.Element {
+function TransliterationLineDisplay({result: {lb: {lnr}, words, maybeParagraphSeparator}}: { result: AOLineBreak }): JSX.Element {
   return (
     <>
       <sup>{lnr}</sup>

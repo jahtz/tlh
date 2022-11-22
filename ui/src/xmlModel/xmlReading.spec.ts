@@ -1,5 +1,5 @@
 import {parseNewXml, ParseResult} from './xmlReading';
-import {emptyNode, textNode, XmlElementNode} from './xmlModel';
+import {xmlElementNode, textNode, XmlElementNode} from './xmlModel';
 
 describe('xmlReader', () => {
   const x = '<w trans="%-nan~" mrp0sel="DEL"><del_fin/>x-<laes_in/>na-an<laes_fin/>-<del_in/></w>';
@@ -7,7 +7,7 @@ describe('xmlReader', () => {
     tagName: 'w',
     attributes: {trans: '%-nan~', mrp0sel: 'DEL'},
     children: [
-      emptyNode('del_fin'), textNode('x-'), emptyNode('laes_in'), textNode('na-an'), emptyNode('laes_fin'), textNode('-'), emptyNode('del_in')
+      xmlElementNode('del_fin'), textNode('x-'), xmlElementNode('laes_in'), textNode('na-an'), xmlElementNode('laes_fin'), textNode('-'), xmlElementNode('del_in')
     ]
   };
 

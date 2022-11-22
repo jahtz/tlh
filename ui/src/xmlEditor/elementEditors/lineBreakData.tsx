@@ -6,7 +6,7 @@ import {selectedNodeClass} from '../tlhXmlEditorConfig';
 
 export interface LineBreakData {
   textId: string;
-  lineNumber: string;
+  lnr: string;
   lg: string | undefined;
 }
 
@@ -21,13 +21,13 @@ export const lineBreakNodeConfig: XmlInsertableSingleEditableNodeConfig<LineBrea
   edit: (props) => <LineBreakEditor key={props.path.join('.')} {...props} />,
   readNode: (node) => ({
     textId: node.attributes.txtid || '',
-    lineNumber: node.attributes.lnr || '',
+    lnr: node.attributes.lnr || '',
     lg: node.attributes.lg
   }),
-  writeNode: ({textId, lineNumber, lg}, originalNode) => update(originalNode, {
+  writeNode: ({textId, lnr, lg}, originalNode) => update(originalNode, {
     attributes: {
       txtid: {$set: textId},
-      lnr: {$set: lineNumber},
+      lnr: {$set: lnr},
       lg: {$set: lg || ''}
     }
   }),

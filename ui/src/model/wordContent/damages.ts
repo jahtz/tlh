@@ -20,18 +20,13 @@ export function xmlifyDamageContent({damageType}: DamageContent): string[] {
 export type DamageType = 'del_in' | 'del_fin' | 'laes_in' | 'laes_fin' | 'ras_in' | 'ras_fin';
 
 export function getSymbolForDamageType(damageType: DamageType): string {
-  switch (damageType) {
-  case 'del_in':
-    return '[';
-  case 'del_fin':
-    return ']';
-  case 'laes_in':
-    return '⸢';
-  case 'laes_fin':
-    return '⸣';
-  case 'ras_in':
-  case  'ras_fin':
-    return '*';
-  }
+  return {
+    del_in: '[',
+    del_fin: ']',
+    laes_in: '⸢',
+    laes_fin: '⸣',
+    ras_in: '*',
+    ras_fin: '*'
+  }[damageType];
 }
 

@@ -2,7 +2,6 @@
 
 import {AOWordContent} from './wordContent';
 import {clearUpperMultiStringContent, UpperMultiStringContent, writeMultiWordContent} from './multiStringContent';
-import {XmlWriter} from '../../xmlModel/xmlWriting';
 
 export interface AOAkkadogramm {
   type: 'AOAkkadogramm';
@@ -13,7 +12,9 @@ export function akkadogramm(...contents: (UpperMultiStringContent | string)[]): 
   return {type: 'AOAkkadogramm', contents: contents.map(clearUpperMultiStringContent)};
 }
 
-export const akkadogrammFormat: XmlWriter<AOAkkadogramm> = ({contents}) => [`<aGr>${contents.flatMap(writeMultiWordContent).join('')}</aGr>`];
+export function convertAoAkkadogrammToXmlStrings({contents}: AOAkkadogramm): string[] {
+  return [`<aGr>${contents.flatMap(writeMultiWordContent).join('')}</aGr>`];
+}
 
 export function isAkkadogramm(c: AOWordContent): c is AOAkkadogramm {
   return c.type === 'AOAkkadogramm';

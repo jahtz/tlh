@@ -8,7 +8,7 @@ import {akkadogramm, AOAkkadogramm} from '../model/wordContent/akkadogramm';
 import {AOSumerogramm, sumerogramm} from '../model/wordContent/sumerogramm';
 import {inscribedLetter, InscribedLetter} from '../model/wordContent/inscribedLetter';
 import {AOGap, aoGap} from '../model/sentenceContent/gap';
-import {aoEllipsis, Ellipsis} from '../model/wordContent/ellipsis';
+import {aoEllipsis, AOEllipsis} from '../model/wordContent/ellipsis';
 import {AOWord, parsedWord} from '../model/sentenceContent/word';
 import {AOMaterLectionis, materLectionis} from '../model/wordContent/materLectionis';
 import {AONumeralContent, numeralContent} from '../model/wordContent/numeralContent';
@@ -38,7 +38,7 @@ type LanguageSpec = {
 
   // Other content
   paragraphSeparator: ParagraphSeparator,
-  ellipsis: Ellipsis,
+  ellipsis: AOEllipsis,
 
   gap: AOGap;
 

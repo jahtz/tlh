@@ -1,6 +1,5 @@
 import {AOWordContent} from './wordContent';
 import {clearUpperMultiStringContent, UpperMultiStringContent, writeMultiWordContent} from './multiStringContent';
-import {XmlWriter} from '../../xmlModel/xmlWriting';
 
 /*
  * Determinativ:
@@ -16,7 +15,9 @@ export function determinativ(...content: (UpperMultiStringContent | string)[]): 
   return {type: 'AODeterminativ', content: content.map(clearUpperMultiStringContent)};
 }
 
-export const determinativFormat: XmlWriter<AODeterminativ> = ({content}) => [`<d>${content.flatMap(writeMultiWordContent).join('')}</d>`];
+export function convertAoDeterminativToXmlStrings({content}: AODeterminativ): string[] {
+  return [`<d>${content.flatMap(writeMultiWordContent).join('')}</d>`];
+}
 
 export function isDeterminativ(c: AOWordContent): c is AODeterminativ {
   return c.type === 'AODeterminativ';
