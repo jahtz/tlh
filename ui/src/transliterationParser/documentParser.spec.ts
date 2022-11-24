@@ -1,12 +1,17 @@
 import {LineParseResult, lineParseSuccess, parseTransliterationLine} from './lineParser';
 import {parsedWord as w} from '../model/sentenceContent/word';
-import {sumerogramm as sg} from '../model/wordContent/sumerogramm';
-import {determinativ as d} from '../model/wordContent/determinativ';
-import {akkadogramm as ag} from '../model/wordContent/akkadogramm';
-import {numeralContent as nc} from '../model/wordContent/numeralContent';
-import {aoIllegibleContent as illeg} from '../model/wordContent/illegible';
-import {del_fin, del_in, laes_fin, laes_in, ue, us} from './testHelpers';
-import {indexDigit} from '../model/wordContent/indexDigit';
+import {
+  akkadogramm as ag,
+  aoIllegibleContent as illeg,
+  del_fin,
+  del_in,
+  determinativ as d,
+  indexDigit,
+  laes_fin,
+  laes_in,
+  numeralContent as nc,
+  sumerogramm as sg
+} from '../model/wordContent';
 import {paragraphSeparator} from '../model/paragraphSeparator';
 
 const completeInput = `
@@ -98,7 +103,7 @@ describe('DocumentParser', () => {
     {
       toParse: '1 # ti-e-ez-zi nu LÚ°MEŠ° x [x x (x)]',
       //
-      expected: lineParseSuccess('1', [w('ti-e-ez-zi'), w('nu'), w(sg('LÚ'), d('MEŠ')), w(illeg), w(del_in, illeg), w(illeg), w(us, illeg, ue, del_fin)])
+      expected: lineParseSuccess('1', [w('ti-e-ez-zi'), w('nu'), w(sg('LÚ'), d('MEŠ')), w(illeg), w(del_in, illeg), w(illeg), w('(', illeg, ')', del_fin)])
     },
     {
       toParse: '2 # ḫa-an-te-ez-zi ti-an-zi',
@@ -126,7 +131,7 @@ describe('DocumentParser', () => {
     },
     {
       toParse: '8 # [1 NINDA.GUR4.RA KU₇ °LÚ°Š]U.I ú-da-i',
-      expected: lineParseSuccess('8', [w(del_in, nc('1')), w(sg('NINDA', '.', 'GUR', indexDigit(4), '.', 'RA')), w(sg('KU', indexDigit(7))), w(d('LÚ'), sg('Š', del_fin, 'U', '.', 'I')), w('ú-da-i')])
+      expected: lineParseSuccess('8', [w(del_in, nc('1')), w(sg('NINDA', '.', 'GUR', indexDigit('4'), '.', 'RA')), w(sg('KU', indexDigit('7'))), w(d('LÚ'), sg('Š', del_fin, 'U', '.', 'I')), w('ú-da-i')])
     },
     {
       toParse: '9 # [na-an _A-NA DUMU].⸢É⸣.GAL pa-a-i', // <lb txtid="KBo 71.53" lnr="Vs. III 9" lg="Hit"/> <w><del_in/>na-an</w> <w><aGr>A-NA</aGr></w> <w><sGr>DUMU<del_fin/>.<laes_in/>É<laes_fin/>.GAL</sGr></w> <w>pa-a-i</w>

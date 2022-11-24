@@ -1,19 +1,23 @@
 import {transliteration} from './lineContentParser';
-import {determinativ} from '../model/wordContent/determinativ';
-import {materLectionis} from '../model/wordContent/materLectionis';
-import {damageContent, DamageType} from '../model/wordContent/damages';
-import {aoCorr} from '../model/wordContent/corrections';
-import {aoEllipsis} from '../model/wordContent/ellipsis';
-import {aoSign} from '../model/wordContent/sign';
-import {aoKolonMark} from '../model/wordContent/kolonMark';
-import {aoNote} from '../model/wordContent/footNote';
+import {
+  aoBasicText,
+  aoCorr,
+  aoEllipsis,
+  aoFootNote,
+  aoIllegibleContent,
+  aoKolonMark,
+  aoSign,
+  del_fin,
+  del_in,
+  determinativ,
+  laes_fin,
+  laes_in,
+  materLectionis
+} from '../model/wordContent';
 import {AOGap, aoGap} from '../model/sentenceContent/gap';
-import {aoIllegibleContent} from '../model/wordContent/illegible';
 import {Parser} from 'parsimmon';
-import {AOWordContent} from '../model/wordContent/wordContent';
-import {numeralContent} from '../model/wordContent/numeralContent';
-import {aoBasicText} from '../model/wordContent/basicText';
 import {ParagraphSeparator, paragraphSeparator, paragraphSeparatorDouble} from '../model/paragraphSeparator';
+import {XmlElementNode, XmlNonEmptyNode} from '../xmlModel/xmlModel';
 
 const determinativSpecialGenusCases: [string][] = [['m'], ['f']];
 const determinativSpecialDeityCases: [string][] = [['m.D'], ['f.D']];
@@ -22,16 +26,16 @@ const materLectionisCases: [string][] = [['abc'], ['xyz']];
 
 const curlyBraceCases: [string][] = [['AN'], ['Anderer Text!'], ['Text : mit : Doppel:punkten']];
 
-export function testParseDamages(parser: Parser<AOWordContent>): void {
+export function testParseDamages(parser: Parser<XmlNonEmptyNode>): void {
 
-  test.each<{ toParse: string, expected: DamageType }>([
-    {toParse: '[', expected: 'del_in'},
-    {toParse: ']', expected: 'del_fin'},
-    {toParse: '⸢', expected: 'laes_in'},
-    {toParse: '⸣', expected: 'laes_fin'}
+  test.each<{ toParse: string, expected: XmlElementNode }>([
+    {toParse: '[', expected: del_in},
+    {toParse: ']', expected: del_fin},
+    {toParse: '⸢', expected: laes_in},
+    {toParse: '⸣', expected: laes_fin}
   ])(
     'should parse $toParse as Damage Content with Damage Type $expected',
-    ({toParse, expected}) => expect(parser.tryParse(toParse)).toEqual(damageContent(expected))
+    ({toParse, expected}) => expect(parser.tryParse(toParse)).toEqual(expected)
   );
 }
 
@@ -45,7 +49,7 @@ describe('damageParser', () => {
 
 // Corrections
 
-export function testParseCorrections(parser: Parser<AOWordContent>): void {
+export function testParseCorrections(parser: Parser<XmlNonEmptyNode>): void {
   const cases = ['?', '(?)', '!', 'sic', '!?'];
 
   test.each(cases)(
@@ -74,7 +78,7 @@ describe('parseParagraphParser', () => testParseParagraphSeparator(transliterati
 
 // Ellipsis
 
-export function testParseEllipsis(parser: Parser<AOWordContent>): void {
+export function testParseEllipsis(parser: Parser<XmlNonEmptyNode>): void {
   test.each([['…'], ['...']])(
     'should parse %p as Ellipsis',
     (toParse) => expect(parser.tryParse(toParse)).toEqual(aoEllipsis)
@@ -85,7 +89,7 @@ describe('ellipsisParser', () => testParseEllipsis(transliteration.ellipsis));
 
 // Hittite
 
-export function testParseHittite(parser: Parser<AOWordContent>): void {
+export function testParseHittite(parser: Parser<XmlNonEmptyNode>): void {
   const cases: string[] = ['abc', 'def', 'wyz'];
 
   test.each(cases)(
@@ -97,7 +101,7 @@ describe('hittite', () => testParseHittite(transliteration.basicText));
 
 // Determinativ
 
-function testParseDefaultDeterminativ(parser: Parser<AOWordContent>): void {
+function testParseDefaultDeterminativ(parser: Parser<XmlNonEmptyNode>): void {
   const defaultCases: [string][] = [['ABC'], ['XYZ']];
 
   test.each(defaultCases)(
@@ -106,21 +110,21 @@ function testParseDefaultDeterminativ(parser: Parser<AOWordContent>): void {
   );
 }
 
-function testParseSpecialGenusDeterminativ(parser: Parser<AOWordContent>): void {
+function testParseSpecialGenusDeterminativ(parser: Parser<XmlNonEmptyNode>): void {
   test.each(determinativSpecialGenusCases)(
     'should parse °%p° as a determinativ [!Special Case!]',
     (toParse) => expect(parser.tryParse(`°${toParse}°`)).toEqual(determinativ(aoBasicText(toParse)))
   );
 }
 
-function testParseSpecialDeityDeterminativ(parser: Parser<AOWordContent>): void {
+function testParseSpecialDeityDeterminativ(parser: Parser<XmlNonEmptyNode>): void {
   test.each(determinativSpecialDeityCases)(
     'should parse °%p° as a determinativ [!Special Case!]',
     (toParse) => expect(parser.tryParse(`°${toParse}°`)).toEqual(determinativ(aoBasicText(toParse)))
   );
 }
 
-export function testParseDeterminativ(parser: Parser<AOWordContent>): void {
+export function testParseDeterminativ(parser: Parser<XmlNonEmptyNode>): void {
   testParseDefaultDeterminativ(parser);
   testParseSpecialGenusDeterminativ(parser);
   testParseSpecialDeityDeterminativ(parser);
@@ -139,7 +143,7 @@ describe('determinativ', () => {
 
 // Mater Lectionis
 
-export function testParseMaterLectionis(parser: Parser<AOWordContent>): void {
+export function testParseMaterLectionis(parser: Parser<XmlNonEmptyNode>): void {
   test.each(materLectionisCases)(
     'should parse °%p° as mater lectionis',
     (toParse) => expect(parser.tryParse(`°${toParse}°`)).toEqual(materLectionis(toParse))
@@ -155,7 +159,7 @@ describe('materLectionis', () => {
 
 // Illegible Content
 
-export function testParseIllegibleContent(parser: Parser<AOWordContent>): void {
+export function testParseIllegibleContent(parser: Parser<XmlNonEmptyNode>): void {
   expect(parser.tryParse('x')).toEqual(aoIllegibleContent);
 }
 
@@ -163,7 +167,7 @@ describe('illegible', () => testParseIllegibleContent(transliteration.illegible)
 
 // Sign content
 
-export function testParseSignContent(parser: Parser<AOWordContent>): void {
+export function testParseSignContent(parser: Parser<XmlNonEmptyNode>): void {
   test.each(curlyBraceCases)(
     'should parse {S:%p} as a sign',
     (toParse) => expect(parser.tryParse(`{S:${toParse}}`)).toEqual(aoSign(toParse))
@@ -185,10 +189,10 @@ describe('gapParser', () => testParseGapContent(transliteration.gap));
 
 // Foot Note
 
-export function testParseFootNote(parser: Parser<AOWordContent>): void {
+export function testParseFootNote(parser: Parser<XmlNonEmptyNode>): void {
   test.each(curlyBraceCases)(
     'should parse {F:%p} as a foot note',
-    (toParse) => expect(parser.tryParse(`{F:${toParse}}`)).toEqual(aoNote(toParse))
+    (toParse) => expect(parser.tryParse(`{F:${toParse}}`)).toEqual(aoFootNote(toParse))
   );
 }
 
@@ -196,7 +200,7 @@ describe('footNoteParser', () => testParseFootNote(transliteration.footNote));
 
 // Kolon Mark
 
-export function testParseKolonMark(parser: Parser<AOWordContent>): void {
+export function testParseKolonMark(parser: Parser<XmlNonEmptyNode>): void {
   test.each(curlyBraceCases)(
     'should parse {K:%p} as a kolon mark',
     (toParse) => expect(parser.tryParse(`{K:${toParse}}`)).toEqual(aoKolonMark(toParse))
@@ -207,10 +211,10 @@ describe('kolonMarkParser', () => testParseKolonMark(transliteration.kolonMark))
 
 // Numeral content
 
-export function testParseNumeralContent(parser: Parser<AOWordContent>): void {
+export function testParseNumeralContent(parser: Parser<XmlNonEmptyNode>): void {
   test.each(['1', '3', '4', '77'])(
     'should parse %p as numeral content',
-    (toParse) => expect(parser.tryParse(toParse)).toEqual(numeralContent(aoBasicText(toParse)))
+    (toParse) => expect(parser.tryParse(toParse)).toEqual(aoBasicText(toParse))
   );
 }
 
@@ -218,7 +222,7 @@ describe('numeralContentParser', () => testParseNumeralContent(transliteration.n
 
 // Inscribed Letter
 
-export function testParseInscribedLetter(parser: Parser<AOWordContent>): void {
+export function testParseInscribedLetter(parser: Parser<XmlNonEmptyNode>): void {
   it.skip('should parse an inscribed letter', () => {
     fail('TODO: implement!');
   });

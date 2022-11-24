@@ -1,8 +1,5 @@
 import {transliteration} from './lineContentParser';
-import {akkadogramm} from '../model/wordContent/akkadogramm';
-import {sumerogramm} from '../model/wordContent/sumerogramm';
-import {inscribedLetter} from '../model/wordContent/inscribedLetter';
-import {AOWordContent} from '../model/wordContent/wordContent';
+import {akkadogramm, indexDigit, inscribedLetter, sumerogramm} from '../model/wordContent';
 import {Parser} from 'parsimmon';
 import {
   testParseCorrections,
@@ -15,9 +12,9 @@ import {
   testParseNumeralContent,
   testParseSignContent
 } from './singleParsers.spec';
-import {indexDigit} from '../model/wordContent/indexDigit';
+import {XmlNonEmptyNode} from '../xmlModel/xmlModel';
 
-function testParseContentOfMultiContent(parser: Parser<AOWordContent>): void {
+function testParseContentOfMultiContent(parser: Parser<XmlNonEmptyNode>): void {
   // testParseHittite(parser);
   // FIXME: parse upper text!
   testParseCorrections(parser);
@@ -27,7 +24,7 @@ function testParseContentOfMultiContent(parser: Parser<AOWordContent>): void {
 
 describe('contentOfMultiStringContentParser', () => testParseContentOfMultiContent(transliteration.contentOfMultiStringContent));
 
-function testParseSimpleWordContent(parser: Parser<AOWordContent>): void {
+function testParseSimpleWordContent(parser: Parser<XmlNonEmptyNode>): void {
   testParseContentOfMultiContent(parser);
   testParseDeterminativ(parser);
   testParseMaterLectionis(parser);
@@ -42,7 +39,7 @@ describe('simpleWordContentParser', () => testParseSimpleWordContent(translitera
 
 // Akkadogramm
 
-function testParseAkkadogramm(parser: Parser<AOWordContent>): void {
+function testParseAkkadogramm(parser: Parser<XmlNonEmptyNode>): void {
   test.each`
   toParse       | expected
   ${'_ABC'}     | ${akkadogramm('ABC')}
@@ -67,7 +64,7 @@ describe('akkadogramm', () => testParseAkkadogramm(transliteration.akkadogramm))
 
 // Sumerogramm
 
-function testParseSumerogramm(parser: Parser<AOWordContent>): void {
+function testParseSumerogramm(parser: Parser<XmlNonEmptyNode>): void {
   test.each`
   toParse        | expected
   ${'ABC'}       | ${sumerogramm('ABC')}
@@ -86,7 +83,7 @@ describe('sumerogramm', () => testParseSumerogramm(transliteration.sumerogramm))
 
 // Word Content
 
-function testParseWordContent(parser: Parser<AOWordContent>): void {
+function testParseWordContent(parser: Parser<XmlNonEmptyNode>): void {
   testParseAkkadogramm(parser);
   testParseSumerogramm(parser);
   testParseSimpleWordContent(parser);

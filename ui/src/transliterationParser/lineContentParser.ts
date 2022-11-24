@@ -1,24 +1,28 @@
 import {alt, createLanguage, end, Failure, oneOf, optWhitespace, regexp, Result, Result as ParsimmonResult, seq, string, TypedLanguage} from 'parsimmon';
-import {AOSign, aoSign} from '../model/wordContent/sign';
-import {damageContent, DamageContent, DamageType} from '../model/wordContent/damages';
-import {aoCorr, AOCorr} from '../model/wordContent/corrections';
+import {
+  akkadogramm,
+  aoBasicText,
+  aoCorr,
+  aoEllipsis,
+  aoFootNote,
+  aoIllegibleContent,
+  aoKolonMark,
+  aoSign,
+  del_fin,
+  del_in,
+  determinativ,
+  indexDigit,
+  inscribedLetter,
+  laes_fin,
+  laes_in,
+  materLectionis,
+  ras_in,
+  sumerogramm
+} from '../model/wordContent';
 import {paragraphSeparator, ParagraphSeparator, paragraphSeparatorDouble} from '../model/paragraphSeparator';
-import {AODeterminativ, determinativ,} from '../model/wordContent/determinativ';
-import {akkadogramm, AOAkkadogramm} from '../model/wordContent/akkadogramm';
-import {AOSumerogramm, sumerogramm} from '../model/wordContent/sumerogramm';
-import {inscribedLetter, InscribedLetter} from '../model/wordContent/inscribedLetter';
 import {AOGap, aoGap} from '../model/sentenceContent/gap';
-import {aoEllipsis, AOEllipsis} from '../model/wordContent/ellipsis';
 import {AOWord, parsedWord} from '../model/sentenceContent/word';
-import {AOMaterLectionis, materLectionis} from '../model/wordContent/materLectionis';
-import {AONumeralContent, numeralContent} from '../model/wordContent/numeralContent';
-import {AOFootNote, aoNote} from '../model/wordContent/footNote';
-import {aoIllegibleContent, AOIllegibleContent} from '../model/wordContent/illegible';
-import {aoKolonMark, AOKolonMark} from '../model/wordContent/kolonMark';
-import {AOSimpleWordContent, AOWordContent} from '../model/wordContent/wordContent';
-import {aoBasicText, BasicText} from '../model/wordContent/basicText';
-import {ForeignCharacter, UpperMultiStringContent} from '../model/wordContent/multiStringContent';
-import {indexDigit, IndexDigit} from '../model/wordContent/indexDigit';
+import {XmlElementNode, XmlNonEmptyNode, XmlTextNode} from '../xmlModel/xmlModel';
 
 // Other
 
@@ -26,41 +30,41 @@ type LanguageSpec = {
   lowerText: string;
   upperText: string;
 
-  indexDigit: IndexDigit;
+  indexDigit: XmlTextNode;
 
   // Multi string content
-  damages: DamageContent;
-  corrections: AOCorr;
-  inscribedLetter: InscribedLetter | IndexDigit;
-  basicText: BasicText;
+  damages: XmlElementNode;
+  corrections: XmlElementNode;
+  inscribedLetter: XmlTextNode;
+  basicText: XmlTextNode;
 
-  contentOfMultiStringContent: UpperMultiStringContent;
+  contentOfMultiStringContent: XmlNonEmptyNode;
 
   // Other content
   paragraphSeparator: ParagraphSeparator,
-  ellipsis: AOEllipsis,
+  ellipsis: XmlTextNode,
 
   gap: AOGap;
 
   // Simple word content
   specialDeterminativeContent: string;
-  determinative: AODeterminativ;
-  materLectionis: AOMaterLectionis | AODeterminativ;
-  numeralContent: AONumeralContent;
-  footNote: AOFootNote;
-  sign: AOSign;
-  kolonMark: AOKolonMark;
-  illegible: AOIllegibleContent;
+  determinative: XmlElementNode;
+  materLectionis: XmlElementNode;
+  numeralContent: XmlTextNode;
+  footNote: XmlElementNode;
+  sign: XmlElementNode;
+  kolonMark: XmlElementNode;
+  illegible: XmlTextNode;
 
-  simpleWordContent: AOSimpleWordContent;
+  simpleWordContent: XmlNonEmptyNode;
 
   // Word content
-  foreignCharacter: ForeignCharacter;
+  foreignCharacter: XmlNonEmptyNode[];
 
-  akkadogramm: AOAkkadogramm;
-  sumerogramm: AOSumerogramm;
+  akkadogramm: XmlElementNode;
+  sumerogramm: XmlElementNode;
 
-  wordContent: AOWordContent;
+  wordContent: XmlNonEmptyNode;
 
   word: AOWord;
 }
@@ -80,14 +84,14 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
   lowerText: () => regexp(/\p{Ll}+/u),
   upperText: () => regexp(/\p{Lu}+/u),
 
-  damages: () => alt<DamageType>(
-    string('[').result('del_in'),
-    string(']').result('del_fin'),
-    string('⸢').result('laes_in'),
-    string('⸣').result('laes_fin'),
+  damages: () => alt(
+    string('[').result(del_in),
+    string(']').result(del_fin),
+    string('⸢').result(laes_in),
+    string('⸣').result(laes_fin),
     // FIXME: rasure has start and end!
-    string('*').result('ras_in'),
-  ).map(damageContent),
+    string('*').result(ras_in),
+  ),
 
   corrections: () => alt(
     string('?'),
@@ -119,7 +123,7 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
     string('°')
   ).map(([, result,]) => result === 'm' || result === 'f' ? determinativ(aoBasicText(result)) : materLectionis(result)),
 
-  numeralContent: () => regexp(/[[\d]+/).map((result) => numeralContent(aoBasicText(result))),
+  numeralContent: () => regexp(/[[\d]+/).map((result) => aoBasicText(result)),
 
   illegible: () => string('x').result(aoIllegibleContent),
 
@@ -130,7 +134,7 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
     .map(([, , content,]) => aoKolonMark(content)),
 
   footNote: () => seq(string('{F:'), optWhitespace, regexp(/[^}]*/), string('}'))
-    .map(([, , content,]) => aoNote(content)),
+    .map(([, , content,]) => aoFootNote(content)),
 
   gap: () => seq(string('{G:'), optWhitespace, regexp(/[^}]*/), string('}'))
     .map(([, , content,]) => aoGap(content)),
@@ -142,12 +146,12 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
 
   indexDigit: () => alt(
     // FIXME: subscript!
-    regexp(/\d+/).map(parseInt),
-    regexp(/[₀₁₂₃₄₅₆₇₈₉]+/).map((res) => res.charCodeAt(0) % 10),
+    regexp(/\d+/),
+    regexp(/[₀₁₂₃₄₅₆₇₈₉]+/).map((res) => (res.charCodeAt(0) % 10).toString()),
     string('x')
   ).lookahead(end).map(indexDigit),
 
-  simpleWordContent: r => alt<AOSimpleWordContent>(
+  simpleWordContent: r => alt(
     r.corrections,
     r.damages,
     r.inscribedLetter,
@@ -160,7 +164,7 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
     alt(r.determinative, r.materLectionis, r.numeralContent),
   ),
 
-  contentOfMultiStringContent: (r) => alt<UpperMultiStringContent>(
+  contentOfMultiStringContent: (r) => alt(
     r.corrections,
     r.damages,
     r.inscribedLetter,

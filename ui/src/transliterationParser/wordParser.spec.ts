@@ -1,10 +1,16 @@
 import {transliteration} from './lineContentParser';
-import {del_fin, del_in, laes_fin, laes_in, uc, ue, us} from './testHelpers';
-import {determinativ as d} from '../model/wordContent/determinativ';
-import {sumerogramm as sg} from '../model/wordContent/sumerogramm';
-import {numeralContent} from '../model/wordContent/numeralContent';
-import {materLectionis} from '../model/wordContent/materLectionis';
-import {aoEllipsis} from '../model/wordContent/ellipsis';
+import {
+  aoEllipsis,
+  del_fin,
+  del_in,
+  determinativ as d,
+  laes_fin,
+  laes_in,
+  materLectionis,
+  numeralContent,
+  sumerogramm as sg
+} from '../model/wordContent';
+import {uc} from './testHelpers';
 import {AOWord, parsedWord} from '../model/sentenceContent/word';
 
 interface TestData {
@@ -16,7 +22,7 @@ describe('transliteration Parser', () => {
   test.each<TestData>([
     {toParse: '...', expected: parsedWord(aoEllipsis)},
     // FIXME: what does (-) mean? Is this 'legal'?
-    {toParse: 'im-ma(-)[', expected: parsedWord('im-ma', us, '-', ue, del_in)},
+    {toParse: 'im-ma(-)[', expected: parsedWord('im-ma', '(', '-', ')', del_in)},
     {toParse: '°m°LUGAL--KAL', expected: parsedWord(d('m'), sg('LUGAL'), '-', sg('KAL'))},
     {toParse: 'DUMU°MEŠ°].⸢É⸣.GAL-ma-an', expected: parsedWord(sg('DUMU'), d('MEŠ'), sg(del_fin, '.', laes_in, 'É', laes_fin, '.', 'GAL'), '-ma-an')},
     {toParse: 'DINGIR?', expected: parsedWord(sg('DINGIR'), uc)},

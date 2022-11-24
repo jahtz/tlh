@@ -20,7 +20,7 @@ export interface XmlTextNode {
   textContent: string;
 }
 
-export function textNode(textContent: string): XmlTextNode {
+export function xmlTextNode(textContent: string): XmlTextNode {
   return {textContent};
 }
 
@@ -36,7 +36,9 @@ export function isXmlCommentNode(node: XmlNode): node is XmlCommentNode {
   return 'comment' in node;
 }
 
-export type XmlNode = XmlElementNode | XmlTextNode | XmlCommentNode;
+export type XmlNonEmptyNode = XmlElementNode | XmlTextNode;
+
+export type XmlNode = XmlNonEmptyNode | XmlCommentNode;
 
 // Helper functions
 

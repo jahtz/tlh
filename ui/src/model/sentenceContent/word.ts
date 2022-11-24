@@ -1,16 +1,17 @@
-import {AOWordContent, convertAoWordToXmlString, convertAoWordContentToXmlNode} from '../wordContent/wordContent';
 import {MorphologicalAnalysis, writeMorphAnalysisAttribute} from '../morphologicalAnalysis';
-import {aoBasicText} from '../wordContent/basicText';
-import {indent} from '../../xmlModel/xmlWriting';
-import {Attributes, xmlElementNode, XmlElementNode} from '../../xmlModel/xmlModel';
+import {indent, writeNode} from '../../xmlModel/xmlWriting';
+import {Attributes, xmlElementNode, XmlElementNode, XmlNonEmptyNode, xmlTextNode} from '../../xmlModel/xmlModel';
 
+/**
+ * @deprecated: make <w/>-Tag!
+ */
 export interface AOWord {
   _type: 'AoWord';
   lng?: string;
   mrp0sel?: string;
   morphologies?: MorphologicalAnalysis[];
   transliteration?: string;
-  content: AOWordContent[];
+  content: XmlNonEmptyNode[];
 }
 
 export function convertAoWord2XmlStrings({transliteration, content, lng, mrp0sel, morphologies}: AOWord): string[] {
@@ -20,7 +21,7 @@ export function convertAoWord2XmlStrings({transliteration, content, lng, mrp0sel
     ...(mrp0sel ? [indent(`mrp0sel="${mrp0sel || ''}"`)] : []),
     ...(lng ? [indent(`lng="${lng}"`)] : []),
     ...(morphologies || []).flatMap(writeMorphAnalysisAttribute).map(indent),
-    `>${content.map(convertAoWordToXmlString).join('')}</w>`
+    `>${content.map((n) => writeNode(n)).join('')}</w>`
   ];
 }
 
@@ -34,9 +35,9 @@ export function convertAoWordToXml({transliteration, content, lng: lng, mrp0sel,
     }
   }
 
-  return xmlElementNode('w', attributes, content.map(convertAoWordContentToXmlNode));
+  return xmlElementNode('w', attributes, content);
 }
 
-export function parsedWord(...content: (AOWordContent | string)[]): AOWord {
-  return {_type: 'AoWord', content: content.map((c) => typeof c === 'string' ? aoBasicText(c) : c)};
+export function parsedWord(...content: (XmlNonEmptyNode | string)[]): AOWord {
+  return {_type: 'AoWord', content: content.map((c) => typeof c === 'string' ? xmlTextNode(c) : c)};
 }
