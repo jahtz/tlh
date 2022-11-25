@@ -3,10 +3,12 @@ import {LineBreakData} from '../../xmlEditor/elementEditors/lineBreakData';
 import {xmlElementNode, XmlElementNode} from '../../xmlModel/xmlModel';
 
 
-export const paragraphSeparatorXmlNode: XmlElementNode = xmlElementNode('parsep');
+export const paragraphSeparatorXmlNode: XmlElementNode<'parsep'> = xmlElementNode('parsep');
 
-export const paragraphSeparatorDoubleXmlNode: XmlElementNode = xmlElementNode('parsep_dbl');
+export const paragraphSeparatorDoubleXmlNode: XmlElementNode<'parsep_dbl'> = xmlElementNode('parsep_dbl');
 
+
+export type ParagraphSeparatorNode = XmlElementNode<'parsep'> | XmlElementNode<'parsep_dbl'>;
 
 export interface AOLineBreak {
   type: 'AOLineBreak';
@@ -14,7 +16,7 @@ export interface AOLineBreak {
   // => <w/>[]
   words: AOWord[];
   // => <parsep/> or <parsep_dbl/>
-  maybeParagraphSeparator: XmlElementNode | undefined;
+  maybeParagraphSeparator: ParagraphSeparatorNode | undefined;
 }
 
 export function convertAoLineBreakToXmlString({lb: {textId, lnr, lg}, words}: AOLineBreak): string[] {

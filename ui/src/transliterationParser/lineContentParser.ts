@@ -22,7 +22,7 @@ import {
 import {AOGap, aoGap} from '../model/sentenceContent/gap';
 import {AOWord, parsedWord} from '../model/sentenceContent/word';
 import {XmlElementNode, XmlNonEmptyNode, XmlTextNode} from '../xmlModel/xmlModel';
-import {paragraphSeparatorDoubleXmlNode, paragraphSeparatorXmlNode} from '../model/sentenceContent/linebreak';
+import {paragraphSeparatorDoubleXmlNode, ParagraphSeparatorNode, paragraphSeparatorXmlNode} from '../model/sentenceContent/linebreak';
 
 
 // Other
@@ -42,7 +42,7 @@ type LanguageSpec = {
   contentOfMultiStringContent: XmlNonEmptyNode;
 
   // Other content
-  paragraphSeparator: XmlElementNode,
+  paragraphSeparator: ParagraphSeparatorNode,
   ellipsis: XmlTextNode,
 
   gap: AOGap;
@@ -238,7 +238,7 @@ interface ContentParseError {
 interface ContentParseSuccess {
   type: 'ContentParseSuccess';
   words: AOWord[];
-  maybeParSep: XmlElementNode | undefined;
+  maybeParSep: ParagraphSeparatorNode | undefined;
 }
 
 export type ContentParseResult = ContentParseError | ContentParseSuccess;

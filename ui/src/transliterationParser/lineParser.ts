@@ -2,7 +2,7 @@ import {AOWord} from '../model/sentenceContent/word';
 import {Failure, Result} from 'parsimmon';
 import {LinePreParseResult, preParseLine} from './linePreParser';
 import {parseTransliterationLineContent} from './lineContentParser';
-import {XmlElementNode} from '../xmlModel/xmlModel';
+import {ParagraphSeparatorNode} from '../model/sentenceContent/linebreak';
 
 interface LinePreParsingError {
   type: 'LinePreParsingError';
@@ -20,11 +20,11 @@ interface LineParseSuccess {
     // make object?
     lnr: string;
     words: AOWord[];
-    maybeParagraphSeparator: XmlElementNode | undefined;
+    maybeParagraphSeparator: ParagraphSeparatorNode | undefined;
   };
 }
 
-export function lineParseSuccess(lnr: string, words: AOWord[], maybeParagraphSeparator: XmlElementNode | undefined = undefined): LineParseSuccess {
+export function lineParseSuccess(lnr: string, words: AOWord[], maybeParagraphSeparator: ParagraphSeparatorNode | undefined = undefined): LineParseSuccess {
   return {type: 'LineParseSuccess', data: {lnr, words, maybeParagraphSeparator}};
 }
 
