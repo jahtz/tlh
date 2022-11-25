@@ -10,13 +10,13 @@ export interface NodeEditorRightSideProps {
   initiateSubmit: () => void;
   deleteNode?: () => void;
   cancelSelection: () => void;
+  jumpElement?: (forward: boolean) => void;
+  fontSizeSelectorProps: FontSizeSelectorProps;
 }
 
 interface IProps extends NodeEditorRightSideProps {
   children: JSX.Element;
   otherButtons?: JSX.Element;
-  jumpElement?: (forward: boolean) => void;
-  fontSizeSelectorProps: FontSizeSelectorProps;
 }
 
 export function NodeEditorRightSide({

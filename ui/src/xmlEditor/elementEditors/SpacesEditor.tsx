@@ -4,17 +4,7 @@ import {XmlElementNode} from '../../xmlModel/xmlModel';
 import {useTranslation} from 'react-i18next';
 import {NodeEditorRightSide} from '../NodeEditorRightSide';
 
-export function SpacesEditor({
-  data,
-  originalNode,
-  updateNode,
-  changed,
-  deleteNode,
-  initiateSubmit,
-  initiateJumpElement,
-  fontSizeSelectorProps,
-  cancelSelection
-}: XmlEditableNodeIProps<WordNodeData>): JSX.Element {
+export function SpacesEditor({data, updateNode, rightSideProps}: XmlEditableNodeIProps<WordNodeData>): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -23,8 +13,7 @@ export function SpacesEditor({
   }
 
   return (
-    <NodeEditorRightSide originalNode={originalNode} changed={changed} initiateSubmit={initiateSubmit} deleteNode={deleteNode} jumpElement={initiateJumpElement}
-                         fontSizeSelectorProps={fontSizeSelectorProps} cancelSelection={cancelSelection}>
+    <NodeEditorRightSide {...rightSideProps}>
       <div>
         <label htmlFor="spacesCount" className="font-bold">{t('spacesCount')}:</label>
 

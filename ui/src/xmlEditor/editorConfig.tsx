@@ -2,19 +2,18 @@ import {XmlElementNode} from '../xmlModel/xmlModel';
 import {Argument as ClassNamesArgument} from 'classnames';
 import {InsertablePositions, NodePath} from './insertablePositions';
 import {Spec} from 'immutability-helper';
-import {FontSizeSelectorProps} from './FontSizeSelector';
 import {NodeEditorRightSideProps} from './NodeEditorRightSide';
 
 export type EditTriggerFunc = (node: XmlElementNode, path: NodePath) => void;
 
-export interface XmlEditableNodeIProps<T = XmlElementNode> extends NodeEditorRightSideProps {
+export interface XmlEditableNodeIProps<T = XmlElementNode> {
   data: T;
   path: number[];
   updateNode: (spec: Spec<T>) => void;
   keyHandlingEnabled: boolean,
   setKeyHandlingEnabled: (enabled: boolean) => void;
   initiateJumpElement: (forward: boolean) => void;
-  fontSizeSelectorProps: FontSizeSelectorProps;
+  rightSideProps: NodeEditorRightSideProps;
 }
 
 

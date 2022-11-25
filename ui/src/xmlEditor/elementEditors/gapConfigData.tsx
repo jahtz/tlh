@@ -25,23 +25,12 @@ export const gapConfig: XmlInsertableSingleEditableNodeConfig = {
   }
 };
 
-function GapEditor({
-  data,
-  originalNode,
-  updateNode,
-  changed,
-  initiateSubmit,
-  deleteNode,
-  initiateJumpElement,
-  fontSizeSelectorProps,
-  cancelSelection
-}: XmlEditableNodeIProps): JSX.Element {
+function GapEditor({data, updateNode, rightSideProps}: XmlEditableNodeIProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
   return (
-    <NodeEditorRightSide originalNode={originalNode} changed={changed} initiateSubmit={initiateSubmit} deleteNode={deleteNode}
-                         jumpElement={initiateJumpElement} fontSizeSelectorProps={fontSizeSelectorProps} cancelSelection={cancelSelection}>
+    <NodeEditorRightSide {...rightSideProps}>
       <div>
         <label htmlFor="content" className="font-bold">{t('content')}:</label>
 

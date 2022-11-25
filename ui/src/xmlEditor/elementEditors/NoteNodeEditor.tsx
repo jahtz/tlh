@@ -28,12 +28,10 @@ export function reCountNodeNumbers(rootNode: XmlElementNode, tagName: string, at
 
 export function NoteNodeEditor({
   data,
-  changed,
   updateNode,
-  deleteNode,
   setKeyHandlingEnabled,
-  initiateSubmit,
-  initiateJumpElement
+  initiateJumpElement,
+  rightSideProps: {changed, deleteNode, initiateSubmit}
 }: XmlEditableNodeIProps<NoteData>): JSX.Element {
 
   const {t} = useTranslation('common');

@@ -27,16 +27,10 @@ interface IState {
 
 export function WordNodeEditor({
   data,
-  originalNode,
-  changed,
   updateNode,
-  deleteNode,
   keyHandlingEnabled,
   setKeyHandlingEnabled,
-  initiateJumpElement,
-  initiateSubmit,
-  fontSizeSelectorProps,
-  cancelSelection
+  rightSideProps
 }: XmlEditableNodeIProps<WordNodeData>): JSX.Element {
 
   const {t} = useTranslation('common');
@@ -51,7 +45,7 @@ export function WordNodeEditor({
 
   function handleKey(event: KeyboardEvent) {
     if (keyHandlingEnabled && editorConfig.submitChangeKeys.includes(event.key)) {
-      initiateSubmit();
+      rightSideProps.initiateSubmit();
     }
   }
 
@@ -160,8 +154,7 @@ export function WordNodeEditor({
   );
 
   return (
-    <NodeEditorRightSide originalNode={originalNode} changed={changed} initiateSubmit={initiateSubmit} jumpElement={initiateJumpElement} deleteNode={deleteNode}
-                         otherButtons={otherButtons} fontSizeSelectorProps={fontSizeSelectorProps} cancelSelection={cancelSelection}>
+    <NodeEditorRightSide {...rightSideProps} otherButtons={otherButtons}>
       {(state.editContent || typeof state.editContent === 'string')
         ? <WordContentEditor initialTransliteration={state.editContent} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>
         : (

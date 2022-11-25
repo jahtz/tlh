@@ -36,33 +36,14 @@ export const clEditorConfig: XmlInsertableSingleEditableNodeConfig = {
   }
 };
 
-export function ClEditor({
-  /*  data,*/
-  originalNode,
-  changed,
-  updateNode,
-  deleteNode,
-  setKeyHandlingEnabled,
-  initiateSubmit,
-  initiateJumpElement,
-  fontSizeSelectorProps,
-  cancelSelection,
-}: XmlEditableNodeIProps): JSX.Element {
+export function ClEditor({updateNode, setKeyHandlingEnabled, rightSideProps}: XmlEditableNodeIProps): JSX.Element {
   const {t} = useTranslation('common');
 
   return (
-    <NodeEditorRightSide
-      originalNode={originalNode}
-      changed={changed}
-      initiateSubmit={initiateSubmit}
-      jumpElement={initiateJumpElement}
-      deleteNode={deleteNode}
-      fontSizeSelectorProps={fontSizeSelectorProps}
-      cancelSelection={cancelSelection}
-    >
+    <NodeEditorRightSide{...rightSideProps}>
       <div>
         <label htmlFor="id" className="font-bold block">{t('id')}:</label>
-        <input id="id" defaultValue={originalNode.attributes.id}
+        <input id="id" defaultValue={rightSideProps.originalNode.attributes.id}
                className="p-2 rounded border border-slate-200 w-full mt-2"
                onFocus={() => setKeyHandlingEnabled(false)}
                onChange={(event) => updateNode({attributes: {id: {$set: event.target.value}}})}/>

@@ -21,15 +21,7 @@ function AoTextNumberField({source: {type, name}, updateType, updateText}: AoTex
   );
 }
 
-export function AoManuscriptsEditor({
-  data,
-  originalNode,
-  updateNode,
-  changed,
-  initiateSubmit,
-  fontSizeSelectorProps,
-  cancelSelection
-}: XmlEditableNodeIProps<AoManuscriptsData>): JSX.Element {
+export function AoManuscriptsEditor({data, updateNode, rightSideProps,}: XmlEditableNodeIProps<AoManuscriptsData>): JSX.Element {
 
   function updateType(index: number, newType: SourceType): void {
     updateNode({content: {[index]: {type: {$set: newType}}}});
@@ -52,8 +44,7 @@ export function AoManuscriptsEditor({
   }
 
   return (
-    <NodeEditorRightSide originalNode={originalNode} changed={changed} initiateSubmit={initiateSubmit} fontSizeSelectorProps={fontSizeSelectorProps}
-                         cancelSelection={cancelSelection}>
+    <NodeEditorRightSide {...rightSideProps}>
       <div>
         {data.content.map((source, index) =>
           <div className="mt-2 flex" key={index}>

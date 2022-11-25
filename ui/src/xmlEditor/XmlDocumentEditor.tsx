@@ -274,21 +274,24 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
 
   function renderNodeEditor({node, data, path, changed}: IEditNodeState<T>): JSX.Element {
     return (editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>).edit({
-      originalNode: node,
+      rightSideProps: {
+        originalNode: node,
+        deleteNode: () => deleteNode(path),
+        changed,
+        initiateSubmit: () => updateNode(),
+        fontSizeSelectorProps: {
+          currentFontSize: state.rightSideFontSize,
+          updateFontSize: (delta) => setState((state) => update(state, {rightSideFontSize: {$apply: (value) => value + delta}}))
+        },
+        cancelSelection: () => setState((state) => update(state, {editorState: {$set: undefined}})),
+        jumpElement: (forward) => jumpEditableNodes(node.tagName, forward)
+      },
       data,
       path,
-      changed,
       updateNode: (data) => updateEditedNode(data),
-      deleteNode: () => deleteNode(path),
       initiateJumpElement: (forward) => jumpEditableNodes(node.tagName, forward),
       keyHandlingEnabled: state.keyHandlingEnabled,
       setKeyHandlingEnabled: (value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}})),
-      initiateSubmit: () => updateNode(),
-      fontSizeSelectorProps: {
-        currentFontSize: state.rightSideFontSize,
-        updateFontSize: (delta) => setState((state) => update(state, {rightSideFontSize: {$apply: (value) => value + delta}}))
-      },
-      cancelSelection: () => setState((state) => update(state, {editorState: {$set: undefined}})),
     });
   }
 

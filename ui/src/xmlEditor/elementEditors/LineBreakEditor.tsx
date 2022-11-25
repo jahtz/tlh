@@ -6,22 +6,15 @@ import {NodeEditorRightSide} from '../NodeEditorRightSide';
 
 export function LineBreakEditor({
   data,
-  originalNode,
-  changed,
   updateNode,
-  deleteNode,
   setKeyHandlingEnabled,
-  initiateSubmit,
-  initiateJumpElement,
-  fontSizeSelectorProps,
-  cancelSelection
+  rightSideProps
 }: XmlEditableNodeIProps<LineBreakData>): JSX.Element {
 
   const {t} = useTranslation('common');
 
   return (
-    <NodeEditorRightSide originalNode={originalNode} changed={changed} initiateSubmit={initiateSubmit} jumpElement={initiateJumpElement}
-                         deleteNode={deleteNode} fontSizeSelectorProps={fontSizeSelectorProps} cancelSelection={cancelSelection}>
+    <NodeEditorRightSide {...rightSideProps}>
       <div>
         <div className="mb-4">
           <label htmlFor="textId" className="font-bold">{t('textId')}:</label>

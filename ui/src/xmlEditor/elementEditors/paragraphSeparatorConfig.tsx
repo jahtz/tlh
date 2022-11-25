@@ -16,7 +16,7 @@ export const paragraphSeparatorConfig: XmlSingleEditableNodeConfig = {
 
 const separatorTypes: string[] = ['parsep', 'parsep_dbl'];
 
-function ParagraphSeparatorEditor({data, updateNode, changed, initiateSubmit, deleteNode}: XmlEditableNodeIProps): JSX.Element {
+function ParagraphSeparatorEditor({data, updateNode, rightSideProps: {changed, initiateSubmit, deleteNode}}: XmlEditableNodeIProps): JSX.Element {
 
   const {t} = useTranslation('common');
 

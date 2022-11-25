@@ -3,24 +3,12 @@ import {useTranslation} from 'react-i18next';
 import {NodeEditorRightSide} from '../NodeEditorRightSide';
 import {ClbData} from './clbData';
 
-export function ClbEditor({
-  data,
-  originalNode,
-  changed,
-  updateNode,
-  deleteNode,
-  setKeyHandlingEnabled,
-  initiateSubmit,
-  initiateJumpElement,
-  fontSizeSelectorProps,
-  cancelSelection
-}: XmlEditableNodeIProps<ClbData>): JSX.Element {
+export function ClbEditor({data, updateNode, setKeyHandlingEnabled, rightSideProps}: XmlEditableNodeIProps<ClbData>): JSX.Element {
 
   const {t} = useTranslation('common');
 
   return (
-    <NodeEditorRightSide originalNode={originalNode} changed={changed} initiateSubmit={initiateSubmit} jumpElement={initiateJumpElement}
-                         deleteNode={deleteNode} fontSizeSelectorProps={fontSizeSelectorProps} cancelSelection={cancelSelection}>
+    <NodeEditorRightSide {...rightSideProps}>
 
       <div className="mb-4">
         <label htmlFor="lineNumber" className="font-bold">{t('id')}:</label>
