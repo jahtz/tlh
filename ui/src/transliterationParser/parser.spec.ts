@@ -20,7 +20,7 @@ import {
   sumerogramm as sg
 } from '../model/wordContent';
 import {sc, uc} from './testHelpers';
-import {paragraphSeparator, paragraphSeparatorDouble} from '../model/paragraphSeparator';
+import {paragraphSeparatorDoubleXmlNode as parsep_dbl, paragraphSeparatorXmlNode as parsep} from '../model/sentenceContent/linebreak';
 
 interface TestData {
   toParse: string;
@@ -83,7 +83,7 @@ describe('The transliteration parser should parse lines', () => {
           // <w><del_in/></w> <w><sGr>...</sGr></w> <w>pa-ra-a<del_fin/></w> <w>da-a-aš</w> </s></p><parsep/><p><s>
           w(del_in), w(aoEllipsis), w('pa-ra-a', del_fin), w('da-a-aš')
         ],
-        paragraphSeparator
+        parsep
       )
     },
     {
@@ -130,7 +130,7 @@ describe('The transliteration parser should parse lines', () => {
           // <w>kar-<SP___AO_3a_MaterLect>di</SP___AO_3a_MaterLect>dim-mi-ia-az</w> </s></p><parsep_dbl/><p><s>
           w('kar-', ml('di'), 'dim-mi-ia-az')
         ],
-        paragraphSeparatorDouble)
+        parsep_dbl)
     },
     {
       toParse: '12 # GU4 ka4 ubx ub[x K]AxU §',
@@ -140,7 +140,7 @@ describe('The transliteration parser should parse lines', () => {
           // <w><sGr>GU₄</sGr></w> <w>ka₄</w> <w>ubₓ</w> <w>ub<del_in/>ₓ</w> <w><sGr>K<del_fin/>A×U</sGr></w> </s></p><parsep/><p><s>
           w(sg('GU', id('4'))), w('ka', id('4')), w('ub', id('x')), w('ub', del_in, id('x')), w(sg('K', del_fin, 'A', inscribedLetter('U')))
         ],
-        paragraphSeparator)
+        parsep)
     },
     {
       toParse: '13 # 4 GU4',
@@ -271,11 +271,11 @@ describe('The transliteration parser should parse lines', () => {
     },
     {
       toParse: '13\' # [ … -z]i ¬¬¬',
-      expected: lineParseSuccess('13\'', [w(del_in), w(aoEllipsis), w('-z', del_fin, 'i')], paragraphSeparator)
+      expected: lineParseSuccess('13\'', [w(del_in), w(aoEllipsis), w('-z', del_fin, 'i')], parsep)
     },
     {
       toParse: '1\' # [x x] x x [ ¬¬¬',
-      expected: lineParseSuccess('1\'', [w(del_in, aoIllegibleContent), w(aoIllegibleContent, del_fin), w(aoIllegibleContent), w(aoIllegibleContent), w(del_in)], paragraphSeparator)
+      expected: lineParseSuccess('1\'', [w(del_in, aoIllegibleContent), w(aoIllegibleContent, del_fin), w(aoIllegibleContent), w(aoIllegibleContent), w(del_in)], parsep)
     },
     {
       toParse: '2\' # LUGAL-uš GUB-[aš',
@@ -287,7 +287,7 @@ describe('The transliteration parser should parse lines', () => {
     },
     {
       toParse: '4\' # °D°zi-in-t[u-ḫi ¬¬¬',
-      expected: lineParseSuccess('4\'', [w(dt('D'), 'zi-in-t', del_in, 'u-ḫi')], paragraphSeparator)
+      expected: lineParseSuccess('4\'', [w(dt('D'), 'zi-in-t', del_in, 'u-ḫi')], parsep)
     },
     {
       toParse: '5\' # °LÚ°SAGI.A 1 NINDA.G[UR₄.RA _EM-ṢA]',
@@ -297,7 +297,7 @@ describe('The transliteration parser should parse lines', () => {
     },
     {
       toParse: '6\' # LUGAL-i pa-a-i LUGAL-u[š pár-ši-ia] ¬¬¬',
-      expected: lineParseSuccess('6\'', [w(sg('LUGAL'), '-i'), w('pa-a-i'), w(sg('LUGAL'), '-u', del_in, 'š'), w('pár-ši-ia', del_fin)], paragraphSeparator)
+      expected: lineParseSuccess('6\'', [w(sg('LUGAL'), '-i'), w('pa-a-i'), w(sg('LUGAL'), '-u', del_in, 'š'), w('pár-ši-ia', del_fin)], parsep)
     },
     {
       toParse: '7\' # ta-aš-ta °MUNUS.MEŠ°zi-[in-tu-ḫi-e-eš',
@@ -309,7 +309,7 @@ describe('The transliteration parser should parse lines', () => {
     },
     {
       toParse: '9\' # pár-aš-na-a-u-<aš>-kán °LÚ°SAG[I.A ¬¬¬',
-      expected: lineParseSuccess('9\'', [w('pár-aš-na-a-u-', '<', 'aš', '>', '-kán'), w(dt('LÚ'), sg('SAG'), del_in, sg('I', '.', 'A'))], paragraphSeparator)
+      expected: lineParseSuccess('9\'', [w('pár-aš-na-a-u-', '<', 'aš', '>', '-kán'), w(dt('LÚ'), sg('SAG'), del_in, sg('I', '.', 'A'))], parsep)
     },
     {
       toParse: '10\' # LUGAL-uš TUŠ-aš <°D°>iz-zi-i[š?-ta?-nu?',
@@ -319,7 +319,7 @@ describe('The transliteration parser should parse lines', () => {
     },
     {
       toParse: '11\' # e-ku-zi GIŠ ⸢°D°⸣[INANNA ¬¬¬',
-      expected: lineParseSuccess('11\'', [w('e-ku-zi'), w(sg('GIŠ')), w(laes_in, dt('D'), laes_fin, del_in, sg('INANNA'))], paragraphSeparator)
+      expected: lineParseSuccess('11\'', [w('e-ku-zi'), w(sg('GIŠ')), w(laes_in, dt('D'), laes_fin, del_in, sg('INANNA'))], parsep)
     },
     {
       toParse: '12\' # °LÚ°SAGI.A [1 NINDA.GUR₄.RA EM-ṢA]',
@@ -329,7 +329,7 @@ describe('The transliteration parser should parse lines', () => {
     },
     {
       toParse: '13\' # LUGAL-i pa-a-i [LUGAL-uš pár-ši-ia] ¬¬¬',
-      expected: lineParseSuccess('13\'', [w(sg('LUGAL'), '-i'), w('pa-a-i'), w(del_in, sg('LUGAL'), '-uš'), w('pár-ši-ia', del_fin)], paragraphSeparator)
+      expected: lineParseSuccess('13\'', [w(sg('LUGAL'), '-i'), w('pa-a-i'), w(del_in, sg('LUGAL'), '-uš'), w('pár-ši-ia', del_fin)], parsep)
     },
     {
       toParse: '14\' # GAL DUMU.MEŠ ⸢É⸣.[GAL',
@@ -339,7 +339,7 @@ describe('The transliteration parser should parse lines', () => {
     },
     {
       toParse: '15\' # °LÚ.MEŠ°GA[LA ¬¬¬',
-      expected: lineParseSuccess('15\'', [w(dt('LÚ', '.', 'MEŠ'), sg('GA', del_in, 'LA'))], paragraphSeparator)
+      expected: lineParseSuccess('15\'', [w(dt('LÚ', '.', 'MEŠ'), sg('GA', del_in, 'LA'))], parsep)
     },
     {
       toParse: '16\' # ⸢na-aš⸣-k[án',

@@ -16,8 +16,8 @@ import {
 } from '../model/wordContent';
 import {AOGap, aoGap} from '../model/sentenceContent/gap';
 import {Parser} from 'parsimmon';
-import {ParagraphSeparator, paragraphSeparator, paragraphSeparatorDouble} from '../model/paragraphSeparator';
 import {XmlElementNode, XmlNonEmptyNode} from '../xmlModel/xmlModel';
+import {paragraphSeparatorDoubleXmlNode, paragraphSeparatorXmlNode} from '../model/sentenceContent/linebreak';
 
 const determinativSpecialGenusCases: [string][] = [['m'], ['f']];
 const determinativSpecialDeityCases: [string][] = [['m.D'], ['f.D']];
@@ -62,12 +62,12 @@ describe('correctionsParser', () => testParseCorrections(transliteration.correct
 
 // Paragraph separator
 
-export function testParseParagraphSeparator(parser: Parser<ParagraphSeparator>): void {
-  test.each<[string, ParagraphSeparator]>([
-    ['§', paragraphSeparator],
-    ['¬¬¬', paragraphSeparator],
-    ['§§', paragraphSeparatorDouble],
-    ['===', paragraphSeparatorDouble]
+export function testParseParagraphSeparator(parser: Parser<XmlElementNode>): void {
+  test.each<[string, XmlElementNode]>([
+    ['§', paragraphSeparatorXmlNode],
+    ['¬¬¬', paragraphSeparatorXmlNode],
+    ['§§', paragraphSeparatorDoubleXmlNode],
+    ['===', paragraphSeparatorDoubleXmlNode]
   ])(
     'should parse %p as ParseP',
     (toParse, expected) => expect(parser.tryParse(toParse)).toEqual(expected)

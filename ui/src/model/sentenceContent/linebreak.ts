@@ -1,6 +1,12 @@
 import {AOWord, convertAoWord2XmlStrings} from './word';
-import {ParagraphSeparator} from '../paragraphSeparator';
 import {LineBreakData} from '../../xmlEditor/elementEditors/lineBreakData';
+import {xmlElementNode, XmlElementNode} from '../../xmlModel/xmlModel';
+
+
+export const paragraphSeparatorXmlNode: XmlElementNode = xmlElementNode('parsep');
+
+export const paragraphSeparatorDoubleXmlNode: XmlElementNode = xmlElementNode('parsep_dbl');
+
 
 export interface AOLineBreak {
   type: 'AOLineBreak';
@@ -8,7 +14,7 @@ export interface AOLineBreak {
   // => <w/>[]
   words: AOWord[];
   // => <parsep/> or <parsep_dbl/>
-  maybeParagraphSeparator: ParagraphSeparator | undefined;
+  maybeParagraphSeparator: XmlElementNode | undefined;
 }
 
 export function convertAoLineBreakToXmlString({lb: {textId, lnr, lg}, words}: AOLineBreak): string[] {

@@ -7,10 +7,14 @@ import {Attributes, xmlElementNode, XmlElementNode, XmlNonEmptyNode, xmlTextNode
  */
 export interface AOWord {
   _type: 'AoWord';
+
+  // attributes
   lng?: string;
   mrp0sel?: string;
   morphologies?: MorphologicalAnalysis[];
   transliteration?: string;
+
+  // children
   content: XmlNonEmptyNode[];
 }
 

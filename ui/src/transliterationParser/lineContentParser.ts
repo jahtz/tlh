@@ -1,4 +1,4 @@
-import {alt, createLanguage, end, Failure, oneOf, optWhitespace, regexp, Result, Result as ParsimmonResult, seq, string, TypedLanguage} from 'parsimmon';
+import {alt, createLanguage, end, Failure, oneOf, optWhitespace, regexp, Result as ParsimmonResult, seq, string, TypedLanguage} from 'parsimmon';
 import {
   akkadogramm,
   aoBasicText,
@@ -19,10 +19,11 @@ import {
   ras_in,
   sumerogramm
 } from '../model/wordContent';
-import {paragraphSeparator, ParagraphSeparator, paragraphSeparatorDouble} from '../model/paragraphSeparator';
 import {AOGap, aoGap} from '../model/sentenceContent/gap';
 import {AOWord, parsedWord} from '../model/sentenceContent/word';
 import {XmlElementNode, XmlNonEmptyNode, XmlTextNode} from '../xmlModel/xmlModel';
+import {paragraphSeparatorDoubleXmlNode, paragraphSeparatorXmlNode} from '../model/sentenceContent/linebreak';
+
 
 // Other
 
@@ -41,7 +42,7 @@ type LanguageSpec = {
   contentOfMultiStringContent: XmlNonEmptyNode;
 
   // Other content
-  paragraphSeparator: ParagraphSeparator,
+  paragraphSeparator: XmlElementNode,
   ellipsis: XmlTextNode,
 
   gap: AOGap;
@@ -102,8 +103,8 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
   ).map(aoCorr),
 
   paragraphSeparator: () => alt(
-    alt(string('§'), string('¬¬¬')).result(paragraphSeparator),
-    alt(string('§§'), string('===')).result(paragraphSeparatorDouble)
+    alt(string('§'), string('¬¬¬')).result(paragraphSeparatorXmlNode),
+    alt(string('§§'), string('===')).result(paragraphSeparatorDoubleXmlNode)
   ),
 
   ellipsis: () => alt(string('…'), string('...')).result(aoEllipsis),
@@ -237,7 +238,7 @@ interface ContentParseError {
 interface ContentParseSuccess {
   type: 'ContentParseSuccess';
   words: AOWord[];
-  maybeParSep: ParagraphSeparator | undefined;
+  maybeParSep: XmlElementNode | undefined;
 }
 
 export type ContentParseResult = ContentParseError | ContentParseSuccess;
@@ -252,7 +253,7 @@ export function parseTransliterationLineContent(content: string): ContentParseRe
   }
 
   // check last element for special processing (paragraphSeparator)
-  const lastContentParSepParseResult: Result<ParagraphSeparator> = transliteration.paragraphSeparator.parse(stringContents[stringContents.length - 1].trim());
+  const lastContentParSepParseResult = transliteration.paragraphSeparator.parse(stringContents[stringContents.length - 1].trim());
 
   const [wordContents, maybeParSep] = lastContentParSepParseResult.status
     ? [stringContents.slice(0, stringContents.length - 1), lastContentParSepParseResult.value]

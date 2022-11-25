@@ -1,7 +1,6 @@
 import {TransliterationLine} from '../model/transliterationLine';
 import {AOLineBreak} from '../model/sentenceContent/linebreak';
 import {NodeDisplay} from '../xmlEditor/NodeDisplay';
-import {paragraphSeparatorDoubleXmlNode, paragraphSeparatorXmlNode} from '../model/paragraphSeparator';
 
 // Single line
 
@@ -14,8 +13,7 @@ function TransliterationLineDisplay({result: {lb: {lnr}, words, maybeParagraphSe
         <span key={index}>{content.map((c, i) => <NodeDisplay node={c} isLeftSide={false} key={i}/>)}&nbsp;</span>
       )}
 
-      {maybeParagraphSeparator &&
-        <NodeDisplay node={maybeParagraphSeparator.double ? paragraphSeparatorDoubleXmlNode : paragraphSeparatorXmlNode} isLeftSide={false}/>}
+      {maybeParagraphSeparator && <NodeDisplay node={maybeParagraphSeparator} isLeftSide={false}/>}
     </>
   );
 }

@@ -12,7 +12,7 @@ import {
   numeralContent as nc,
   sumerogramm as sg
 } from '../model/wordContent';
-import {paragraphSeparator} from '../model/paragraphSeparator';
+import {paragraphSeparatorXmlNode as parsep} from '../model/sentenceContent/linebreak';
 
 const completeInput = `
 $Publikationsnummer: KBo 71.53, Grabungsnummer: Bo 2018/6, Paläographische Klassifizierung: junghethitisch
@@ -127,7 +127,7 @@ describe('DocumentParser', () => {
     },
     {
       toParse: '7 # [x x x x]-nu-zi §',
-      expected: lineParseSuccess('7', [w(del_in, illeg), w(illeg, illeg), w(illeg, del_fin, '-nu-zi')], paragraphSeparator)
+      expected: lineParseSuccess('7', [w(del_in, illeg), w(illeg, illeg), w(illeg, del_fin, '-nu-zi')], parsep)
     },
     {
       toParse: '8 # [1 NINDA.GUR4.RA KU₇ °LÚ°Š]U.I ú-da-i',
