@@ -1,8 +1,8 @@
-import {AOWord} from '../model/sentenceContent/word';
 import {Failure, Result} from 'parsimmon';
 import {LinePreParseResult, preParseLine} from './linePreParser';
 import {parseTransliterationLineContent} from './lineContentParser';
 import {ParagraphSeparatorNode} from '../model/sentenceContent/linebreak';
+import {XmlElementNode} from '../xmlModel/xmlModel';
 
 interface LinePreParsingError {
   type: 'LinePreParsingError';
@@ -19,12 +19,12 @@ interface LineParseSuccess {
   data: {
     // make object?
     lnr: string;
-    words: AOWord[];
+    words: XmlElementNode<'w'>[];
     maybeParagraphSeparator: ParagraphSeparatorNode | undefined;
   };
 }
 
-export function lineParseSuccess(lnr: string, words: AOWord[], maybeParagraphSeparator: ParagraphSeparatorNode | undefined = undefined): LineParseSuccess {
+export function lineParseSuccess(lnr: string, words: XmlElementNode<'w'>[], maybeParagraphSeparator: ParagraphSeparatorNode | undefined = undefined): LineParseSuccess {
   return {type: 'LineParseSuccess', data: {lnr, words, maybeParagraphSeparator}};
 }
 

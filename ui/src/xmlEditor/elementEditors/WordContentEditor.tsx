@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {transliteration as transliterationLanguage} from '../../transliterationParser/lineContentParser';
-import {AOWord, convertAoWordToXml} from '../../model/sentenceContent/word';
 import {Result} from 'parsimmon';
 import {XmlElementNode} from '../../xmlModel/xmlModel';
 import classNames from 'classnames';
@@ -17,15 +16,12 @@ interface IProps {
 }
 
 interface IState {
+  // FIXME: make type IState = Result<XmlElementNode>!
   parseResult: Result<XmlElementNode>;
 }
 
 function readTransliteration(transliteration: string): IState {
-  const parseResult: Result<AOWord> = transliterationLanguage.word.parse(transliteration);
-
-  return parseResult.status
-    ? {parseResult: {status: true, value: convertAoWordToXml(parseResult.value)}}
-    : {parseResult};
+  return {parseResult: transliterationLanguage.word.parse(transliteration)};
 }
 
 export function WordContentEditor({initialTransliteration, cancelEdit, updateNode}: IProps): JSX.Element {

@@ -1,5 +1,5 @@
 import {LineParseResult, lineParseSuccess, parseTransliterationLine} from './lineParser';
-import {parsedWord as w} from '../model/sentenceContent/word';
+import {paragraphSeparatorXmlNode as parsep, parsedWord as w} from '../model/sentenceContent/linebreak';
 import {
   akkadogramm as ag,
   aoIllegibleContent as illeg,
@@ -12,7 +12,6 @@ import {
   numeralContent as nc,
   sumerogramm as sg
 } from '../model/wordContent';
-import {paragraphSeparatorXmlNode as parsep} from '../model/sentenceContent/linebreak';
 
 const completeInput = `
 $Publikationsnummer: KBo 71.53, Grabungsnummer: Bo 2018/6, Paläographische Klassifizierung: junghethitisch

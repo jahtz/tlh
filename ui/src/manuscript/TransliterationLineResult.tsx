@@ -9,9 +9,7 @@ function TransliterationLineDisplay({result: {lb: {lnr}, words, maybeParagraphSe
     <>
       <sup>{lnr}</sup>
       &nbsp;
-      {words.map(({/*transliteration,*/ content}, index) =>
-        <span key={index}>{content.map((c, i) => <NodeDisplay node={c} isLeftSide={false} key={i}/>)}&nbsp;</span>
-      )}
+      {words.map((word, index) => <span key={index}><NodeDisplay node={word} isLeftSide={false}/>&nbsp;</span>)}
 
       {maybeParagraphSeparator && <NodeDisplay node={maybeParagraphSeparator} isLeftSide={false}/>}
     </>

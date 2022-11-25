@@ -1,5 +1,5 @@
 import {LineParseResult, lineParseSuccess, parseTransliterationLine} from './lineParser';
-import {parsedWord as w} from '../model/sentenceContent/word';
+import {paragraphSeparatorDoubleXmlNode as parsep_dbl, paragraphSeparatorXmlNode as parsep, parsedWord as w} from '../model/sentenceContent/linebreak';
 import {
   akkadogramm as ag,
   aoEllipsis,
@@ -20,7 +20,6 @@ import {
   sumerogramm as sg
 } from '../model/wordContent';
 import {sc, uc} from './testHelpers';
-import {paragraphSeparatorDoubleXmlNode as parsep_dbl, paragraphSeparatorXmlNode as parsep} from '../model/sentenceContent/linebreak';
 
 interface TestData {
   toParse: string;

@@ -20,9 +20,8 @@ import {
   sumerogramm
 } from '../model/wordContent';
 import {AOGap, aoGap} from '../model/sentenceContent/gap';
-import {AOWord, parsedWord} from '../model/sentenceContent/word';
+import {paragraphSeparatorDoubleXmlNode, ParagraphSeparatorNode, paragraphSeparatorXmlNode, parsedWord} from '../model/sentenceContent/linebreak';
 import {XmlElementNode, XmlNonEmptyNode, XmlTextNode} from '../xmlModel/xmlModel';
-import {paragraphSeparatorDoubleXmlNode, ParagraphSeparatorNode, paragraphSeparatorXmlNode} from '../model/sentenceContent/linebreak';
 
 
 // Other
@@ -67,7 +66,7 @@ type LanguageSpec = {
 
   wordContent: XmlNonEmptyNode;
 
-  word: AOWord;
+  word: XmlElementNode<'w'>;
 }
 
 
@@ -237,7 +236,7 @@ interface ContentParseError {
 
 interface ContentParseSuccess {
   type: 'ContentParseSuccess';
-  words: AOWord[];
+  words: XmlElementNode<'w'>[];
   maybeParSep: ParagraphSeparatorNode | undefined;
 }
 

@@ -1,21 +1,12 @@
 import {transliteration} from './lineContentParser';
-import {
-  aoEllipsis,
-  del_fin,
-  del_in,
-  determinativ as d,
-  laes_fin,
-  laes_in,
-  materLectionis,
-  numeralContent,
-  sumerogramm as sg
-} from '../model/wordContent';
+import {aoEllipsis, del_fin, del_in, determinativ as d, laes_fin, laes_in, materLectionis, numeralContent, sumerogramm as sg} from '../model/wordContent';
 import {uc} from './testHelpers';
-import {AOWord, parsedWord} from '../model/sentenceContent/word';
+import {parsedWord} from '../model/sentenceContent/linebreak';
+import {XmlElementNode} from '../xmlModel/xmlModel';
 
 interface TestData {
   toParse: string;
-  expected: AOWord;
+  expected: XmlElementNode<'w'>;
 }
 
 describe('transliteration Parser', () => {
