@@ -18,20 +18,17 @@ export const clbNodeConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode
   }
 };
 
-export function ClbEditor({data, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNodeIProps<XmlElementNode<'clb'>>): JSX.Element {
+function ClbEditor({data, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNodeIProps<XmlElementNode<'clb'>>): JSX.Element {
 
   const {t} = useTranslation('common');
 
-  function updateId(value: string): void {
-    updateEditedNode({attributes: {id: {$set: value}}});
-  }
-
   return (
-    <div className="mb-4">
-      <label htmlFor="lineNumber" className="font-bold">{t('id')}:</label>
-      <input type="text" id="lineNumber" className="p-2 rounded border border-slate-500 w-full mt-2"
+    <>
+      <label htmlFor="id" className="font-bold">{t('id')}:</label>
+      <input type="text" id="id" className="mt-2 p-2 rounded border border-slate-500 w-full"
              defaultValue={data.attributes.id?.trim()}
-             onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateId(event.target.value)}/>
-    </div>
+             onFocus={() => setKeyHandlingEnabled(false)}
+             onChange={(event) => updateEditedNode({attributes: {id: {$set: event.target.value}}})}/>
+    </>
   );
 }

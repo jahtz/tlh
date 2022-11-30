@@ -259,6 +259,8 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
 
     const config = editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>;
 
+    // const updateAttribute = (key: string, value: string | undefined) => updateEditedNode({attributes: {[key]: {$set: value}}});
+
     return (
       <NodeEditorRightSide key={path.join('.')} originalNode={node} changed={changed}
                            deleteNode={() => deleteNode(path)}
