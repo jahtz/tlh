@@ -202,7 +202,7 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
   },
   edit: (props) => isOnlySpaces(props.data.node)
     ? <SpacesEditor {...props}/>
-    : <WordNodeEditor key={props.path.join('.')} {...props}/>,
+    : <WordNodeEditor {...props}/>,
   readNode: readWordNodeData,
   writeNode: writeWordNodeData,
   insertablePositions: {

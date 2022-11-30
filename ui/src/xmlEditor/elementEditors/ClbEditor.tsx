@@ -1,6 +1,5 @@
 import {displayReplace, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import {useTranslation} from 'react-i18next';
-import {NodeEditorRightSide} from '../NodeEditorRightSide';
 import classNames from 'classnames';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 import {XmlElementNode, xmlElementNode} from '../../xmlModel/xmlModel';
@@ -19,24 +18,20 @@ export const clbNodeConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode
   }
 };
 
-export function ClbEditor({data, updateNode, setKeyHandlingEnabled, rightSideProps}: XmlEditableNodeIProps<XmlElementNode<'clb'>>): JSX.Element {
+export function ClbEditor({data, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNodeIProps<XmlElementNode<'clb'>>): JSX.Element {
 
   const {t} = useTranslation('common');
 
   function updateId(value: string): void {
-    updateNode({attributes: {id: {$set: value}}});
+    updateEditedNode({attributes: {id: {$set: value}}});
   }
 
   return (
-    <NodeEditorRightSide {...rightSideProps}>
-
-      <div className="mb-4">
-        <label htmlFor="lineNumber" className="font-bold">{t('id')}:</label>
-        <input type="text" id="lineNumber" className="p-2 rounded border border-slate-500 w-full mt-2"
-               defaultValue={data.attributes.id?.trim()}
-               onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateId(event.target.value)}/>
-      </div>
-
-    </NodeEditorRightSide>
+    <div className="mb-4">
+      <label htmlFor="lineNumber" className="font-bold">{t('id')}:</label>
+      <input type="text" id="lineNumber" className="p-2 rounded border border-slate-500 w-full mt-2"
+             defaultValue={data.attributes.id?.trim()}
+             onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateId(event.target.value)}/>
+    </div>
   );
 }

@@ -2,7 +2,6 @@ import {displayReplace, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeCo
 import classNames from 'classnames';
 import {useTranslation} from 'react-i18next';
 import {XmlElementNode} from '../../xmlModel/xmlModel';
-import {NodeEditorRightSide} from '../NodeEditorRightSide';
 
 function isLineGapNode(node: XmlElementNode): boolean {
   return 't' in node.attributes && node.attributes.t === 'line';
@@ -25,18 +24,15 @@ export const gapConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'ga
   }
 };
 
-function GapEditor({data, updateNode, rightSideProps}: XmlEditableNodeIProps<XmlElementNode<'gap'>>): JSX.Element {
+function GapEditor({data, updateEditedNode}: XmlEditableNodeIProps<XmlElementNode<'gap'>>): JSX.Element {
 
   const {t} = useTranslation('common');
 
   return (
-    <NodeEditorRightSide {...rightSideProps}>
-      <div>
-        <label htmlFor="content" className="font-bold">{t('content')}:</label>
-
-        <input type="text" defaultValue={data.attributes.c} id="content" className="mt-2 p-2 rounded border border-slate-500 w-full"
-               onChange={(event) => updateNode({attributes: {c: {$set: event.target.value}}})}/>
-      </div>
-    </NodeEditorRightSide>
+    <div>
+      <label htmlFor="content" className="font-bold">{t('content')}:</label>
+      <input type="text" defaultValue={data.attributes.c} id="content" className="mt-2 p-2 rounded border border-slate-500 w-full"
+             onChange={(event) => updateEditedNode({attributes: {c: {$set: event.target.value}}})}/>
+    </div>
   );
 }

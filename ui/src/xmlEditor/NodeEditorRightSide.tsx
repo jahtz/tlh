@@ -1,13 +1,13 @@
 import {NodeDisplay} from './NodeDisplay';
 import {XmlElementNode} from '../xmlModel/xmlModel';
-import {SelectableButton, DeleteButton} from '../genericElements/Buttons';
+import {DeleteButton, SelectableButton} from '../genericElements/Buttons';
 import {useTranslation} from 'react-i18next';
 import {FontSizeSelector, FontSizeSelectorProps} from './FontSizeSelector';
 
 export interface NodeEditorRightSideProps {
   originalNode: XmlElementNode;
   changed: boolean;
-  initiateSubmit: () => void;
+  applyUpdates: () => void;
   deleteNode?: () => void;
   cancelSelection: () => void;
   jumpElement?: (forward: boolean) => void;
@@ -16,16 +16,14 @@ export interface NodeEditorRightSideProps {
 
 interface IProps extends NodeEditorRightSideProps {
   children: JSX.Element;
-  otherButtons?: JSX.Element;
 }
 
 export function NodeEditorRightSide({
   originalNode,
   children,
   changed,
-  initiateSubmit,
+  applyUpdates,
   deleteNode,
-  otherButtons,
   jumpElement,
   fontSizeSelectorProps,
   cancelSelection
@@ -43,14 +41,12 @@ export function NodeEditorRightSide({
         <div className="float-right">
           <FontSizeSelector {...fontSizeSelectorProps}/>
 
-          {otherButtons}
-
           {jumpElement && <button type="button" className="ml-2 px-2 rounded border border-slate-500" onClick={() => jumpElement(false)}
                                   title={t('previousTag')}>&larr;</button>}
 
           {deleteNode && <DeleteButton onClick={deleteNode} otherClasses={['ml-2', 'px-2', 'rounded']}/>}
 
-          <SelectableButton selected={changed} onClick={initiateSubmit} otherClasses={['ml-2', 'px-2', 'rounded']}>
+          <SelectableButton selected={changed} onClick={applyUpdates} otherClasses={['ml-2', 'px-2', 'rounded']}>
             <>{t('update')}</>
           </SelectableButton>
 

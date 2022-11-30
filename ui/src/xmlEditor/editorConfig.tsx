@@ -2,16 +2,12 @@ import {XmlElementNode} from '../xmlModel/xmlModel';
 import {Argument as ClassNamesArgument} from 'classnames';
 import {InsertablePositions} from './insertablePositions';
 import {Spec} from 'immutability-helper';
-import {NodeEditorRightSideProps} from './NodeEditorRightSide';
 
 export interface XmlEditableNodeIProps<T = XmlElementNode> {
   data: T;
   path: number[];
-  updateNode: (spec: Spec<T>) => void;
-  keyHandlingEnabled: boolean,
+  updateEditedNode: (spec: Spec<T>) => void;
   setKeyHandlingEnabled: (enabled: boolean) => void;
-  initiateJumpElement: (forward: boolean) => void;
-  rightSideProps: NodeEditorRightSideProps;
 }
 
 export interface DisplayReplacement {

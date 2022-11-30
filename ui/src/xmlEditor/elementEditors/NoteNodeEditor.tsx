@@ -1,6 +1,5 @@
 import {displayReplace, XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from '../editorConfig';
 import {useTranslation} from 'react-i18next';
-import {UpdatePrevNextButtons} from '../morphAnalysisOption/UpdatePrevNextButtons';
 import {XmlElementNode} from '../../xmlModel/xmlModel';
 
 export const noteNodeConfig: XmlSingleEditableNodeConfig<XmlElementNode<'note'>> = {
@@ -10,13 +9,7 @@ export const noteNodeConfig: XmlSingleEditableNodeConfig<XmlElementNode<'note'>>
   writeNode: (newNode) => newNode
 };
 
-export function NoteNodeEditor({
-  data,
-  updateNode,
-  setKeyHandlingEnabled,
-  initiateJumpElement,
-  rightSideProps: {changed, deleteNode, initiateSubmit}
-}: XmlEditableNodeIProps<XmlElementNode<'note'>>): JSX.Element {
+export function NoteNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNodeIProps<XmlElementNode<'note'>>): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -31,14 +24,8 @@ export function NoteNodeEditor({
       <div className="mb-4">
         <label htmlFor="content" className="font-bold">{t('content')}:</label>
         <input type="text" id="content" className="p-2 mt-2 rounded border border-slate-500 w-full" defaultValue={data.attributes.c} placeholder={t('content')}
-               onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateNode({attributes: {c: {$set: event.target.value}}})}/>
+               onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateEditedNode({attributes: {c: {$set: event.target.value}}})}/>
       </div>
-
-      <div className="my-3">
-        <UpdatePrevNextButtons changed={changed} initiateUpdate={initiateSubmit} initiateJumpElement={(forward) => initiateJumpElement(forward)}
-                               deleteElement={deleteNode}/>
-      </div>
-
     </div>
   );
 }

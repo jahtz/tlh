@@ -1,10 +1,8 @@
 import {XmlEditableNodeIProps} from '../editorConfig';
 import {useTranslation} from 'react-i18next';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {MorphologicalAnalysis, MultiMorphologicalAnalysisWithMultiEnclitics} from '../../model/morphologicalAnalysis';
 import {MorphAnalysisOptionContainer} from '../morphAnalysisOption/MorphAnalysisOptionContainer';
-import {useSelector} from 'react-redux';
-import {editorKeyConfigSelector} from '../../newStore';
 import {XmlElementNode} from '../../xmlModel/xmlModel';
 import {MorphAnalysisOptionEditor} from '../morphAnalysisOption/MorphAnalysisOptionEditor';
 import {reconstructTransliteration} from '../transliterationReconstruction';
@@ -12,7 +10,6 @@ import {WordContentEditor} from './WordContentEditor';
 import update, {Spec} from 'immutability-helper';
 import {readWordNodeData, WordNodeData} from './wordNodeData';
 import {LanguageInput} from '../LanguageInput';
-import {NodeEditorRightSide} from '../NodeEditorRightSide';
 import {WordStringChildEditor} from './WordStringChildEditor';
 import {
   SelectedMultiMorphAnalysisWithEnclitic,
@@ -25,36 +22,18 @@ interface IState {
   editContent?: string;
 }
 
-export function WordNodeEditor({
-  data,
-  updateNode,
-  keyHandlingEnabled,
-  setKeyHandlingEnabled,
-  rightSideProps
-}: XmlEditableNodeIProps<WordNodeData>): JSX.Element {
+export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNodeIProps<WordNodeData>): JSX.Element {
 
   const {t} = useTranslation('common');
-  const editorConfig = useSelector(editorKeyConfigSelector);
 
   const [state, setState] = useState<IState>({addMorphology: false});
-
-  useEffect(() => {
-    document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
-  });
-
-  function handleKey(event: KeyboardEvent) {
-    if (keyHandlingEnabled && editorConfig.submitChangeKeys.includes(event.key)) {
-      rightSideProps.initiateSubmit();
-    }
-  }
 
   function toggleAnalysisSelection(morphIndex: number, letterIndex: number | undefined, encLetterIndex: number | undefined, targetState: boolean | undefined): void {
     const action: Spec<{ selected: boolean }> = targetState !== undefined
       ? {selected: {$set: targetState}}
       : {$toggle: ['selected']};
 
-    if (letterIndex || letterIndex === 0) {
+    if (letterIndex !== undefined) {
       // Multi morph
       if (encLetterIndex !== undefined) {
         // TODO: Multi enclitics
@@ -75,19 +54,19 @@ export function WordNodeEditor({
           }
         };
 
-        updateNode({morphologies: {[morphIndex]: innerSpec}});
+        updateEditedNode({morphologies: {[morphIndex]: innerSpec}});
       } else {
         // Single or no enclitics
-        updateNode({morphologies: {[morphIndex]: {analysisOptions: {[letterIndex]: action}}}});
+        updateEditedNode({morphologies: {[morphIndex]: {analysisOptions: {[letterIndex]: action}}}});
       }
     } else {
       // Single morph
       if (encLetterIndex !== undefined) {
         // Multi enclitics
-        updateNode({morphologies: {[morphIndex]: {encliticsAnalysis: {analysisOptions: {[encLetterIndex]: action}}}}});
+        updateEditedNode({morphologies: {[morphIndex]: {encliticsAnalysis: {analysisOptions: {[encLetterIndex]: action}}}}});
       } else {
         // Single or no enclitics
-        updateNode({morphologies: {[morphIndex]: action}});
+        updateEditedNode({morphologies: {[morphIndex]: action}});
       }
     }
   }
@@ -101,7 +80,7 @@ export function WordNodeEditor({
   }
 
   function handleEditUpdate(node: XmlElementNode): void {
-    updateNode({$set: readWordNodeData(node)});
+    updateEditedNode({$set: readWordNodeData(node)});
     cancelEdit();
   }
 
@@ -111,7 +90,7 @@ export function WordNodeEditor({
   }
 
   function updateMorphology(index: number, newMa: MorphologicalAnalysis): void {
-    updateNode({morphologies: {[index]: {$set: newMa}}});
+    updateEditedNode({morphologies: {[index]: {$set: newMa}}});
     setState((state) => update(state, {addMorphology: {$set: false}}));
   }
 
@@ -127,84 +106,76 @@ export function WordNodeEditor({
   }
 
   function updateAttribute(name: string, value: string | undefined): void {
-    updateNode((state) => update(state, {node: {attributes: {[name]: {$set: value}}}}));
+    updateEditedNode((state) => update(state, {node: {attributes: {[name]: {$set: value}}}}));
   }
 
   const setEditingQuestion = (value: string | undefined) => updateAttribute('editingQuestion', value);
   const removeEditingQuestion = () => setEditingQuestion(undefined);
 
   function setFootNote(value: string): void {
-    updateNode((state) => update(state, {footNote: {$set: value}}));
+    updateEditedNode((state) => update(state, {footNote: {$set: value}}));
   }
 
   function removeFootNote(): void {
-    updateNode((state) => update(state, {$unset: ['footNote']}));
+    updateEditedNode((state) => update(state, {$unset: ['footNote']}));
   }
 
-  const otherButtons = (
-    <>
-      <button type="button" className="ml-2 px-2 rounded border border-slate-500" onClick={toggleAddMorphology} title={t('addMorphologicalAnalysis')}>
-        +
-      </button>
+  return (state.editContent || typeof state.editContent === 'string')
+    ? <WordContentEditor initialTransliteration={state.editContent} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>
+    : (
+      <>
+        <div className="mt-4">
+          <LanguageInput initialValue={data.node.attributes.lg} onChange={(lg) => updateAttribute('lg', lg.trim() || '')}/>
+        </div>
 
-      <button type="button" className="ml-2 px-2 rounded bg-blue-500 text-white" onClick={enableEditWordState} title={t('editContent')}>
-        &#9998;
-      </button>
-    </>
-  );
+        <button type="button" className="mt-4 p-2 rounded bg-blue-500 text-white w-full" onClick={enableEditWordState} title={t('editContent')}>
+          &#9998; {t('editContent')}
+        </button>
 
-  return (
-    <NodeEditorRightSide {...rightSideProps} otherButtons={otherButtons}>
-      {(state.editContent || typeof state.editContent === 'string')
-        ? <WordContentEditor initialTransliteration={state.editContent} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>
-        : (
-          <>
-            <div className="mt-4">
-              <LanguageInput initialValue={data.node.attributes.lg} onChange={(lg) => updateAttribute('lg', lg.trim() || '')}/>
-            </div>
+        <div className="mt-4">
+          <WordStringChildEditor value={data.node.attributes.editingQuestion} set={setEditingQuestion} remove={removeEditingQuestion}
+                                 isEditingQuestion={true} setKeyHandlingEnabled={setKeyHandlingEnabled}
+                                 strings={{add: t('addEditingQuestion'), placeHolder: t('editingQuestion')}}/>
+        </div>
 
-            <div className="mt-4">
-              <WordStringChildEditor value={data.node.attributes.editingQuestion} set={setEditingQuestion} remove={removeEditingQuestion}
-                                     isEditingQuestion={true} setKeyHandlingEnabled={setKeyHandlingEnabled}
-                                     strings={{add: t('addEditingQuestion'), placeHolder: t('editingQuestion')}}/>
-            </div>
+        <div className="mt-4">
+          <WordStringChildEditor value={data.footNote} set={setFootNote} remove={removeFootNote} setKeyHandlingEnabled={setKeyHandlingEnabled}
+                                 isEditingQuestion={false} strings={{add: t('addFootNote'), placeHolder: t('footNote')}}/>
+        </div>
 
-            <div className="mt-4">
-              <WordStringChildEditor value={data.footNote} set={setFootNote} remove={removeFootNote} setKeyHandlingEnabled={setKeyHandlingEnabled}
-                                     isEditingQuestion={false} strings={{add: t('addFootNote'), placeHolder: t('footNote')}}/>
-            </div>
+        <div className="mt-4">
+          {data.morphologies.length === 0
+            ? <div>
+              <div className="p-4 rounded bg-amber-400 text-center">{t('noMorphologicalAnalysesFound')}</div>
 
-            <div className="mt-4">
-              {data.morphologies.length === 0
-                ? <div>
-                  <div className="p-4 rounded bg-amber-400 text-center">{t('noMorphologicalAnalysesFound')}</div>
-
-                  {data.node.attributes.mrp0sel === 'DEL'
-                    ? <div className="mt-2 p-2 rounded bg-blue-600 text-white text-center w-full">mrp0sel=&quot;DEL&quot;</div>
-                    : (
-                      <button type="button" className="mt-2 p-2 rounded border border-slate-500 text-center w-full"
-                              onClick={() => updateAttribute('mrp0sel', 'DEL')}>
-                        {t('set_mrp0sel=DEL')}
-                      </button>
-                    )}
-                </div>
-                : data.morphologies.map((m, index) => <div className="mt-2" key={m.number}>
-                    <MorphAnalysisOptionContainer
-                      morphologicalAnalysis={m}
-                      toggleAnalysisSelection={(letterIndex, encLetterIndex, targetState) => toggleAnalysisSelection(index, letterIndex, encLetterIndex, targetState)}
-                      updateMorphology={(newMa) => updateMorphology(index, newMa)}
-                      setKeyHandlingEnabled={setKeyHandlingEnabled}
-                    />
-                  </div>
+              {data.node.attributes.mrp0sel === 'DEL'
+                ? <div className="mt-2 p-2 rounded bg-blue-600 text-white text-center w-full">mrp0sel=&quot;DEL&quot;</div>
+                : (
+                  <button type="button" className="mt-2 p-2 rounded border border-slate-500 text-center w-full"
+                          onClick={() => updateAttribute('mrp0sel', 'DEL')}>
+                    {t('set_mrp0sel=DEL')}
+                  </button>
                 )}
-
-              {state.addMorphology && <MorphAnalysisOptionEditor
-                morphologicalAnalysis={nextMorphAnalysis()}
-                onSubmit={(newMa) => updateMorphology(data.morphologies.length, newMa)}
-                cancelUpdate={toggleAddMorphology}/>}
             </div>
-          </>
-        )}
-    </NodeEditorRightSide>
-  );
+            : data.morphologies.map((m, index) => <div className="mt-2" key={m.number}>
+                <MorphAnalysisOptionContainer
+                  morphologicalAnalysis={m}
+                  toggleAnalysisSelection={(letterIndex, encLetterIndex, targetState) => toggleAnalysisSelection(index, letterIndex, encLetterIndex, targetState)}
+                  updateMorphology={(newMa) => updateMorphology(index, newMa)}
+                  setKeyHandlingEnabled={setKeyHandlingEnabled}
+                />
+              </div>
+            )}
+
+          {state.addMorphology
+            ? <MorphAnalysisOptionEditor morphologicalAnalysis={nextMorphAnalysis()} onSubmit={(newMa) => updateMorphology(data.morphologies.length, newMa)}
+                                         cancelUpdate={toggleAddMorphology}/>
+            : (
+              <button type="button" className="mt-4 p-2 rounded bg-cyan-300 text-white w-full" onClick={toggleAddMorphology}>
+                {t('addMorphologicalAnalysis')}
+              </button>
+            )}
+        </div>
+      </>
+    );
 }

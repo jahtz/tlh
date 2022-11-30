@@ -1,6 +1,5 @@
 import {displayReplace, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import {useTranslation} from 'react-i18next';
-import {NodeEditorRightSide} from '../NodeEditorRightSide';
 import {buildActionSpec, getElementByPath, XmlElementNode} from '../../xmlModel/xmlModel';
 
 export const clEditorConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'cl'>> = {
@@ -34,20 +33,18 @@ export const clEditorConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNod
   }
 };
 
-export function ClEditor({updateNode, setKeyHandlingEnabled, rightSideProps}: XmlEditableNodeIProps<XmlElementNode<'cl'>>): JSX.Element {
+export function ClEditor({data, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNodeIProps<XmlElementNode<'cl'>>): JSX.Element {
   const {t} = useTranslation('common');
 
   function updateId(value: string): void {
-    updateNode({attributes: {id: {$set: value}}});
+    updateEditedNode({attributes: {id: {$set: value}}});
   }
 
   return (
-    <NodeEditorRightSide{...rightSideProps}>
-      <div>
-        <label htmlFor="id" className="font-bold block">{t('id')}:</label>
-        <input id="id" defaultValue={rightSideProps.originalNode.attributes.id} className="p-2 rounded border border-slate-200 w-full mt-2"
-               onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateId(event.target.value)}/>
-      </div>
-    </NodeEditorRightSide>
+    <div>
+      <label htmlFor="id" className="font-bold block">{t('id')}:</label>
+      <input id="id" defaultValue={data.attributes.id} className="p-2 rounded border border-slate-200 w-full mt-2"
+             onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateId(event.target.value)}/>
+    </div>
   );
 }

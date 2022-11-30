@@ -13,6 +13,8 @@ import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
 import {addNodeEditorState, compareChangesEditorState, defaultRightSideState, editNodeEditorState, EditorState, IEditNodeEditorState} from './editorState';
 import {ReadFile} from '../xmlComparator/XmlComparatorContainer';
 import {XmlComparator} from '../xmlComparator/XmlComparator';
+import {NodeEditorRightSide} from './NodeEditorRightSide';
+import {FontSizeSelectorProps} from './FontSizeSelector';
 
 interface IProps {
   node: XmlNode;
@@ -160,7 +162,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
     }));
   }
 
-  function updateNode(nextEditablePath?: number[]): void {
+  function applyUpdates(nextEditablePath?: number[]): void {
     let newEditorState: IEditNodeEditorState<T> | undefined = undefined;
 
     if (nextEditablePath) {
@@ -189,7 +191,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
   function updateEditedNode(updateSpec: Spec<T>): void {
     setState((state) => update(state, {
       editorState: {
-        $apply: (editorState) => editorState && 'path' in editorState
+        $apply: (editorState) => editorState._type === 'EditNodeRightState'
           ? update(editorState, {data: updateSpec, changed: {$set: true}})
           : editorState
       }
@@ -216,14 +218,14 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
 
       if (editorKeyConfig.updateAndNextEditableNodeKeys.includes(event.key)) {
         // FIXME: update and jump...
-        updateNode(
+        applyUpdates(
           searchEditableNode(tagName, state.rootNode as XmlElementNode, state.editorState.path, true)
         );
       } else if (editorKeyConfig.nextEditableNodeKeys.includes(event.key)) {
         jumpEditableNodes(tagName, true);
       } else if (editorKeyConfig.updateAndPreviousEditableNodeKeys.includes(event.key)) {
         // FIXME: update and jump...
-        updateNode(
+        applyUpdates(
           searchEditableNode(tagName, state.rootNode as XmlElementNode, state.editorState.path, false)
         );
       } else if (editorKeyConfig.previousEditableNodeKeys.includes(event.key)) {
@@ -247,26 +249,26 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
   }
 
   function renderNodeEditor({node, data, path, changed}: IEditNodeEditorState<T>): JSX.Element {
-    return (editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>).edit({
-      rightSideProps: {
-        originalNode: node,
-        deleteNode: () => deleteNode(path),
-        changed,
-        initiateSubmit: () => updateNode(),
-        fontSizeSelectorProps: {
-          currentFontSize: state.rightSideFontSize,
-          updateFontSize: (delta) => setState((state) => update(state, {rightSideFontSize: {$apply: (value) => value + delta}}))
-        },
-        cancelSelection: () => setState((state) => update(state, {editorState: {$set: defaultRightSideState}})),
-        jumpElement: (forward) => jumpEditableNodes(node.tagName, forward)
-      },
-      data,
-      path,
-      updateNode: (data) => updateEditedNode(data),
-      initiateJumpElement: (forward) => jumpEditableNodes(node.tagName, forward),
-      keyHandlingEnabled: state.keyHandlingEnabled,
-      setKeyHandlingEnabled: (value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}})),
-    });
+
+    const fontSizeSelectorProps: FontSizeSelectorProps = {
+      currentFontSize: state.rightSideFontSize,
+      updateFontSize: (delta) => setState((state) => update(state, {rightSideFontSize: {$apply: (value) => value + delta}}))
+    };
+
+    const setKeyHandlingEnabled = (value: boolean) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}}));
+
+    const config = editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>;
+
+    return (
+      <NodeEditorRightSide key={path.join('.')} originalNode={node} changed={changed}
+                           deleteNode={() => deleteNode(path)}
+                           applyUpdates={applyUpdates}
+                           cancelSelection={() => setState((state) => update(state, {editorState: {$set: defaultRightSideState}}))}
+                           jumpElement={(forward) => jumpEditableNodes(node.tagName, forward)}
+                           fontSizeSelectorProps={fontSizeSelectorProps}>
+        {config.edit({data, path, updateEditedNode, setKeyHandlingEnabled})}
+      </NodeEditorRightSide>
+    );
   }
 
   function toggleElementInsert(tagName: string, insertablePositions: InsertablePositions): void {
