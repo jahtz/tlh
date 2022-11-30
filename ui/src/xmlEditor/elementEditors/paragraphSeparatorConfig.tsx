@@ -1,39 +1,29 @@
 import {displayReplace, XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from '../editorConfig';
-import classNames from 'classnames';
-import {useTranslation} from 'react-i18next';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
+import {XmlElementNode} from '../../xmlModel/xmlModel';
+import {NodeEditorRightSide} from '../NodeEditorRightSide';
 
-export const paragraphSeparatorConfig: XmlSingleEditableNodeConfig = {
+export const paragraphSeparatorConfig: XmlSingleEditableNodeConfig<XmlElementNode<'parsep' | 'parsep_dbl'>> = {
   replace: (node, _renderedChildren, isSelected) => displayReplace(
     <span className={isSelected ? selectedNodeClass : ''}>
       {node.tagName === 'parsep' ? '¬¬¬' : '==='}
     </span>
   ),
   edit: (props) => <ParagraphSeparatorEditor {...props}/>,
-  readNode: (node) => node,
+  readNode: (node) => node as XmlElementNode<'parsep' | 'parsep_dbl'>,
   writeNode: (node) => node,
 };
 
-const separatorTypes: string[] = ['parsep', 'parsep_dbl'];
+const separatorTypes: ('parsep' | 'parsep_dbl')[] = ['parsep', 'parsep_dbl'];
 
-function ParagraphSeparatorEditor({data, updateNode, rightSideProps: {changed, initiateSubmit, deleteNode}}: XmlEditableNodeIProps): JSX.Element {
-
-  const {t} = useTranslation('common');
+function ParagraphSeparatorEditor({data, updateNode, rightSideProps}: XmlEditableNodeIProps<XmlElementNode<'parsep' | 'parsep_dbl'>>): JSX.Element {
 
   return (
-    <div>
+    <NodeEditorRightSide {...rightSideProps}>
       <select className="p-2 rounded border border-slate-500 bg-white w-full" defaultValue={data.tagName}
-              onChange={(event) => updateNode({tagName: {$set: event.target.value}})}>
+              onChange={(event) => updateNode({tagName: {$set: event.target.value as 'parsep' | 'parsep_dbl'}})}>
         {separatorTypes.map((st) => <option key={st}>{st}</option>)}
       </select>
-
-      <div className="grid grid-cols-2 mt-2">
-        <button type="button" className="p-2 rounded-l bg-red-500 text-white" onClick={deleteNode}>{t('deleteNode')}</button>
-        <button type="button" className={classNames('p-2', 'rounded-r', changed ? ['bg-blue-500', 'text-white'] : ['border', 'border-slate-500'])}
-                disabled={!changed} onClick={initiateSubmit}>
-          {t('update')}
-        </button>
-      </div>
-    </div>
+    </NodeEditorRightSide>
   );
 }

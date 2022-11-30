@@ -8,7 +8,7 @@ function isLineGapNode(node: XmlElementNode): boolean {
   return 't' in node.attributes && node.attributes.t === 'line';
 }
 
-export const gapConfig: XmlInsertableSingleEditableNodeConfig = {
+export const gapConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'gap'>> = {
   replace: (node, _renderedChildren, isSelected, isLeftSide) => displayReplace(
     <>
       {isLineGapNode(node) && isLeftSide && <br/>}
@@ -16,7 +16,7 @@ export const gapConfig: XmlInsertableSingleEditableNodeConfig = {
     </>
   ),
   edit: (props) => <GapEditor {...props}/>,
-  readNode: (n) => n,
+  readNode: (n) => n as XmlElementNode<'gap'>,
   writeNode: (n) => n,
   insertablePositions: {
     beforeElement: ['w'],
@@ -25,7 +25,7 @@ export const gapConfig: XmlInsertableSingleEditableNodeConfig = {
   }
 };
 
-function GapEditor({data, updateNode, rightSideProps}: XmlEditableNodeIProps): JSX.Element {
+function GapEditor({data, updateNode, rightSideProps}: XmlEditableNodeIProps<XmlElementNode<'gap'>>): JSX.Element {
 
   const {t} = useTranslation('common');
 

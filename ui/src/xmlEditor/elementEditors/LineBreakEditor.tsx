@@ -4,15 +4,9 @@ import {LanguageInput} from '../LanguageInput';
 import {NodeEditorRightSide} from '../NodeEditorRightSide';
 import classNames from 'classnames';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
-import update from 'immutability-helper';
+import {XmlElementNode} from '../../xmlModel/xmlModel';
 
-export interface LineBreakData {
-  textId: string;
-  lnr: string;
-  lg: string | undefined;
-}
-
-export const lineBreakNodeConfig: XmlInsertableSingleEditableNodeConfig<LineBreakData> = {
+export const lineBreakNodeConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'lb'>> = {
   replace: (node, _renderedChildren, isSelected, isLeftSide) => displayReplace(
     <>
       {isLeftSide && <br/>}
@@ -21,10 +15,8 @@ export const lineBreakNodeConfig: XmlInsertableSingleEditableNodeConfig<LineBrea
     </>
   ),
   edit: (props) => <LineBreakEditor key={props.path.join('.')} {...props} />,
-  readNode: (node) => ({textId: node.attributes.txtid || '', lnr: node.attributes.lnr || '', lg: node.attributes.lg}),
-  writeNode: ({textId, lnr, lg}, originalNode) => update(originalNode, {
-    attributes: {txtid: {$set: textId}, lnr: {$set: lnr}, lg: {$set: lg || ''}}
-  }),
+  readNode: (node) => node as XmlElementNode<'lb'>,
+  writeNode: (newNode) => newNode,
   insertablePositions: {
     beforeElement: ['lb', 'w', 'gap'],
     asLastChildOf: ['div1']
@@ -36,7 +28,7 @@ export function LineBreakEditor({
   updateNode,
   setKeyHandlingEnabled,
   rightSideProps
-}: XmlEditableNodeIProps<LineBreakData>): JSX.Element {
+}: XmlEditableNodeIProps<XmlElementNode<'lb'>>): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -44,18 +36,18 @@ export function LineBreakEditor({
     <NodeEditorRightSide {...rightSideProps}>
       <div>
         <div className="mb-4">
-          <label htmlFor="textId" className="font-bold">{t('textId')}:</label>
-          <input type="text" id="textId" className="p-2 rounded border border-slate-500 w-full mt-2" defaultValue={data.textId} readOnly/>
+          <label htmlFor="txtId" className="font-bold">{t('textId')}:</label>
+          <input type="text" id="txtId" className="p-2 rounded border border-slate-500 w-full mt-2" defaultValue={data.attributes.txtid} readOnly/>
         </div>
 
         <div className="mb-4">
           <label htmlFor="lineNumber" className="font-bold">{t('lineNumber')}:</label>
-          <input type="text" id="lineNumber" className="p-2 rounded border border-slate-500 w-full mt-2" defaultValue={data.lnr?.trim()}
-                 onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateNode({lnr: {$set: event.target.value}})}/>
+          <input type="text" id="lineNumber" className="p-2 rounded border border-slate-500 w-full mt-2" defaultValue={data.attributes.lnr?.trim()}
+                 onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateNode({attributes: {lnr: {$set: event.target.value}}})}/>
         </div>
 
         <div className="mb-4">
-          <LanguageInput initialValue={data.lg} onChange={(value) => updateNode({lg: {$set: value}})}/>
+          <LanguageInput initialValue={data.attributes.lg} onChange={(value) => updateNode({attributes: {lg: {$set: value}}})}/>
         </div>
       </div>
     </NodeEditorRightSide>

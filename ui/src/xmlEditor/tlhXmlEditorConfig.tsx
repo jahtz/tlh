@@ -1,6 +1,6 @@
 import {displayReplace, XmlEditorConfig} from './editorConfig';
-import {XmlElementNode} from '../xmlModel/xmlModel';
-import {noteNodeConfig, reCountNodeNumbers} from './elementEditors/NoteNodeEditor';
+import {isXmlCommentNode, isXmlTextNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
+import {noteNodeConfig} from './elementEditors/NoteNodeEditor';
 import {aoManuscriptsConfig} from './elementEditors/aoManuscriptsConfigData';
 import {lineBreakNodeConfig} from './elementEditors/LineBreakEditor';
 import {clbNodeConfig} from './elementEditors/ClbEditor';
@@ -10,6 +10,30 @@ import {paragraphSeparatorConfig} from './elementEditors/paragraphSeparatorConfi
 import {clEditorConfig} from './elementEditors/ClEditor';
 
 export const selectedNodeClass = 'bg-teal-400';
+
+
+export function reCountNodeNumbers(rootNode: XmlElementNode, tagName: string, attrName: string): void {
+
+  function go(node: XmlNode, currentCount: number): number {
+    if (isXmlTextNode(node) || isXmlCommentNode(node)) {
+      return currentCount;
+    } else {
+      if (node.tagName === tagName) {
+        node.attributes[attrName] = currentCount.toString();
+        currentCount++;
+      }
+
+      for (const child of node.children) {
+        currentCount = go(child, currentCount);
+      }
+
+      return currentCount;
+    }
+  }
+
+  go(rootNode, 1);
+}
+
 
 export const tlhXmlEditorConfig: XmlEditorConfig = {
   nodeConfigs: {

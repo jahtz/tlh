@@ -3,15 +3,13 @@ import {useTranslation} from 'react-i18next';
 import {NodeEditorRightSide} from '../NodeEditorRightSide';
 import {buildActionSpec, getElementByPath, XmlElementNode} from '../../xmlModel/xmlModel';
 
-export const clEditorConfig: XmlInsertableSingleEditableNodeConfig/*<XmlElementNode<'cl'>>*/ = {
+export const clEditorConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'cl'>> = {
   replace: (node, renderedChildren, isSelected, isLeftSide) => displayReplace(
-    <>
-      <span className="px-1 cl">{node.attributes.id || ' '}</span>&nbsp;
-    </>,
+    <><span className="px-1 cl">{node.attributes.id || ' '}</span>&nbsp;</>,
     isLeftSide ? <>{renderedChildren}<br/></> : undefined
   ),
   edit: (props) => <ClEditor {...props} />,
-  readNode: (n) => n,
+  readNode: (n) => n as XmlElementNode<'cl'>,
   writeNode: (n) => n,
   dontRenderChildrenInline: true,
   insertablePositions: {
@@ -36,15 +34,19 @@ export const clEditorConfig: XmlInsertableSingleEditableNodeConfig/*<XmlElementN
   }
 };
 
-export function ClEditor({updateNode, setKeyHandlingEnabled, rightSideProps}: XmlEditableNodeIProps/*<XmlElementNode<'cl'>>*/): JSX.Element {
+export function ClEditor({updateNode, setKeyHandlingEnabled, rightSideProps}: XmlEditableNodeIProps<XmlElementNode<'cl'>>): JSX.Element {
   const {t} = useTranslation('common');
+
+  function updateId(value: string): void {
+    updateNode({attributes: {id: {$set: value}}});
+  }
 
   return (
     <NodeEditorRightSide{...rightSideProps}>
       <div>
         <label htmlFor="id" className="font-bold block">{t('id')}:</label>
         <input id="id" defaultValue={rightSideProps.originalNode.attributes.id} className="p-2 rounded border border-slate-200 w-full mt-2"
-               onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateNode({attributes: {id: {$set: event.target.value}}})}/>
+               onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateId(event.target.value)}/>
       </div>
     </NodeEditorRightSide>
   );

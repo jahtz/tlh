@@ -1,6 +1,11 @@
-import {LineBreakData} from '../../xmlEditor/elementEditors/LineBreakEditor';
 import {xmlElementNode, XmlElementNode, XmlNonEmptyNode, xmlTextNode} from '../../xmlModel/xmlModel';
 import {writeNode} from '../../xmlModel/xmlWriting';
+
+export interface LineBreakData {
+  textId: string;
+  lnr: string;
+  lg: string | undefined;
+}
 
 
 export function parsedWord(...content: (XmlNonEmptyNode | string)[]): XmlElementNode<'w'> {

@@ -3,23 +3,15 @@ import {useTranslation} from 'react-i18next';
 import {NodeEditorRightSide} from '../NodeEditorRightSide';
 import classNames from 'classnames';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
-import update from 'immutability-helper';
-import {xmlElementNode} from '../../xmlModel/xmlModel';
+import {XmlElementNode, xmlElementNode} from '../../xmlModel/xmlModel';
 
-export interface ClbData {
-  id: string;
-}
-
-export const clbNodeConfig: XmlInsertableSingleEditableNodeConfig<ClbData> = {
-  // TODO: how to display <clb/> in xml editor?
+export const clbNodeConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'clb'>> = {
   replace: (node, _element, isSelected) => displayReplace(
-    <>
-      <span className={classNames(isSelected ? selectedNodeClass : 'bg-amber-500')}>{node.attributes.id}</span>&nbsp;
-    </>
+    <span className={classNames(isSelected ? selectedNodeClass : 'bg-amber-500')}>{node.attributes.id}&nbsp;</span>
   ),
   edit: (props) => <ClbEditor {...props}/>,
-  readNode: (node): ClbData => ({id: node.attributes.id || ''}),
-  writeNode: ({id: newId}, node) => update(node, {attributes: {id: {$set: newId}}}),
+  readNode: (node) => node as XmlElementNode<'clb'>,
+  writeNode: (newNode) => newNode,
   insertablePositions: {
     beforeElement: ['w', 'parsep', 'parsep_dbl'],
     afterElement: ['w'],
@@ -27,17 +19,22 @@ export const clbNodeConfig: XmlInsertableSingleEditableNodeConfig<ClbData> = {
   }
 };
 
-export function ClbEditor({data, updateNode, setKeyHandlingEnabled, rightSideProps}: XmlEditableNodeIProps<ClbData>): JSX.Element {
+export function ClbEditor({data, updateNode, setKeyHandlingEnabled, rightSideProps}: XmlEditableNodeIProps<XmlElementNode<'clb'>>): JSX.Element {
 
   const {t} = useTranslation('common');
+
+  function updateId(value: string): void {
+    updateNode({attributes: {id: {$set: value}}});
+  }
 
   return (
     <NodeEditorRightSide {...rightSideProps}>
 
       <div className="mb-4">
         <label htmlFor="lineNumber" className="font-bold">{t('id')}:</label>
-        <input type="text" id="lineNumber" className="p-2 rounded border border-slate-500 w-full mt-2" defaultValue={data.id.trim()}
-               onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateNode({id: {$set: event.target.value}})}/>
+        <input type="text" id="lineNumber" className="p-2 rounded border border-slate-500 w-full mt-2"
+               defaultValue={data.attributes.id?.trim()}
+               onFocus={() => setKeyHandlingEnabled(false)} onChange={(event) => updateId(event.target.value)}/>
       </div>
 
     </NodeEditorRightSide>
