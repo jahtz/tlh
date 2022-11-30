@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import {NodeDisplay, NodeDisplayIProps} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
-import {EditTriggerFunc} from './editorConfig';
 import {XmlElementNode} from '../xmlModel/xmlModel';
 import classNames from 'classnames';
 import {parseNewXml} from '../xmlModel/xmlReading';
@@ -11,10 +10,11 @@ import {writeXml} from './XmlDocumentEditor';
 import {isLeft} from '../xmlModel/either';
 import update from 'immutability-helper';
 import {FontSizeSelector} from './FontSizeSelector';
+import {NodePath} from './insertablePositions';
 
 export interface EditorLeftSideProps extends NodeDisplayIProps {
   filename: string;
-  onNodeSelect: EditTriggerFunc;
+  onNodeSelect: (node: XmlElementNode, path: NodePath) => void;
   closeFile: () => void;
   exportXml: () => void;
   updateNode: (node: XmlElementNode) => void;

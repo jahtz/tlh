@@ -1,5 +1,5 @@
-import {isXmlCommentNode, isXmlTextNode, XmlNode} from '../xmlModel/xmlModel';
-import {EditTriggerFunc, isXmlEditableNodeConfig, XmlEditorNodeConfig} from './editorConfig';
+import {isXmlCommentNode, isXmlTextNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
+import {isXmlEditableNodeConfig, XmlEditorNodeConfig} from './editorConfig';
 import classNames from 'classnames';
 import {NodePath} from './insertablePositions';
 import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
@@ -13,7 +13,7 @@ export interface InsertStuff {
 export interface NodeDisplayIProps {
   node: XmlNode;
   currentSelectedPath?: NodePath;
-  onSelect?: EditTriggerFunc;
+  onSelect?: (node: XmlElementNode, path: NodePath) => void;
   path?: NodePath;
   insertStuff?: InsertStuff;
   isLeftSide: boolean;

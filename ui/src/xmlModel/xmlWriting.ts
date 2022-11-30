@@ -1,17 +1,11 @@
 import {isXmlCommentNode, isXmlTextNode, XmlNode} from './xmlModel';
 
-export interface XmlWriteConfig {
-  [tagName: string]: {
-    inlineChildren: boolean
-  };
+interface XmlWriteConfig {
+  inlineChildrenOf: string[];
 }
 
-export const tlhXmlWriteConfig: XmlWriteConfig = {
-  docID: {inlineChildren: true},
-
-  'AO:TxtPubl': {inlineChildren: true},
-
-  w: {inlineChildren: true},
+const tlhXmlWriteConfig: XmlWriteConfig = {
+  inlineChildrenOf: ['docID', 'AO:TxtPubl', 'w'],
 };
 
 function writeAttributeValue(value: string): string {
@@ -23,44 +17,37 @@ function writeAttributeValue(value: string): string {
     .replace(/>/g, '&gt;');
 }
 
-export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXmlWriteConfig, parentInline = false): string[] {
+const indent = (s: string, count = 2): string => ' '.repeat(count) + s;
+
+export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXmlWriteConfig, parentInline = false, indentCount = 2): string[] {
   if (isXmlCommentNode(node)) {
     return [`<!-- ${node.comment} -->`];
-  } else if (isXmlTextNode(node)) {
-    return [node.textContent];
-  } else {
-    const {tagName, attributes, children} = node;
-
-    const writeConfig = xmlWriteConfig[tagName] || undefined;
-
-    const writtenAttributes = Object.entries(attributes)
-      .flatMap<string>(([name, value]) =>
-        value !== undefined
-          ? `${name}="${writeAttributeValue(value)}"`
-          : [])
-      .join(' ');
-
-    if (children.length === 0) {
-      return [`<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}/>`];
-    } else if (children.length === 1 && isXmlTextNode(children[0])) {
-      return [`<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}>${children[0].textContent}</${tagName}>`];
-    } else {
-      const inlineChildren = !!writeConfig?.inlineChildren || parentInline;
-
-      const writtenChildren = children.flatMap((n) => writeNode(n, xmlWriteConfig, inlineChildren));
-
-      const startTag = `<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}>`;
-      const endTag = `</${tagName}>`;
-
-      return inlineChildren
-        ? [startTag + writtenChildren.join('') + endTag]
-        : [startTag, ...writtenChildren.map(indent), endTag];
-    }
   }
-}
 
-// Old version
+  if (isXmlTextNode(node)) {
+    return [node.textContent];
+  }
 
-export function indent(s: string): string {
-  return ' '.repeat(2) + s;
+  const {tagName, attributes, children} = node;
+
+  const writtenAttributes = Object.entries(attributes)
+    .flatMap<string>(([name, value]) => value !== undefined ? `${name}="${writeAttributeValue(value)}"` : [])
+    .join(' ');
+
+  if (children.length === 0) {
+    return [`<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}/>`];
+  } else if (children.length === 1 && isXmlTextNode(children[0])) {
+    return [`<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}>${children[0].textContent}</${tagName}>`];
+  } else {
+    const inlineChildren = xmlWriteConfig.inlineChildrenOf.includes(tagName) || parentInline;
+
+    const writtenChildren = children.flatMap((n) => writeNode(n, xmlWriteConfig, inlineChildren));
+
+    const startTag = `<${tagName}${writtenAttributes.length === 0 ? '' : ' ' + writtenAttributes}>`;
+    const endTag = `</${tagName}>`;
+
+    return inlineChildren
+      ? [startTag + writtenChildren.join('') + endTag]
+      : [startTag, ...writtenChildren.map((c) => indent(c, indentCount)), endTag];
+  }
 }

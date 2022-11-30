@@ -22,7 +22,7 @@ import {XmlDocumentEditorContainer} from './xmlEditor/XmlDocumentEditorContainer
 import {DocumentMergerContainer} from './documentMerger/DocumentMergerContainer';
 import {tlhXmlEditorConfig} from './xmlEditor/tlhXmlEditorConfig';
 import {Preferences} from './Preferences';
-import {XmlComparator} from './xmlComparator/XmlComparator';
+import {XmlComparatorContainer} from './xmlComparator/XmlComparatorContainer';
 import {ManuscriptDocument, ManuscriptMetaDataFragment, ManuscriptQuery, ManuscriptQueryVariables} from './graphql';
 import {apolloClient} from './apolloClient';
 import {TypedDocumentNode} from '@apollo/client';
@@ -68,7 +68,7 @@ export const router = createHashRouter([
 
       {path: editTranscriptionDocumentUrl, element: <XmlDocumentEditorContainer editorConfig={tlhXmlEditorConfig}/>},
 
-      {path: xmlComparatorUrl, element: <XmlComparator/>},
+      {path: xmlComparatorUrl, element: <XmlComparatorContainer/>},
 
       {path: preferencesUrl, element: <Preferences/>},
 

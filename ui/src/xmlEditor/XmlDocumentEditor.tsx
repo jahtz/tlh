@@ -10,6 +10,9 @@ import {EditorLeftSide, EditorLeftSideProps} from './EditorLeftSide';
 import {EditorEmptyRightSide} from './EditorEmptyRightSide';
 import {calculateInsertablePositions, InsertablePositions, NodePath} from './insertablePositions';
 import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
+import {addNodeEditorState, compareChangesEditorState, defaultRightSideState, editNodeEditorState, EditorState, IEditNodeEditorState} from './editorState';
+import {ReadFile} from '../xmlComparator/XmlComparatorContainer';
+import {XmlComparator} from '../xmlComparator/XmlComparator';
 
 interface IProps {
   node: XmlNode;
@@ -20,28 +23,10 @@ interface IProps {
   autoSave: (rootNode: XmlNode) => void;
 }
 
-interface IEditNodeState<T> {
-  node: XmlElementNode;
-  data: T;
-  changed: boolean;
-  path: number[];
-}
-
-function editorStateIsEditNodeState<T>(s: EditorState<T>): s is IEditNodeState<T> {
-  return 'path' in s;
-}
-
-interface IAddNodeState {
-  tagName: string;
-  insertablePositions: InsertablePositions;
-}
-
-type EditorState<T> = IEditNodeState<T> | IAddNodeState;
-
 interface IState<T> {
   keyHandlingEnabled: boolean;
   rootNode: XmlNode;
-  editorState?: EditorState<T>;
+  editorState: EditorState<T>;
   changed: boolean;
   author?: string;
   rightSideFontSize: number;
@@ -124,8 +109,13 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);
-  const [state, setState] = useState<IState<T>>({keyHandlingEnabled: true, rootNode: initialNode, changed: false, rightSideFontSize: 100});
-
+  const [state, setState] = useState<IState<T>>({
+    keyHandlingEnabled: true,
+    rootNode: initialNode,
+    editorState: defaultRightSideState,
+    changed: false,
+    rightSideFontSize: 100
+  });
 
   useEffect(() => {
     state.changed && autoSave(state.rootNode);
@@ -163,43 +153,36 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
   function onNodeSelect(node: XmlElementNode, path: number[]): void {
     setState((state) => update(state, {
       editorState: {
-        $apply: (editorState: EditorState<T> | undefined) => {
-          const config = editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>;
-
-          return (editorState && editorStateIsEditNodeState(editorState) && editorState.path.join('.') === path.join('.'))
-            ? undefined
-            : {node, data: config.readNode(node), changed: false, path};
-        }
+        $apply: (editorState) => editorState._type === 'EditNodeRightState' && editorState.path.join('.') === path.join('.')
+          ? defaultRightSideState
+          : editNodeEditorState(node, editorConfig, path)
       }
     }));
   }
 
   function updateNode(nextEditablePath?: number[]): void {
-    let newEditorState: IEditNodeState<T> | undefined = undefined;
+    let newEditorState: IEditNodeEditorState<T> | undefined = undefined;
 
     if (nextEditablePath) {
       const node = findElement(state.rootNode as XmlElementNode, nextEditablePath);
 
       if (state.editorState && 'path' in state.editorState) {
-        newEditorState = {
-          node, path: nextEditablePath, changed: false, data: (editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node)
-        };
+        newEditorState = editNodeEditorState(node, editorConfig, nextEditablePath);
       }
     }
 
-    setState((state) =>
-      state.editorState && editorStateIsEditNodeState(state.editorState)
-        ? update(state, {
-          rootNode: state.editorState.path.reduceRight<Spec<XmlNode>>(
-            (acc, index) => ({children: {[index]: acc}}),
-            {$set: (editorConfig.nodeConfigs[state.editorState.node.tagName] as XmlSingleEditableNodeConfig<T>).writeNode(state.editorState.data, state.editorState.node)}
-          ),
-          editorState: newEditorState
-            ? {$set: newEditorState}
-            : {changed: {$set: false}},
-          changed: {$set: true}
-        })
-        : state
+    setState((state) => state.editorState._type === 'EditNodeRightState'
+      ? update(state, {
+        rootNode: state.editorState.path.reduceRight<Spec<XmlNode>>(
+          (acc, index) => ({children: {[index]: acc}}),
+          {$set: (editorConfig.nodeConfigs[state.editorState.node.tagName] as XmlSingleEditableNodeConfig<T>).writeNode(state.editorState.data, state.editorState.node)}
+        ),
+        editorState: newEditorState
+          ? {$set: newEditorState}
+          : {changed: {$set: false}},
+        changed: {$set: true}
+      })
+      : state
     );
   }
 
@@ -221,16 +204,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
       if (path) {
         const node = findElement(state.rootNode as XmlElementNode, path);
 
-        setState((state) => update(state, {
-          editorState: {
-            $set: {
-              node,
-              data: (editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>).readNode(node),
-              changed: false,
-              path
-            }
-          }
-        }));
+        setState((state) => update(state, {editorState: {$set: editNodeEditorState(node, editorConfig, path)}}));
       }
     }
   }
@@ -265,14 +239,14 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
             (acc, index) => ({children: {[index]: acc}}),
             {children: {$splice: [[path[path.length - 1], 1]]}}
           ),
-          editorState: {$set: undefined},
+          editorState: {$set: defaultRightSideState},
           changed: {$set: true}
         })
       );
     }
   }
 
-  function renderNodeEditor({node, data, path, changed}: IEditNodeState<T>): JSX.Element {
+  function renderNodeEditor({node, data, path, changed}: IEditNodeEditorState<T>): JSX.Element {
     return (editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>).edit({
       rightSideProps: {
         originalNode: node,
@@ -283,7 +257,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
           currentFontSize: state.rightSideFontSize,
           updateFontSize: (delta) => setState((state) => update(state, {rightSideFontSize: {$apply: (value) => value + delta}}))
         },
-        cancelSelection: () => setState((state) => update(state, {editorState: {$set: undefined}})),
+        cancelSelection: () => setState((state) => update(state, {editorState: {$set: defaultRightSideState}})),
         jumpElement: (forward) => jumpEditableNodes(node.tagName, forward)
       },
       data,
@@ -296,16 +270,28 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
   }
 
   function toggleElementInsert(tagName: string, insertablePositions: InsertablePositions): void {
+    const targetState = addNodeEditorState(tagName, insertablePositions);
+
     setState((state) => {
-        if (!state.editorState) {
-          return update(state, {editorState: {$set: {tagName, insertablePositions}}});
-        } else if (state.editorState && 'path' in state.editorState) {
-          return state;
-        } else {
-          return update(state, {editorState: {$set: state.editorState.tagName !== tagName ? {tagName, insertablePositions} : undefined}});
+        switch (state.editorState._type) {
+          case 'DefaultEditorState':
+            return update(state, {editorState: {$set: targetState}});
+          case 'AddNodeRightState':
+            return update(state, {editorState: {$set: state.editorState.tagName !== tagName ? targetState : defaultRightSideState}});
+          case 'EditNodeRightState':
+          case 'CompareChangesEditorState':
+            return state;
         }
       }
     );
+  }
+
+  function toggleCompareChanges(): void {
+    setState((state) => update(state, {editorState: {$set: compareChangesEditorState}}));
+  }
+
+  function toggleDefaultMode(): void {
+    setState((state) => update(state, {editorState: {$set: defaultRightSideState}}));
   }
 
   function initiateInsert(path: NodePath): void {
@@ -313,9 +299,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
 
       const {newElement, insertAction} = state.editorState.insertablePositions;
 
-      const newNode = newElement !== undefined
-        ? newElement()
-        : {tagName: state.editorState.tagName, attributes: {}, children: []};
+      const newNode = newElement !== undefined ? newElement() : {tagName: state.editorState.tagName, attributes: {}, children: []};
 
       const actionSpec: Spec<XmlNode> = insertAction
         ? insertAction(path, newNode, state.rootNode as XmlElementNode)
@@ -323,14 +307,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
 
       setState((state) => update(state, {
         rootNode: actionSpec,
-        editorState: {
-          $set: {
-            path,
-            changed: false,
-            node: newNode,
-            data: (editorConfig.nodeConfigs[newNode.tagName] as XmlSingleEditableNodeConfig<T>).readNode(newNode)
-          }
-        },
+        editorState: {$set: editNodeEditorState(newNode, editorConfig, path)},
         changed: {$set: true}
       }));
     }
@@ -365,14 +342,32 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
     isLeftSide: true
   };
 
-  return (
-    <div className="px-2 grid grid-cols-2 gap-4 h-full max-h-full">
-      <EditorLeftSide {...leftSideProps}/>
+  if (state.editorState._type === 'CompareChangesEditorState') {
 
-      {state.editorState && 'path' in state.editorState
-        ? <div className="max-h-full overflow-auto"
-               key={state.editorState.path.join('.')}>{renderNodeEditor(state.editorState) /* don't convert to a component! */}</div>
-        : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}/>}
-    </div>
-  );
+    const leftSide: ReadFile = {name: '', baseContent: writeNode(initialNode).join('\n')};
+    const right: ReadFile = {name: '', baseContent: writeNode(state.rootNode).join('\n')};
+
+    return (
+      <div className="container mx-auto">
+        <button type="button" onClick={toggleDefaultMode} className="my-4 p-2 rounded bg-blue-500 text-white w-full">{t('close')}</button>
+        <XmlComparator leftFile={leftSide} rightFile={right}/>
+      </div>
+    );
+  } else {
+
+    return (
+      <div className="px-2 grid grid-cols-2 gap-4 h-full max-h-full">
+        <EditorLeftSide {...leftSideProps}/>
+
+        {state.editorState._type === 'EditNodeRightState'
+          ? (
+            <div className="max-h-full overflow-auto" key={state.editorState.path.join('.')}>
+              {renderNodeEditor(state.editorState) /* don't convert to a component! */}
+            </div>
+          )
+          : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}
+                                  toggleCompareChanges={toggleCompareChanges}/>}
+      </div>
+    );
+  }
 }

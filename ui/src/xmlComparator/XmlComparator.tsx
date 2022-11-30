@@ -1,98 +1,38 @@
-import {useState} from 'react';
-import {FileLoader} from '../forms/FileLoader';
-import {useTranslation} from 'react-i18next';
-import {Change, diffLines} from 'diff';
-import {allXmlComparatorConfig, emptyXmlComparatorConfig, makeReplacements, XmlComparatorConfig} from './xmlComparatorConfig';
-import {ObjectSelect, SelectOption} from '../forms/BulmaFields';
-import classNames from 'classnames';
+import {leftColorClass, ReadFile, rightColorClass} from './XmlComparatorContainer';
+import {defaultXmlComparatorConfig, makeReplacements, XmlComparatorConfig} from './xmlComparatorConfig';
+import {diffLines} from 'diff';
 
-interface IState {
-  config: XmlComparatorConfig;
-  firstFile?: ReadFile;
-  secondFile?: ReadFile;
-  changes?: Change[];
+interface IProps {
+  leftFile: ReadFile;
+  rightFile: ReadFile;
+  config?: XmlComparatorConfig;
 }
 
-interface ReadFile {
-  name: string;
-  baseContent: string;
+type DiffLine = {
+  line: string;
+  className: string | undefined;
 }
 
-function beautifyXml(content: string): string {
-  return new XMLSerializer().serializeToString(new DOMParser().parseFromString(content, 'text/xml'));
-}
+export function XmlComparator({leftFile, rightFile, config = defaultXmlComparatorConfig}: IProps): JSX.Element {
 
-const leftColorClass = 'text-red-500';
-const rightColorClass = 'text-green-500';
+  const firstFileContent = makeReplacements(leftFile.baseContent, config);
+  const secondFileContent = makeReplacements(rightFile.baseContent, config);
 
-export function XmlComparator(): JSX.Element {
+  const changes2 = diffLines(firstFileContent, secondFileContent).flatMap<DiffLine>(({value, added, removed}) => {
+    const className = added ? leftColorClass : (removed ? rightColorClass : undefined);
 
-  const {t} = useTranslation('common');
-  const [state, setState] = useState<IState>({config: emptyXmlComparatorConfig});
-
-  function updateState({config, firstFile, secondFile}: IState): IState {
-    if (!firstFile || !secondFile) {
-      return {config, firstFile, secondFile};
-    }
-
-    const firstFileContent = makeReplacements(firstFile.baseContent, config);
-    const secondFileContent = makeReplacements(secondFile.baseContent, config);
-
-    const changes = diffLines(firstFileContent, secondFileContent);
-
-    return {config, firstFile, secondFile, changes};
-  }
-
-  async function readFile(file: File): Promise<ReadFile> {
-    const xmlContent = await file.text();
-
-    return {name: file.name, baseContent: beautifyXml(xmlContent)};
-  }
-
-  async function setFirstFile(file: File): Promise<void> {
-    const firstFile = await readFile(file);
-    setState((currentState) => updateState({...currentState, firstFile}));
-  }
-
-  async function setSecondFile(file: File): Promise<void> {
-    const secondFile = await readFile(file);
-    setState((currentState) => updateState({...currentState, secondFile}));
-  }
-
-  function updateXmlConfigOption(config: XmlComparatorConfig): void {
-    setState((currentState) => updateState({...currentState, config}));
-  }
-
-  const xmlConfigOptions: SelectOption<XmlComparatorConfig>[] = allXmlComparatorConfig.map((option) => ({value: option, label: option.name}));
+    return value
+      .split('\n')
+      .map((line) => ({line, className}));
+  });
 
   return (
-    <div className="container mx-auto">
-      <h1 className="font-bold text-2xl text-center">{t('xmlComparator')}</h1>
-
-      <div className="mt-2 grid grid-cols-3 gap-2">
-        {state.firstFile
-          ? <div className={classNames('text-center', 'underline', leftColorClass)}>{state.firstFile.name}</div>
-          : <FileLoader onLoad={setFirstFile}/>}
-
-        <ObjectSelect label={t('xmlComparatorConfig')} id="xmlComparatorConfig" currentValue={state.config} options={xmlConfigOptions}
-                      onUpdate={updateXmlConfigOption}/>
-        {state.secondFile
-          ? <div className={classNames('text-center', 'underline', rightColorClass)}>{state.secondFile.name}</div>
-          : <FileLoader onLoad={setSecondFile}/>}
-      </div>
-
-      {state.changes && state.changes.map(({value, added, removed}, index) => {
-
-        const className = added ? rightColorClass : removed ? leftColorClass : '';
-
-        return value
-          .split('\n')
-          .map((line, lineIndex) =>
-            <p style={{wordBreak: 'break-all'}} className={className} key={state.config.name + '_' + index + '_' + lineIndex}>
-              {line.replace(/ /g, '\u00a0')}
-            </p>
-          );
-      })}
+    <div>
+      {changes2.map(({line, className}, index) =>
+        <p key={config.name + '_' + index + '_' + index} style={{wordBreak: 'break-all'}} className={className}>
+          {line.replace(/ /g, '\u00a0')}
+        </p>
+      )}
     </div>
   );
 }

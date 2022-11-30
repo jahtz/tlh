@@ -7,9 +7,10 @@ interface IProps {
   editorConfig: XmlEditorConfig;
   currentInsertedElement?: string;
   toggleElementInsert: (tagName: string, ip: InsertablePositions) => void;
+  toggleCompareChanges: () => void;
 }
 
-export function EditorEmptyRightSide({editorConfig, currentInsertedElement, toggleElementInsert}: IProps): JSX.Element {
+export function EditorEmptyRightSide({editorConfig, currentInsertedElement, toggleElementInsert, toggleCompareChanges}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -28,6 +29,10 @@ export function EditorEmptyRightSide({editorConfig, currentInsertedElement, togg
             <>{tagName}</>
           </SelectableButton>
         )}
+      </div>
+
+      <div className="mt-4">
+        <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={toggleCompareChanges}>{t('compareChanges')}</button>
       </div>
     </div>
   );

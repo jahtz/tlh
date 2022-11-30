@@ -1,13 +1,12 @@
 import {displayReplace, XmlEditorConfig} from './editorConfig';
 import {XmlElementNode} from '../xmlModel/xmlModel';
-import {reCountNodeNumbers} from './elementEditors/NoteNodeEditor';
+import {noteNodeConfig, reCountNodeNumbers} from './elementEditors/NoteNodeEditor';
 import {aoManuscriptsConfig} from './elementEditors/aoManuscriptsConfigData';
-import {lineBreakNodeConfig} from './elementEditors/lineBreakData';
-import {clbNodeConfig} from './elementEditors/clbData';
+import {lineBreakNodeConfig} from './elementEditors/LineBreakEditor';
+import {clbNodeConfig} from './elementEditors/ClbEditor';
 import {wordNodeConfig} from './elementEditors/wordNodeData';
 import {gapConfig} from './elementEditors/gapConfigData';
 import {paragraphSeparatorConfig} from './elementEditors/paragraphSeparatorConfig';
-import {noteNodeConfig} from './elementEditors/noteData';
 import {clEditorConfig} from './elementEditors/ClEditor';
 
 export const selectedNodeClass = 'bg-teal-400';

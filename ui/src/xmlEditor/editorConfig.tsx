@@ -1,10 +1,8 @@
 import {XmlElementNode} from '../xmlModel/xmlModel';
 import {Argument as ClassNamesArgument} from 'classnames';
-import {InsertablePositions, NodePath} from './insertablePositions';
+import {InsertablePositions} from './insertablePositions';
 import {Spec} from 'immutability-helper';
 import {NodeEditorRightSideProps} from './NodeEditorRightSide';
-
-export type EditTriggerFunc = (node: XmlElementNode, path: NodePath) => void;
 
 export interface XmlEditableNodeIProps<T = XmlElementNode> {
   data: T;
@@ -15,7 +13,6 @@ export interface XmlEditableNodeIProps<T = XmlElementNode> {
   initiateJumpElement: (forward: boolean) => void;
   rightSideProps: NodeEditorRightSideProps;
 }
-
 
 export interface DisplayReplacement {
   clickable: JSX.Element;

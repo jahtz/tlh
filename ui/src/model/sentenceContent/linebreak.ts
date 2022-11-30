@@ -1,4 +1,4 @@
-import {LineBreakData} from '../../xmlEditor/elementEditors/lineBreakData';
+import {LineBreakData} from '../../xmlEditor/elementEditors/LineBreakEditor';
 import {xmlElementNode, XmlElementNode, XmlNonEmptyNode, xmlTextNode} from '../../xmlModel/xmlModel';
 import {writeNode} from '../../xmlModel/xmlWriting';
 
