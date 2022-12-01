@@ -84,10 +84,12 @@ export function writeWordNodeData({node: originalNode, morphologies}: WordNodeDa
 
   const attributes: Record<string, string | undefined> = {
     // put attributes trans and mrp0sel at start of tag...
+
     trans,
+    // FIXME: can mrp0sel == undefined be overwritten?
     mrp0sel: mrp0sel === undefined || mrp0sel.trim() !== 'DEL'
-      ? selectedAnalysisOptions.join(' ')
-      : mrp0sel,
+      ? mrp0sel
+      : selectedAnalysisOptions.join(' '),
     ...rest
   };
 
@@ -118,13 +120,17 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
 
     const selectedMorph = node.attributes.mrp0sel;
 
+    if (node.tagName === 'del_in' || node.tagName === 'del_fin') {
+      console.info(selectedMorph);
+    }
+
     const isDeletion = selectedMorph === 'DEL';
 
     const isForeignLanguage = selectedMorph !== undefined
       ? Object.keys(foreignLanguageColors).includes(selectedMorph)
       : false;
 
-    const hasNoMorphologySelected = 'mrp0sel' in node.attributes && (selectedMorph === undefined || selectedMorph.trim().length === 0 && selectedMorph !== '???');
+    const hasNoMorphologySelected = selectedMorph !== undefined && selectedMorph.trim().length === 0 && selectedMorph !== '???';
 
     const hasEditingQuestion = node.attributes.editingQuestion !== undefined;
 

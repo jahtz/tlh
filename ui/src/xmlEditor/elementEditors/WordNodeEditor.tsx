@@ -212,7 +212,10 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
         <hr className="my-2"/>
 
         <section>
-          <h2 className="mb-2 font-bold text-center">{t('morphologicalAnalysis_plural')} (mrp0sel=&quot;{data.node.attributes.mrp0sel}&quot;)</h2>
+          <h2 className="mb-2 font-bold text-center">
+            {t('morphologicalAnalysis_plural')}
+            {data.node.attributes.mrp0sel !== undefined && <span>(mrp0sel=&quot;{data.node.attributes.mrp0sel}&quot;)</span>}
+          </h2>
 
           {data.morphologies.length === 0
             ? (
