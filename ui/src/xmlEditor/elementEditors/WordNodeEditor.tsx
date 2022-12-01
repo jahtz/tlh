@@ -113,11 +113,9 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
   }
 
   function nextMorphAnalysis(): MorphologicalAnalysis {
-    const number = Math.max(0, ...data.morphologies.map(({number}) => number)) + 1;
-
     return {
-      _type: 'MultiMorphAnalysis',
-      number,
+      _type: 'MultiMorphAnalysisWithoutEnclitics',
+      number: Math.max(0, ...data.morphologies.map(({number}) => number)) + 1,
       translation: '',
       referenceWord: '',
       analysisOptions: [],

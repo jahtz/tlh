@@ -1,4 +1,4 @@
-import {multiMorphAnalysisIsWithoutEnclitics, multiMorphAnalysisIsWithSingleEnclitics, MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
+import {MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {EncliticsAnalysisDisplay} from './SingleMorphAnalysisOptionButton';
 import {MultiMorphAnalysisSelection} from './MultiMorphAnalysisSelection';
 import {MultiMorphMultiEncAnalysisSelection} from './MultiMorphMultiEncAnalysisSelection';
@@ -14,49 +14,46 @@ interface IProps {
 }
 
 export function MultiMorphAnalysisOptionButtons({morphAnalysis, toggleAnalysisSelection}: IProps): JSX.Element {
+  switch (morphAnalysis._type) {
+    case 'MultiMorphAnalysisWithoutEnclitics':
+      return (
+        <div>
+          <MultiMorphAnalysisSelection ma={morphAnalysis}/>
 
-  if (multiMorphAnalysisIsWithoutEnclitics(morphAnalysis)) {
-    return (
-      <div>
-        <MultiMorphAnalysisSelection ma={morphAnalysis}/>
+          {morphAnalysis.analysisOptions.map(({letter, analysis, selected}, index) => <div key={index} className="mb-1">
+            <SelectableButton selected={selected} otherClasses={otherClasses} onClick={() => toggleAnalysisSelection(index, undefined)}>
+              <>{letter} - {analysis}</>
+            </SelectableButton>
+          </div>)}
+        </div>
+      );
 
-        {morphAnalysis.analysisOptions.map(({letter, analysis, selected}, index) => <div key={index} className="mb-1">
-          <SelectableButton selected={selected} otherClasses={otherClasses} onClick={() => toggleAnalysisSelection(index, undefined)}>
-            <>{letter} - {analysis}</>
-          </SelectableButton>
-        </div>)}
-      </div>
-    );
+    case 'MultiMorphAnalysisWithSingleEnclitics':
+      return (
+        <div>
+          <MultiMorphAnalysisSelection ma={morphAnalysis}/>
+
+          {morphAnalysis.analysisOptions.map(({letter, analysis, selected}, index) => <div key={index} className="mb-1">
+            <SelectableButton selected={selected} otherClasses={otherClasses} onClick={() => toggleAnalysisSelection(index, undefined)}>
+              <>{letter} - {analysis} <EncliticsAnalysisDisplay enclitics={morphAnalysis.encliticsAnalysis.enclitics}
+                                                                analysis={morphAnalysis.encliticsAnalysis.analysis}/></>
+            </SelectableButton>
+          </div>)}
+        </div>
+      );
+
+    case 'MultiMorphAnalysisWithMultiEnclitics':
+      return (
+        <div>
+          <MultiMorphMultiEncAnalysisSelection ma={morphAnalysis}/>
+
+          {morphAnalysis.analysisOptions.map((morphAnalysisOption, index) =>
+            <MultiMorphMultiSelectionButton key={index} ma={morphAnalysis} morphAnalysisOption={morphAnalysisOption}
+                                            enclitics={morphAnalysis.encliticsAnalysis.enclitics}
+                                            encliticsAnalysisOptions={morphAnalysis.encliticsAnalysis.analysisOptions}
+                                            toggleAnalysisSelection={(letterIndex) => toggleAnalysisSelection(index, letterIndex)}/>
+          )}
+        </div>
+      );
   }
-
-  if (multiMorphAnalysisIsWithSingleEnclitics(morphAnalysis)) {
-
-    const {enclitics, analysis: encAnalysis} = morphAnalysis.encliticsAnalysis;
-
-    return (
-      <div>
-        <MultiMorphAnalysisSelection ma={morphAnalysis}/>
-
-        {morphAnalysis.analysisOptions.map(({letter, analysis, selected}, index) => <div key={index} className="mb-1">
-          <SelectableButton selected={selected} otherClasses={otherClasses} onClick={() => toggleAnalysisSelection(index, undefined)}>
-            <>{letter} - {analysis} <EncliticsAnalysisDisplay enclitics={enclitics} analysis={encAnalysis}/></>
-          </SelectableButton>
-        </div>)}
-      </div>
-    );
-  }
-
-  const {enclitics, analysisOptions} = morphAnalysis.encliticsAnalysis;
-
-  return (
-    <div>
-      <MultiMorphMultiEncAnalysisSelection ma={morphAnalysis}/>
-
-      {morphAnalysis.analysisOptions.map((morphAnalysisOption, index) =>
-        <MultiMorphMultiSelectionButton key={index} ma={morphAnalysis} morphAnalysisOption={morphAnalysisOption} enclitics={enclitics}
-                                        encliticsAnalysisOptions={analysisOptions}
-                                        toggleAnalysisSelection={(letterIndex) => toggleAnalysisSelection(index, letterIndex)}/>
-      )}
-    </div>
-  );
 }

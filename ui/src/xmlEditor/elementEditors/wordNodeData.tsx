@@ -1,13 +1,9 @@
 import {
   MorphologicalAnalysis,
-  multiMorphAnalysisIsWithoutEnclitics,
-  multiMorphAnalysisIsWithSingleEnclitics,
   MultiMorphologicalAnalysisWithMultiEnclitics,
   MultiMorphologicalAnalysisWithoutEnclitics,
   MultiMorphologicalAnalysisWithSingleEnclitics,
   readMorphologiesFromNode,
-  singleMorphAnalysisIsWithoutEnclitics,
-  singleMorphAnalysisIsWithSingleEnclitics,
   SingleMorphologicalAnalysisWithMultiEnclitics,
   SingleMorphologicalAnalysisWithoutEnclitics,
   SingleMorphologicalAnalysisWithSingleEnclitics,
@@ -70,22 +66,18 @@ export function extractSelMorphAnalysesFromMultiMorphWithMultiEnc({
 
 function extractSelectedMorphologicalAnalyses(ma: MorphologicalAnalysis): string[] {
   switch (ma._type) {
-    case 'MultiMorphAnalysis':
-      if (multiMorphAnalysisIsWithoutEnclitics(ma)) {
-        return extractSelMorphAnalysesFromMultiMorphWithoutEnc(ma);
-      } else if (multiMorphAnalysisIsWithSingleEnclitics(ma)) {
-        return extractSelMorphAnalysesFromMultiMorphWithSingleEnc(ma);
-      } else {
-        return extractSelMorphAnalysesFromMultiMorphWithMultiEnc(ma);
-      }
-    case 'SingleMorphAnalysis':
-      if (singleMorphAnalysisIsWithoutEnclitics(ma)) {
-        return extractSelMorphAnalysesFromSingleMorphWithoutEnc(ma);
-      } else if (singleMorphAnalysisIsWithSingleEnclitics(ma)) {
-        return extractSelMorphAnalysesFromSingleMorphWithSingleEnc(ma);
-      } else {
-        return extractSelMorphAnalysesFromSingleMorphWithMultiEnc(ma);
-      }
+    case 'MultiMorphAnalysisWithoutEnclitics':
+      return extractSelMorphAnalysesFromMultiMorphWithoutEnc(ma);
+    case 'MultiMorphAnalysisWithSingleEnclitics':
+      return extractSelMorphAnalysesFromMultiMorphWithSingleEnc(ma);
+    case 'MultiMorphAnalysisWithMultiEnclitics':
+      return extractSelMorphAnalysesFromMultiMorphWithMultiEnc(ma);
+    case 'SingleMorphAnalysisWithoutEnclitics':
+      return extractSelMorphAnalysesFromSingleMorphWithoutEnc(ma);
+    case 'SingleMorphAnalysisWithSingleEnclitics':
+      return extractSelMorphAnalysesFromSingleMorphWithSingleEnc(ma);
+    case 'SingleMorphAnalysisWithMultiEnclitics':
+      return extractSelMorphAnalysesFromSingleMorphWithMultiEnc(ma);
   }
 }
 

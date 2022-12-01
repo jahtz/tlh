@@ -1,14 +1,7 @@
 import {LetteredAnalysisOption, parseMultiAnalysisString, SelectableLetteredAnalysisOption} from './analysisOptions';
 import {tlhAnalyzerUrl} from '../urls';
 import {XmlElementNode} from '../xmlModel/xmlModel';
-import {
-  EncliticsAnalysis,
-  isMultiEncliticsAnalysis,
-  isSingleEncliticsAnalysis,
-  MultiEncliticsAnalysis,
-  SingleEncliticsAnalysis,
-  writeEncliticsAnalysis
-} from './encliticsAnalysis';
+import {EncliticsAnalysis, isSingleEncliticsAnalysis, MultiEncliticsAnalysis, SingleEncliticsAnalysis, writeEncliticsAnalysis} from './encliticsAnalysis';
 import {SelectedMorphAnalysis, SelectedMultiMorphAnalysisWithEnclitic, selectedMultiMorphAnalysisWithEnclitics} from './selectedMorphologicalAnalysis';
 
 const morphologyAttributeNameRegex = /^mrp(\d+)$/;
@@ -24,34 +17,24 @@ export interface IMorphologicalAnalysis {
 // Single analysis
 
 export interface ISingleMorphologicalAnalysis extends IMorphologicalAnalysis {
-  _type: 'SingleMorphAnalysis';
   analysis: string;
 }
 
 export interface SingleMorphologicalAnalysisWithoutEnclitics extends ISingleMorphologicalAnalysis {
+  _type: 'SingleMorphAnalysisWithoutEnclitics';
   encliticsAnalysis: undefined;
   selected: boolean;
 }
 
-export function singleMorphAnalysisIsWithoutEnclitics(sa: SingleMorphologicalAnalysis): sa is SingleMorphologicalAnalysisWithoutEnclitics {
-  return sa.encliticsAnalysis === undefined;
-}
-
 export interface SingleMorphologicalAnalysisWithSingleEnclitics extends ISingleMorphologicalAnalysis {
+  _type: 'SingleMorphAnalysisWithSingleEnclitics';
   encliticsAnalysis: SingleEncliticsAnalysis;
   selected: boolean;
 }
 
-export function singleMorphAnalysisIsWithSingleEnclitics(sa: SingleMorphologicalAnalysis): sa is SingleMorphologicalAnalysisWithSingleEnclitics {
-  return sa.encliticsAnalysis !== undefined && isSingleEncliticsAnalysis(sa.encliticsAnalysis);
-}
-
 export interface SingleMorphologicalAnalysisWithMultiEnclitics extends ISingleMorphologicalAnalysis {
+  _type: 'SingleMorphAnalysisWithMultiEnclitics';
   encliticsAnalysis: MultiEncliticsAnalysis;
-}
-
-export function singleMorphAnalysisIsWithMultiEnclitics(sa: SingleMorphologicalAnalysis): sa is SingleMorphologicalAnalysisWithMultiEnclitics {
-  return sa.encliticsAnalysis !== undefined && isMultiEncliticsAnalysis(sa.encliticsAnalysis);
 }
 
 export type SingleMorphologicalAnalysis =
@@ -65,37 +48,26 @@ export function isSingleMorphologicalAnalysis(ma: MorphologicalAnalysis): ma is 
 
 // Multi analysis
 
-export interface IMultiMorphologicalAnalysis extends IMorphologicalAnalysis {
-  _type: 'MultiMorphAnalysis';
-}
+type IMultiMorphologicalAnalysis = IMorphologicalAnalysis;
 
 export interface MultiMorphologicalAnalysisWithoutEnclitics extends IMultiMorphologicalAnalysis {
+  _type: 'MultiMorphAnalysisWithoutEnclitics';
   analysisOptions: SelectableLetteredAnalysisOption[];
   encliticsAnalysis: undefined;
 }
 
-export function multiMorphAnalysisIsWithoutEnclitics(ma: MultiMorphologicalAnalysis): ma is MultiMorphologicalAnalysisWithoutEnclitics {
-  return ma.encliticsAnalysis === undefined;
-}
-
 export interface MultiMorphologicalAnalysisWithSingleEnclitics extends IMultiMorphologicalAnalysis {
+  _type: 'MultiMorphAnalysisWithSingleEnclitics';
   analysisOptions: SelectableLetteredAnalysisOption[];
   encliticsAnalysis: SingleEncliticsAnalysis;
 }
 
-export function multiMorphAnalysisIsWithSingleEnclitics(ma: MultiMorphologicalAnalysis): ma is MultiMorphologicalAnalysisWithSingleEnclitics {
-  return ma.encliticsAnalysis !== undefined && ma.encliticsAnalysis && 'analysis' in ma.encliticsAnalysis;
-}
-
 export interface MultiMorphologicalAnalysisWithMultiEnclitics extends IMultiMorphologicalAnalysis {
+  _type: 'MultiMorphAnalysisWithMultiEnclitics';
   analysisOptions: LetteredAnalysisOption[];
   // FIXME: MultiEncliticsAnalysis should not be selectable here!
   encliticsAnalysis: MultiEncliticsAnalysis;
   selectedAnalysisCombinations: SelectedMultiMorphAnalysisWithEnclitic[];
-}
-
-export function multiMorphAnalysisIsWithMultiEnclitics(ma: MultiMorphologicalAnalysis): ma is MultiMorphologicalAnalysisWithMultiEnclitics {
-  return ma.encliticsAnalysis !== undefined && ma.encliticsAnalysis && 'analysisOptions' in ma.encliticsAnalysis;
 }
 
 export type MultiMorphologicalAnalysis =
@@ -189,11 +161,9 @@ export function readMorphologicalAnalysis(number: number, content: string | null
   if (analysesString.includes('{')) {
     const analysisOptions: SelectableLetteredAnalysisOption[] = parseMultiAnalysisString(analysesString, selectedAnalysisLetters);
 
-    const _type = 'MultiMorphAnalysis';
-
     if (encliticsAnalysis === undefined) {
       return {
-        _type,
+        _type: 'MultiMorphAnalysisWithoutEnclitics',
         number,
         translation,
         referenceWord,
@@ -204,7 +174,7 @@ export function readMorphologicalAnalysis(number: number, content: string | null
       } as MultiMorphologicalAnalysisWithoutEnclitics;
     } else if (isSingleEncliticsAnalysis(encliticsAnalysis)) {
       return {
-        _type,
+        _type: 'MultiMorphAnalysisWithSingleEnclitics',
         number,
         translation,
         referenceWord,
@@ -221,7 +191,7 @@ export function readMorphologicalAnalysis(number: number, content: string | null
       }) => selectedMultiMorphAnalysisWithEnclitics(number, morphLetter || '', encLetter || ''));
 
       return {
-        _type,
+        _type: 'MultiMorphAnalysisWithMultiEnclitics',
         number,
         translation,
         referenceWord,
@@ -235,18 +205,46 @@ export function readMorphologicalAnalysis(number: number, content: string | null
       };
     }
   } else {
-    const _type = 'SingleMorphAnalysis';
 
     const selected = selectedAnalyses.length > 0;
 
     const analysis = analysesString;
 
     if (encliticsAnalysis == undefined) {
-      return {_type, number, referenceWord, translation, paradigmClass, determinative: determinative, analysis, encliticsAnalysis, selected};
+      return {
+        _type: 'SingleMorphAnalysisWithoutEnclitics',
+        number,
+        referenceWord,
+        translation,
+        paradigmClass,
+        determinative: determinative,
+        analysis,
+        encliticsAnalysis,
+        selected
+      };
     } else if (isSingleEncliticsAnalysis(encliticsAnalysis)) {
-      return {_type, number, referenceWord, translation, paradigmClass, determinative: determinative, analysis, encliticsAnalysis, selected};
+      return {
+        _type: 'SingleMorphAnalysisWithSingleEnclitics',
+        number,
+        referenceWord,
+        translation,
+        paradigmClass,
+        determinative: determinative,
+        analysis,
+        encliticsAnalysis,
+        selected
+      };
     } else {
-      return {_type, number, referenceWord, translation, paradigmClass, determinative: determinative, analysis, encliticsAnalysis};
+      return {
+        _type: 'SingleMorphAnalysisWithMultiEnclitics',
+        number,
+        referenceWord,
+        translation,
+        paradigmClass,
+        determinative: determinative,
+        analysis,
+        encliticsAnalysis
+      };
     }
   }
 }

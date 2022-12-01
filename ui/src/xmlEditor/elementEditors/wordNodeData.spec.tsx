@@ -45,14 +45,14 @@ function multiEncliticsAnalysis(saosMap: { [key: string]: boolean }): MultiEncli
 
 // single morphs
 
-const baseSingleMorphAnalysis: ISingleMorphologicalAnalysis = {...baseMorphAnalysis, _type: 'SingleMorphAnalysis', analysis: ''};
+const baseSingleMorphAnalysis: ISingleMorphologicalAnalysis = {...baseMorphAnalysis, analysis: ''};
 
 describe('wordNodeData', () => {
 
   // Single morphs without enclitics
   test.each<{ ma: SingleMorphologicalAnalysisWithoutEnclitics, expected: string[] }>([
-    {ma: {...baseSingleMorphAnalysis, encliticsAnalysis: undefined, selected: false}, expected: []},
-    {ma: {...baseSingleMorphAnalysis, encliticsAnalysis: undefined, selected: true}, expected: ['1']}
+    {ma: {_type: 'SingleMorphAnalysisWithoutEnclitics', ...baseSingleMorphAnalysis, encliticsAnalysis: undefined, selected: false}, expected: []},
+    {ma: {_type: 'SingleMorphAnalysisWithoutEnclitics', ...baseSingleMorphAnalysis, encliticsAnalysis: undefined, selected: true}, expected: ['1']}
   ])(
     'should extract selection from $ma as $expected',
     ({ma, expected}) => expect(extractSelMorphAnalysesFromSingleMorphWithoutEnc(ma)).toEqual(expected)
@@ -60,8 +60,8 @@ describe('wordNodeData', () => {
 
   // Single morph analysis with single enclitics
   test.each<{ ma: SingleMorphologicalAnalysisWithSingleEnclitics, expected: string[] }>([
-    {ma: {...baseSingleMorphAnalysis, encliticsAnalysis, selected: false}, expected: []},
-    {ma: {...baseSingleMorphAnalysis, encliticsAnalysis, selected: true}, expected: ['1']}
+    {ma: {_type: 'SingleMorphAnalysisWithSingleEnclitics', ...baseSingleMorphAnalysis, encliticsAnalysis, selected: false}, expected: []},
+    {ma: {_type: 'SingleMorphAnalysisWithSingleEnclitics', ...baseSingleMorphAnalysis, encliticsAnalysis, selected: true}, expected: ['1']}
   ])(
     'should extract selection from $ma as $expected',
     ({ma, expected}) => expect(extractSelMorphAnalysesFromSingleMorphWithSingleEnc(ma)).toEqual(expected)
@@ -69,8 +69,18 @@ describe('wordNodeData', () => {
 
   // single morph analysis with multi enclitics
   test.each<{ ma: SingleMorphologicalAnalysisWithMultiEnclitics, expected: string[] }>([
-    {ma: {...baseSingleMorphAnalysis, encliticsAnalysis: {enclitics: '', analysisOptions: slaos({R: false, S: false, T: false})}}, expected: []},
-    {ma: {...baseSingleMorphAnalysis, encliticsAnalysis: {enclitics: '', analysisOptions: slaos({R: true, S: true, T: true})}}, expected: ['1R', '1S', '1T']}
+    {
+      ma: {
+        _type: 'SingleMorphAnalysisWithMultiEnclitics', ...baseSingleMorphAnalysis,
+        encliticsAnalysis: {enclitics: '', analysisOptions: slaos({R: false, S: false, T: false})}
+      }, expected: []
+    },
+    {
+      ma: {
+        _type: 'SingleMorphAnalysisWithMultiEnclitics', ...baseSingleMorphAnalysis,
+        encliticsAnalysis: {enclitics: '', analysisOptions: slaos({R: true, S: true, T: true})}
+      }, expected: ['1R', '1S', '1T']
+    }
   ])(
     'should extract selection from $ma as $expected',
     ({ma, expected}) => expect(extractSelMorphAnalysesFromSingleMorphWithMultiEnc(ma)).toEqual(expected)
@@ -79,11 +89,21 @@ describe('wordNodeData', () => {
   // multi morph analysis without enclitics
   test.each<{ ma: MultiMorphologicalAnalysisWithoutEnclitics, expected: string[] }>([
     {
-      ma: {...baseSingleMorphAnalysis, _type: 'MultiMorphAnalysis', encliticsAnalysis: undefined, analysisOptions: slaos({a: false, b: false, c: false})},
+      ma: {
+        ...baseSingleMorphAnalysis,
+        _type: 'MultiMorphAnalysisWithoutEnclitics',
+        encliticsAnalysis: undefined,
+        analysisOptions: slaos({a: false, b: false, c: false})
+      },
       expected: []
     },
     {
-      ma: {...baseSingleMorphAnalysis, _type: 'MultiMorphAnalysis', encliticsAnalysis: undefined, analysisOptions: slaos({a: true, b: false, c: true})},
+      ma: {
+        ...baseSingleMorphAnalysis,
+        _type: 'MultiMorphAnalysisWithoutEnclitics',
+        encliticsAnalysis: undefined,
+        analysisOptions: slaos({a: true, b: false, c: true})
+      },
       expected: ['1a', '1c']
     }
   ])(
@@ -93,9 +113,16 @@ describe('wordNodeData', () => {
 
   // multi morph analysis with single enclitics
   test.each<{ ma: MultiMorphologicalAnalysisWithSingleEnclitics, expected: string[] }>([
-    {ma: {...baseSingleMorphAnalysis, _type: 'MultiMorphAnalysis', encliticsAnalysis, analysisOptions: slaos({a: false, b: false, c: false})}, expected: []},
     {
-      ma: {...baseSingleMorphAnalysis, _type: 'MultiMorphAnalysis', encliticsAnalysis, analysisOptions: slaos({a: true, b: true, c: true})},
+      ma: {
+        ...baseSingleMorphAnalysis,
+        _type: 'MultiMorphAnalysisWithSingleEnclitics',
+        encliticsAnalysis,
+        analysisOptions: slaos({a: false, b: false, c: false})
+      }, expected: []
+    },
+    {
+      ma: {...baseSingleMorphAnalysis, _type: 'MultiMorphAnalysisWithSingleEnclitics', encliticsAnalysis, analysisOptions: slaos({a: true, b: true, c: true})},
       expected: ['1a', '1b', '1c']
     }
   ])(
@@ -108,7 +135,7 @@ describe('wordNodeData', () => {
     {
       ma: {
         ...baseSingleMorphAnalysis,
-        _type: 'MultiMorphAnalysis',
+        _type: 'MultiMorphAnalysisWithMultiEnclitics',
         analysisOptions: laos('a', 'b', 'c'),
         encliticsAnalysis: multiEncliticsAnalysis({R: false, S: false, T: false}),
         selectedAnalysisCombinations: []
@@ -118,7 +145,7 @@ describe('wordNodeData', () => {
     {
       ma: {
         ...baseSingleMorphAnalysis,
-        _type: 'MultiMorphAnalysis',
+        _type: 'MultiMorphAnalysisWithMultiEnclitics',
         analysisOptions: laos('a', 'b', 'c'),
         encliticsAnalysis: multiEncliticsAnalysis({R: false, S: false, T: false}),
         selectedAnalysisCombinations: [

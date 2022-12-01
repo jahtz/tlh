@@ -28,7 +28,7 @@ describe('morphologicalAnalysis', () => {
 
   const maString0 = 'wē-/uwa- @ kommen @ 3SG.PRS @ I.12 @ ';
   const ma0: SingleMorphologicalAnalysisWithoutEnclitics = {
-    _type: 'SingleMorphAnalysis',
+    _type: 'SingleMorphAnalysisWithoutEnclitics',
     number,
     referenceWord: 'wē-/uwa-',
     translation: 'kommen',
@@ -43,7 +43,7 @@ describe('morphologicalAnalysis', () => {
 
   const maString1 = 'paršn=ā(e)- @ sich niederhocken @ VBN.GEN.SG @ I.9 += kkan @ OBPk @  @ ';
   const ma1: SingleMorphologicalAnalysisWithSingleEnclitics = {
-    _type: 'SingleMorphAnalysis',
+    _type: 'SingleMorphAnalysisWithSingleEnclitics',
     number,
     referenceWord: 'paršn=ā(e)-',
     translation: 'sich niederhocken',
@@ -58,7 +58,7 @@ describe('morphologicalAnalysis', () => {
 
   const maString2 = 'parašnau=aš @ Mann des Niederhockens @ GENunh @ 30.12 += kkan @ OBPk @  @ (LÚ)';
   const ma2: SingleMorphologicalAnalysisWithSingleEnclitics = {
-    _type: 'SingleMorphAnalysis',
+    _type: 'SingleMorphAnalysisWithSingleEnclitics',
     number,
     referenceWord: 'parašnau=aš',
     translation: 'Mann des Niederhockens',
@@ -76,7 +76,7 @@ describe('morphologicalAnalysis', () => {
 		{ R → PPRO.3SG.C.NOM}
 		{ S → PPRO.3PL.C.ACC} @  @ `;
   const ma3: SingleMorphologicalAnalysisWithMultiEnclitics = {
-    _type: 'SingleMorphAnalysis',
+    _type: 'SingleMorphAnalysisWithMultiEnclitics',
     number,
     referenceWord: 'gen=u-',
     translation: 'Knie',
@@ -92,12 +92,11 @@ describe('morphologicalAnalysis', () => {
     }
   };
 
-
   // multiple morphs, no enclitics
 
   const maString4 = 'gen=u- @ Knie @ { a → GEN.SG} { b → GEN.PL} { c → D/L.PL} @ 3.1.1 @ ';
   const ma4: MultiMorphologicalAnalysis = {
-    _type: 'MultiMorphAnalysis',
+    _type: 'MultiMorphAnalysisWithoutEnclitics',
     number,
     referenceWord: 'gen=u-',
     translation: 'Knie',
@@ -115,7 +114,7 @@ describe('morphologicalAnalysis', () => {
         { a → DN.GEN.PL}       
         { b → DN.D/L.PL}   @   35.1.2   @   D`;
   const multMorphNoEncRes2: MultiMorphologicalAnalysisWithoutEnclitics = {
-    _type: 'MultiMorphAnalysis',
+    _type: 'MultiMorphAnalysisWithoutEnclitics',
     number,
     referenceWord: '① tamnaššar=a-',
     translation: 'Dam(ma)naššareš',
@@ -140,7 +139,7 @@ describe('morphologicalAnalysis', () => {
 		{ g → DN.VOC.SG} @ 35.1.1
 		   += ma @ CNJctr @  @ D`;
   const ma5: MultiMorphologicalAnalysisWithSingleEnclitics = {
-    _type: 'MultiMorphAnalysis',
+    _type: 'MultiMorphAnalysisWithSingleEnclitics',
     number,
     referenceWord: 'mezull=a-',
     translation: 'Mez(z)ul(l)a',
@@ -171,7 +170,7 @@ describe('morphologicalAnalysis', () => {
 		{ R → PPRO.3SG.C.NOM}
 		{ S → PPRO.3PL.C.ACC} @  @ `;
   const ma6: MultiMorphologicalAnalysisWithMultiEnclitics = {
-    _type: 'MultiMorphAnalysis',
+    _type: 'MultiMorphAnalysisWithMultiEnclitics',
     number,
     referenceWord: 'gen=u-',
     translation: 'Knie',
@@ -207,7 +206,7 @@ describe('morphologicalAnalysis', () => {
         { R → PPRO.3SG.C.NOM}       
         { S → PPRO.3PL.C.ACC}   @   D`;
   const multMorphMultEncRes2: MultiMorphologicalAnalysisWithMultiEnclitics = {
-    _type: 'MultiMorphAnalysis',
+    _type: 'MultiMorphAnalysisWithMultiEnclitics',
     number,
     referenceWord: '②Ⓐ tamnaššar=a-',
     translation: 'Dam(ma)naššareš',
