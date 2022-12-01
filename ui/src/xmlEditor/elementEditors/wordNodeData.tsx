@@ -18,7 +18,7 @@ import {readSelectedMorphology} from '../../model/selectedMorphologicalAnalysis'
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 
 /**
- * @deprecated
+ * TODO: deprecate?
  */
 export interface WordNodeData {
   node: XmlElementNode;
@@ -28,10 +28,7 @@ export interface WordNodeData {
 export function readWordNodeData(node: XmlElementNode): WordNodeData {
   const selectedMorphologies = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
 
-  return {
-    node: node,
-    morphologies: readMorphologiesFromNode(node, selectedMorphologies),
-  };
+  return {node, morphologies: readMorphologiesFromNode(node, selectedMorphologies)};
 }
 
 export function extractSelMorphAnalysesFromSingleMorphWithoutEnc({selected, number}: SingleMorphologicalAnalysisWithoutEnclitics): string[] {
@@ -42,11 +39,8 @@ export function extractSelMorphAnalysesFromSingleMorphWithSingleEnc({selected, n
   return selected ? [number.toString()] : [];
 }
 
-export function extractSelMorphAnalysesFromSingleMorphWithMultiEnc({
-  number,
-  encliticsAnalysis: {analysisOptions}
-}: SingleMorphologicalAnalysisWithMultiEnclitics): string[] {
-  return analysisOptions.filter(({selected}) => selected).map(({letter}) => `${number}${letter}`);
+export function extractSelMorphAnalysesFromSingleMorphWithMultiEnc({number, encliticsAnalysis}: SingleMorphologicalAnalysisWithMultiEnclitics): string[] {
+  return encliticsAnalysis.analysisOptions.filter(({selected}) => selected).map(({letter}) => `${number}${letter}`);
 }
 
 export function extractSelMorphAnalysesFromMultiMorphWithoutEnc({number, analysisOptions}: MultiMorphologicalAnalysisWithoutEnclitics): string[] {
