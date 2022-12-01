@@ -1,63 +1,30 @@
 import {useState} from 'react';
-import {DeleteButton, EditButton} from '../../genericElements/Buttons';
-import classNames from 'classnames';
-import {WordStringChildEditForm} from './WordStringChildEditForm';
 
 interface IProps {
-  value: string | undefined;
-  set: (newValue: string) => void;
-  remove: () => void;
-  setKeyHandlingEnabled: (value: boolean) => void;
-  isEditingQuestion: boolean;
-  strings: {
-    add: string;
-    placeHolder: string;
-  };
+  title: string;
+  initialValue: string | undefined;
+  onDelete: () => void;
+  onCancel: () => void;
+  onSubmit: (value: string) => void;
 }
 
-/**
- * Used for editing questions (attribute q) and footnotes (last child if tag name note)
- */
-export function WordStringChildEditor({value, set, remove, setKeyHandlingEnabled, isEditingQuestion, strings}: IProps): JSX.Element {
+export function WordStringChildEditor({title, initialValue, onDelete, onCancel, onSubmit}: IProps): JSX.Element {
 
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [value, setValue] = useState(initialValue || '');
 
-  function enableEditMode(): void {
-    setKeyHandlingEnabled(false);
-    setIsEditMode(true);
-  }
+  return (
+    <div className="mt-2 flex">
+      <label htmlFor="stringChildInput" className="p-2 rounded-l border-l border-y border-slate-500 bg-slate-100 font-bold">{title}:</label>
 
-  function cancelEditMode(): void {
-    setKeyHandlingEnabled(true);
-    setIsEditMode(false);
-  }
+      <input type="text" id="stringChildInput" placeholder={title} defaultValue={value} onChange={(event) => setValue(event.target.value)}
+             className="p-2 border border-slate-500 flex-grow"/>
 
-  function submitEdit(value: string): void {
-    set(value);
-    cancelEditMode();
-  }
+      <button type="button" className="p-2 border-y border-slate-500 bg-red-600 text-white" onClick={onDelete}>&#128465;</button>
 
-  return !value && !isEditMode
-    ? (
-      <button type="button" className={classNames('p-2 rounded text-white w-full', isEditingQuestion ? 'bg-teal-400' : 'bg-slate-400')}
-              onClick={enableEditMode}>
-        {strings.add}
-      </button>
-    ) : (
-      <div className={classNames('rounded border-l-4', isEditingQuestion ? 'border-teal-400' : 'border-slate-400')}>
-        <div className={classNames('p-2 rounded-tr', isEditingQuestion ? 'bg-teal-300' : 'bg-slate-300')}>
-          <span>{strings.placeHolder}</span>
+      <button type="button" className="p-2 border-y border-slate-500 bg-yellow-400 text-white" onClick={onCancel}>&#128473;</button>
 
-          <div className="float-right">
-            {!isEditMode && <EditButton onClick={enableEditMode}/>}
-            <DeleteButton onClick={isEditMode ? cancelEditMode : remove} otherClasses={['ml-2', 'px-2', 'rounded']}/>
-          </div>
-        </div>
-        <div className="p-2 rounded-br border-b border-r">
-          {isEditMode
-            ? <WordStringChildEditForm initialValue={value} cancel={cancelEditMode} onSubmit={submitEdit} strings={strings}/>
-            : value}
-        </div>
-      </div>
-    );
+      <button type="button" className="p-2 rounded-r border-r border-y border-slate-500 bg-blue-500 text-white"
+              onClick={() => onSubmit(value)}>&#10003;</button>
+    </div>
+  );
 }

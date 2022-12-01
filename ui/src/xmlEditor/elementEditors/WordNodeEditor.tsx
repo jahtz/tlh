@@ -10,12 +10,12 @@ import {WordContentEditor} from './WordContentEditor';
 import {Spec} from 'immutability-helper';
 import {readWordNodeData, WordNodeData} from './wordNodeData';
 import {LanguageInput} from '../LanguageInput';
-import {WordStringChildEditor} from './WordStringChildEditor';
 import {
   SelectedMultiMorphAnalysisWithEnclitic,
   selectedMultiMorphAnalysisWithEnclitics,
   stringifyMultiMorphAnalysisWithEnclitics
 } from '../../model/selectedMorphologicalAnalysis';
+import {WordStringChildEditor} from './WordStringChildEditor';
 
 // States
 
@@ -23,14 +23,16 @@ const defaultState: { _type: 'DefaultState' } = {_type: 'DefaultState'};
 
 const addMorphologyState: { _type: 'AddMorphology' } = {_type: 'AddMorphology'};
 
-const addEditingQuestionState: { _type: 'AddEditingQuestion' } = {_type: 'AddEditingQuestion'};
+const editEditingQuestionState: { _type: 'EditEditingQuestion' } = {_type: 'EditEditingQuestion'};
+
+const editFootNoteState: { _type: 'EditFootNoteState' } = {_type: 'EditFootNoteState'};
 
 interface EditContentState {
   _type: 'EditContent';
   editContent: string;
 }
 
-type States = typeof defaultState | typeof addMorphologyState | typeof addEditingQuestionState | EditContentState;
+type States = typeof defaultState | typeof addMorphologyState | typeof editEditingQuestionState | typeof editFootNoteState | EditContentState;
 
 // Component
 
@@ -129,19 +131,25 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
 
   // editing question
 
+  const isAddingEditingQuestion = state === editEditingQuestionState;
+
   const setEditingQuestion = (value: string | undefined) => updateAttribute('editingQuestion', value);
 
-  const removeEditingQuestion = () => setEditingQuestion(undefined);
+  const onEditingQuestionSubmit = (value: string): void => {
+    setEditingQuestion(value);
+    setState(defaultState);
+  };
 
-  function onEditingQuestionButtonClick(): void {
-    if (data.node.attributes.editingQuestion !== undefined) {
-      removeEditingQuestion();
-    } else {
-      console.info('TODO: ...');
-    }
-  }
+  const onEditEditingQuestionButtonClick = (): void => setState((oldState) => oldState === editEditingQuestionState ? defaultState : editEditingQuestionState);
+
+  const onRemoveEditingQuestion = (): void => {
+    setEditingQuestion(undefined);
+    setState(defaultState);
+  };
 
   // footnote
+
+  const isAddingFootNote = state === editFootNoteState;
 
   const lastChild = lastChildNode(data.node);
 
@@ -149,12 +157,24 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
     ? lastChild.attributes.c
     : undefined;
 
+  const onEditFootNoteButtonClick = (): void => setState((oldState) => oldState === editFootNoteState ? defaultState : editFootNoteState);
+
   const addOrUpdateFootNote = (value: string): void => updateEditedNode(
     footNote === undefined
       ? {node: {children: {$push: [xmlElementNode('note', {c: value})]}}}
       : {node: {children: {[data.node.children.length - 1]: {attributes: {c: {$set: value}}}}}});
 
-  const removeFootNote = (): void => updateEditedNode({node: {children: {$splice: [[data.node.children.length - 1, 1]]}}});
+  const onFootNoteSubmit = (value: string): void => {
+    addOrUpdateFootNote(value);
+    setState(defaultState);
+  };
+
+  const onRemoveFootNote = (): void => {
+    if (footNote !== undefined) {
+      updateEditedNode({node: {children: {$splice: [[data.node.children.length - 1, 1]]}}});
+    }
+    setState(defaultState);
+  };
 
   // Html
 
@@ -162,34 +182,36 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
     ? <WordContentEditor initialTransliteration={state.editContent} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>
     : (
       <>
-        <div className="mt-4">
+        <div className="mt-2">
           <LanguageInput initialValue={data.node.attributes.lg} onChange={(lg) => updateAttribute('lg', lg.trim() || '')}/>
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-2">
+        <div className="mt-2 grid grid-cols-3 gap-2">
           <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={enableEditWordState} title={t('editContent')}>
             &#9998; {t('editContent')}
           </button>
-          <button type="button" className="p-2 rounded bg-teal-400 text-white w-full" onClick={onEditingQuestionButtonClick}>
-            {data.node.attributes.editingQuestion ? t('removeEditingQuestion') : t('addEditingQuestion')}
+          <button type="button" onClick={onEditEditingQuestionButtonClick} className="p-2 rounded bg-teal-400 text-white w-full">
+            &#10068; {t('editEditingQuestion')}
           </button>
-          <button type="button" className="p-2 rounded bg-slate-400 text-white w-full">{t('addFootNote')}</button>
+          <button type="button" onClick={onEditFootNoteButtonClick} className="p-2 rounded bg-slate-400 text-white w-full">
+            {t('editFootNote')}
+          </button>
         </div>
 
-        {state._type === 'AddEditingQuestion' && <div>TODO!</div>}
+        {isAddingEditingQuestion &&
+          <WordStringChildEditor title={t('editingQuestion')} initialValue={data.node.attributes.editingQuestion} onDelete={onRemoveEditingQuestion}
+                                 onCancel={() => setState(defaultState)} onSubmit={onEditingQuestionSubmit}/>}
 
-        <div className="mt-4">
-          <WordStringChildEditor value={data.node.attributes.editingQuestion} set={setEditingQuestion} remove={removeEditingQuestion}
-                                 isEditingQuestion={true} setKeyHandlingEnabled={setKeyHandlingEnabled}
-                                 strings={{add: t('addEditingQuestion'), placeHolder: t('editingQuestion')}}/>
-        </div>
+        {isAddingFootNote &&
+          <WordStringChildEditor title={t('footNote')} initialValue={footNote} onDelete={onRemoveFootNote} onCancel={() => setState(defaultState)}
+                                 onSubmit={onFootNoteSubmit}/>}
 
-        <div className="mt-4">
-          <WordStringChildEditor value={footNote} set={addOrUpdateFootNote} remove={removeFootNote} setKeyHandlingEnabled={setKeyHandlingEnabled}
-                                 isEditingQuestion={false} strings={{add: t('addFootNote'), placeHolder: t('footNote')}}/>
-        </div>
+        {data.node.attributes.editingQuestion && /* TODO: styling... */
+          <div className="p-2 text-center">{t('editingQuestion')}: {data.node.attributes.editingQuestion}!</div>}
 
-        <hr className="my-4"/>
+        {footNote && /* TODO: styling... */ <div className="p-2 text-center">{t('footNote')}: {footNote}</div>}
+
+        <hr className="my-2"/>
 
         <section>
           <h2 className="mb-2 font-bold text-center">{t('morphologicalAnalysis_plural')} (mrp0sel=&quot;{data.node.attributes.mrp0sel}&quot;)</h2>
