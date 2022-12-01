@@ -87,7 +87,7 @@ export function writeWordNodeData({node: originalNode, morphologies}: WordNodeDa
 
     trans,
     // FIXME: can mrp0sel == undefined be overwritten?
-    mrp0sel: mrp0sel === undefined || mrp0sel.trim() !== 'DEL'
+    mrp0sel: (mrp0sel === undefined || mrp0sel.trim() === 'DEL')
       ? mrp0sel
       : selectedAnalysisOptions.join(' '),
     ...rest
