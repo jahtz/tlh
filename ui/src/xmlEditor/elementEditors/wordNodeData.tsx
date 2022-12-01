@@ -1,5 +1,4 @@
 import {
-  isMultiMorphologicalAnalysis,
   MorphologicalAnalysis,
   multiMorphAnalysisIsWithoutEnclitics,
   multiMorphAnalysisIsWithSingleEnclitics,
@@ -14,7 +13,7 @@ import {
   SingleMorphologicalAnalysisWithSingleEnclitics,
   writeMorphAnalysisValue
 } from '../../model/morphologicalAnalysis';
-import {isXmlElementNode, XmlElementNode, XmlNode} from '../../xmlModel/xmlModel';
+import {isXmlElementNode, XmlElementNode} from '../../xmlModel/xmlModel';
 import {displayReplace, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {WordNodeEditor} from './WordNodeEditor';
@@ -22,46 +21,22 @@ import {SpacesEditor} from './SpacesEditor';
 import {readSelectedMorphology} from '../../model/selectedMorphologicalAnalysis';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 
+/**
+ * @deprecated
+ */
 export interface WordNodeData {
   node: XmlElementNode;
   morphologies: MorphologicalAnalysis[];
-  footNote?: string;
 }
 
 export function readWordNodeData(node: XmlElementNode): WordNodeData {
-  const lastChild = node.children[node.children.length - 1];
-
   const selectedMorphologies = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
-
-  const morphologies = readMorphologiesFromNode(node, selectedMorphologies);
 
   return {
     node: node,
-    morphologies,
-    footNote: lastChild && isXmlElementNode(lastChild) && lastChild.tagName === 'note'
-      ? lastChild.attributes.c
-      : undefined,
+    morphologies: readMorphologiesFromNode(node, selectedMorphologies),
   };
 }
-
-function addFootNote(children: XmlNode[], footNote: string): XmlNode[] {
-  const lastElement = children[children.length - 1];
-
-  const newElement = {tagName: 'note', attributes: {c: footNote}, children: []};
-
-  return isXmlElementNode(lastElement) && lastElement.tagName === 'note'
-    ? [...children.slice(0, -1), newElement]
-    : [...children, newElement];
-}
-
-function removeFootNote(children: XmlNode[]): XmlNode[] {
-  const lastElement: XmlNode | undefined = children[children.length - 1];
-
-  return lastElement && isXmlElementNode(lastElement) && lastElement.tagName === 'note'
-    ? children.slice(0, -1)
-    : children;
-}
-
 
 export function extractSelMorphAnalysesFromSingleMorphWithoutEnc({selected, number}: SingleMorphologicalAnalysisWithoutEnclitics): string[] {
   return selected ? [number.toString()] : [];
@@ -94,56 +69,47 @@ export function extractSelMorphAnalysesFromMultiMorphWithMultiEnc({
 }
 
 function extractSelectedMorphologicalAnalyses(ma: MorphologicalAnalysis): string[] {
-  if (isMultiMorphologicalAnalysis(ma)) {
-    if (multiMorphAnalysisIsWithoutEnclitics(ma)) {
-      return extractSelMorphAnalysesFromMultiMorphWithoutEnc(ma);
-    } else if (multiMorphAnalysisIsWithSingleEnclitics(ma)) {
-      return extractSelMorphAnalysesFromMultiMorphWithSingleEnc(ma);
-    } else {
-      return extractSelMorphAnalysesFromMultiMorphWithMultiEnc(ma);
-    }
-  } else {
-    if (singleMorphAnalysisIsWithoutEnclitics(ma)) {
-      return extractSelMorphAnalysesFromSingleMorphWithoutEnc(ma);
-    } else if (singleMorphAnalysisIsWithSingleEnclitics(ma)) {
-      return extractSelMorphAnalysesFromSingleMorphWithSingleEnc(ma);
-    } else {
-      return extractSelMorphAnalysesFromSingleMorphWithMultiEnc(ma);
-    }
+  switch (ma._type) {
+    case 'MultiMorphAnalysis':
+      if (multiMorphAnalysisIsWithoutEnclitics(ma)) {
+        return extractSelMorphAnalysesFromMultiMorphWithoutEnc(ma);
+      } else if (multiMorphAnalysisIsWithSingleEnclitics(ma)) {
+        return extractSelMorphAnalysesFromMultiMorphWithSingleEnc(ma);
+      } else {
+        return extractSelMorphAnalysesFromMultiMorphWithMultiEnc(ma);
+      }
+    case 'SingleMorphAnalysis':
+      if (singleMorphAnalysisIsWithoutEnclitics(ma)) {
+        return extractSelMorphAnalysesFromSingleMorphWithoutEnc(ma);
+      } else if (singleMorphAnalysisIsWithSingleEnclitics(ma)) {
+        return extractSelMorphAnalysesFromSingleMorphWithSingleEnc(ma);
+      } else {
+        return extractSelMorphAnalysesFromSingleMorphWithMultiEnc(ma);
+      }
   }
 }
 
-export function writeWordNodeData({node: originalNode, morphologies, footNote}: WordNodeData): XmlElementNode {
-  const {tagName, attributes: originalAttributes, children: originalChildren} = originalNode;
+export function writeWordNodeData({node: originalNode, morphologies}: WordNodeData): XmlElementNode {
+  const {tagName, attributes: originalAttributes, children} = originalNode;
 
   const selectedAnalysisOptions: string[] = morphologies.flatMap(extractSelectedMorphologicalAnalyses);
 
-  let mrp0sel = originalAttributes.mrp0sel;
-
-  if (mrp0sel === undefined || mrp0sel.trim() !== 'DEL') {
-    mrp0sel = selectedAnalysisOptions.length > 0
-      ? selectedAnalysisOptions.join(' ')
-      : undefined;
-  }
+  const {trans, mrp0sel, ...rest} = originalAttributes;
 
   const attributes: Record<string, string | undefined> = {
     // put attributes trans and mrp0sel at start of tag...
-    trans: originalAttributes.trans,
-    mrp0sel,
-    ...originalAttributes
+    trans,
+    mrp0sel: mrp0sel === undefined || mrp0sel.trim() !== 'DEL'
+      ? selectedAnalysisOptions.join(' ')
+      : mrp0sel,
+    ...rest
   };
 
   for (const ma of morphologies) {
     attributes[`mrp${ma.number}`] = writeMorphAnalysisValue(ma);
   }
 
-  return {
-    tagName,
-    attributes,
-    children: footNote
-      ? addFootNote(originalChildren, footNote)
-      : removeFootNote(originalChildren)
-  };
+  return {tagName, attributes, children};
 }
 
 const foreignLanguageColors: { [key: string]: string } = {

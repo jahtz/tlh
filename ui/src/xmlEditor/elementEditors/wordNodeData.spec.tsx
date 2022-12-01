@@ -1,5 +1,5 @@
 import {
-  IMultiMorphologicalAnalysis,
+  IMorphologicalAnalysis,
   ISingleMorphologicalAnalysis,
   MultiMorphologicalAnalysisWithMultiEnclitics,
   MultiMorphologicalAnalysisWithoutEnclitics,
@@ -22,7 +22,7 @@ import {selectedMultiMorphAnalysisWithEnclitics} from '../../model/selectedMorph
 
 // Helpers
 
-const baseMorphAnalysis: IMultiMorphologicalAnalysis = {
+const baseMorphAnalysis: IMorphologicalAnalysis = {
   number: 1, referenceWord: '', translation: '', determinative: undefined, paradigmClass: ''
 };
 
@@ -45,7 +45,7 @@ function multiEncliticsAnalysis(saosMap: { [key: string]: boolean }): MultiEncli
 
 // single morphs
 
-const baseSingleMorphAnalysis: ISingleMorphologicalAnalysis = {...baseMorphAnalysis, analysis: ''};
+const baseSingleMorphAnalysis: ISingleMorphologicalAnalysis = {...baseMorphAnalysis, _type: 'SingleMorphAnalysis', analysis: ''};
 
 describe('wordNodeData', () => {
 
@@ -78,8 +78,14 @@ describe('wordNodeData', () => {
 
   // multi morph analysis without enclitics
   test.each<{ ma: MultiMorphologicalAnalysisWithoutEnclitics, expected: string[] }>([
-    {ma: {...baseSingleMorphAnalysis, encliticsAnalysis: undefined, analysisOptions: slaos({a: false, b: false, c: false})}, expected: []},
-    {ma: {...baseSingleMorphAnalysis, encliticsAnalysis: undefined, analysisOptions: slaos({a: true, b: false, c: true})}, expected: ['1a', '1c']}
+    {
+      ma: {...baseSingleMorphAnalysis, _type: 'MultiMorphAnalysis', encliticsAnalysis: undefined, analysisOptions: slaos({a: false, b: false, c: false})},
+      expected: []
+    },
+    {
+      ma: {...baseSingleMorphAnalysis, _type: 'MultiMorphAnalysis', encliticsAnalysis: undefined, analysisOptions: slaos({a: true, b: false, c: true})},
+      expected: ['1a', '1c']
+    }
   ])(
     'should extract selection from $ma as $expected',
     ({ma, expected}) => expect(extractSelMorphAnalysesFromMultiMorphWithoutEnc(ma)).toEqual(expected)
@@ -87,8 +93,11 @@ describe('wordNodeData', () => {
 
   // multi morph analysis with single enclitics
   test.each<{ ma: MultiMorphologicalAnalysisWithSingleEnclitics, expected: string[] }>([
-    {ma: {...baseSingleMorphAnalysis, encliticsAnalysis, analysisOptions: slaos({a: false, b: false, c: false})}, expected: []},
-    {ma: {...baseSingleMorphAnalysis, encliticsAnalysis, analysisOptions: slaos({a: true, b: true, c: true})}, expected: ['1a', '1b', '1c']}
+    {ma: {...baseSingleMorphAnalysis, _type: 'MultiMorphAnalysis', encliticsAnalysis, analysisOptions: slaos({a: false, b: false, c: false})}, expected: []},
+    {
+      ma: {...baseSingleMorphAnalysis, _type: 'MultiMorphAnalysis', encliticsAnalysis, analysisOptions: slaos({a: true, b: true, c: true})},
+      expected: ['1a', '1b', '1c']
+    }
   ])(
     'should extract selection from $ma as $expected',
     ({ma, expected}) => expect(extractSelMorphAnalysesFromMultiMorphWithSingleEnc(ma)).toEqual(expected)
@@ -99,6 +108,7 @@ describe('wordNodeData', () => {
     {
       ma: {
         ...baseSingleMorphAnalysis,
+        _type: 'MultiMorphAnalysis',
         analysisOptions: laos('a', 'b', 'c'),
         encliticsAnalysis: multiEncliticsAnalysis({R: false, S: false, T: false}),
         selectedAnalysisCombinations: []
@@ -108,6 +118,7 @@ describe('wordNodeData', () => {
     {
       ma: {
         ...baseSingleMorphAnalysis,
+        _type: 'MultiMorphAnalysis',
         analysisOptions: laos('a', 'b', 'c'),
         encliticsAnalysis: multiEncliticsAnalysis({R: false, S: false, T: false}),
         selectedAnalysisCombinations: [
@@ -121,6 +132,5 @@ describe('wordNodeData', () => {
     'should extract selection from $ma as $expected',
     ({ma, expected}) => expect(extractSelMorphAnalysesFromMultiMorphWithMultiEnc(ma)).toEqual(expected)
   );
-
 
 });

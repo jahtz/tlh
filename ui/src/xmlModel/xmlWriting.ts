@@ -31,7 +31,7 @@ export function writeNode(node: XmlNode, xmlWriteConfig: XmlWriteConfig = tlhXml
   const {tagName, attributes, children} = node;
 
   const writtenAttributes = Object.entries(attributes)
-    .flatMap<string>(([name, value]) => value !== undefined ? `${name}="${writeAttributeValue(value)}"` : [])
+    .flatMap(([name, value]) => value !== undefined ? [`${name}="${writeAttributeValue(value)}"`] : [])
     .join(' ');
 
   if (children.length === 0) {

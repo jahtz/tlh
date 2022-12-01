@@ -16,6 +16,14 @@ export function isXmlElementNode(node: XmlNode): node is XmlElementNode {
   return 'tagName' in node;
 }
 
+export function firstChildNode({children}: XmlElementNode): XmlNode | undefined {
+  return children[0];
+}
+
+export function lastChildNode({children}: XmlElementNode): XmlNode | undefined {
+  return children[children.length - 1];
+}
+
 export interface XmlTextNode {
   textContent: string;
 }

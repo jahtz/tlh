@@ -24,6 +24,7 @@ export interface IMorphologicalAnalysis {
 // Single analysis
 
 export interface ISingleMorphologicalAnalysis extends IMorphologicalAnalysis {
+  _type: 'SingleMorphAnalysis';
   analysis: string;
 }
 
@@ -64,7 +65,9 @@ export function isSingleMorphologicalAnalysis(ma: MorphologicalAnalysis): ma is 
 
 // Multi analysis
 
-export type IMultiMorphologicalAnalysis = IMorphologicalAnalysis;
+export interface IMultiMorphologicalAnalysis extends IMorphologicalAnalysis {
+  _type: 'MultiMorphAnalysis';
+}
 
 export interface MultiMorphologicalAnalysisWithoutEnclitics extends IMultiMorphologicalAnalysis {
   analysisOptions: SelectableLetteredAnalysisOption[];
@@ -186,8 +189,11 @@ export function readMorphologicalAnalysis(number: number, content: string | null
   if (analysesString.includes('{')) {
     const analysisOptions: SelectableLetteredAnalysisOption[] = parseMultiAnalysisString(analysesString, selectedAnalysisLetters);
 
+    const _type = 'MultiMorphAnalysis';
+
     if (encliticsAnalysis === undefined) {
       return {
+        _type,
         number,
         translation,
         referenceWord,
@@ -198,6 +204,7 @@ export function readMorphologicalAnalysis(number: number, content: string | null
       } as MultiMorphologicalAnalysisWithoutEnclitics;
     } else if (isSingleEncliticsAnalysis(encliticsAnalysis)) {
       return {
+        _type,
         number,
         translation,
         referenceWord,
@@ -212,8 +219,9 @@ export function readMorphologicalAnalysis(number: number, content: string | null
         morphLetter,
         encLetter
       }) => selectedMultiMorphAnalysisWithEnclitics(number, morphLetter || '', encLetter || ''));
-     
+
       return {
+        _type,
         number,
         translation,
         referenceWord,
@@ -227,16 +235,18 @@ export function readMorphologicalAnalysis(number: number, content: string | null
       };
     }
   } else {
+    const _type = 'SingleMorphAnalysis';
+
     const selected = selectedAnalyses.length > 0;
 
     const analysis = analysesString;
 
     if (encliticsAnalysis == undefined) {
-      return {number, referenceWord, translation, paradigmClass, determinative: determinative, analysis, encliticsAnalysis, selected};
+      return {_type, number, referenceWord, translation, paradigmClass, determinative: determinative, analysis, encliticsAnalysis, selected};
     } else if (isSingleEncliticsAnalysis(encliticsAnalysis)) {
-      return {number, referenceWord, translation, paradigmClass, determinative: determinative, analysis, encliticsAnalysis, selected};
+      return {_type, number, referenceWord, translation, paradigmClass, determinative: determinative, analysis, encliticsAnalysis, selected};
     } else {
-      return {number, referenceWord, translation, paradigmClass, determinative: determinative, analysis, encliticsAnalysis};
+      return {_type, number, referenceWord, translation, paradigmClass, determinative: determinative, analysis, encliticsAnalysis};
     }
   }
 }

@@ -90,14 +90,13 @@ function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode
   annotationNode.children.push({
     tagName: 'annot',
     attributes: {
-      editor, data: (new Date).toISOString()
+      editor, date: (new Date()).toISOString()
     },
     children: []
   });
 
   return rootNode;
 }
-
 
 export function writeXml(node: XmlElementNode, editorConfig: XmlEditorConfig = tlhXmlEditorConfig): string {
   const nodeToExport = editorConfig.beforeExport(node);
@@ -165,7 +164,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
   function applyUpdates(nextEditablePath?: number[]): void {
     let newEditorState: IEditNodeEditorState<T> | undefined = undefined;
 
-    if (nextEditablePath) {
+    if (nextEditablePath !== undefined) {
       const node = findElement(state.rootNode as XmlElementNode, nextEditablePath);
 
       if (state.editorState && 'path' in state.editorState) {
@@ -264,7 +263,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
     return (
       <NodeEditorRightSide key={path.join('.')} originalNode={node} changed={changed}
                            deleteNode={() => deleteNode(path)}
-                           applyUpdates={applyUpdates}
+                           applyUpdates={() => applyUpdates()}
                            cancelSelection={() => setState((state) => update(state, {editorState: {$set: defaultRightSideState}}))}
                            jumpElement={(forward) => jumpEditableNodes(node.tagName, forward)}
                            fontSizeSelectorProps={fontSizeSelectorProps}>
