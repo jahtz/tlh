@@ -13,3 +13,6 @@ mkdir -p ${CLIENT_TARGET_DIR}
 rm -r ${CLIENT_TARGET_DIR:?}/*
 
 cp -r ui/build/* ${CLIENT_TARGET_DIR}/
+
+# create .htaccess file
+echo "FallbackResource index.html" > ${CLIENT_TARGET_DIR}/.htaccess
