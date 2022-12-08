@@ -1,6 +1,6 @@
 import {leftColorClass, ReadFile, rightColorClass} from './XmlComparatorContainer';
 import {defaultXmlComparatorConfig, makeReplacements, XmlComparatorConfig} from './xmlComparatorConfig';
-import {diffLines} from 'diff';
+import {Change, diffLines} from 'diff';
 
 interface IProps {
   leftFile: ReadFile;
@@ -8,31 +8,33 @@ interface IProps {
   config?: XmlComparatorConfig;
 }
 
-type DiffLine = {
-  line: string;
-  className: string | undefined;
+function DiffDisplay({change}: { change: Change }): JSX.Element {
+
+  const {value, removed, added} = change;
+
+  const className = added ? leftColorClass : (removed ? rightColorClass : undefined);
+
+  return (
+    <>
+      {value.split(/\n/).map((line, index) =>
+        <p key={index} style={{wordBreak: 'break-all'}} className={className}>
+          {line.replace(/ /g, '\u00a0')}
+        </p>
+      )}
+    </>
+  );
 }
 
 export function XmlComparator({leftFile, rightFile, config = defaultXmlComparatorConfig}: IProps): JSX.Element {
 
-  const firstFileContent = makeReplacements(leftFile.baseContent, config);
-  const secondFileContent = makeReplacements(rightFile.baseContent, config);
-
-  const changes2 = diffLines(firstFileContent, secondFileContent).flatMap<DiffLine>(({value, added, removed}) => {
-    const className = added ? leftColorClass : (removed ? rightColorClass : undefined);
-
-    return value
-      .split('\n')
-      .map((line) => ({line, className}));
-  });
+  const diff = diffLines(
+    makeReplacements(leftFile.baseContent, config),
+    makeReplacements(rightFile.baseContent, config)
+  );
 
   return (
-    <div>
-      {changes2.map(({line, className}, index) =>
-        <p key={config.name + '_' + index + '_' + index} style={{wordBreak: 'break-all'}} className={className}>
-          {line.replace(/ /g, '\u00a0')}
-        </p>
-      )}
-    </div>
+    <>
+      {diff.map((change, index) => <DiffDisplay key={index} change={change}/>)}
+    </>
   );
 }
