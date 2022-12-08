@@ -1,5 +1,6 @@
-import {createHashRouter, LoaderFunctionArgs} from 'react-router-dom';
+import {createBrowserRouter, LoaderFunctionArgs, useRouteError} from 'react-router-dom';
 import {
+  basename,
   createManuscriptUrl,
   createTransliterationUrl,
   documentMergerUrl,
@@ -43,36 +44,53 @@ async function manuscriptDataLoader({params}: LoaderFunctionArgs): Promise<Manus
     : undefined;
 }
 
-export const router = createHashRouter([
+export const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <App/>,
+      children: [
+        {path: homeUrl, element: <Home/>},
+
+        {path: registerUrl, element: <RegisterForm/>},
+        {path: loginUrl, element: <LoginForm/>},
+
+        {path: createManuscriptUrl, element: <RequireAuth>{() => <CreateManuscriptForm/>}</RequireAuth>},
+
+        {
+          path: 'manuscripts/:mainIdentifier',
+          children: [
+            {path: 'data', element: <ManuscriptData/>, loader: manuscriptDataLoader},
+            {path: uploadPicturesUrl, element: <UploadPicturesForm/>, loader: manuscriptDataLoader},
+            {path: createTransliterationUrl, element: <TransliterationInput/>, loader: manuscriptDataLoader},
+          ]
+        },
+
+        {path: editTransliterationDocumentUrl, element: <XmlDocumentEditorContainer editorConfig={tlhXmlEditorConfig}/>},
+
+        {path: editTranscriptionDocumentUrl, element: <XmlDocumentEditorContainer editorConfig={tlhXmlEditorConfig}/>},
+
+        {path: xmlComparatorUrl, element: <XmlComparatorContainer/>},
+
+        {path: preferencesUrl, element: <Preferences/>},
+
+        {path: documentMergerUrl, element: <DocumentMergerContainer/>},
+      ],
+      errorElement: <ErrorBoundary/>
+    }
+  ],
   {
-    path: '/',
-    element: <App/>,
-    children: [
-      {path: homeUrl, element: <Home/>},
-
-      {path: registerUrl, element: <RegisterForm/>},
-      {path: loginUrl, element: <LoginForm/>},
-
-      {path: createManuscriptUrl, element: <RequireAuth>{() => <CreateManuscriptForm/>}</RequireAuth>},
-
-      {
-        path: 'manuscripts/:mainIdentifier',
-        children: [
-          {path: 'data', element: <ManuscriptData/>, loader: manuscriptDataLoader},
-          {path: uploadPicturesUrl, element: <UploadPicturesForm/>, loader: manuscriptDataLoader},
-          {path: createTransliterationUrl, element: <TransliterationInput/>, loader: manuscriptDataLoader},
-        ]
-      },
-
-      {path: editTransliterationDocumentUrl, element: <XmlDocumentEditorContainer editorConfig={tlhXmlEditorConfig}/>},
-
-      {path: editTranscriptionDocumentUrl, element: <XmlDocumentEditorContainer editorConfig={tlhXmlEditorConfig}/>},
-
-      {path: xmlComparatorUrl, element: <XmlComparatorContainer/>},
-
-      {path: preferencesUrl, element: <Preferences/>},
-
-      {path: documentMergerUrl, element: <DocumentMergerContainer/>},
-    ]
+    basename,
   }
-]);
+);
+
+function ErrorBoundary(): JSX.Element {
+
+  const error = useRouteError();
+
+  console.error(error);
+
+  return (
+    <div>Error...</div>
+  );
+
+}
