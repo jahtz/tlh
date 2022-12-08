@@ -1,7 +1,7 @@
 export const serverUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:8066' : '';
 
 // FIXME: set basename!
-export const basename = process.env.NODE_ENV === 'development' ? '' : '/test/public';
+export const basename = process.env.NODE_ENV === 'development' ? '' : '/release/public';
 
 
 export function pictureBaseUrl(manuscriptMainIdentifier: string): string {

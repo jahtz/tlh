@@ -18,6 +18,7 @@ import {apolloClient} from './apolloClient';
 i18n
   .use(initReactI18next)
   .init({
+    lng: 'en',
     fallbackLng: 'de',
     resources: {
       de: {common: common_de},

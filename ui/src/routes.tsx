@@ -86,11 +86,9 @@ export const router = createBrowserRouter([
 function ErrorBoundary(): JSX.Element {
 
   const error = useRouteError();
-
   console.error(error);
 
   return (
     <div>Error...</div>
   );
-
 }
