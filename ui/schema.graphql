@@ -1,126 +1,133 @@
+# This file was generated based on ".graphqlconfig". Do not edit manually.
+
+schema {
+    query: Query
+    mutation: Mutation
+}
+
 type LoggedInUserMutations {
-  createManuscript(values: ManuscriptMetaDataInput): String
-  manuscript(mainIdentifier: String!): ManuscriptMutations
+    createManuscript(values: ManuscriptMetaDataInput): String
+    manuscript(mainIdentifier: String!): ManuscriptMutations
 }
 
 type ManuscriptIdentifier {
-  identifier: String!
-  identifierType: ManuscriptIdentifierType!
-}
-
-input ManuscriptIdentifierInput {
-  identifier: String!
-  identifierType: ManuscriptIdentifierType!
-}
-
-enum ManuscriptIdentifierType {
-  CollectionNumber
-  ExcavationNumber
-  PublicationShortReference
+    identifier: String!
+    identifierType: ManuscriptIdentifierType!
 }
 
 type ManuscriptLanguage {
-  abbreviation: String!
-  name: String!
+    abbreviation: String!
+    name: String!
 }
 
 type ManuscriptMetaData {
-  bibliography: String
-  creatorUsername: String!
-  cthClassification: Int
-  mainIdentifier: ManuscriptIdentifier!
-  otherIdentifiers: [ManuscriptIdentifier!]!
-  palaeographicClassification: PalaeographicClassification!
-  palaeographicClassificationSure: Boolean!
-  pictureUrls: [String!]!
-  provenance: String
-  status: ManuscriptStatus
-  transliterations: [Transliteration!]
-}
-
-input ManuscriptMetaDataInput {
-  bibliography: String
-  cthClassification: Int
-  mainIdentifier: ManuscriptIdentifierInput!
-  otherIdentifiers: [ManuscriptIdentifierInput!]!
-  palaeographicClassification: PalaeographicClassification!
-  palaeographicClassificationSure: Boolean!
-  provenance: String
+    bibliography: String
+    creatorUsername: String!
+    cthClassification: Int
+    mainIdentifier: ManuscriptIdentifier!
+    otherIdentifiers: [ManuscriptIdentifier!]!
+    palaeographicClassification: PalaeographicClassification!
+    palaeographicClassificationSure: Boolean!
+    pictureUrls: [String!]!
+    provenance: String
+    status: ManuscriptStatus
+    transliterations: [Transliteration!]
 }
 
 type ManuscriptMutations {
-  updateTransliteration(values: [TransliterationInput!]!): Boolean!
-}
-
-enum ManuscriptSide {
-  InscriptionNumber
-  LeftEdge
-  LowerEdge
-  NotIdentifiable
-  Obverse
-  Reverse
-  RightEdge
-  SealInscription
-  SideA
-  SideB
-  UpperEdge
-}
-
-enum ManuscriptStatus {
-  Approved
-  Created
-  ExecutiveReviewMerged
-  ExecutiveReviewed
-  InCreation
-  ReviewMerged
-  Reviewed
+    updateTransliteration(values: [TransliterationInput!]!): Boolean!
 }
 
 type Mutation {
-  login(password: String!, username: String!): String
-  me: LoggedInUserMutations
-  register(userInput: UserInput!): String
-}
-
-enum PalaeographicClassification {
-  AssyroMittanianScript
-  LateNewScript
-  MiddleAssyrianScript
-  MiddleBabylonianScript
-  MiddleScript
-  NewScript
-  OldAssyrianScript
-  OldScript
-  Unclassified
+    login(password: String!, username: String!): String
+    me: LoggedInUserMutations
+    register(userInput: UserInput!): String
 }
 
 type Query {
-  allManuscripts(page: Int!, paginationSize: Int!): [ManuscriptMetaData!]!
-  manuscript(mainIdentifier: String!): ManuscriptMetaData
-  manuscriptCount: Int!
-  manuscriptLanguages: [ManuscriptLanguage!]!
+    allManuscripts(page: Int!, paginationSize: Int!): [ManuscriptMetaData!]!
+    manuscript(mainIdentifier: String!): ManuscriptMetaData
+    manuscriptCount: Int!
+    manuscriptLanguages: [ManuscriptLanguage!]!
 }
 
 type Transliteration {
-  input: String!
-  resultJson: String!
-  resultXml: String!
-  side: ManuscriptSide!
-  version: Int!
+    input: String!
+    resultJson: String!
+    resultXml: String!
+    side: ManuscriptSide!
+    version: Int!
+}
+
+enum ManuscriptIdentifierType {
+    CollectionNumber
+    ExcavationNumber
+    PublicationShortReference
+}
+
+enum ManuscriptSide {
+    InscriptionNumber
+    LeftEdge
+    LowerEdge
+    NotIdentifiable
+    Obverse
+    Reverse
+    RightEdge
+    SealInscription
+    SideA
+    SideB
+    UpperEdge
+}
+
+enum ManuscriptStatus {
+    Approved
+    Created
+    ExecutiveReviewMerged
+    ExecutiveReviewed
+    InCreation
+    ReviewMerged
+    Reviewed
+}
+
+enum PalaeographicClassification {
+    AssyroMittanianScript
+    LateNewScript
+    MiddleAssyrianScript
+    MiddleBabylonianScript
+    MiddleScript
+    NewScript
+    OldAssyrianScript
+    OldScript
+    Unclassified
+}
+
+input ManuscriptIdentifierInput {
+    identifier: String!
+    identifierType: ManuscriptIdentifierType!
+}
+
+input ManuscriptMetaDataInput {
+    bibliography: String
+    cthClassification: Int
+    mainIdentifier: ManuscriptIdentifierInput!
+    otherIdentifiers: [ManuscriptIdentifierInput!]!
+    palaeographicClassification: PalaeographicClassification!
+    palaeographicClassificationSure: Boolean!
+    provenance: String
 }
 
 input TransliterationInput {
-  input: String!
-  resultJson: String!
-  resultXml: String!
-  side: ManuscriptSide!
+    input: String!
+    resultJson: String!
+    resultXml: String!
+    side: ManuscriptSide!
 }
 
 input UserInput {
-  affiliation: String
-  email: String!
-  name: String!
-  password: String!
-  passwordRepeat: String!
-  username: String!
+    affiliation: String
+    email: String!
+    name: String!
+    password: String!
+    passwordRepeat: String!
+    username: String!
 }
