@@ -68,6 +68,8 @@ $manuscriptMutationsType = new ObjectType([
 
         $mapped = array_map(fn($x) => Transliteration::readFromGraphQLInput($mainIdentifier, $x), $args['values']);
 
+        error_log(json_encode($mapped, JSON_PRETTY_PRINT));
+
         $allSaved = true;
 
         $connection = connect_to_db();

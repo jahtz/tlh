@@ -1,12 +1,11 @@
 use hpm;
 
-drop table if exists tlh_dig_transliterations;
-
-drop table if exists tlh_dig_manuscript_other_identifiers;
-
-drop table if exists tlh_dig_manuscript_metadatas;
-
-drop table if exists tlh_dig_users;
+drop table if exists
+  tlh_dig_transliteration_lines,
+  tlh_dig_transliterations,
+  tlh_dig_manuscript_other_identifiers,
+  tlh_dig_manuscript_metadatas,
+  tlh_dig_users;
 
 -- users
 
@@ -51,9 +50,19 @@ create table if not exists tlh_dig_transliterations (
   side            varchar(20) not null,
   version         integer     not null,
 
-  input           text        not null,
-  result_xml      text        not null,
-  result_json     text        not null,
-
   primary key (main_identifier, side, version)
+);
+
+create table if not exists tlh_dig_transliteration_lines (
+  main_identifier varchar(20) not null,
+  side            varchar(20) not null,
+  version         integer     not null,
+  line_number     integer     not null,
+
+  input           text        not null,
+  is_error        boolean     not null,
+  result          varchar(20) not null,
+
+  primary key (main_identifier, side, version, line_number),
+  foreign key (main_identifier, side, version) references tlh_dig_transliterations (main_identifier, side, version) on update cascade on delete cascade
 );
