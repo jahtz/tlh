@@ -1,6 +1,6 @@
 {
   "require": {
-    "webonyx/graphql-php": "^v14.5.1",
+    "webonyx/graphql-php": "^v15.0.0",
     "rbdwllr/reallysimplejwt": "^4.0.0",
     "myclabs/php-enum": "^1.7.7",
     "ext-json": "*",
