@@ -181,7 +181,8 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
     : (
       <>
         <div className="mt-2">
-          <LanguageInput initialValue={data.node.attributes.lg} onChange={(lg) => updateAttribute('lg', lg.trim() || '')}/>
+          <LanguageInput initialValue={data.node.attributes.lg} onChange={(lg) => updateAttribute('lg', lg.trim() || '')}
+                         onFocus={() => setKeyHandlingEnabled(false)} onBlur={() => setKeyHandlingEnabled(true)}/>
         </div>
 
         <div className="mt-2 grid grid-cols-3 gap-2">
