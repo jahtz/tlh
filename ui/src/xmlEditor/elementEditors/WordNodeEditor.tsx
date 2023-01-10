@@ -199,11 +199,12 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
 
         {isAddingEditingQuestion &&
           <WordStringChildEditor title={t('editingQuestion')} initialValue={data.node.attributes.editingQuestion} onDelete={onRemoveEditingQuestion}
-                                 onCancel={() => setState(defaultState)} onSubmit={onEditingQuestionSubmit}/>}
+                                 onCancel={() => setState(defaultState)} onSubmit={onEditingQuestionSubmit}
+                                 onFocus={() => setKeyHandlingEnabled(false)} onBlur={() => setKeyHandlingEnabled(true)}/>}
 
         {isAddingFootNote &&
           <WordStringChildEditor title={t('footNote')} initialValue={footNote} onDelete={onRemoveFootNote} onCancel={() => setState(defaultState)}
-                                 onSubmit={onFootNoteSubmit}/>}
+                                 onSubmit={onFootNoteSubmit} onFocus={() => setKeyHandlingEnabled(false)} onBlur={() => setKeyHandlingEnabled(true)}/>}
 
         {data.node.attributes.editingQuestion && /* TODO: styling... */
           <div className="p-2 text-center">{t('editingQuestion')}: {data.node.attributes.editingQuestion}!</div>}
