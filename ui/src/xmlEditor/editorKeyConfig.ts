@@ -6,13 +6,6 @@ export interface EditorKeyConfig {
   submitChangeKeys: string[];
 }
 
-export interface OldEditorKeyConfig {
-  nextEditableNodeKeys: string[];
-  previousEditableNodeKeys: string[];
-  submitChangeKeys: string[];
-}
-
-
 export const defaultEditorKeyConfig: EditorKeyConfig = {
   updateAndNextEditableNodeKeys: ['w'],
   nextEditableNodeKeys: [],

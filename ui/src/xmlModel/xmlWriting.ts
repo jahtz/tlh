@@ -14,7 +14,8 @@ function writeAttributeValue(value: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/>/g, '&gt;')
+    .replace(/ +/g, ' ');
 }
 
 const indent = (s: string, count = 2): string => ' '.repeat(count) + s;

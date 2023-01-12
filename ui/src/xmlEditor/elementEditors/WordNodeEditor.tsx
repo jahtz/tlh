@@ -245,7 +245,8 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
             )}
 
           {state === addMorphologyState
-            ? <MorphAnalysisOptionEditor morphologicalAnalysis={nextMorphAnalysis()} onSubmit={(newMa) => updateMorphology(data.morphologies.length, newMa)}
+            ? <MorphAnalysisOptionEditor initialMorphologicalAnalysis={nextMorphAnalysis()}
+                                         onSubmit={(newMa) => updateMorphology(data.morphologies.length, newMa)}
                                          cancelUpdate={toggleAddMorphology}/>
             : (
               <button type="button" className="mt-4 p-2 rounded bg-cyan-300 text-white w-full" onClick={toggleAddMorphology}>
