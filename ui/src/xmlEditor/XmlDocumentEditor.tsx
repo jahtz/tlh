@@ -347,8 +347,8 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
 
   if (state.editorState._type === 'CompareChangesEditorState') {
 
-    const leftSide: ReadFile = {name: '', baseContent: writeNode(initialNode).join('\n')};
-    const right: ReadFile = {name: '', baseContent: writeNode(state.rootNode).join('\n')};
+    const leftSide: ReadFile = {name: '', baseContent: writeXml(initialNode as XmlElementNode)};
+    const right: ReadFile = {name: '', baseContent: writeXml(state.rootNode as XmlElementNode)};
 
     return (
       <div className="container mx-auto">
