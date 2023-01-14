@@ -1,7 +1,7 @@
 <?php
 
-require_once './sql_queries.inc';
-require_once 'cors.inc';
+require_once './sql_queries.php';
+require_once 'cors.php';
 
 cors();
 

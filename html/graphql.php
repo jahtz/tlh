@@ -1,16 +1,16 @@
 <?php
 
-require_once 'sql_queries.inc';
-require_once 'cors.inc';
+require_once 'sql_queries.php';
+require_once 'cors.php';
 
 require_once 'vendor/autoload.php';
 
-require_once 'graphql/MyGraphQLExceptions.inc';
-require_once 'graphql/LoggedInUser.inc';
+require_once 'graphql/MyGraphQLExceptions.php';
+require_once 'graphql/LoggedInUser.php';
 
-require_once 'model/ManuscriptMetaData.inc';
-require_once 'model/ManuscriptLanguages.inc';
-require_once 'model/User.inc';
+require_once 'model/ManuscriptMetaData.php';
+require_once 'model/ManuscriptLanguages.php';
+require_once 'model/User.php';
 
 use GraphQL\Error\{DebugFlag, FormattedError};
 use GraphQL\GraphQL;

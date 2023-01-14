@@ -1,12 +1,12 @@
 <?php
 
-require_once __DIR__ . '/mysqliconn.inc';
+require_once __DIR__ . '/mysqliconn.php';
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-require_once __DIR__ . '/model/ManuscriptMetaData.inc';
-require_once __DIR__ . '/model/Transliteration.inc';
-require_once __DIR__ . '/model/User.inc';
+require_once __DIR__ . '/model/ManuscriptMetaData.php';
+require_once __DIR__ . '/model/Transliteration.php';
+require_once __DIR__ . '/model/User.php';
 
 use tlh_dig\model\{ManuscriptIdentifier, ManuscriptMetaData, User};
 

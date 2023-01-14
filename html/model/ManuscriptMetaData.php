@@ -2,8 +2,8 @@
 
 namespace tlh_dig\model;
 
-require_once __DIR__ . '/ManuscriptIdentifier.inc';
-require_once __DIR__ . '/Transliteration.inc';
+require_once __DIR__ . '/ManuscriptIdentifier.php';
+require_once __DIR__ . '/Transliteration.php';
 
 use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
 
