@@ -24,6 +24,8 @@ export function NavBar(): JSX.Element {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const buildDate = process.env.REACT_APP_BUILD_DATE;
+
   function onLogout() {
     dispatch(logout());
     navigate(loginUrl);
@@ -35,7 +37,7 @@ export function NavBar(): JSX.Element {
 
   return (
     <nav className="flex flex-row bg-gray-800 text-white">
-      <NavLink className="p-4 hover:bg-slate-700 font-extrabold" to={homeUrl}>TLH<sup>dig</sup></NavLink>
+      <NavLink className="p-4 hover:bg-slate-700 font-extrabold" title={buildDate} to={homeUrl}>TLH<sup>dig</sup></NavLink>
 
       {user && <NavLink className="p-4 ml-4 hover:bg-slate-700" to={createManuscriptUrl}>{t('createManuscript')}</NavLink>}
       <NavLink className="p-4 ml-4 hover:bg-slate-700" to={editTransliterationDocumentUrl}>{t('editDocument')}</NavLink>

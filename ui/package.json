@@ -55,7 +55,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "REACT_APP_BUILD_DATE=$(date) react-scripts build",
     "test": "react-scripts test",
     "testVerbose": "react-scripts test --verbose",
     "eject": "react-scripts eject",
