@@ -1,4 +1,3 @@
-import {serverUrl} from './urls';
 import {ApolloClient, ApolloLink, concat, HttpLink, InMemoryCache} from '@apollo/client';
 import {newStore} from './newStore';
 
@@ -20,7 +19,7 @@ const versionModifier = window.location.href.includes('stable')
     : '';
 
 
-const apolloUri = `${serverUrl}${versionModifier}/graphql.php`;
+const apolloUri = `${process.env.REACT_APP_SERVER_URL}${versionModifier}/graphql.php`;
 
 
 export const apolloClient = new ApolloClient({

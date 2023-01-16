@@ -1,6 +1,6 @@
 import {ChangeEvent, createRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {homeUrl, serverUrl} from '../urls';
+import {homeUrl} from '../urls';
 import {PicturesBlock} from './PicturesBlock';
 import {Navigate, useLoaderData} from 'react-router-dom';
 import {ManuscriptMetaDataFragment} from '../graphql';
@@ -25,7 +25,7 @@ export function UploadPicturesForm(): JSX.Element {
   const fileUploadRef = createRef<HTMLInputElement>();
 
 
-  const uploadUrl = `${serverUrl}/uploadPicture.php?id=${encodeURIComponent(manuscript.mainIdentifier.identifier)}`;
+  const uploadUrl = `${process.env.REACT_APP_SERVER_URL}/uploadPicture.php?id=${encodeURIComponent(manuscript.mainIdentifier.identifier)}`;
 
   function selectFile(event: ChangeEvent<HTMLInputElement>): void {
     const fileList = event.target.files;

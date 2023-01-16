@@ -1,11 +1,5 @@
-export const serverUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:8066' : '';
-
-// FIXME: set basename!
-export const basename = process.env.NODE_ENV === 'development' ? '' : '/release/public';
-
-
 export function pictureBaseUrl(manuscriptMainIdentifier: string): string {
-  return `${serverUrl}/uploads/${manuscriptMainIdentifier}`;
+  return `${process.env.REACT_APP_SERVER_URL}/uploads/${manuscriptMainIdentifier}`;
 }
 
 export const homeUrl = '/';
@@ -35,6 +29,4 @@ export const createTransliterationUrl = 'createTransliteration';
 
 // Foreign urls
 
-const tlhAnalyzerServerUrl = /*process.env.NODE_ENV === 'development' ? 'http://localhost:8057' :*/ '/TLHaly';
-
-export const tlhAnalyzerUrl = `${tlhAnalyzerServerUrl}/jasonanalysis.php`;
+export const tlhAnalyzerUrl = '/TLHaly/jasonanalysis.php';

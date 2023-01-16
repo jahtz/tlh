@@ -1,6 +1,5 @@
 import {createBrowserRouter, LoaderFunctionArgs, useRouteError} from 'react-router-dom';
 import {
-  basename,
   createManuscriptUrl,
   createTransliterationUrl,
   documentMergerUrl,
@@ -44,6 +43,11 @@ async function manuscriptDataLoader({params}: LoaderFunctionArgs): Promise<Manus
     : undefined;
 }
 
+const routerOptions = {
+  // FIXME: set basename!
+  basename: process.env.REACT_APP_BASENAME,
+};
+
 export const router = createBrowserRouter([
     {
       path: '/',
@@ -78,9 +82,7 @@ export const router = createBrowserRouter([
       errorElement: <ErrorBoundary/>
     }
   ],
-  {
-    basename,
-  }
+  routerOptions
 );
 
 function ErrorBoundary(): JSX.Element {
