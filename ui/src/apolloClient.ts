@@ -12,15 +12,13 @@ const apolloAuthMiddleware = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
-const versionModifier = window.location.href.includes('stable')
-  ? '/stable'
-  : window.location.href.includes('release')
-    ? '/release'
-    : '';
-
+const versionModifier = (process.env.REACT_APP_VERSION as string).length > 0
+  ? `/${process.env.REACT_APP_VERSION}`
+  : '';
 
 const apolloUri = `${process.env.REACT_APP_SERVER_URL}${versionModifier}/graphql.php`;
 
+console.info(apolloUri);
 
 export const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),

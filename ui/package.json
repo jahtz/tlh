@@ -1,6 +1,6 @@
 {
   "name": "tlh_dig_react",
-  "version": "0.1.0",
+  "version": "0.8.0",
   "private": true,
   "homepage": "./",
   "dependencies": {
@@ -55,7 +55,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "REACT_APP_BUILD_DATE=$(date) react-scripts build",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "testVerbose": "react-scripts test --verbose",
     "eject": "react-scripts eject",
