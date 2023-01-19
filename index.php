@@ -1,3 +1,9 @@
+<?php
+$versions = array_filter(
+  array_filter(glob('*'), 'is_dir'),
+  fn($version) => $version !== 'TLHaly' && $version !== 'stable' && $version !== 'release'
+);
+?>
 <!doctype html>
 <html lang="de">
   <head>
@@ -23,9 +29,15 @@
 
       <?php if (file_exists("./release/index.php")): ?>
         <div class="my-3">
-          <a href="release" class="button is-link is-fullwidth">Release-Version</a>
+          <a href="./release" class="button is-link is-fullwidth">Release-Version</a>
         </div>
       <?php endif; ?>
+
+      <?php foreach ($versions as $version): ?>
+        <div class="my-3">
+          <a href="./<?php echo $version; ?>" class="button is-link is-fullwidth"><?php echo $version; ?></a>
+        </div>
+      <?php endforeach; ?>
 
     </div>
   </body>
