@@ -210,13 +210,13 @@ export const transliteration: TypedLanguage<LanguageSpec> = createLanguage<Langu
   ).map(([mark, first, rest]) => akkadogramm(...mark, ...first, ...rest.flat().flat())),
 
   sumerogramm: r => seq(
-    string('--').times(0, 1),
+    string('--').result('-').times(0, 1),
     r.foreignCharacter,
     seq(
       string('.'),
       r.foreignCharacter
     ).many(),
-  ).map(([, first, rest]) => sumerogramm(...first, ...rest.flat().flat())),
+  ).map(([start, first, rest]) => sumerogramm(start.length === 1 ? start[0] : '', ...first, ...rest.flat().flat())),
 
   wordContent: r => alt(r.akkadogramm, r.sumerogramm, r.simpleWordContent),
 
