@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {transliteration as transliterationLanguage} from '../../transliterationParser/lineContentParser';
+import {wordParser} from '../../transliterationParser/lineContentParser';
 import {Result} from 'parsimmon';
 import {XmlElementNode} from '../../xmlModel/xmlModel';
 import classNames from 'classnames';
@@ -21,7 +21,7 @@ interface IState {
 }
 
 function readTransliteration(transliteration: string): IState {
-  return {parseResult: transliterationLanguage.word.parse(transliteration)};
+  return {parseResult: wordParser.parse(transliteration)};
 }
 
 export function WordContentEditor({initialTransliteration, cancelEdit, updateNode}: IProps): JSX.Element {
