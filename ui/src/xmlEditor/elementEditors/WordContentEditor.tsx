@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {wordParser} from '../../transliterationParser/lineContentParser';
+import {wordParser} from '../../transliterationParser/wordParser';
 import {Result} from 'parsimmon';
 import {XmlElementNode} from '../../xmlModel/xmlModel';
 import classNames from 'classnames';
