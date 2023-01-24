@@ -1,16 +1,16 @@
 import {alt, oneOf, Parser, regexp, seq, string} from 'parsimmon';
-import {xmlTextNode, XmlTextNode} from '../xmlModel/xmlModel';
-import {correctionParser as corrections} from './correctionParser';
-import {damageParser as damages} from './damageParser';
+import {xmlTextNode} from '../xmlModel/xmlModel';
+import {Correction, correctionParser as corrections} from './correctionParser';
+import {damageParser as damages, DamageType} from './damageParser';
 import {ellipsisParser as ellipsis} from './ellipsisParser';
-import {footNoteParser as footNote, kolonMarkParser as kolonMark, signParser as sign} from './annotationsParser';
-import {determinativeParser as determinative} from './determinativeParser';
-import {materLectionisParser as materLectionis} from './materLectionisParser';
+import {FootNote, footNoteParser as footNote, KolonMark, kolonMarkParser as kolonMark, Sign, signParser as sign} from './annotationsParser';
+import {Determinative, determinativeParser as determinative} from './determinativeParser';
+import {MaterLectionis, materLectionisParser as materLectionis} from './materLectionisParser';
 import {parsedWord} from '../model/sentenceContent/linebreak';
-import {akkadogrammParser as akkadogramm, sumerogrammParser as sumerogramm} from './foreignWordsParser';
+import {Akkadogramm, akkadogrammParser as akkadogramm, Sumerogramm, sumerogrammParser as sumerogramm} from './foreignWordsParser';
 import {inscribedLetterMarker} from './inscribedLetterMarkerParser';
 
-export const basicText: Parser<XmlTextNode> = seq(
+export const basicText: Parser<string> = seq(
   regexp(/[\p{Ll}〈〉<>˽]+/u),
   seq(
     alt(
@@ -19,11 +19,13 @@ export const basicText: Parser<XmlTextNode> = seq(
     ),
     regexp(/[\p{Ll}〈〉<>˽]+/u),
   )
-).tie().map(xmlTextNode);
+).tie();
 
-export const numeralContentParser = regexp(/[[\d]+/).map((result) => xmlTextNode(result));
+export const numeralContentParser: Parser<string> = regexp(/[[\d]+/);
 
-export const simpleWordContentParser = alt(
+type SimpleWordContent = Correction | DamageType | Sign | FootNote | KolonMark | Determinative | MaterLectionis | string;
+
+export const simpleWordContentParser = alt<SimpleWordContent>(
   corrections,
   damages,
   inscribedLetterMarker,
@@ -38,7 +40,7 @@ export const simpleWordContentParser = alt(
   numeralContentParser,
 );
 
-export const wordContentParser = alt(
+export const wordContentParser = alt<Akkadogramm | Sumerogramm | SimpleWordContent>(
   akkadogramm,
   sumerogramm,
   simpleWordContentParser

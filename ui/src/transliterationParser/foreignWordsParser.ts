@@ -1,22 +1,56 @@
-import {xmlElementNode, XmlElementNode, XmlNonEmptyNode, xmlTextNode} from '../xmlModel/xmlModel';
-import {alt, Parser, seq, seqMap, string} from 'parsimmon';
+import {xmlElementNode, XmlElementNode, XmlNonEmptyNode} from '../xmlModel/xmlModel';
+import {alt, oneOf, Parser, seq, seqMap, string} from 'parsimmon';
 import {clearUpperMultiStringContent, upperText} from './parserBasics';
 import {optionalIndexNumber} from './indexNumberParser';
-import {correctionParser as corrections} from './correctionParser';
-import {damageParser as damages} from './damageParser';
+import {Correction, correctionParser as corrections} from './correctionParser';
+import {damageParser as damages, DamageType} from './damageParser';
 import {inscribedLetterMarker} from './inscribedLetterMarkerParser';
 
-export const foreignCharacterParser = seqMap(
-  upperText.map(xmlTextNode),
-  alt(
+const foreignCharacterParser: Parser<(DamageType | Correction | string)[]> = seqMap(
+  upperText,
+  alt<DamageType | Correction | string>(
     corrections,
     damages,
     inscribedLetterMarker,
-    upperText.map(xmlTextNode)
+    upperText
   ).many(),
   optionalIndexNumber,
   (first, rest, indexDigit) => indexDigit !== undefined ? [first, ...rest, indexDigit] : [first, ...rest]
 );
+
+type NodeOrString = XmlElementNode | string;
+
+type ReduceValues = [NodeOrString[], string | undefined];
+
+export function joinStrings(values: NodeOrString[]): NodeOrString[] {
+  if (values.length === 0) {
+    return [];
+  }
+
+  const [first, ...rest] = values;
+
+  const initialValues: ReduceValues = typeof first === 'string'
+    ? [[], first]
+    : [[first], undefined];
+
+  const [newValues, remaining] = rest.reduce<ReduceValues>(([acc, current], next) => {
+    if (current === undefined) {
+      if (typeof next === 'string') {
+        return [acc, next];
+      } else {
+        return [[...acc, next], undefined];
+      }
+    } else {
+      if (typeof next === 'string') {
+        return [acc, current + next];
+      } else {
+        return [[...acc, current, next], undefined];
+      }
+    }
+  }, initialValues);
+
+  return [...newValues, ...(remaining !== undefined ? [remaining] : [])];
+}
 
 // Akkadogramm
 
@@ -31,10 +65,10 @@ export const akkadogrammParser: Parser<Akkadogramm> = seqMap(
   ),
   foreignCharacterParser,
   seq(
-    string('-'),
+    oneOf('-+'),
     foreignCharacterParser
   ).many(),
-  (mark, first, rest) => akkadogramm(...mark, ...first, ...rest.flat().flat())
+  (mark: string[], first: (DamageType | Correction | string)[], rest) => akkadogramm(...joinStrings([...mark, ...first, ...rest.flat().flat()]))
 );
 
 // Sumerogramm
@@ -57,5 +91,5 @@ export const sumerogrammParser: Parser<Sumerogramm> = seqMap(
       ? [start[0]]
       : [];
 
-    return sumerogramm(...startingMinus, ...first, ...rest.flat().flat());
+    return sumerogramm(...startingMinus, ...joinStrings([...first, ...rest.flat().flat()]));
   });

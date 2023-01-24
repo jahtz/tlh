@@ -1,10 +1,9 @@
-import {Parser, string} from 'parsimmon';
-import {xmlTextNode, XmlTextNode} from '../xmlModel/xmlModel';
+import {oneOf, Parser} from 'parsimmon';
 import {upperText} from './parserBasics';
 
 /**
  * FIXME: make tests!
  */
-export const inscribedLetterMarker: Parser<XmlTextNode> = string('x')
+export const inscribedLetterMarker: Parser<string> = oneOf('x×')
   .lookahead(upperText)
-  .result(xmlTextNode('×'));
+  .result('×');
