@@ -45,7 +45,9 @@ async function manuscriptDataLoader({params}: LoaderFunctionArgs): Promise<Manus
 
 const routerOptions = {
   // FIXME: set basename!
-  basename: `/${process.env.REACT_APP_VERSION}/public`,
+  basename: process.env.NODE_ENV !== 'development'
+    ? `/${process.env.REACT_APP_VERSION}/public`
+    : '',
 };
 
 export const router = createBrowserRouter([

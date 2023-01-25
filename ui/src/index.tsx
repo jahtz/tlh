@@ -25,9 +25,6 @@ i18n
     },
   });
 
-console.info(process.env.REACT_APP_SERVER_URL);
-console.info(process.env.REACT_APP_VERSION);
-
 apolloClient.query<AllManuscriptLanguagesQuery>({query: AllManuscriptLanguagesDocument})
   .then(({data}) => newStore.dispatch(newLanguages(data.manuscriptLanguages)))
   .catch(() => void 0);
