@@ -5,21 +5,25 @@ require_once 'cors.php';
 
 require_once 'vendor/autoload.php';
 
-require_once 'graphql/MyGraphQLExceptions.php';
-require_once 'graphql/LoggedInUser.php';
-
 require_once 'model/ManuscriptMetaData.php';
 require_once 'model/ManuscriptLanguages.php';
 require_once 'model/User.php';
 
-use GraphQL\Error\{DebugFlag, FormattedError};
+use GraphQL\Error\{ClientAware, DebugFlag, FormattedError};
 use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
-use tlh_dig\graphql\{MySafeGraphQLException};
+use ReallySimpleJWT\Token;
 use tlh_dig\model\{ManuscriptLanguage, ManuscriptMetaData, Transliteration, User};
-use function tlh_dig\graphql\{register, resolveUser, verifyUser};
 use function tlh_dig\model\allManuscriptLanguages;
+
+class MySafeGraphQLException extends Exception implements ClientAware
+{
+  public function isClientSafe(): bool
+  {
+    return true;
+  }
+}
 
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
 $jwtSecret = '1234%ASDf_0aosd';
@@ -131,6 +135,61 @@ $loggedInUserMutationsType = new ObjectType([
     ]
   ]
 ]);
+
+/**
+ * @throws MySafeGraphQLException
+ */
+function register(array $args): string
+{
+  $user = User::fromGraphQLInput($args['userInput']);
+
+  if ($user === null) {
+    throw new MySafeGraphQLException("Could not read input!");
+  }
+
+  if (insertUserIntoDatabase($user)) {
+    return $user->username;
+  } else {
+    throw new MySafeGraphQLException("Could not insert user into database!");
+  }
+}
+
+function verifyUser(string $username, string $password): ?string
+{
+  global $jwtSecret, $jwtValidityTime;
+
+  $user = maybeUserFromDatabase($username);
+
+  if ($user === null) {
+    return null;
+  }
+
+  if (password_verify($password, $user->pwHash)) {
+    return Token::create($user->username, $jwtSecret, time() + $jwtValidityTime, 'localhost');
+  } else {
+    return null;
+  }
+}
+
+/**
+ * @throws MySafeGraphQLException
+ */
+function resolveUser(): ?string
+{
+  global $jwtSecret;
+
+  $jwt = $_SERVER['HTTP_AUTHORIZATION'];
+
+  if (!Token::validate($jwt, $jwtSecret)) {
+    throw new MySafeGraphQLException('Invalid login information. Maybe your login is expired? Try logging out and logging back in again.');
+  }
+
+  try {
+    return Token::getPayload($jwt, $jwtSecret)['user_id'];
+  } catch (Exception $e) {
+    throw new MySafeGraphQLException('Invalid login information. Maybe your login is expired? Try logging out and logging back in again.');
+  }
+}
 
 $mutationType = new ObjectType([
   "name" => "Mutation",

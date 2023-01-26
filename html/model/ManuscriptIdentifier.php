@@ -17,16 +17,19 @@ class ManuscriptIdentifier
   public string $identifierType;
   public string $identifier;
 
-  function __construct(string $identifierType, string $identifier) {
+  function __construct(string $identifierType, string $identifier)
+  {
     $this->identifierType = $identifierType;
     $this->identifier = $identifier;
   }
 
-  static function fromGraphQLInput(array $input): ManuscriptIdentifier {
+  static function fromGraphQLInput(array $input): ManuscriptIdentifier
+  {
     return new ManuscriptIdentifier($input['identifierType'], $input['identifier']);
   }
 
-  static function fromDbAssocArray(array $row): ManuscriptIdentifier {
+  static function fromDbAssocArray(array $row): ManuscriptIdentifier
+  {
     return new ManuscriptIdentifier($row['identifier_type'], $row['identifier']);
   }
 }

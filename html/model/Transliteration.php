@@ -13,27 +13,30 @@ class Transliteration
   static ObjectType $graphQLObjectType;
   static InputObjectType $graphQLInputObjectType;
 
+  // foreign keys
   public string $mainIdentifier;
   public string $side;
   public int $version;
+  // data
   public string $input;
   public string $resultXml;
-  public string $resultJson;
 
-  public function __construct(string $mainIdentifier, string $side, int $version, string $input, string $resultXml, string $resultJson) {
+  public function __construct(string $mainIdentifier, string $side, int $version, string $input, string $resultXml)
+  {
     $this->mainIdentifier = $mainIdentifier;
     $this->side = $side;
     $this->version = $version;
     $this->input = $input;
     $this->resultXml = $resultXml;
-    $this->resultJson = $resultJson;
   }
 
-  static function readFromGraphQLInput(string $mainIdentifier, array $input): Transliteration {
+  static function readFromGraphQLInput(string $mainIdentifier, array $input): Transliteration
+  {
     return new Transliteration($mainIdentifier, $input['side'], -1, $input['input'], $input['resultXml'], $input['resultJson']);
   }
 
-  function saveToDb(mysqli $conn): bool {
+  function saveToDb(mysqli $conn): bool
+  {
     $nextVersionSql = "select max(version) as max_version from tlh_dig_transliterations where main_identifier = ? and side = ?;";
 
     $nextVersionStatement = $conn->prepare($nextVersionSql);
@@ -59,7 +62,7 @@ values (?, ?, ?, ?, ?, ?);";
         $conn,
         $insertSql,
         fn(mysqli_stmt $stmt) => $stmt->bind_param('ssisss',
-          $this->mainIdentifier, $this->side, $version, $this->input, $this->resultXml, $this->resultJson
+          $this->mainIdentifier, $this->side, $version, $this->input, $this->resultXml
         ),
         fn(mysqli_stmt $stmt) => true
       );
@@ -78,7 +81,8 @@ values (?, ?, ?, ?, ?, ?);";
  * @param string $mainIdentifier
  * @return ?Transliteration[]
  */
-function getTransliterations(string $mainIdentifier): ?array {
+function getTransliterations(string $mainIdentifier): ?array
+{
   $sql = "select main_identifier, side, version, input, result_xml, result_json from tlh_dig_transliterations where main_identifier = ?;";
 
   try {

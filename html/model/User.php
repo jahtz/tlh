@@ -2,8 +2,7 @@
 
 namespace tlh_dig\model;
 
-use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\{InputObjectType, Type};
 
 class User
 {
@@ -16,7 +15,8 @@ class User
   public ?string $affiliation;
   public string $email;
 
-  function __construct(string $username, string $pwHash, string $name, ?string $affiliation, string $email) {
+  function __construct(string $username, string $pwHash, string $name, ?string $affiliation, string $email)
+  {
     $this->username = $username;
     $this->pwHash = $pwHash;
     $this->name = $name;
@@ -24,11 +24,13 @@ class User
     $this->email = $email;
   }
 
-  static function fromDbAssocArray(array $dbArray): User {
+  static function fromDbAssocArray(array $dbArray): User
+  {
     return new User($dbArray['username'], $dbArray['pw_hash'], $dbArray['name'], $dbArray['affiliation'], $dbArray['email']);
   }
 
-  static function fromGraphQLInput(array $graphQLInputObject): ?User {
+  static function fromGraphQLInput(array $graphQLInputObject): ?User
+  {
     $password = $graphQLInputObject['password'];
     $passwordRepeat = $graphQLInputObject['passwordRepeat'];
 

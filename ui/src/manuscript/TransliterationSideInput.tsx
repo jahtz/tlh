@@ -5,12 +5,13 @@ import {useTranslation} from 'react-i18next';
 import {defaultSideBasics, SideBasics, SideParseResult} from '../model/sideParseResult';
 import {ObjectSelect, SelectOption} from '../forms/BulmaFields';
 import {Transliteration} from './TransliterationLineResult';
-import {transliterationLine, TransliterationLine} from '../model/transliterationLine';
+import {TransliterationLine} from '../model/transliterationLine';
 import {ManuscriptSide, TransliterationInput} from '../graphql';
 import {BulmaTabs} from '../genericElements/BulmaTabs';
 import {getNameForManuscriptSide, manuscriptSides} from '../model/manuscriptProperties/manuscriptSide';
 import {LineParseResult, parseTransliterationLine} from '../transliterationParser/lineParser';
 import {convertAoLineBreakToXmlString} from '../model/sentenceContent/linebreak';
+import update from 'immutability-helper';
 
 interface IProps {
   textId: string;
@@ -91,17 +92,19 @@ export function TransliterationSideInput({textId, onTransliterationUpdate}: IPro
 
         if ('error' in parseResult) {
           // TODO: pre parsing error
-          return transliterationLine(lineInput);
+          console.error(JSON.stringify(parseResult.error));
+          return {lineInput};
         }
 
         if ('errors' in parseResult) {
           // TODO: word parser errors
-          return transliterationLine(lineInput);
+          console.error(JSON.stringify(parseResult.errors));
+          return {lineInput};
         }
 
         const {lnr, words, maybeParagraphSeparator} = parseResult.data;
 
-        return transliterationLine(lineInput, {type: 'AOLineBreak', lb: {textId, lnr, lg}, words, maybeParagraphSeparator});
+        return {lineInput, result: {type: 'AOLineBreak', lb: {textId, lnr, lg}, words, maybeParagraphSeparator}};
       });
 
     const sideParseResult = {
@@ -109,9 +112,7 @@ export function TransliterationSideInput({textId, onTransliterationUpdate}: IPro
       lineResults
     };
 
-    setState((state) => {
-      return {...state, sideParseResult};
-    });
+    setState((state) => update(state, {sideParseResult: {$set: sideParseResult}}));
 
     onTransliterationUpdate({
       side: state.sideBasics.side,
