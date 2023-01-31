@@ -7,7 +7,8 @@ $database = 'hpm';
 $port = 3406;
 
 
-function connect_to_db(): mysqli {
+function connect_to_db(): mysqli
+{
   global $host, $user, $password, $database, $port;
 
   $db = mysqli_connect($host, $user, $password, $database, $port);

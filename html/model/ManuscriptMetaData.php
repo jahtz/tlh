@@ -1,9 +1,9 @@
 <?php
 
-namespace tlh_dig\model;
+namespace model;
 
 require_once __DIR__ . '/ManuscriptIdentifier.php';
-require_once __DIR__ . '/Transliteration.php';
+require_once __DIR__ . '/TransliterationLine.php';
 
 use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
 
@@ -11,7 +11,8 @@ use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
  * @param string $manuscriptMainIdentifier
  * @return string[]
  */
-function getPictures(string $manuscriptMainIdentifier): array {
+function getPictures(string $manuscriptMainIdentifier): array
+{
   $folder = __DIR__ . "/../uploads/$manuscriptMainIdentifier/";
 
   if (!file_exists($folder) || !is_dir($folder)) {
@@ -50,7 +51,8 @@ class ManuscriptMetaData
     ?string              $bibliography,
     string               $status,
     string               $creatorUsername
-  ) {
+  )
+  {
     $this->mainIdentifier = $mainIdentifier;
     $this->otherIdentifiers = $otherIdentifiers;
     $this->palaeographicClassification = $palaeographicClassification;
@@ -62,7 +64,8 @@ class ManuscriptMetaData
     $this->creatorUsername = $creatorUsername;
   }
 
-  static function fromDbAssocArray(array $row): ManuscriptMetaData {
+  static function fromDbAssocArray(array $row): ManuscriptMetaData
+  {
     return new ManuscriptMetaData(
       new ManuscriptIdentifier($row['main_identifier_type'], $row['main_identifier']),
       [],
@@ -76,7 +79,8 @@ class ManuscriptMetaData
     );
   }
 
-  static function fromGraphQLInput(array $input, string $creatorUsername): ManuscriptMetaData {
+  static function fromGraphQLInput(array $input, string $creatorUsername): ManuscriptMetaData
+  {
     $otherIdentifiers = array_key_exists('otherIdentifiers', $input)
       ? array_map(fn($x) => ManuscriptIdentifier::fromGraphQLInput($x), $input['otherIdentifiers'])
       : null;
@@ -129,8 +133,8 @@ ManuscriptMetaData::$graphQLType = new ObjectType([
       'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): array => getPictures($manuscriptMetaData->mainIdentifier->identifier)
     ],
     'transliterations' => [
-      'type' => Type::listOf(Type::nonNull(Transliteration::$graphQLObjectType)),
-      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): ?array => getTransliterations($manuscriptMetaData->mainIdentifier->identifier)
+      'type' => Type::listOf(Type::nonNull(TransliterationLine::$graphQLObjectType)),
+      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): ?array => getTransliterationLines($manuscriptMetaData->mainIdentifier->identifier)
     ]
   ]
 ]);

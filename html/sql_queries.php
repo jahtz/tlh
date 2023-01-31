@@ -5,10 +5,10 @@ require_once __DIR__ . '/mysqliconn.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 require_once __DIR__ . '/model/ManuscriptMetaData.php';
-require_once __DIR__ . '/model/Transliteration.php';
+require_once __DIR__ . '/model/TransliterationLine.php';
 require_once __DIR__ . '/model/User.php';
 
-use tlh_dig\model\{ManuscriptIdentifier, ManuscriptMetaData, User};
+use model\{ManuscriptIdentifier, ManuscriptMetaData, User};
 
 
 /**
@@ -21,7 +21,8 @@ use tlh_dig\model\{ManuscriptIdentifier, ManuscriptMetaData, User};
  *
  * @throws Exception
  */
-function execute_query(mysqli $connection, string $sql, ?Closure $bindParams, Closure $f) {
+function execute_query(mysqli $connection, string $sql, ?Closure $bindParams, Closure $f)
+{
   $statement = $connection->prepare($sql);
   if (!$statement) {
     throw new Exception("Could not prepare statement: " . $connection->error);
@@ -63,7 +64,8 @@ function execute_query(mysqli $connection, string $sql, ?Closure $bindParams, Cl
  *
  * @throws Exception
  */
-function execute_select_query(string $sql, ?Closure $bindParams, Closure $f) {
+function execute_select_query(string $sql, ?Closure $bindParams, Closure $f)
+{
   return execute_query(connect_to_db(), $sql, $bindParams, function (mysqli_stmt $stmt) use ($f) {
     $stmtResult = $stmt->get_result();
 
@@ -78,7 +80,8 @@ function execute_select_query(string $sql, ?Closure $bindParams, Closure $f) {
   });
 }
 
-function allManuscriptsCount(): int {
+function allManuscriptsCount(): int
+{
   $sql = "select count(*) from tlh_dig_manuscript_metadatas;";
 
   try {
@@ -97,7 +100,8 @@ function allManuscriptsCount(): int {
 /**
  * @return ManuscriptMetaData[]
  */
-function allManuscriptMetaData(int $paginationSize, int $page): array {
+function allManuscriptMetaData(int $paginationSize, int $page): array
+{
 
   $paginationSize = max(10, $paginationSize);
 
@@ -124,7 +128,8 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
   }
 }
 
-function manuscriptMetaDataById(string $mainIdentifier): ?ManuscriptMetaData {
+function manuscriptMetaDataById(string $mainIdentifier): ?ManuscriptMetaData
+{
   $sql = "
 select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username
     from tlh_dig_manuscript_metadatas
@@ -149,7 +154,8 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
  * @param string $mainIdentifier
  * @return ManuscriptIdentifier[]
  */
-function getOtherIdentifiers(string $mainIdentifier): array {
+function getOtherIdentifiers(string $mainIdentifier): array
+{
   $sql = "select identifier_type, identifier from tlh_dig_manuscript_other_identifiers where main_identifier = ?;";
 
   try {
@@ -166,7 +172,8 @@ function getOtherIdentifiers(string $mainIdentifier): array {
   }
 }
 
-function insertManuscriptMetaData(ManuscriptMetaData $mmd): bool {
+function insertManuscriptMetaData(ManuscriptMetaData $mmd): bool
+{
   $mainInsertSql = "
 insert into tlh_dig_manuscript_metadatas (main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username)
 values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
@@ -236,7 +243,8 @@ values (?, ?, ?)");
   return $result;
 }
 
-function maybeUserFromDatabase(string $username): ?User {
+function maybeUserFromDatabase(string $username): ?User
+{
   $sql = "select username, pw_hash, name, affiliation, email from tlh_dig_users where username = ?;";
 
   try {
@@ -253,7 +261,8 @@ function maybeUserFromDatabase(string $username): ?User {
   }
 }
 
-function insertUserIntoDatabase(User $user): bool {
+function insertUserIntoDatabase(User $user): bool
+{
   $sql = "insert into tlh_dig_users (username, pw_hash, name, affiliation, email) values (?, ?, ?, ?, ?);";
 
   $conn = connect_to_db();

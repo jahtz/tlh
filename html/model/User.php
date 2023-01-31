@@ -1,6 +1,6 @@
 <?php
 
-namespace tlh_dig\model;
+namespace model;
 
 use GraphQL\Type\Definition\{InputObjectType, Type};
 

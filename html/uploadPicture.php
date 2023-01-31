@@ -1,12 +1,13 @@
 <?php
 
-require_once './sql_queries.php';
-require_once 'cors.php';
+require_once __DIR__ . '/sql_queries.php';
+require_once __DIR__ . '/cors.php';
 
 cors();
 
 
-function fileTypeAllowed(string $fileType): bool {
+function fileTypeAllowed(string $fileType): bool
+{
   return in_array($fileType, ['png', 'jpg', 'jpeg', 'gif']);
 }
 
@@ -15,7 +16,8 @@ function fileTypeAllowed(string $fileType): bool {
  * @return string
  * @throws Exception
  */
-function doUpload(string $manuscriptId): string {
+function doUpload(string $manuscriptId): string
+{
   // check if manuscript exists
   if (!manuscriptMetaDataById($manuscriptId)) {
     throw new Exception('No such manifest exists!');

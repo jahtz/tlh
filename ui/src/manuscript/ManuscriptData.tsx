@@ -5,8 +5,6 @@ import {useSelector} from 'react-redux';
 import {activeUserSelector, User} from '../newStore';
 import {getNameForPalaeoClassification} from '../palaeoClassification';
 import {PicturesBlock} from './PicturesBlock';
-import {SideParseResult} from '../model/sideParseResult';
-import {Transliteration} from './TransliterationLineResult';
 import {createTransliterationUrl, homeUrl, uploadPicturesUrl} from '../urls';
 
 export function ManuscriptData(/*{manuscript}: ManuscriptBaseIProps*/): JSX.Element {
@@ -38,8 +36,9 @@ export function ManuscriptData(/*{manuscript}: ManuscriptBaseIProps*/): JSX.Elem
     );
   }
 
-  const sideParseResults: SideParseResult[] | undefined = manuscript.transliterations
-    ? manuscript.transliterations.map(({resultJson}) => JSON.parse(resultJson) as SideParseResult)
+
+  const sideParseResults = manuscript.transliterations
+    ? manuscript.transliterations/*.map(({result}) => JSON.parse(resultJson) as SideParseResult)*/
     : undefined;
 
   return (
@@ -99,12 +98,16 @@ export function ManuscriptData(/*{manuscript}: ManuscriptBaseIProps*/): JSX.Elem
         <h2 className="font-bold text-xl">{t('transliteration')}</h2>
 
         {sideParseResults
-          ? <div className="my-3">
-            {sideParseResults.map(({lineResults}, index) => <Transliteration key={index} lines={lineResults}/>)}
-          </div>
-          : <div className="notification is-info has-text-centered">
-            {t('noTransliterationCraetedYet')}.
-          </div>}
+          ? (
+            <div className="my-3">
+              {/*sideParseResults.map(({lineResults}, index) => <Transliteration key={index} lines={lineResults}/>)*/}
+            </div>
+          )
+          : (
+            <div className="notification is-info has-text-centered">
+              {t('noTransliterationCreatedYet')}.
+            </div>
+          )}
 
         {createdByUser &&
           <Link className="mt-2 p-2 block rounded bg-blue-500 text-white text-center w-full" to={`../${createTransliterationUrl}`}>

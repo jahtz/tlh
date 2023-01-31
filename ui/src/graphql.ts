@@ -15,6 +15,17 @@ export type Scalars = {
   Float: number;
 };
 
+export type LineNumber = {
+  __typename?: 'LineNumber';
+  isConfirmed: Scalars['Boolean'];
+  number: Scalars['Int'];
+};
+
+export type LineNumberInput = {
+  isConfirmed: Scalars['Boolean'];
+  number: Scalars['Int'];
+};
+
 export type LoggedInUserMutations = {
   __typename?: 'LoggedInUserMutations';
   createManuscript?: Maybe<Scalars['String']>;
@@ -30,6 +41,26 @@ export type LoggedInUserMutationsCreateManuscriptArgs = {
 export type LoggedInUserMutationsManuscriptArgs = {
   mainIdentifier: Scalars['String'];
 };
+
+export enum ManuscriptColumn {
+  ColumnDivider = 'ColumnDivider',
+  I = 'I',
+  Ii = 'II',
+  Iii = 'III',
+  Iv = 'IV',
+  Ix = 'IX',
+  LeftColumn = 'LeftColumn',
+  MiddleColumn = 'MiddleColumn',
+  None = 'None',
+  RightColumn = 'RightColumn',
+  V = 'V',
+  Vi = 'VI',
+  Vii = 'VII',
+  Viii = 'VIII',
+  X = 'X',
+  Xi = 'XI',
+  Xii = 'XII'
+}
 
 export type ManuscriptIdentifier = {
   __typename?: 'ManuscriptIdentifier';
@@ -66,7 +97,7 @@ export type ManuscriptMetaData = {
   pictureUrls: Array<Scalars['String']>;
   provenance?: Maybe<Scalars['String']>;
   status?: Maybe<ManuscriptStatus>;
-  transliterations?: Maybe<Array<Transliteration>>;
+  transliterations?: Maybe<Array<TransliterationLine>>;
 };
 
 export type ManuscriptMetaDataInput = {
@@ -86,7 +117,7 @@ export type ManuscriptMutations = {
 
 
 export type ManuscriptMutationsUpdateTransliterationArgs = {
-  values: Array<TransliterationInput>;
+  values: Array<TransliterationSideInput>;
 };
 
 export enum ManuscriptSide {
@@ -162,19 +193,29 @@ export type QueryManuscriptArgs = {
   mainIdentifier: Scalars['String'];
 };
 
-export type Transliteration = {
-  __typename?: 'Transliteration';
-  input: Scalars['String'];
-  resultJson: Scalars['String'];
-  resultXml: Scalars['String'];
-  side: ManuscriptSide;
+export type TransliterationColumnInput = {
+  column: ManuscriptColumn;
+  lines: Array<TransliterationLineInput>;
+};
+
+export type TransliterationLine = {
+  __typename?: 'TransliterationLine';
+  input?: Maybe<Scalars['String']>;
+  inputIndex: Scalars['Int'];
+  lineNumber?: Maybe<LineNumber>;
+  result: Scalars['String'];
   version: Scalars['Int'];
 };
 
-export type TransliterationInput = {
+export type TransliterationLineInput = {
   input: Scalars['String'];
-  resultJson: Scalars['String'];
-  resultXml: Scalars['String'];
+  inputIndex: Scalars['Int'];
+  lineNumber?: InputMaybe<LineNumberInput>;
+  result?: InputMaybe<Scalars['String']>;
+};
+
+export type TransliterationSideInput = {
+  columns: Array<TransliterationColumnInput>;
   side: ManuscriptSide;
 };
 
@@ -228,14 +269,14 @@ export type CreateManuscriptMutationVariables = Exact<{
 
 export type CreateManuscriptMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', createManuscript?: string | null } | null };
 
-export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }>, transliterations?: Array<{ __typename?: 'Transliteration', side: ManuscriptSide, version: number, input: string, resultXml: string, resultJson: string }> | null };
+export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }>, transliterations?: Array<{ __typename?: 'TransliterationLine', version: number, inputIndex: number, input?: string | null, result: string, lineNumber?: { __typename?: 'LineNumber', number: number, isConfirmed: boolean } | null }> | null };
 
 export type ManuscriptQueryVariables = Exact<{
   mainIdentifier: Scalars['String'];
 }>;
 
 
-export type ManuscriptQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }>, transliterations?: Array<{ __typename?: 'Transliteration', side: ManuscriptSide, version: number, input: string, resultXml: string, resultJson: string }> | null } | null };
+export type ManuscriptQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }>, transliterations?: Array<{ __typename?: 'TransliterationLine', version: number, inputIndex: number, input?: string | null, result: string, lineNumber?: { __typename?: 'LineNumber', number: number, isConfirmed: boolean } | null }> | null } | null };
 
 export type ManuscriptIdentWithCreatorFragment = { __typename?: 'ManuscriptMetaData', pictureUrls: Array<string>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
@@ -255,7 +296,7 @@ export type TransliterationInputQuery = { __typename?: 'Query', manuscript?: { _
 
 export type UploadTransliterationMutationVariables = Exact<{
   mainIdentifier: Scalars['String'];
-  values: Array<TransliterationInput> | TransliterationInput;
+  values: Array<TransliterationSideInput> | TransliterationSideInput;
 }>;
 
 
@@ -298,11 +339,14 @@ export const ManuscriptMetaDataFragmentDoc = gql`
   creatorUsername
   pictureUrls
   transliterations {
-    side
     version
+    inputIndex
+    lineNumber {
+      number
+      isConfirmed
+    }
     input
-    resultXml
-    resultJson
+    result
   }
 }
     ${ManuscriptIdentifierFragmentDoc}`;
@@ -590,7 +634,7 @@ export type TransliterationInputQueryHookResult = ReturnType<typeof useTranslite
 export type TransliterationInputLazyQueryHookResult = ReturnType<typeof useTransliterationInputLazyQuery>;
 export type TransliterationInputQueryResult = Apollo.QueryResult<TransliterationInputQuery, TransliterationInputQueryVariables>;
 export const UploadTransliterationDocument = gql`
-    mutation uploadTransliteration($mainIdentifier: String!, $values: [TransliterationInput!]!) {
+    mutation uploadTransliteration($mainIdentifier: String!, $values: [TransliterationSideInput!]!) {
   me {
     manuscript(mainIdentifier: $mainIdentifier) {
       updateTransliteration(values: $values)

@@ -3,36 +3,30 @@ import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
 import {activeUserSelector} from '../newStore';
 import {homeUrl} from '../urls';
-import {ManuscriptMetaDataFragment, TransliterationInput as TI, useUploadTransliterationMutation} from '../graphql';
-import {TransliterationSideInput} from './TransliterationSideInput';
+import {ManuscriptMetaDataFragment, useUploadTransliterationMutation} from '../graphql';
+import {defaultSideInput, SideInput, TransliterationSideInputDisplay} from './TransliterationSideInputDisplay';
 import {Navigate, useLoaderData} from 'react-router-dom';
 import update from 'immutability-helper';
 
-interface SideParseResultContainer {
-  newSideParseResult?: TI;
+interface IState {
+  sides: SideInput[];
 }
 
-interface IState {
-  sideParseResults: SideParseResultContainer[];
-}
+const defaultState: IState = {
+  sides: [defaultSideInput]
+};
 
 export function TransliterationInput(): JSX.Element {
 
   const manuscript = useLoaderData() as ManuscriptMetaDataFragment | undefined;
 
   const {t} = useTranslation('common');
-  const [state, setState] = useState<IState>({sideParseResults: [{}]});
+  const [state, setState] = useState<IState>(defaultState);
   const currentUser = useSelector(activeUserSelector);
 
-  const [uploadTransliteration, {data, loading, error}] = useUploadTransliterationMutation();
+  const [/*uploadTransliteration*/, {data, loading, error}] = useUploadTransliterationMutation();
 
-  if (!manuscript) {
-    return <Navigate to={homeUrl}/>;
-  }
-
-  const mainIdentifier = manuscript.mainIdentifier.identifier;
-
-  if (!currentUser || currentUser.user_id !== manuscript.creatorUsername) {
+  if (!manuscript || !currentUser || currentUser.user_id !== manuscript.creatorUsername) {
     return <Navigate to={homeUrl}/>;
   }
 
@@ -41,33 +35,29 @@ export function TransliterationInput(): JSX.Element {
   }
 
   function upload(): void {
+    /*
     const values = state.sideParseResults.flatMap(({newSideParseResult}) => newSideParseResult ? [newSideParseResult] : []);
 
     uploadTransliteration({variables: {mainIdentifier, values}})
       .catch((error) => console.error('Could not upload transliteration:\n' + error));
+     */
   }
 
-  function addTransliterationSideInput(): void {
-    setState((state) => update(state, {sideParseResults: {$push: [{}]}}));
-  }
-
-  function updateTransliteration(index: number, result: TI): void {
-    setState((state) => update(state, {sideParseResults: {[index]: {newSideParseResult: {$set: result}}}}));
-  }
+  const addTransliterationSideInput = (): void => setState((state) => update(state, {sides: {$push: [defaultSideInput]}}));
 
   return (
-    <div>
-      <h1 className="font-bold text-xl text-center">{t('createTransliteration')}</h1>
+    <div className="container mx-auto">
+      <h1 className="my-4 font-bold text-xl text-center">{t('createTransliteration')}</h1>
 
-      {state.sideParseResults.map((_, index) =>
-        <TransliterationSideInput key={index} textId={mainIdentifier} onTransliterationUpdate={(s) => updateTransliteration(index, s)}/>
+      {state.sides.map((sideInput, index) =>
+        <TransliterationSideInputDisplay key={index}{...sideInput} updateSideInput={(spec) => setState((state) => update(state, {sides: {[index]: spec}}))}/>
       )}
 
       {error && <div className="mt-2 p-2 bg-red-500 text-white text-center">{error.message}</div>}
 
       <div className="mt-2 grid grid-cols-2 gap-2">
         <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={addTransliterationSideInput}>{t('additionalPage')}</button>
-        <button type="button" className="p-2 rounded bg-blue-500 text-white w-full " onClick={upload} disabled={loading}>{t('uploadTransliteration')}</button>
+        <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={upload} disabled={loading}>{t('uploadTransliteration')}</button>
       </div>
     </div>
   );

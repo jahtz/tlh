@@ -18,8 +18,6 @@ const versionModifier = (process.env.REACT_APP_VERSION as string).length > 0
 
 const apolloUri = `${process.env.REACT_APP_SERVER_URL}${versionModifier}/graphql.php`;
 
-console.info(apolloUri);
-
 export const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
   link: concat(

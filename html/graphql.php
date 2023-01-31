@@ -1,29 +1,24 @@
 <?php
 
-require_once 'sql_queries.php';
-require_once 'cors.php';
+require_once __DIR__ . '/sql_queries.php';
+require_once __DIR__ . '/cors.php';
+require_once __DIR__ . '/MySafeGraphQLException.php';
 
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
-require_once 'model/ManuscriptMetaData.php';
-require_once 'model/ManuscriptLanguages.php';
-require_once 'model/User.php';
+require_once __DIR__ . '/model/ManuscriptMetaData.php';
+require_once __DIR__ . '/model/ManuscriptLanguage.php';
+require_once __DIR__ . '/model/User.php';
+require_once __DIR__ . '/model/TransliterationSideInput.php';
 
-use GraphQL\Error\{ClientAware, DebugFlag, FormattedError};
+use GraphQL\Error\{DebugFlag, FormattedError};
 use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
+use model\{ManuscriptLanguage, ManuscriptMetaData, TransliterationSideInput, User};
 use ReallySimpleJWT\Token;
-use tlh_dig\model\{ManuscriptLanguage, ManuscriptMetaData, Transliteration, User};
-use function tlh_dig\model\allManuscriptLanguages;
+use function model\allManuscriptLanguages;
 
-class MySafeGraphQLException extends Exception implements ClientAware
-{
-  public function isClientSafe(): bool
-  {
-    return true;
-  }
-}
 
 # Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
 $jwtSecret = '1234%ASDf_0aosd';
@@ -59,30 +54,56 @@ $queryType = new ObjectType([
   ]
 ]);
 
+function selectNextManuscriptTransliterationVersion(mysqli $conn, string $mainIdentifier): ?int
+{
+  $nextVersionSql = "select max(version) as max_version from tlh_dig_transliteration_lines where main_identifier = ?;";
+
+  $nextVersionStatement = $conn->prepare($nextVersionSql);
+  $nextVersionStatement->bind_param('s', $mainIdentifier);
+  $nextVersionExecuted = $nextVersionStatement->execute();
+
+  if (!$nextVersionExecuted) {
+    error_log("Could not delete TransliterationLine from db: " . $nextVersionStatement->error);
+    return null;
+  }
+
+  $version = $nextVersionStatement->get_result()->fetch_assoc()['max_version'] + 1;
+  $nextVersionStatement->close();
+
+  return $version;
+}
+
 $manuscriptMutationsType = new ObjectType([
   'name' => 'ManuscriptMutations',
   'fields' => [
     'updateTransliteration' => [
       'type' => Type::nonNull(Type::boolean()),
       'args' => [
-        'values' => Type::nonNull(Type::listOf(Type::nonNull(Transliteration::$graphQLInputObjectType)))
+        'values' => Type::nonNull(Type::listOf(Type::nonNull(TransliterationSideInput::$graphQLInputObjectType)))
       ],
-      'resolve' => function (ManuscriptMetaData $manuscriptMetaData, array $args): ?string {
+      'resolve' => function (ManuscriptMetaData $manuscriptMetaData, array $args): bool {
         $mainIdentifier = $manuscriptMetaData->mainIdentifier->identifier;
 
-        $mapped = array_map(fn($x) => Transliteration::readFromGraphQLInput($mainIdentifier, $x), $args['values']);
+        $connection = connect_to_db();
 
-        error_log(json_encode($mapped, JSON_PRETTY_PRINT));
+        // FIXME: select next version!
+        $version = selectNextManuscriptTransliterationVersion($connection, $mainIdentifier);
+
+        /**
+         * @var TransliterationSideInput[] $sideInputs
+         */
+        $sideInputs = array_map(fn($sideInput) => TransliterationSideInput::fromGraphQLInput($sideInput, $version), $args['values']);
+
+        error_log(json_encode($sideInputs, JSON_PRETTY_PRINT));
 
         $allSaved = true;
 
-        $connection = connect_to_db();
 
         $connection->begin_transaction();
 
         try {
-          foreach ($mapped as $transliterationLine) {
-            $allSaved &= $transliterationLine->saveToDb($connection);
+          foreach ($sideInputs as $transliterationSide) {
+            $allSaved = $allSaved && $transliterationSide->saveToDb($connection, $mainIdentifier, $version);
           }
 
           error_log("All saved: " . ($allSaved ? "true" : "false"));

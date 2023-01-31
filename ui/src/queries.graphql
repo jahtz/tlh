@@ -76,11 +76,15 @@ fragment ManuscriptMetaData on ManuscriptMetaData {
   creatorUsername
   pictureUrls
   transliterations {
-    side
+    # side
     version
+    inputIndex
+    lineNumber {
+      number
+      isConfirmed
+    }
     input
-    resultXml
-    resultJson
+    result
   }
 }
 
@@ -116,7 +120,7 @@ query TransliterationInput($mainIdentifier: String!) {
   }
 }
 
-mutation uploadTransliteration($mainIdentifier: String!, $values: [TransliterationInput!]!) {
+mutation uploadTransliteration($mainIdentifier: String!, $values: [TransliterationSideInput!]!) {
   me {
     manuscript(mainIdentifier: $mainIdentifier) {
       updateTransliteration(values: $values)

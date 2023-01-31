@@ -2,7 +2,6 @@ use hpm;
 
 drop table if exists
   tlh_dig_transliteration_lines,
-  tlh_dig_transliterations,
   tlh_dig_manuscript_other_identifiers,
   tlh_dig_manuscript_metadatas,
   tlh_dig_users;
@@ -35,9 +34,9 @@ create table if not exists tlh_dig_manuscript_metadatas (
 );
 
 create table if not exists tlh_dig_manuscript_other_identifiers (
-  main_identifier varchar(20) references tlh_dig_manuscript_metadatas (main_identifier) on update cascade on delete cascade,
+  main_identifier varchar(20)                                                                not null references tlh_dig_manuscript_metadatas (main_identifier) on update cascade on delete cascade,
 
-  identifier      varchar(20) unique,
+  identifier      varchar(20)                                                                not null unique,
   identifier_type enum ('ExcavationNumber', 'CollectionNumber', 'PublicationShortReference') not null default 'ExcavationNumber',
 
   primary key (main_identifier, identifier, identifier_type)
@@ -45,24 +44,18 @@ create table if not exists tlh_dig_manuscript_other_identifiers (
 
 -- transliterations
 
-create table if not exists tlh_dig_transliterations (
-  main_identifier varchar(20) not null references tlh_dig_manuscript_metadatas (main_identifier) on update cascade on delete cascade,
-  side            varchar(20) not null,
-  version         integer     not null,
-
-  primary key (main_identifier, side, version)
-);
-
 create table if not exists tlh_dig_transliteration_lines (
-  main_identifier varchar(20) not null,
-  side            varchar(20) not null,
-  version         integer     not null,
-  line_number     integer     not null,
+  main_identifier          varchar(20) not null references tlh_dig_manuscript_metadatas (main_identifier) on update cascade on delete cascade,
+  side                     varchar(20) not null,
+  manuscript_column        varchar(20) not null,
+  version                  integer     not null,
+  input_index              integer     not null,
 
-  input           text        not null,
-  is_error        boolean     not null,
-  result          varchar(20) not null,
+  line_number              integer     not null,
+  line_number_is_confirmed boolean     not null,
+  input                    text        not null,
+  result                   text,
 
-  primary key (main_identifier, side, version, line_number),
-  foreign key (main_identifier, side, version) references tlh_dig_transliterations (main_identifier, side, version) on update cascade on delete cascade
+  primary key (main_identifier, side, manuscript_column, version, input_index),
+  unique (main_identifier, side, manuscript_column, version, line_number, line_number_is_confirmed)
 );

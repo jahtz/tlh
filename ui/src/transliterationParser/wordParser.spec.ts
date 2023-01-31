@@ -1,5 +1,5 @@
 import {wordParser} from './wordParser';
-import {parsedWord as w} from '../model/sentenceContent/linebreak';
+import {parsedWord as w} from '../transliterationParser/wordParser';
 import {akkadogramm as aGr, sumerogramm as sGr} from './foreignWordsParser';
 import {determinativ as det} from './determinativeParser';
 import {XmlElementNode} from '../xmlModel/xmlModel';
@@ -12,7 +12,7 @@ export interface SuccessfulTestData<T> {
 
 type Word = XmlElementNode<'w'>;
 
-describe.skip('word', () => testParser<Word>('word', wordParser, [
+describe('word', () => testParser<Word>('word', wordParser, [
   // Basic
   {source: 'pár-ši-ia', awaitedResult: w('pár-ši-ia')},
   {source: 'me-ma-i', awaitedResult: w('me-ma-i')},
@@ -22,7 +22,7 @@ describe.skip('word', () => testParser<Word>('word', wordParser, [
   {source: 'NINDA', awaitedResult: w(sGr('NINDA'))},
   {source: 'LUGAL', awaitedResult: w(sGr('LUGAL'))},
   {source: 'LUGAL-uš', awaitedResult: w(sGr('LUGAL'), '-uš')},
-  {source: 'NINDA.GUR4.RA', awaitedResult: w(sGr('NINDA.GUR4.RA'))},
+  {source: 'NINDA.GUR4.RA', awaitedResult: w(sGr('NINDA.GUR₄.RA'))},
   {source: 'GIŠ.°D°INANNA', awaitedResult: w(sGr('GIŠ.'), det('D'), sGr('INANNA'))},
   {source: 'DUMU°MEŠ°.É.GAL', awaitedResult: w(sGr('DUMU'), det('MEŠ'), sGr('.É.GAL'))},
 
@@ -31,16 +31,18 @@ describe.skip('word', () => testParser<Word>('word', wordParser, [
 
   // Akkadogramm
   {source: '_ŠI-PÁT', awaitedResult: w(aGr('ŠI-PÁT'))},
-  {source: '_A-NA', awaitedResult: w('A-NA')},
+  {source: '_A-NA', awaitedResult: w(aGr('A-NA'))},
   {source: '_A+NA', awaitedResult: w(aGr('A+NA'))},
 
   // Akkadische Präposition
+  // FIXME: prepending a preposition with '~' is not yet supported...
   {source: '_A-NA~É.GAL', awaitedResult: w(aGr('A-NA'), ' ', sGr('É.GAL'))},
   {source: '_I-NA~°GIŠ°MA.ṢÁ.AB', awaitedResult: w(aGr('IŠ-TU'), ' ', det('GIŠ'), sGr('MA.SÁ.AB'))},
 
   // Determinativ
   {source: '°MUNUS°', awaitedResult: w(det('MUNUS'))},
   {source: '°MUNUS°ŠU.GI', awaitedResult: w(det('MUNUS'), sGr('ŠU.GI'))},
+  {source: 'DINGIR°MEŠ°', awaitedResult: w(sGr('DINGIR'), det('MEŠ'))},
   {source: 'DINGIR°MEŠ°-aš', awaitedResult: w(sGr('DINGIR'), det('MEŠ'), '-aš')},
   {source: '°m°ḫa-at-tu-ši-li', awaitedResult: w(det('m'), 'ḫa-at-tu-ši-li')},
   {source: '°NA4°ḫu-wa-ši-ia', awaitedResult: w(det('NA₄'), 'ḫu-wa-ši-ia')},

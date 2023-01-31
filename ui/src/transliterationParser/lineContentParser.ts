@@ -1,7 +1,6 @@
 import {Failure, Result as ParsimmonResult} from 'parsimmon';
-import {ParagraphSeparatorNode} from '../model/sentenceContent/linebreak';
 import {XmlElementNode} from '../xmlModel/xmlModel';
-import {paragraphSeparatorParser} from './paragraphSeparatorParser';
+import {ParagraphSeparatorNode, paragraphSeparatorParser} from './paragraphSeparatorParser';
 import {wordParser} from './wordParser';
 
 // Other
@@ -26,7 +25,7 @@ interface ContentParseError {
 interface ContentParseSuccess {
   type: 'ContentParseSuccess';
   words: XmlElementNode<'w'>[];
-  maybeParSep: ParagraphSeparatorNode | undefined;
+  maybeParagraphSeparator: ParagraphSeparatorNode | undefined;
 }
 
 export type ContentParseResult = ContentParseError | ContentParseSuccess;
@@ -37,13 +36,13 @@ export function parseTransliterationLineContent(content: string): ContentParseRe
 
   if (stringContents.length === 0) {
     // no words or other content in line
-    return {type: 'ContentParseSuccess', words: [], maybeParSep: undefined};
+    return {type: 'ContentParseSuccess', words: [], maybeParagraphSeparator: undefined};
   }
 
   // check last element for special processing (paragraphSeparator)
   const lastContentParSepParseResult = paragraphSeparatorParser.parse(stringContents[stringContents.length - 1].trim());
 
-  const [wordContents, maybeParSep] = lastContentParSepParseResult.status
+  const [wordContents, maybeParagraphSeparator] = lastContentParSepParseResult.status
     ? [stringContents.slice(0, stringContents.length - 1), lastContentParSepParseResult.value]
     : [stringContents, undefined];
 
@@ -53,7 +52,7 @@ export function parseTransliterationLineContent(content: string): ContentParseRe
 
   return errors.length > 0
     ? {type: 'ContentParseError', errors}
-    : {type: 'ContentParseSuccess', words, maybeParSep};
+    : {type: 'ContentParseSuccess', words, maybeParagraphSeparator};
 }
 
 

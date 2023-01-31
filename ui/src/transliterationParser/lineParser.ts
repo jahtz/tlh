@@ -1,34 +1,7 @@
-import {Failure, Result} from 'parsimmon';
+import {Result} from 'parsimmon';
 import {LinePreParseResult, preParseLine} from './linePreParser';
 import {parseTransliterationLineContent} from './lineContentParser';
-import {ParagraphSeparatorNode} from '../model/sentenceContent/linebreak';
-import {XmlElementNode} from '../xmlModel/xmlModel';
-
-interface LinePreParsingError {
-  type: 'LinePreParsingError';
-  error: Failure;
-}
-
-interface LineWordParsingError {
-  type: 'LineWordParsingError';
-  errors: Failure[];
-}
-
-interface LineParseSuccess {
-  type: 'LineParseSuccess';
-  data: {
-    // make object?
-    lnr: string;
-    words: XmlElementNode<'w'>[];
-    maybeParagraphSeparator: ParagraphSeparatorNode | undefined;
-  };
-}
-
-export function lineParseSuccess(lnr: string, words: XmlElementNode<'w'>[], maybeParagraphSeparator: ParagraphSeparatorNode | undefined = undefined): LineParseSuccess {
-  return {type: 'LineParseSuccess', data: {lnr, words, maybeParagraphSeparator}};
-}
-
-export type LineParseResult = LinePreParsingError | LineWordParsingError | LineParseSuccess;
+import {LineParseResult} from './lineParseResult';
 
 export function parseTransliterationLine(transliterationLineInput: string): LineParseResult {
 
@@ -47,7 +20,7 @@ export function parseTransliterationLine(transliterationLineInput: string): Line
     return {type: 'LineWordParsingError', errors: contentParseResult.errors};
   }
 
-  const {words, maybeParSep} = contentParseResult;
+  const {words, maybeParagraphSeparator} = contentParseResult;
 
-  return lineParseSuccess(lineNumber, words, maybeParSep);
+  return {type: 'LineParseSuccess', lineNumber, words, maybeParagraphSeparator};
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace tlh_dig\model;
+namespace model;
 
 use GraphQL\Type\Definition\{ObjectType, Type};
 
@@ -16,7 +16,6 @@ class ManuscriptLanguage
     $this->name = $name;
     $this->abbreviation = $abbreviation;
   }
-
 }
 
 ManuscriptLanguage::$graphQLType = new ObjectType([
