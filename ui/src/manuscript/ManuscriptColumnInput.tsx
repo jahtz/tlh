@@ -1,5 +1,4 @@
-import {ManuscriptColumn} from '../graphql';
-import {ManuscriptColumnModifier} from '../model/manuscriptProperties/manuscriptColumnModifier';
+import {ManuscriptColumn, ManuscriptColumnModifier} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import {manuscriptColumnModifiers, manuscriptColumns} from '../model/manuscriptProperties/manuscriptColumn';
 

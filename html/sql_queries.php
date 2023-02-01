@@ -10,18 +10,19 @@ require_once __DIR__ . '/model/User.php';
 
 use model\{ManuscriptIdentifier, ManuscriptMetaData, User};
 
-
 /**
+ * @template T
+ *
  * @param mysqli $connection
  * @param string $sql
- * @param Closure|null $bindParams
- * @param Closure $f
+ * @param ?callable(mysqli_stmt) $bindParams
+ * @param callable(mysqli_stmt):T $f
  *
  * @return mixed
  *
  * @throws Exception
  */
-function execute_query(mysqli $connection, string $sql, ?Closure $bindParams, Closure $f)
+function execute_query_with_connection(mysqli $connection, string $sql, ?callable $bindParams, callable $f)
 {
   $statement = $connection->prepare($sql);
   if (!$statement) {
@@ -56,17 +57,43 @@ function execute_query(mysqli $connection, string $sql, ?Closure $bindParams, Cl
 }
 
 /**
+ * @template T
+ *
  * @param string $sql
- * @param Closure | null $bindParams
- * @param Closure $f
+ * @param ?callable(mysqli_stmt) $bindParams
+ * @param callable(mysqli_stmt):T $f
+ * @return mixed
+ *
+ * @throws Exception
+ */
+function execute_query(string $sql, ?callable $bindParams, callable $f)
+{
+  $conn = connect_to_db();
+
+  try {
+    $executed = execute_query_with_connection($conn, $sql, $bindParams, $f);
+  } catch (Exception $e) {
+    $conn->close();
+    throw $e;
+  }
+
+  $conn->close();
+  return $executed;
+}
+
+/**
+ * @template T
+ * @param string $sql
+ * @param callable|null $bindParams
+ * @param callable(mysqli_result):T $f
  *
  * @return mixed
  *
  * @throws Exception
  */
-function execute_select_query(string $sql, ?Closure $bindParams, Closure $f)
+function execute_select_query(string $sql, ?callable $bindParams, callable $f)
 {
-  return execute_query(connect_to_db(), $sql, $bindParams, function (mysqli_stmt $stmt) use ($f) {
+  return execute_query($sql, $bindParams, function (mysqli_stmt $stmt) use ($f) {
     $stmtResult = $stmt->get_result();
 
     if (!$stmtResult) {
@@ -80,42 +107,40 @@ function execute_select_query(string $sql, ?Closure $bindParams, Closure $f)
   });
 }
 
+const allManuscriptsCountQuery = "select count(*) from tlh_dig_manuscript_metadatas;";
+
 function allManuscriptsCount(): int
 {
-  $sql = "select count(*) from tlh_dig_manuscript_metadatas;";
-
   try {
     return execute_select_query(
-      $sql,
+      allManuscriptsCountQuery,
       null,
-      function (mysqli_result $result) {
-        return $result->fetch_row()[0];
-      });
+      fn(mysqli_result $result): int => $result->fetch_row()[0]
+    );
   } catch (Exception $e) {
     error_log($e);
     return -1;
   }
 }
 
+const allManuscriptMetaDataQuery = "
+select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username
+    from tlh_dig_manuscript_metadatas
+    limit ?, ?;";
+
 /**
  * @return ManuscriptMetaData[]
  */
 function allManuscriptMetaData(int $paginationSize, int $page): array
 {
-
   $paginationSize = max(10, $paginationSize);
-
-  $sql = "
-select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username
-    from tlh_dig_manuscript_metadatas
-    limit ?, ?;";
 
   $first = $page * $paginationSize;
   $last = ($page + 1) * $paginationSize;
 
   try {
     return execute_select_query(
-      $sql,
+      allManuscriptMetaDataQuery,
       fn(mysqli_stmt $stmt) => $stmt->bind_param('ii', $first, $last),
       fn(mysqli_result $result): array => array_map(
         fn(array $row): ManuscriptMetaData => ManuscriptMetaData::fromDbAssocArray($row),
@@ -128,18 +153,18 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
   }
 }
 
-function manuscriptMetaDataById(string $mainIdentifier): ?ManuscriptMetaData
-{
-  $sql = "
+const manuscriptMetaDataByIdQuery = "
 select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username
     from tlh_dig_manuscript_metadatas
     where main_identifier = ?;";
 
+function manuscriptMetaDataById(string $mainIdentifier): ?ManuscriptMetaData
+{
   try {
     return execute_select_query(
-      $sql,
+      manuscriptMetaDataByIdQuery,
       fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
-      function (mysqli_result $result) use ($mainIdentifier): ?ManuscriptMetaData {
+      function (mysqli_result $result): ?ManuscriptMetaData {
         $fetched = $result->fetch_all(MYSQLI_ASSOC)[0] ?? null;
 
         return $fetched ? ManuscriptMetaData::fromDbAssocArray($fetched) : null;
@@ -150,17 +175,17 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
   }
 }
 
+const getOtherIdentifiersQuery = "select identifier_type, identifier from tlh_dig_manuscript_other_identifiers where main_identifier = ?;";
+
 /**
  * @param string $mainIdentifier
  * @return ManuscriptIdentifier[]
  */
 function getOtherIdentifiers(string $mainIdentifier): array
 {
-  $sql = "select identifier_type, identifier from tlh_dig_manuscript_other_identifiers where main_identifier = ?;";
-
   try {
     return execute_select_query(
-      $sql,
+      getOtherIdentifiersQuery,
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
       fn(mysqli_result $result): array => array_map(
         fn(array $row): ManuscriptIdentifier => ManuscriptIdentifier::fromDbAssocArray($row),
@@ -168,18 +193,18 @@ function getOtherIdentifiers(string $mainIdentifier): array
       )
     );
   } catch (Exception $e) {
-    return array();
+    return [];
   }
 }
 
-function insertManuscriptMetaData(ManuscriptMetaData $mmd): bool
-{
-  $mainInsertSql = "
+const mainInsertSql = "
 insert into tlh_dig_manuscript_metadatas (main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username)
 values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
-  $db = connect_to_db();
+function insertManuscriptMetaData(ManuscriptMetaData $mmd): bool
+{
 
+  $db = connect_to_db();
 
   $otherIdentifierInsertStatement = $db->prepare("
 insert into tlh_dig_manuscript_other_identifiers (main_identifier, identifier, identifier_type)
@@ -195,15 +220,15 @@ values (?, ?, ?)");
 
   # insert main data
   try {
-    execute_query(
+    execute_query_with_connection(
       $db,
-      $mainInsertSql,
+      mainInsertSql,
       fn(mysqli_stmt $mainInsertStatement) => $mainInsertStatement->bind_param(
         'sssisisss',
         $mmd->mainIdentifier->identifier, $mmd->mainIdentifier->identifierType, $mmd->palaeographicClassification, $mmd->palaeographicClassificationSure,
         $mmd->provenance, $mmd->cthClassification, $mmd->bibliography, $mmd->status, $mmd->creatorUsername
       ),
-      fn(mysqli_stmt $stmt) => null
+      fn(mysqli_stmt $_stmt) => null
     );
 
   } catch (Exception $e) {
@@ -243,13 +268,13 @@ values (?, ?, ?)");
   return $result;
 }
 
+const maybeUserFromDatabaseQuery = "select username, pw_hash, name, affiliation, email from tlh_dig_users where username = ?;";
+
 function maybeUserFromDatabase(string $username): ?User
 {
-  $sql = "select username, pw_hash, name, affiliation, email from tlh_dig_users where username = ?;";
-
   try {
     return execute_select_query(
-      $sql,
+      maybeUserFromDatabaseQuery,
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $username),
       function (mysqli_result $result): ?User {
         $userArray = $result->fetch_all(MYSQLI_ASSOC)[0] ?? null;
@@ -261,26 +286,17 @@ function maybeUserFromDatabase(string $username): ?User
   }
 }
 
+const insertUserIntoDatabaseQuery = "insert into tlh_dig_users (username, pw_hash, name, affiliation, email) values (?, ?, ?, ?, ?);";
+
 function insertUserIntoDatabase(User $user): bool
 {
-  $sql = "insert into tlh_dig_users (username, pw_hash, name, affiliation, email) values (?, ?, ?, ?, ?);";
-
-  $conn = connect_to_db();
-
   try {
-    $executed = execute_query(
-      $conn,
-      $sql,
+    return execute_query(
+      insertUserIntoDatabaseQuery,
       fn(mysqli_stmt $stmt) => $stmt->bind_param('sssss', $user->username, $user->pwHash, $user->name, $user->affiliation, $user->email),
-      fn(mysqli_stmt $stmt) => true
+      fn(mysqli_stmt $_stmt) => true
     );
-
-    $conn->close();
-
-    return $executed;
   } catch (Exception $e) {
-    $conn->close();
     return false;
   }
 }
-

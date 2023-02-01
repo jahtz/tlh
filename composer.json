@@ -6,7 +6,8 @@
     "ext-json": "*",
     "ext-xml": "*",
     "ext-mysqli": "*",
-    "ext-mbstring": "*"
+    "ext-mbstring": "*",
+    "ext-random": "*"
   },
   "config": {
     "vendor-dir": "html/vendor",

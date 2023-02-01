@@ -6,16 +6,19 @@ import {ParagraphSeparatorNode} from './paragraphSeparatorParser';
 
 interface LinePreParsingError {
   type: 'LinePreParsingError';
+  input: string;
   error: Failure;
 }
 
 interface LineWordParsingError {
   type: 'LineWordParsingError';
+  input: string;
   errors: Failure[];
 }
 
 interface LineParseSuccess {
   type: 'LineParseSuccess';
+  input: string;
   lineNumber: LineNumberInput;
   words: XmlElementNode<'w'>[];
   maybeParagraphSeparator: ParagraphSeparatorNode | undefined;

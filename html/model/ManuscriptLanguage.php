@@ -21,8 +21,14 @@ class ManuscriptLanguage
 ManuscriptLanguage::$graphQLType = new ObjectType([
   'name' => 'ManuscriptLanguage',
   'fields' => [
-    'name' => Type::nonNull(Type::string()),
-    'abbreviation' => Type::nonNull(Type::string())
+    'name' => [
+      'name' => Type::nonNull(Type::string()),
+      'resolve' => fn(ManuscriptLanguage $language): string => $language->name
+    ],
+    'abbreviation' => [
+      'name' => Type::nonNull(Type::string()),
+      'resolve' => fn(ManuscriptLanguage $language): string => $language->abbreviation
+    ]
   ]
 ]);
 

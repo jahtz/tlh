@@ -30,11 +30,11 @@ $queryType = new ObjectType([
   'fields' => [
     'manuscriptLanguages' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptLanguage::$graphQLType))),
-      'resolve' => fn() => allManuscriptLanguages()
+      'resolve' => fn(): array => allManuscriptLanguages()
     ],
     'manuscriptCount' => [
       'type' => Type::nonNull(Type::int()),
-      'resolve' => fn() => allManuscriptsCount()
+      'resolve' => fn(): int => allManuscriptsCount()
     ],
     'allManuscripts' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptMetaData::$graphQLType))),
@@ -42,14 +42,14 @@ $queryType = new ObjectType([
         'paginationSize' => Type::nonNull(Type::int()),
         'page' => Type::nonNull(Type::int())
       ],
-      'resolve' => fn($rootValue, array $args) => allManuscriptMetaData($args['paginationSize'], $args['page'])
+      'resolve' => fn($_rootValue, array $args): array => allManuscriptMetaData($args['paginationSize'], $args['page'])
     ],
     'manuscript' => [
       'type' => ManuscriptMetaData::$graphQLType,
       'args' => [
         'mainIdentifier' => Type::nonNull(Type::string())
       ],
-      'resolve' => fn($rootValue, array $args) => manuscriptMetaDataById($args['mainIdentifier'])
+      'resolve' => fn($_rootValue, array $args): ?ManuscriptMetaData => manuscriptMetaDataById($args['mainIdentifier'])
     ]
   ]
 ]);
@@ -86,18 +86,13 @@ $manuscriptMutationsType = new ObjectType([
 
         $connection = connect_to_db();
 
-        // FIXME: select next version!
         $version = selectNextManuscriptTransliterationVersion($connection, $mainIdentifier);
 
-        /**
-         * @var TransliterationSideInput[] $sideInputs
-         */
-        $sideInputs = array_map(fn($sideInput) => TransliterationSideInput::fromGraphQLInput($sideInput, $version), $args['values']);
+        $sideInputs = array_map(fn(array $sideInput): TransliterationSideInput => TransliterationSideInput::fromGraphQLInput($sideInput), $args['values']);
 
         error_log(json_encode($sideInputs, JSON_PRETTY_PRINT));
 
         $allSaved = true;
-
 
         $connection->begin_transaction();
 
@@ -105,8 +100,6 @@ $manuscriptMutationsType = new ObjectType([
           foreach ($sideInputs as $transliterationSide) {
             $allSaved = $allSaved && $transliterationSide->saveToDb($connection, $mainIdentifier, $version);
           }
-
-          error_log("All saved: " . ($allSaved ? "true" : "false"));
 
           if ($allSaved) {
             $connection->commit();
@@ -152,7 +145,7 @@ $loggedInUserMutationsType = new ObjectType([
       'args' => [
         'mainIdentifier' => Type::nonNull(Type::string())
       ],
-      'resolve' => fn(string $username, array $args) => manuscriptMetaDataById($args['mainIdentifier'])
+      'resolve' => fn(string $_username, array $args): ?ManuscriptMetaData => manuscriptMetaDataById($args['mainIdentifier'])
     ]
   ]
 ]);
@@ -220,7 +213,7 @@ $mutationType = new ObjectType([
         'userInput' => Type::nonNull(User::$graphQLInputObjectType)
       ],
       'type' => Type::string(),
-      'resolve' => fn($rootValue, array $args) => register($args)
+      'resolve' => fn($_rootValue, array $args) => register($args)
     ],
     'login' => [
       'args' => [
@@ -228,11 +221,11 @@ $mutationType = new ObjectType([
         'password' => Type::nonNull(Type::string())
       ],
       'type' => Type::string(),
-      'resolve' => fn($rootValue, array $args) => verifyUser($args['username'], $args['password'])
+      'resolve' => fn($_rootValue, array $args) => verifyUser($args['username'], $args['password'])
     ],
     'me' => [
       'type' => $loggedInUserMutationsType,
-      'resolve' => fn($rootValue, array $args) => resolveUser()
+      'resolve' => fn($_rootValue, array $_args): ?string => resolveUser()
     ]
   ]
 ]);
@@ -260,6 +253,7 @@ try {
 
     $query = $input['query'];
 
+    /** @psalm-suppress UndefinedDocblockClass */
     $output = GraphQL::executeQuery($schema, $query, null, $authHeader, $variablesValues, $operationName)->toArray($debug);
   } else {
     $output = [

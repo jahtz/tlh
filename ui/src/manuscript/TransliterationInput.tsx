@@ -3,10 +3,17 @@ import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
 import {activeUserSelector} from '../newStore';
 import {homeUrl} from '../urls';
-import {ManuscriptMetaDataFragment, useUploadTransliterationMutation} from '../graphql';
+import {
+  ManuscriptMetaDataFragment,
+  TransliterationColumnInput,
+  TransliterationLineInput,
+  TransliterationSideInput,
+  useUploadTransliterationMutation
+} from '../graphql';
 import {defaultSideInput, SideInput, TransliterationSideInputDisplay} from './TransliterationSideInputDisplay';
 import {Navigate, useLoaderData} from 'react-router-dom';
 import update from 'immutability-helper';
+import {LineParseResult, writeLineParseSuccessToXml} from '../transliterationParser/lineParseResult';
 
 interface IState {
   sides: SideInput[];
@@ -16,6 +23,17 @@ const defaultState: IState = {
   sides: [defaultSideInput]
 };
 
+function convertLineParseResult2TransliterationLineInput(lineParseResult: LineParseResult, inputIndex: number): TransliterationLineInput {
+
+  if (lineParseResult.type === 'LinePreParsingError' || lineParseResult.type === 'LineWordParsingError') {
+    return {input: lineParseResult.input, inputIndex};
+  }
+
+  const {input, lineNumber} = lineParseResult;
+
+  return {inputIndex, input, lineNumber, result: writeLineParseSuccessToXml(lineParseResult)};
+}
+
 export function TransliterationInput(): JSX.Element {
 
   const manuscript = useLoaderData() as ManuscriptMetaDataFragment | undefined;
@@ -24,23 +42,32 @@ export function TransliterationInput(): JSX.Element {
   const [state, setState] = useState<IState>(defaultState);
   const currentUser = useSelector(activeUserSelector);
 
-  const [/*uploadTransliteration*/, {data, loading, error}] = useUploadTransliterationMutation();
+  const [uploadTransliteration, {/*data,*/ loading, error}] = useUploadTransliterationMutation();
 
   if (!manuscript || !currentUser || currentUser.user_id !== manuscript.creatorUsername) {
     return <Navigate to={homeUrl}/>;
   }
 
+  const mainIdentifier = manuscript.mainIdentifier.identifier;
+
+  /*
   if (data) {
     console.info(JSON.stringify(data, null, 2));
   }
+   */
 
   function upload(): void {
-    /*
-    const values = state.sideParseResults.flatMap(({newSideParseResult}) => newSideParseResult ? [newSideParseResult] : []);
+    const values = state.sides.map<TransliterationSideInput>(({side, columns}) => ({
+      side,
+      columns: columns.map<TransliterationColumnInput>(({column, columnModifier, currentLineParseResult}) => ({
+        column,
+        columnModifier,
+        lines: currentLineParseResult.map((lineParseResult, inputIndex) => convertLineParseResult2TransliterationLineInput(lineParseResult, inputIndex))
+      }))
+    }));
 
     uploadTransliteration({variables: {mainIdentifier, values}})
       .catch((error) => console.error('Could not upload transliteration:\n' + error));
-     */
   }
 
   const addTransliterationSideInput = (): void => setState((state) => update(state, {sides: {$push: [defaultSideInput]}}));

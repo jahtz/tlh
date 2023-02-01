@@ -2,6 +2,8 @@ use hpm;
 
 drop table if exists
   tlh_dig_transliteration_lines,
+  tlh_dig_transliteration_columns,
+  tlh_dig_transliteration_sides,
   tlh_dig_manuscript_other_identifiers,
   tlh_dig_manuscript_metadatas,
   tlh_dig_users;
@@ -17,7 +19,7 @@ create table if not exists tlh_dig_users (
 );
 
 insert into tlh_dig_users (username, pw_hash, name, email)
-values ('jack', '$2y$10$vjF0vsyhdJ7alN3Q.JwmLuvyF1HzAwStyolDD117vE.tM3KxIBjwy', 'Jack Bourne', 'j.bourne@example.com');
+values ('jack', '$2y$10$vjF0vsyhdJ7alN3Q.JwmLuvyF1HzAwStyolDD117vE.tM3KxIBjwy', 'Jack Bourne', '');
 
 -- manuscripts
 
@@ -44,10 +46,34 @@ create table if not exists tlh_dig_manuscript_other_identifiers (
 
 -- transliterations
 
+create table if not exists tlh_dig_transliteration_sides (
+  main_identifier varchar(20) not null references tlh_dig_manuscript_metadatas (main_identifier) on update cascade on delete cascade,
+  side_index      integer     not null,
+  side            varchar(50) not null,
+  version         int         not null,
+
+  primary key (main_identifier, side_index, version)
+  -- unique (main_identifier, side)
+);
+
+create table if not exists tlh_dig_transliteration_columns (
+  main_identifier   varchar(20) not null,
+  side_index        integer     not null,
+  version           integer     not null,
+  column_index      integer     not null,
+  manuscript_column varchar(50) not null,
+  column_modifier   varchar(30) not null,
+
+  primary key (main_identifier, side_index, version, column_index),
+  unique (main_identifier, side_index, manuscript_column),
+
+  foreign key (main_identifier, side_index) references tlh_dig_transliteration_sides (main_identifier, side_index) on update cascade on delete cascade
+);
+
 create table if not exists tlh_dig_transliteration_lines (
-  main_identifier          varchar(20) not null references tlh_dig_manuscript_metadatas (main_identifier) on update cascade on delete cascade,
-  side                     varchar(20) not null,
-  manuscript_column        varchar(20) not null,
+  main_identifier          varchar(20) not null,
+  side_index               integer     not null,
+  column_index             integer     not null,
   version                  integer     not null,
   input_index              integer     not null,
 
@@ -56,6 +82,8 @@ create table if not exists tlh_dig_transliteration_lines (
   input                    text        not null,
   result                   text,
 
-  primary key (main_identifier, side, manuscript_column, version, input_index),
-  unique (main_identifier, side, manuscript_column, version, line_number, line_number_is_confirmed)
+  primary key (main_identifier, side_index, column_index, version, input_index),
+  unique (main_identifier, side_index, column_index, version, line_number, line_number_is_confirmed),
+
+  foreign key (main_identifier, side_index, version, column_index) references tlh_dig_transliteration_columns (main_identifier, side_index, version, column_index) on update cascade on delete cascade
 );

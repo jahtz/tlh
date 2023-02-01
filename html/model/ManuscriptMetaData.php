@@ -3,7 +3,8 @@
 namespace model;
 
 require_once __DIR__ . '/ManuscriptIdentifier.php';
-require_once __DIR__ . '/TransliterationLine.php';
+// require_once __DIR__ . '/TransliterationLine.php';
+require_once __DIR__ . '/TransliterationSide.php';
 
 use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
 
@@ -133,8 +134,8 @@ ManuscriptMetaData::$graphQLType = new ObjectType([
       'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): array => getPictures($manuscriptMetaData->mainIdentifier->identifier)
     ],
     'transliterations' => [
-      'type' => Type::listOf(Type::nonNull(TransliterationLine::$graphQLObjectType)),
-      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): ?array => getTransliterationLines($manuscriptMetaData->mainIdentifier->identifier)
+      'type' => Type::listOf(Type::nonNull(TransliterationSide::$graphQLObjectType)),
+      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): array => TransliterationSide::selectTransliterationSides($manuscriptMetaData->mainIdentifier->identifier)
     ]
   ]
 ]);

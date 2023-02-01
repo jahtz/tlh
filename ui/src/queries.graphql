@@ -61,6 +61,28 @@ mutation CreateManuscript($manuscriptMetaData : ManuscriptMetaDataInput) {
 
 # /manuscripts/:id
 
+fragment TransliterationColumn on TransliterationColumn {
+  columnIndex
+  lines {
+    inputIndex
+    lineNumber {
+      number
+      isConfirmed
+    }
+    input
+    result
+  }
+}
+
+fragment TransliterationSide on TransliterationSide {
+  sideIndex
+  side
+  version
+  columns {
+    ...TransliterationColumn
+  }
+}
+
 fragment ManuscriptMetaData on ManuscriptMetaData {
   mainIdentifier {
     ...ManuscriptIdentifier
@@ -76,15 +98,7 @@ fragment ManuscriptMetaData on ManuscriptMetaData {
   creatorUsername
   pictureUrls
   transliterations {
-    # side
-    version
-    inputIndex
-    lineNumber {
-      number
-      isConfirmed
-    }
-    input
-    result
+    ...TransliterationSide
   }
 }
 

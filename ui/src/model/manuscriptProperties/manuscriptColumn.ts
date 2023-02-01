@@ -1,5 +1,4 @@
-import {ManuscriptColumn} from '../../graphql';
-import {ManuscriptColumnModifier} from './manuscriptColumnModifier';
+import {ManuscriptColumn, ManuscriptColumnModifier} from '../../graphql';
 
 export const manuscriptColumns: ManuscriptColumn[] = [
   ManuscriptColumn.ColumnDivider,

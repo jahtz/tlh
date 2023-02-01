@@ -3,13 +3,13 @@ import {LinePreParseResult, preParseLine} from './linePreParser';
 import {parseTransliterationLineContent} from './lineContentParser';
 import {LineParseResult} from './lineParseResult';
 
-export function parseTransliterationLine(transliterationLineInput: string): LineParseResult {
+export function parseTransliterationLine(input: string): LineParseResult {
 
   // extract line number and actual content
-  const linePreParsingResult: Result<LinePreParseResult> = preParseLine(transliterationLineInput.trim());
+  const linePreParsingResult: Result<LinePreParseResult> = preParseLine(input.trim());
 
   if (!linePreParsingResult.status) {
-    return {type: 'LinePreParsingError', error: linePreParsingResult};
+    return {type: 'LinePreParsingError', input, error: linePreParsingResult};
   }
 
   const {lineNumber, content} = linePreParsingResult.value;
@@ -17,10 +17,10 @@ export function parseTransliterationLine(transliterationLineInput: string): Line
   const contentParseResult = parseTransliterationLineContent(content);
 
   if ('errors' in contentParseResult) {
-    return {type: 'LineWordParsingError', errors: contentParseResult.errors};
+    return {type: 'LineWordParsingError', input, errors: contentParseResult.errors};
   }
 
   const {words, maybeParagraphSeparator} = contentParseResult;
 
-  return {type: 'LineParseSuccess', lineNumber, words, maybeParagraphSeparator};
+  return {type: 'LineParseSuccess', input, lineNumber, words, maybeParagraphSeparator};
 }

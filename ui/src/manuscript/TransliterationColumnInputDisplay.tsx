@@ -2,21 +2,20 @@ import {useTranslation} from 'react-i18next';
 import {LineParseResult} from '../transliterationParser/lineParseResult';
 import {SideParseResultComponent} from './SideParseResultComponent';
 import {parseTransliterationLine} from '../transliterationParser/lineParser';
-import {ManuscriptColumn} from '../graphql';
-import {ManuscriptColumnModifier} from '../model/manuscriptProperties/manuscriptColumnModifier';
+import {ManuscriptColumn, ManuscriptColumnModifier} from '../graphql';
 import {ManuscriptColumnInput} from './ManuscriptColumnInput';
 import {Spec} from 'immutability-helper';
 
 export interface ColumnInput {
   column: ManuscriptColumn;
   columnModifier: ManuscriptColumnModifier;
-  currentLineParseResult?: LineParseResult[];
+  currentLineParseResult: LineParseResult[];
 }
 
 export const defaultColumnInput: ColumnInput = {
   column: ManuscriptColumn.I,
   columnModifier: ManuscriptColumnModifier.None,
-  currentLineParseResult: undefined
+  currentLineParseResult: []
 };
 
 interface IProps extends ColumnInput {
@@ -52,7 +51,7 @@ export function TransliterationColumnInputDisplay({column, columnModifier, curre
         <section className="col-span-2">
           <label className="font-bold block text-center">{t('parseResult')}:</label>
 
-          {currentLineParseResult !== undefined
+          {currentLineParseResult.length > 0
             ? <SideParseResultComponent lineParseResults={currentLineParseResult}/>
             : <div className="p-2 italic text-cyan-500 text-center">{t('no_result_yet')}...</div>}
         </section>

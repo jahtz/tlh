@@ -33,6 +33,12 @@ enum ManuscriptColumn {
   XII
 }
 
+enum ManuscriptColumnModifier {
+  None
+  Slash
+  SlashQuestion
+}
+
 type ManuscriptIdentifier {
   identifier: String!
   identifierType: ManuscriptIdentifierType!
@@ -65,7 +71,7 @@ type ManuscriptMetaData {
   pictureUrls: [String!]!
   provenance: String
   status: ManuscriptStatus
-  transliterations: [TransliterationLine!]
+  transliterations: [TransliterationSide!]
 }
 
 input ManuscriptMetaDataInput {
@@ -131,8 +137,15 @@ type Query {
   manuscriptLanguages: [ManuscriptLanguage!]!
 }
 
+type TransliterationColumn {
+  columnIndex: Int!
+  lines: [TransliterationLine!]!
+}
+
 input TransliterationColumnInput {
   column: ManuscriptColumn!
+  columnIndex: Int!
+  columnModifier: ManuscriptColumnModifier!
   lines: [TransliterationLineInput!]!
 }
 
@@ -141,19 +154,26 @@ type TransliterationLine {
   inputIndex: Int!
   lineNumber: LineNumber
   result: String!
-  version: Int!
 }
 
 input TransliterationLineInput {
   input: String!
-  inputIndex: Int!
+  lineIndex: Int!
   lineNumber: LineNumberInput
   result: String
+}
+
+type TransliterationSide {
+  columns: [TransliterationColumn!]!
+  side: ManuscriptSide!
+  sideIndex: Int!
+  version: Int!
 }
 
 input TransliterationSideInput {
   columns: [TransliterationColumnInput!]!
   side: ManuscriptSide!
+  sideIndex: Int!
 }
 
 input UserInput {
