@@ -1,9 +1,11 @@
-type LineNumber {
-  isConfirmed: Boolean!
-  number: Int!
+# This file was generated based on ".graphqlconfig". Do not edit manually.
+
+schema {
+  query: Query
+  mutation: Mutation
 }
 
-input LineNumberInput {
+type LineNumber {
   isConfirmed: Boolean!
   number: Int!
 }
@@ -11,6 +13,68 @@ input LineNumberInput {
 type LoggedInUserMutations {
   createManuscript(values: ManuscriptMetaDataInput): String
   manuscript(mainIdentifier: String!): ManuscriptMutations
+}
+
+type ManuscriptIdentifier {
+  identifier: String!
+  identifierType: ManuscriptIdentifierType!
+}
+
+type ManuscriptLanguage {
+  abbreviation: String!
+  name: String!
+}
+
+type ManuscriptMetaData {
+  bibliography: String
+  creatorUsername: String!
+  cthClassification: Int
+  mainIdentifier: ManuscriptIdentifier!
+  otherIdentifiers: [ManuscriptIdentifier!]!
+  palaeographicClassification: PalaeographicClassification!
+  palaeographicClassificationSure: Boolean!
+  pictureUrls: [String!]!
+  provenance: String
+  status: ManuscriptStatus
+  transliterations: [TransliterationSide!]
+}
+
+type ManuscriptMutations {
+  updateTransliteration(values: [TransliterationSideInput!]!): Boolean!
+}
+
+type Mutation {
+  login(password: String!, username: String!): String
+  me: LoggedInUserMutations
+  register(userInput: UserInput!): String
+}
+
+type Query {
+  allManuscripts(page: Int!, paginationSize: Int!): [ManuscriptMetaData!]!
+  manuscript(mainIdentifier: String!): ManuscriptMetaData
+  manuscriptCount: Int!
+  manuscriptLanguages: [ManuscriptLanguage!]!
+}
+
+type TransliterationColumn {
+  column: ManuscriptColumn!
+  columnIndex: Int!
+  columnModifier: ManuscriptColumnModifier!
+  lines: [TransliterationLine!]!
+}
+
+type TransliterationLine {
+  input: String!
+  inputIndex: Int!
+  lineNumber: LineNumber
+  result: String
+}
+
+type TransliterationSide {
+  columns: [TransliterationColumn!]!
+  side: ManuscriptSide!
+  sideIndex: Int!
+  version: Int!
 }
 
 enum ManuscriptColumn {
@@ -39,53 +103,10 @@ enum ManuscriptColumnModifier {
   SlashQuestion
 }
 
-type ManuscriptIdentifier {
-  identifier: String!
-  identifierType: ManuscriptIdentifierType!
-}
-
-input ManuscriptIdentifierInput {
-  identifier: String!
-  identifierType: ManuscriptIdentifierType!
-}
-
 enum ManuscriptIdentifierType {
   CollectionNumber
   ExcavationNumber
   PublicationShortReference
-}
-
-type ManuscriptLanguage {
-  abbreviation: String!
-  name: String!
-}
-
-type ManuscriptMetaData {
-  bibliography: String
-  creatorUsername: String!
-  cthClassification: Int
-  mainIdentifier: ManuscriptIdentifier!
-  otherIdentifiers: [ManuscriptIdentifier!]!
-  palaeographicClassification: PalaeographicClassification!
-  palaeographicClassificationSure: Boolean!
-  pictureUrls: [String!]!
-  provenance: String
-  status: ManuscriptStatus
-  transliterations: [TransliterationSide!]
-}
-
-input ManuscriptMetaDataInput {
-  bibliography: String
-  cthClassification: Int
-  mainIdentifier: ManuscriptIdentifierInput!
-  otherIdentifiers: [ManuscriptIdentifierInput!]!
-  palaeographicClassification: PalaeographicClassification!
-  palaeographicClassificationSure: Boolean!
-  provenance: String
-}
-
-type ManuscriptMutations {
-  updateTransliteration(values: [TransliterationSideInput!]!): Boolean!
 }
 
 enum ManuscriptSide {
@@ -112,12 +133,6 @@ enum ManuscriptStatus {
   Reviewed
 }
 
-type Mutation {
-  login(password: String!, username: String!): String
-  me: LoggedInUserMutations
-  register(userInput: UserInput!): String
-}
-
 enum PalaeographicClassification {
   AssyroMittanianScript
   LateNewScript
@@ -130,16 +145,24 @@ enum PalaeographicClassification {
   Unclassified
 }
 
-type Query {
-  allManuscripts(page: Int!, paginationSize: Int!): [ManuscriptMetaData!]!
-  manuscript(mainIdentifier: String!): ManuscriptMetaData
-  manuscriptCount: Int!
-  manuscriptLanguages: [ManuscriptLanguage!]!
+input LineNumberInput {
+  isConfirmed: Boolean!
+  number: Int!
 }
 
-type TransliterationColumn {
-  columnIndex: Int!
-  lines: [TransliterationLine!]!
+input ManuscriptIdentifierInput {
+  identifier: String!
+  identifierType: ManuscriptIdentifierType!
+}
+
+input ManuscriptMetaDataInput {
+  bibliography: String
+  cthClassification: Int
+  mainIdentifier: ManuscriptIdentifierInput!
+  otherIdentifiers: [ManuscriptIdentifierInput!]!
+  palaeographicClassification: PalaeographicClassification!
+  palaeographicClassificationSure: Boolean!
+  provenance: String
 }
 
 input TransliterationColumnInput {
@@ -149,25 +172,11 @@ input TransliterationColumnInput {
   lines: [TransliterationLineInput!]!
 }
 
-type TransliterationLine {
-  input: String
-  inputIndex: Int!
-  lineNumber: LineNumber
-  result: String!
-}
-
 input TransliterationLineInput {
   input: String!
   lineIndex: Int!
   lineNumber: LineNumberInput
   result: String
-}
-
-type TransliterationSide {
-  columns: [TransliterationColumn!]!
-  side: ManuscriptSide!
-  sideIndex: Int!
-  version: Int!
 }
 
 input TransliterationSideInput {

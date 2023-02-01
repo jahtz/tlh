@@ -23,15 +23,15 @@ const defaultState: IState = {
   sides: [defaultSideInput]
 };
 
-function convertLineParseResult2TransliterationLineInput(lineParseResult: LineParseResult, inputIndex: number): TransliterationLineInput {
+function convertLineParseResult2TransliterationLineInput(lineParseResult: LineParseResult, lineIndex: number): TransliterationLineInput {
 
   if (lineParseResult.type === 'LinePreParsingError' || lineParseResult.type === 'LineWordParsingError') {
-    return {input: lineParseResult.input, inputIndex};
+    return {input: lineParseResult.input, lineIndex};
   }
 
   const {input, lineNumber} = lineParseResult;
 
-  return {inputIndex, input, lineNumber, result: writeLineParseSuccessToXml(lineParseResult)};
+  return {lineIndex, input, lineNumber, result: writeLineParseSuccessToXml(lineParseResult)};
 }
 
 export function TransliterationInput(): JSX.Element {
@@ -57,9 +57,11 @@ export function TransliterationInput(): JSX.Element {
    */
 
   function upload(): void {
-    const values = state.sides.map<TransliterationSideInput>(({side, columns}) => ({
+    const values = state.sides.map<TransliterationSideInput>(({side, columns}, sideIndex) => ({
+      sideIndex,
       side,
-      columns: columns.map<TransliterationColumnInput>(({column, columnModifier, currentLineParseResult}) => ({
+      columns: columns.map<TransliterationColumnInput>(({column, columnModifier, currentLineParseResult}, columnIndex) => ({
+        columnIndex,
         column,
         columnModifier,
         lines: currentLineParseResult.map((lineParseResult, inputIndex) => convertLineParseResult2TransliterationLineInput(lineParseResult, inputIndex))
