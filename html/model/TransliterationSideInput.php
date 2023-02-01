@@ -15,10 +15,10 @@ const sideIndexName = 'sideIndex';
 const sideName = 'side';
 const columnsName = 'columns';
 
-const insertTransliterationSideQuery = "insert into tlh_dig_transliteration_sides (main_identifier, side_index, side, version) values (?, ?, ?, ?);";
-
 class TransliterationSideInput
 {
+  const insertQuery = "insert into tlh_dig_transliteration_sides (main_identifier, side_index, side, version) values (?, ?, ?, ?);";
+
   static InputObjectType $graphQLInputObjectType;
 
   public int $sideIndex;
@@ -42,16 +42,19 @@ class TransliterationSideInput
     );
   }
 
-  /** @throws Exception */
   function saveToDb(mysqli $connection, string $mainIdentifier, int $version): bool
   {
-    // FIXME: save this!
-    execute_query_with_connection(
-      $connection,
-      insertTransliterationSideQuery,
-      fn(mysqli_stmt $stmt) => $stmt->bind_param('sisi', $mainIdentifier, $this->sideIndex, $this->side, $version),
-      fn(mysqli_stmt $_result) => true
-    );
+    try {
+      execute_query_with_connection(
+        $connection,
+        TransliterationSideInput::insertQuery,
+        fn(mysqli_stmt $stmt) => $stmt->bind_param('sisi', $mainIdentifier, $this->sideIndex, $this->side, $version),
+        fn(mysqli_stmt $_result) => true
+      );
+    } catch (Exception $e) {
+      error_log('Could not insert transliteration side: ' . $e->getMessage());
+      return false;
+    }
 
     return array_reduce(
       $this->columns,

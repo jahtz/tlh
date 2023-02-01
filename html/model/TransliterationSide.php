@@ -11,10 +11,10 @@ use GraphQL\Type\Definition\{ObjectType, Type};
 use mysqli_result;
 use mysqli_stmt;
 
-const selectTransliterationSideSql = "select main_identifier, side_index, version, side from tlh_dig_transliteration_sides where main_identifier = ?;";
-
 class TransliterationSide
 {
+  const selectForManuscriptQuery = "select main_identifier, side_index, version, side from tlh_dig_transliteration_sides where main_identifier = ?;";
+
   static ObjectType $graphQLObjectType;
 
   public string $manuscriptIdentifier;
@@ -35,10 +35,10 @@ class TransliterationSide
   {
     try {
       return execute_select_query(
-        selectTransliterationSideSql,
+        TransliterationSide::selectForManuscriptQuery,
         fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
         fn(mysqli_result $result): array => array_map(
-          fn(array $row): TransliterationSide => new TransliterationSide($row['main_identifier'], $row['sideIndex'], $row['version'], $row['side']),
+          fn(array $row): TransliterationSide => new TransliterationSide($row['main_identifier'], $row['side_index'], $row['version'], $row['side']),
           $result->fetch_all(MYSQLI_ASSOC)
         )
       );

@@ -16,12 +16,12 @@ const columnName = 'column';
 const columnModifierName = 'columnModifier';
 const linesName = 'lines';
 
-const insertTransliterationColumnQuery = "
+class TransliterationColumnInput
+{
+  const insertQuery = "
 insert into tlh_dig_transliteration_columns (main_identifier, side_index, version, column_index, manuscript_column, column_modifier)
 values (?, ?, ?, ?, ?, ?);";
 
-class TransliterationColumnInput
-{
   static InputObjectType $graphQLInputObjectType;
 
   public int $columIndex;
@@ -48,16 +48,19 @@ class TransliterationColumnInput
     );
   }
 
-  /** @throws Exception */
   function saveToDb(mysqli $conn, string $mainIdentifier, int $sideIndex, int $version): bool
   {
-    // FIXME: save this!
-    execute_query_with_connection(
-      $conn,
-      insertTransliterationColumnQuery,
-      fn(mysqli_stmt $stmt) => $stmt->bind_param('siiiss', $mainIdentifier, $sideindex, $version, $this->columIndex, $this->column, $this->columnModifier),
-      fn(mysqli_stmt $_result) => true
-    );
+    try {
+      execute_query_with_connection(
+        $conn,
+        TransliterationColumnInput::insertQuery,
+        fn(mysqli_stmt $stmt) => $stmt->bind_param('siiiss', $mainIdentifier, $sideIndex, $version, $this->columIndex, $this->column, $this->columnModifier),
+        fn(mysqli_stmt $_result) => true
+      );
+    } catch (Exception $e) {
+      error_log('Could not insert transliteration column: ' . $e->getMessage());
+      return false;
+    }
 
     return array_reduce(
       $this->lines,

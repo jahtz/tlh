@@ -11,13 +11,14 @@ use GraphQL\Type\Definition\{ObjectType, Type};
 use mysqli_result;
 use mysqli_stmt;
 
-const selectTransliterationColumnSql = "
+
+class TransliterationColumn
+{
+  const selectForSideQuery = "
 select main_identifier, side_index, version, column_index, manuscript_column, column_modifier
     from tlh_dig_transliteration_columns
     where main_identifier = ? and side_index = ? and version = ?;";
 
-class TransliterationColumn
-{
   static ObjectType $graphQLObjectType;
 
   public string $mainIdentifier;
@@ -42,7 +43,7 @@ class TransliterationColumn
   {
     try {
       return execute_select_query(
-        selectTransliterationColumnSql,
+        TransliterationColumn::selectForSideQuery,
         fn(mysqli_stmt $stmt) => $stmt->bind_param('sii', $mainIdentifier, $sideIndex, $version),
         fn(mysqli_result $result): array => array_map(
           fn(array $row): TransliterationColumn => new TransliterationColumn($row['main_identifier'], $row['side_index'], $row['version'], $row['column_index'], $row['manuscript_column'], $row['column_modifier']),

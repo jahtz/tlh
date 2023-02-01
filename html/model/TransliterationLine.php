@@ -10,14 +10,14 @@ use GraphQL\Type\Definition\{ObjectType, Type};
 use mysqli_result;
 use mysqli_stmt;
 
-const selectTransliterationLineSql = "
+class TransliterationLine
+{
+  const selectForColumnQuery = "
 select input_index, line_number, line_number_is_confirmed, input, result 
   from tlh_dig_transliteration_lines 
   where main_identifier = ? and side_index = ? and version = ? and column_index = ?;";
 
 
-class TransliterationLine
-{
   static ObjectType $graphQLObjectType;
 
   public int $inputIndex;
@@ -38,7 +38,7 @@ class TransliterationLine
   {
     try {
       return execute_select_query(
-        selectTransliterationLineSql,
+        TransliterationLine::selectForColumnQuery,
         fn(mysqli_stmt $stmt): bool => $stmt->bind_param('siii', $mainIdentifier, $sideIndex, $version, $columnIndex),
         fn(mysqli_result $result): array => array_map(
           fn(array $x): TransliterationLine => new TransliterationLine($x['input_index'], new LineNumber($x['line_number'], $x['line_number_is_confirmed']), $x['input'], $x['result']),

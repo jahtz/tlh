@@ -90,7 +90,7 @@ $manuscriptMutationsType = new ObjectType([
 
         $sideInputs = array_map(fn(array $sideInput): TransliterationSideInput => TransliterationSideInput::fromGraphQLInput($sideInput), $args['values']);
 
-        error_log(json_encode($sideInputs, JSON_PRETTY_PRINT));
+        // error_log(json_encode($sideInputs, JSON_PRETTY_PRINT));
 
         $allSaved = true;
 
@@ -101,12 +101,15 @@ $manuscriptMutationsType = new ObjectType([
             $allSaved = $allSaved && $transliterationSide->saveToDb($connection, $mainIdentifier, $version);
           }
 
+          error_log("All saved: " . ($allSaved ? '1' : '0'));
+
           if ($allSaved) {
             $connection->commit();
           } else {
             $connection->rollback();
           }
         } catch (mysqli_sql_exception $e) {
+          error_log($e->getMessage());
           $connection->rollback();
         }
 

@@ -15,12 +15,14 @@ const inputName = 'input';
 const lineNumberName = 'lineNumber';
 const resultName = 'result';
 
-const insertTransliterationLineQuery = "
-insert into tlh_dig_transliteration_lines (main_identifier, side_index, version, column_index, input_index, line_number, line_number_is_confirmed, input, result)
-values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
 class TransliterationLineInput
 {
+  const insertQuery = "
+insert into tlh_dig_transliteration_lines (main_identifier, side_index, version, column_index, input_index, line_number, line_number_is_confirmed, input, result)
+values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+
   static InputObjectType $graphQLInputObjectType;
 
   public int $lineIndex;
@@ -47,14 +49,14 @@ class TransliterationLineInput
     try {
       return execute_query_with_connection(
         $conn,
-        insertTransliterationLineQuery,
+        TransliterationLineInput::insertQuery,
         fn(mysqli_stmt $stmt) => $stmt->bind_param('siiiiiiss',
           $mainIdentifier, $sideIndex, $version, $columnIndex, $this->lineIndex, $this->lineNumber->lineNumber, $this->lineNumber->isConfirmed, $this->input, $this->result
         ),
         fn(mysqli_stmt $_stmt) => true
       );
     } catch (Exception $e) {
-      error_log("Could not insert transliteration into db: " . $e->getMessage());
+      error_log("Could not insert transliteration line into db: " . $e->getMessage());
       return false;
     }
   }
