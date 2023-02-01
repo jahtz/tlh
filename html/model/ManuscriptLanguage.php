@@ -4,6 +4,9 @@ namespace model;
 
 use GraphQL\Type\Definition\{ObjectType, Type};
 
+const nameName = 'name';
+const abbreviationName = 'abbreviation';
+
 class ManuscriptLanguage
 {
   static ObjectType $graphQLType;
@@ -21,12 +24,12 @@ class ManuscriptLanguage
 ManuscriptLanguage::$graphQLType = new ObjectType([
   'name' => 'ManuscriptLanguage',
   'fields' => [
-    'name' => [
-      'name' => Type::nonNull(Type::string()),
+    nameName => [
+      'type' => Type::nonNull(Type::string()),
       'resolve' => fn(ManuscriptLanguage $language): string => $language->name
     ],
-    'abbreviation' => [
-      'name' => Type::nonNull(Type::string()),
+    abbreviationName => [
+      'type' => Type::nonNull(Type::string()),
       'resolve' => fn(ManuscriptLanguage $language): string => $language->abbreviation
     ]
   ]
@@ -34,7 +37,7 @@ ManuscriptLanguage::$graphQLType = new ObjectType([
 
 function allManuscriptLanguages(): array
 {
-  return array(
+  return [
     new ManuscriptLanguage('Hittite', 'Hit'),
     new ManuscriptLanguage('Luwian', 'Luw'),
     new ManuscriptLanguage('Palaic', 'Pal'),
@@ -42,5 +45,5 @@ function allManuscriptLanguages(): array
     new ManuscriptLanguage('Hurrian', 'Hur'),
     new ManuscriptLanguage('Akkadian', 'Akk'),
     new ManuscriptLanguage('Sumerian', 'Sum')
-  );
+  ];
 }

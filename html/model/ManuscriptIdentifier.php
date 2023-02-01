@@ -2,12 +2,12 @@
 
 namespace model;
 
-use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
+require_once __DIR__ . '/ManuscriptIdentifierType.php';
 
-$manuscriptIdentifierTypeGraphQLEnumType = new EnumType([
-  'name' => 'ManuscriptIdentifierType',
-  'values' => ['ExcavationNumber', 'CollectionNumber', 'PublicationShortReference']
-]);
+use GraphQL\Type\Definition\{InputObjectType, ObjectType, Type};
+
+const identifierTypeName = 'identifierType';
+const identifierName = 'identifier';
 
 class ManuscriptIdentifier
 {
@@ -25,7 +25,7 @@ class ManuscriptIdentifier
 
   static function fromGraphQLInput(array $input): ManuscriptIdentifier
   {
-    return new ManuscriptIdentifier($input['identifierType'], $input['identifier']);
+    return new ManuscriptIdentifier($input[identifierTypeName], $input[identifierName]);
   }
 
   static function fromDbAssocArray(array $row): ManuscriptIdentifier
@@ -37,15 +37,21 @@ class ManuscriptIdentifier
 ManuscriptIdentifier::$graphQLType = new ObjectType([
   'name' => 'ManuscriptIdentifier',
   'fields' => [
-    'identifierType' => Type::nonNull($manuscriptIdentifierTypeGraphQLEnumType),
-    'identifier' => Type::nonNull(Type::string())
+    identifierTypeName => [
+      'type' => Type::nonNull(ManuscriptIdentifierType::$graphQLType),
+      'resolve' => fn(ManuscriptIdentifier $manuscriptIdentifier): string => $manuscriptIdentifier->identifierType
+    ],
+    identifierName => [
+      'type' => Type::nonNull(Type::string()),
+      'resolve' => fn(ManuscriptIdentifier $manuscriptIdentifier): string => $manuscriptIdentifier->identifier
+    ]
   ]
 ]);
 
 ManuscriptIdentifier::$graphQLInputObjectType = new InputObjectType([
   'name' => 'ManuscriptIdentifierInput',
   'fields' => [
-    'identifierType' => Type::nonNull($manuscriptIdentifierTypeGraphQLEnumType),
-    'identifier' => Type::nonNull(Type::string())
+    identifierTypeName => Type::nonNull(ManuscriptIdentifierType::$graphQLType),
+    identifierName => Type::nonNull(Type::string())
   ]
 ]);

@@ -16,7 +16,6 @@ select main_identifier, side_index, version, column_index, manuscript_column, co
     from tlh_dig_transliteration_columns
     where main_identifier = ? and side_index = ? and version = ?;";
 
-
 class TransliterationColumn
 {
   static ObjectType $graphQLObjectType;

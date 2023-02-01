@@ -49,7 +49,6 @@ class TransliterationLine
       return [];
     }
   }
-
 }
 
 TransliterationLine::$graphQLObjectType = new ObjectType([
@@ -64,11 +63,11 @@ TransliterationLine::$graphQLObjectType = new ObjectType([
       'resolve' => fn(TransliterationLine $line): ?LineNumber => $line->lineNumber
     ],
     'input' => [
-      'type' => Type::string(),
+      'type' => Type::nonNull(Type::string()),
       'resolve' => fn(TransliterationLine $line): string => $line->input
     ],
     'result' => [
-      'type' => Type::nonNull(Type::string()),
+      'type' => Type::string(),
       'resolve' => fn(TransliterationLine $line): ?string => $line->result
     ]
   ]

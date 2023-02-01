@@ -15,7 +15,7 @@ const inputName = 'input';
 const lineNumberName = 'lineNumber';
 const resultName = 'result';
 
-const insertSql = "
+const insertTransliterationLineQuery = "
 insert into tlh_dig_transliteration_lines (main_identifier, side_index, version, column_index, input_index, line_number, line_number_is_confirmed, input, result)
 values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
@@ -47,7 +47,7 @@ class TransliterationLineInput
     try {
       return execute_query_with_connection(
         $conn,
-        insertSql,
+        insertTransliterationLineQuery,
         fn(mysqli_stmt $stmt) => $stmt->bind_param('siiiiiiss',
           $mainIdentifier, $sideIndex, $version, $columnIndex, $this->lineIndex, $this->lineNumber->lineNumber, $this->lineNumber->isConfirmed, $this->input, $this->result
         ),

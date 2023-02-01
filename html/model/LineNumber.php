@@ -4,6 +4,8 @@ namespace model;
 
 use GraphQL\Type\Definition\{InputObjectType, ObjectType, Type};
 
+const numberName = 'number';
+const isConfirmedName = 'isConfirmed';
 
 class LineNumber
 {
@@ -21,22 +23,28 @@ class LineNumber
 
   static function fromGraphQLInput(array $input): LineNumber
   {
-    return new LineNumber($input['number'], $input['isConfirmed']);
+    return new LineNumber($input[numberName], $input[isConfirmedName]);
   }
 }
 
 LineNumber::$graphQLObjectType = new ObjectType([
   'name' => 'LineNumber',
   'fields' => [
-    'number' => Type::nonNull(Type::int()),
-    'isConfirmed' => Type::nonNull(Type::boolean())
+    numberName => [
+      'type' => Type::nonNull(Type::int()),
+      'resolve' => fn(LineNumber $lineNumber): int => $lineNumber->lineNumber
+    ],
+    isConfirmedName => [
+      'type' => Type::nonNull(Type::boolean()),
+      'resolve' => fn(LineNumber $lineNumber): bool => $lineNumber->isConfirmed
+    ]
   ]
 ]);
 
 LineNumber::$graphQLInputObjectType = new InputObjectType([
   'name' => 'LineNumberInput',
   'fields' => [
-    'number' => Type::nonNull(Type::int()),
-    'isConfirmed' => Type::nonNull(Type::boolean())
+    numberName => Type::nonNull(Type::int()),
+    isConfirmedName => Type::nonNull(Type::boolean())
   ]
 ]);
