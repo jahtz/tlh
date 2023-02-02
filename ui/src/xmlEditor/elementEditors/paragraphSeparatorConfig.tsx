@@ -23,8 +23,7 @@ const separatorTypes: ('parsep' | 'parsep_dbl')[] = ['parsep', 'parsep_dbl'];
 function ParagraphSeparatorEditor({data, updateEditedNode}: XmlEditableNodeIProps<XmlElementNode<'parsep' | 'parsep_dbl'>>): JSX.Element {
 
   return (
-    <select className="p-2 rounded border border-slate-500 bg-white w-full"
-            defaultValue={data.tagName}
+    <select className="p-2 rounded border border-slate-500 bg-white w-full" defaultValue={data.tagName}
             onChange={(event) => updateEditedNode({tagName: {$set: event.target.value as 'parsep' | 'parsep_dbl'}})}>
       {separatorTypes.map((st) => <option key={st}>{st}</option>)}
     </select>
