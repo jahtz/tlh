@@ -22,7 +22,7 @@ describe('sumerogrammParser', () => testParser<Sumerogramm>('sumerogramm', sumer
   {source: 'NINDA', awaitedResult: sGr('NINDA')},
   {source: 'LUGAL', awaitedResult: sGr('LUGAL')},
 
-  // GIŠ.°D°INANNA start with <sGr>GIŠ.</sGr> and continues with <det>D</det>!
+  // GIŠ.°D°INANNA start with <sGr>GIŠ.</sGr> and continues with <d>D</d>!
   // {source: 'GIŠ.', awaitedResult: sGr('GIŠ.')},
 
   {source: 'NINDA.GUR.RA', awaitedResult: sGr('NINDA.GUR.RA')},
@@ -31,8 +31,8 @@ describe('sumerogrammParser', () => testParser<Sumerogramm>('sumerogramm', sumer
 
   {source: 'INANNA', awaitedResult: sGr('INANNA')},
 
-  // {source: 'DUMU°MEŠ°.É.GAL', awaitedResult: sGr('DUMU'), det('MEŠ'), sGr('.É.GAL'))},
+  // {source: 'DUMU°MEŠ°.É.GAL', awaitedResult: sGr('DUMU'), d('MEŠ'), sGr('.É.GAL'))},
 
   // Sumerogramm im Wortinneren
-  // {source: '°m°mur-ši--DINGIR-LIM', awaitedResult: w(det('m'), 'mur-ši-', sGr('DINGIR'), aGr('-LIM'))},
+  // {source: '°m°mur-ši--DINGIR-LIM', awaitedResult: w(d('m'), 'mur-ši-', sGr('DINGIR'), aGr('-LIM'))},
 ]));

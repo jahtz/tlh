@@ -49,7 +49,7 @@ export function readMergeDocument(rootNode: XmlElementNode): MergeDocument {
   });
 
   const headerElement: XmlElementNode | undefined = findFirstXmlElementByTagName(rootNode, 'AOHeader');
-  if(headerElement) {
+  if (headerElement) {
     result.header = headerElement;
   }
 
@@ -60,7 +60,7 @@ export function mergeLines(mls: ZipWithOffsetResult<MergeLine>): MergeLine[] {
   return mls.map(([left, right]) => {
     if (left && right) {
       return mergeLine(left, right);
-    } else if (left && right == null ) {
+    } else if (left && right == null) {
       return left;
     } else if (right && left == null) {
       return right;
@@ -122,7 +122,7 @@ function parsePublicationMapping(txtPublication: string, publMap: Map<string, st
     publName = txtPublication;
   }
   const indices = [];
-  for (const value of Array.from(publMap.values())){
+  for (const value of Array.from(publMap.values())) {
     indices.push(value[0]);
   }
   while (indices.includes(publNumber.toString())) {
@@ -134,38 +134,38 @@ function parsePublicationMapping(txtPublication: string, publMap: Map<string, st
 }
 
 export function mergeHeader(firstDocumentHeader: XmlElementNode, secondDocumentHeader: XmlElementNode) {
-    secondDocumentHeader.tagName = 'doc';
-    secondDocumentHeader.children.forEach((node) => {
-      if(isXmlElementNode(node) && node.tagName === 'docID') {
-        node.tagName = 'mDocID';
-      }
-    });
-    const meta = findFirstXmlElementByTagName(firstDocumentHeader, 'meta');
-    if (meta?.children) {
-      const merged = xmlElementNode<'merged'>('merged');
-      merged.children.push(secondDocumentHeader);
-      meta.children.push(merged);
+  secondDocumentHeader.tagName = 'doc';
+  secondDocumentHeader.children.forEach((node) => {
+    if (isXmlElementNode(node) && node.tagName === 'docID') {
+      node.tagName = 'mDocID';
     }
-    return firstDocumentHeader;
+  });
+  const meta = findFirstXmlElementByTagName(firstDocumentHeader, 'meta');
+  if (meta?.children) {
+    const merged = xmlElementNode<'merged'>('merged');
+    merged.children.push(secondDocumentHeader);
+    meta.children.push(merged);
+  }
+  return firstDocumentHeader;
 }
 
 export function replaceLNR(node: XmlElementNode, publicationMap: Map<string, string[]>) {
-  let textLine:string = node.attributes['lnr'] ? node.attributes['lnr'] : 'empty';
+  let textLine: string = node.attributes['lnr'] ? node.attributes['lnr'] : 'empty';
 
 
   const lineMatch = textLine.match(lineNumberRegexNew);
-  if(textLine && lineMatch && lineMatch.groups) {
+  if (textLine && lineMatch && lineMatch.groups) {
     let lineIndex = lineMatch.groups.index;
-    if(lineIndex.includes('+')) {
+    if (lineIndex.includes('+')) {
       const lineIndices = lineIndex.split('+');
-      if(lineIndices.length == 2 && publicationMap.get(lineIndices[1]) && publicationMap.get(lineIndices[0])) {
+      if (lineIndices.length == 2 && publicationMap.get(lineIndices[1]) && publicationMap.get(lineIndices[0])) {
         lineIndices[1] = lineIndices[1].replace(lineIndices[1], publicationMap.get(lineIndices[1])![0]);
         lineIndices[0] = lineIndices[0].replace(lineIndices[0].substring(1), publicationMap.get(lineIndices[0]?.substring(1))![0]);
         lineIndex = lineIndices.join('+');
       }
     } else {
 
-      if(publicationMap.get(lineIndex.substring(1)) === undefined) {
+      if (publicationMap.get(lineIndex.substring(1)) === undefined) {
         console.log(publicationMap);
         console.log(node);
         console.log(textLine);
@@ -179,7 +179,7 @@ export function replaceLNR(node: XmlElementNode, publicationMap: Map<string, str
   } else {
     textLine = '{€' + Array.from(publicationMap.values()).pop()![0] + '}' + textLine;
   }
-  return  textLine;
+  return textLine;
 }
 
 export function resetPublicationMap(publMap: Map<string, string[]>) {
@@ -190,7 +190,7 @@ export function resetPublicationMap(publMap: Map<string, string[]>) {
     if (index.toString() != mapping[0]) {
       updatedMappings.set(index, mapping[0]);
     }
-    });
+  });
   if (updatedMappings!) {
     Array.from(updatedMappings.entries()).map((mapping) => {
       publMap.set(mapping[1], publMap.get(mapping[0])!);

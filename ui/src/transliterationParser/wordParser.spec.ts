@@ -1,7 +1,7 @@
 import {wordParser} from './wordParser';
 import {parsedWord as w} from '../transliterationParser/wordParser';
 import {akkadogramm as aGr, sumerogramm as sGr} from './foreignWordsParser';
-import {determinativ as det} from './determinativeParser';
+import {determinativ as d} from './determinativeParser';
 import {XmlElementNode} from '../xmlModel/xmlModel';
 import {testParser} from './parserBasics';
 
@@ -23,11 +23,11 @@ describe('word', () => testParser<Word>('word', wordParser, [
   {source: 'LUGAL', awaitedResult: w(sGr('LUGAL'))},
   {source: 'LUGAL-uš', awaitedResult: w(sGr('LUGAL'), '-uš')},
   {source: 'NINDA.GUR4.RA', awaitedResult: w(sGr('NINDA.GUR₄.RA'))},
-  {source: 'GIŠ.°D°INANNA', awaitedResult: w(sGr('GIŠ.'), det('D'), sGr('INANNA'))},
-  {source: 'DUMU°MEŠ°.É.GAL', awaitedResult: w(sGr('DUMU'), det('MEŠ'), sGr('.É.GAL'))},
+  {source: 'GIŠ.°D°INANNA', awaitedResult: w(sGr('GIŠ.'), d('D'), sGr('INANNA'))},
+  {source: 'DUMU°MEŠ°.É.GAL', awaitedResult: w(sGr('DUMU'), d('MEŠ'), sGr('.É.GAL'))},
 
   // Sumerogramm im Wortinneren
-  {source: '°m°mur-ši--DINGIR-LIM', awaitedResult: w(det('m'), 'mur-ši-', sGr('DINGIR'), aGr('-LIM'))},
+  {source: '°m°mur-ši--DINGIR-LIM', awaitedResult: w(d('m'), 'mur-ši-', sGr('DINGIR'), aGr('-LIM'))},
 
   // Akkadogramm
   {source: '_ŠI-PÁT', awaitedResult: w(aGr('ŠI-PÁT'))},
@@ -37,17 +37,17 @@ describe('word', () => testParser<Word>('word', wordParser, [
   // Akkadische Präposition
   // FIXME: prepending a preposition with '~' is not yet supported...
   {source: '_A-NA~É.GAL', awaitedResult: w(aGr('A-NA'), ' ', sGr('É.GAL'))},
-  {source: '_I-NA~°GIŠ°MA.ṢÁ.AB', awaitedResult: w(aGr('IŠ-TU'), ' ', det('GIŠ'), sGr('MA.SÁ.AB'))},
+  {source: '_I-NA~°GIŠ°MA.ṢÁ.AB', awaitedResult: w(aGr('IŠ-TU'), ' ', d('GIŠ'), sGr('MA.SÁ.AB'))},
 
   // Determinativ
-  {source: '°MUNUS°', awaitedResult: w(det('MUNUS'))},
-  {source: '°MUNUS°ŠU.GI', awaitedResult: w(det('MUNUS'), sGr('ŠU.GI'))},
-  {source: 'DINGIR°MEŠ°', awaitedResult: w(sGr('DINGIR'), det('MEŠ'))},
-  {source: 'DINGIR°MEŠ°-aš', awaitedResult: w(sGr('DINGIR'), det('MEŠ'), '-aš')},
-  {source: '°m°ḫa-at-tu-ši-li', awaitedResult: w(det('m'), 'ḫa-at-tu-ši-li')},
-  {source: '°NA4°ḫu-wa-ši-ia', awaitedResult: w(det('NA₄'), 'ḫu-wa-ši-ia')},
-  {source: '°LÚ.MEŠ°MUḪALDIM', awaitedResult: w(det('LÚ.MEŠ'), sGr('MUḪALDIM'))},
-  {source: '°m.D°IŠKUR-šar-ru-um-ma', awaitedResult: w(det('m.D'), sGr('IŠKUR'), '-šar-ru-um-ma')},
+  {source: '°MUNUS°', awaitedResult: w(d('MUNUS'))},
+  {source: '°MUNUS°ŠU.GI', awaitedResult: w(d('MUNUS'), sGr('ŠU.GI'))},
+  {source: 'DINGIR°MEŠ°', awaitedResult: w(sGr('DINGIR'), d('MEŠ'))},
+  {source: 'DINGIR°MEŠ°-aš', awaitedResult: w(sGr('DINGIR'), d('MEŠ'), '-aš')},
+  {source: '°m°ḫa-at-tu-ši-li', awaitedResult: w(d('m'), 'ḫa-at-tu-ši-li')},
+  {source: '°NA4°ḫu-wa-ši-ia', awaitedResult: w(d('NA₄'), 'ḫu-wa-ši-ia')},
+  {source: '°LÚ.MEŠ°MUḪALDIM', awaitedResult: w(d('LÚ.MEŠ'), sGr('MUḪALDIM'))},
+  {source: '°m.D°IŠKUR-šar-ru-um-ma', awaitedResult: w(d('m.D'), sGr('IŠKUR'), '-šar-ru-um-ma')},
 
   // Eingeschrieben Zeichen
   {source: 'KAxU', awaitedResult: w(sGr('KA×U'))},

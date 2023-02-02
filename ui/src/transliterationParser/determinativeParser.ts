@@ -3,9 +3,9 @@ import {xmlElementNode, XmlElementNode, XmlNonEmptyNode, xmlTextNode} from '../x
 import {clearUpperMultiStringContent, upperText} from './parserBasics';
 import {optionalIndexNumber} from './indexNumberParser';
 
-export type Determinative = XmlElementNode<'det'>
+export type Determinative = XmlElementNode<'d'>
 
-export const determinativ = (...content: (XmlNonEmptyNode | string)[]) => xmlElementNode('det', {}, content.map(clearUpperMultiStringContent));
+export const determinativ = (...content: (XmlNonEmptyNode | string)[]): Determinative => xmlElementNode('d', {}, content.map(clearUpperMultiStringContent));
 
 const determinativeFollowingSyllable: Parser<string> = seqMap(
   string('.'),
