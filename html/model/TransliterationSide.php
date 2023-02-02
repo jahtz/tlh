@@ -38,7 +38,7 @@ class TransliterationSide
         TransliterationSide::selectForManuscriptQuery,
         fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
         fn(mysqli_result $result): array => array_map(
-          fn(array $row): TransliterationSide => new TransliterationSide($row['main_identifier'], $row['side_index'], $row['version'], $row['side']),
+          fn(array $row): TransliterationSide => new TransliterationSide((string)$row['main_identifier'], (int)$row['side_index'], (int)$row['version'], (string)$row['side']),
           $result->fetch_all(MYSQLI_ASSOC)
         )
       );

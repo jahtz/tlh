@@ -41,7 +41,7 @@ select input_index, line_number, line_number_is_confirmed, input, result
         TransliterationLine::selectForColumnQuery,
         fn(mysqli_stmt $stmt): bool => $stmt->bind_param('siii', $mainIdentifier, $sideIndex, $version, $columnIndex),
         fn(mysqli_result $result): array => array_map(
-          fn(array $x): TransliterationLine => new TransliterationLine($x['input_index'], new LineNumber($x['line_number'], $x['line_number_is_confirmed']), $x['input'], $x['result']),
+          fn(array $x): TransliterationLine => new TransliterationLine((int)$x['input_index'], new LineNumber((int)$x['line_number'], (bool)$x['line_number_is_confirmed']), (string)$x['input'], $x['result']),
           $result->fetch_all(MYSQLI_ASSOC)
         )
       );

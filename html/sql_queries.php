@@ -126,7 +126,7 @@ function allManuscriptsCount(): int
       }
     );
   } catch (Exception $e) {
-    error_log($e);
+    error_log($e->getMessage());
     return -1;
   }
 }
@@ -156,7 +156,7 @@ function allManuscriptMetaData(int $paginationSize, int $page): array
       )
     );
   } catch (Exception $e) {
-    error_log($e);
+    error_log($e->getMessage());
     return [];
   }
 }
@@ -178,7 +178,7 @@ function manuscriptMetaDataById(string $mainIdentifier): ?ManuscriptMetaData
         return $fetched ? ManuscriptMetaData::fromDbAssocArray($fetched) : null;
       });
   } catch (Exception $e) {
-    error_log($e);
+    error_log($e->getMessage());
     return null;
   }
 }
@@ -250,13 +250,15 @@ values (?, ?, ?)");
   $mainIdentifier = $mmd->mainIdentifier->identifier;
 
   $allOtherIdentifiersInserted = true;
-  foreach ($mmd->otherIdentifiers as $identifier) {
-    $otherIdentifierInsertStatement->bind_param('sss', $mainIdentifier, $identifier->identifier, $identifier->identifierType);
+  if (!is_null($mmd->otherIdentifiers)) {
+    foreach ($mmd->otherIdentifiers as $identifier) {
+      $otherIdentifierInsertStatement->bind_param('sss', $mainIdentifier, $identifier->identifier, $identifier->identifierType);
 
-    if (!$otherIdentifierInsertStatement->execute()) {
-      error_log("Could not insert other identifier " . json_encode($identifier) . " into database: " . $otherIdentifierInsertStatement->error);
+      if (!$otherIdentifierInsertStatement->execute()) {
+        error_log("Could not insert other identifier " . json_encode($identifier) . " into database: " . $otherIdentifierInsertStatement->error);
 
-      $allOtherIdentifiersInserted = false;
+        $allOtherIdentifiersInserted = false;
+      }
     }
   }
 

@@ -46,7 +46,7 @@ select main_identifier, side_index, version, column_index, manuscript_column, co
         TransliterationColumn::selectForSideQuery,
         fn(mysqli_stmt $stmt) => $stmt->bind_param('sii', $mainIdentifier, $sideIndex, $version),
         fn(mysqli_result $result): array => array_map(
-          fn(array $row): TransliterationColumn => new TransliterationColumn($row['main_identifier'], $row['side_index'], $row['version'], $row['column_index'], $row['manuscript_column'], $row['column_modifier']),
+          fn(array $row): TransliterationColumn => new TransliterationColumn((string)$row['main_identifier'], (int)$row['side_index'], (int)$row['version'], (int)$row['column_index'], (string)$row['manuscript_column'], (string)$row['column_modifier']),
           $result->fetch_all(MYSQLI_ASSOC)
         )
       );

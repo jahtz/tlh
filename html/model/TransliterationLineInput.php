@@ -46,12 +46,21 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
   function saveToDb(mysqli $conn, string $mainIdentifier, int $sideIndex, int $version, int $columnIndex): bool
   {
+
+    $lineNumber = null;
+    $lineNumberIsConfirmed = null;
+
+    if (!is_null($this->lineNumber)) {
+      $lineNumber = $this->lineNumber->lineNumber;
+      $lineNumberIsConfirmed = $this->lineNumber->isConfirmed;
+    }
+
     try {
       return execute_query_with_connection(
         $conn,
         TransliterationLineInput::insertQuery,
         fn(mysqli_stmt $stmt) => $stmt->bind_param('siiiiiiss',
-          $mainIdentifier, $sideIndex, $version, $columnIndex, $this->lineIndex, $this->lineNumber->lineNumber, $this->lineNumber->isConfirmed, $this->input, $this->result
+          $mainIdentifier, $sideIndex, $version, $columnIndex, $this->lineIndex, $lineNumber, $lineNumberIsConfirmed, $this->input, $this->result
         ),
         fn(mysqli_stmt $_stmt) => true
       );

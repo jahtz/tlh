@@ -29,9 +29,7 @@ class ManuscriptMetaData
   static InputObjectType $graphQLInputObjectType;
 
   public ManuscriptIdentifier $mainIdentifier;
-  /**
-   * @var ManuscriptIdentifier[] | null
-   */
+  /** @var ManuscriptIdentifier[] | null */
   public ?array $otherIdentifiers;
   public string $palaeographicClassification;
   public bool $palaeographicClassificationSure;
@@ -83,7 +81,7 @@ class ManuscriptMetaData
   static function fromGraphQLInput(array $input, string $creatorUsername): ManuscriptMetaData
   {
     $otherIdentifiers = array_key_exists('otherIdentifiers', $input)
-      ? array_map(fn($x) => ManuscriptIdentifier::fromGraphQLInput($x), $input['otherIdentifiers'])
+      ? array_map(fn(array $x): ManuscriptIdentifier => ManuscriptIdentifier::fromGraphQLInput($x), $input['otherIdentifiers'])
       : null;
 
     return new ManuscriptMetaData(

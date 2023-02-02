@@ -16,6 +16,7 @@ use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
 use model\{ManuscriptLanguage, ManuscriptMetaData, TransliterationSideInput, User};
+use phpDocumentor\Reflection\Types\Null_;
 use ReallySimpleJWT\Token;
 use function model\allManuscriptLanguages;
 
@@ -42,14 +43,14 @@ $queryType = new ObjectType([
         'paginationSize' => Type::nonNull(Type::int()),
         'page' => Type::nonNull(Type::int())
       ],
-      'resolve' => fn($_rootValue, array $args): array => allManuscriptMetaData($args['paginationSize'], $args['page'])
+      'resolve' => fn(Null_ $_rootValue, array $args): array => allManuscriptMetaData($args['paginationSize'], $args['page'])
     ],
     'manuscript' => [
       'type' => ManuscriptMetaData::$graphQLType,
       'args' => [
         'mainIdentifier' => Type::nonNull(Type::string())
       ],
-      'resolve' => fn($_rootValue, array $args): ?ManuscriptMetaData => manuscriptMetaDataById($args['mainIdentifier'])
+      'resolve' => fn(Null_ $_rootValue, array $args): ?ManuscriptMetaData => manuscriptMetaDataById($args['mainIdentifier'])
     ]
   ]
 ]);
@@ -74,14 +75,9 @@ function selectNextManuscriptTransliterationVersion(mysqli $conn, string $mainId
     return null;
   }
 
-  $currentVersion = $nextVersionStatement->get_result()->fetch_assoc()['max_version'];
+  $currentVersion = (int)$nextVersionStatement->get_result()->fetch_assoc()['max_version'];
 
   $nextVersionStatement->close();
-
-  if (!is_int($currentVersion)) {
-    error_log("Could not query next version from database!");
-    return null;
-  }
 
   return $currentVersion + 1;
 }
@@ -100,6 +96,10 @@ $manuscriptMutationsType = new ObjectType([
         $connection = connect_to_db();
 
         $version = selectNextManuscriptTransliterationVersion($connection, $mainIdentifier);
+
+        if ($version === null) {
+          throw new Exception("Could not select next version...");
+        }
 
         $sideInputs = array_map(fn(array $sideInput): TransliterationSideInput => TransliterationSideInput::fromGraphQLInput($sideInput), $args['values']);
 
@@ -142,7 +142,7 @@ $loggedInUserMutationsType = new ObjectType([
       'args' => [
         'values' => ManuscriptMetaData::$graphQLInputObjectType
       ],
-      'resolve' => function (string $username, array $args): ?string {
+      'resolve' => function (string $username, array $args): string {
         $manuscript = ManuscriptMetaData::fromGraphQLInput($args['values'], $username);
 
         $manuscriptIdentifier = $manuscript->mainIdentifier->identifier;
@@ -229,7 +229,7 @@ $mutationType = new ObjectType([
         'userInput' => Type::nonNull(User::$graphQLInputObjectType)
       ],
       'type' => Type::string(),
-      'resolve' => fn($_rootValue, array $args) => register($args)
+      'resolve' => fn(Null_ $_rootValue, array $args) => register($args)
     ],
     'login' => [
       'args' => [
@@ -237,11 +237,11 @@ $mutationType = new ObjectType([
         'password' => Type::nonNull(Type::string())
       ],
       'type' => Type::string(),
-      'resolve' => fn($_rootValue, array $args) => verifyUser($args['username'], $args['password'])
+      'resolve' => fn(Null_ $_rootValue, array $args) => verifyUser($args['username'], $args['password'])
     ],
     'me' => [
       'type' => $loggedInUserMutationsType,
-      'resolve' => fn($_rootValue, array $_args): ?string => resolveUser()
+      'resolve' => fn(Null_ $_rootValue, array $_args): ?string => resolveUser()
     ]
   ]
 ]);
@@ -278,7 +278,7 @@ try {
     ];
   }
 } catch (Throwable $e) {
-  error_log($e);
+  error_log($e->getMessage());
 
   $output = [
     'data' => null,
