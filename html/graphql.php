@@ -54,11 +54,18 @@ $queryType = new ObjectType([
   ]
 ]);
 
+const  nextVersionSql = "select max(version) as max_version from tlh_dig_transliteration_lines where main_identifier = ?;";
+
 function selectNextManuscriptTransliterationVersion(mysqli $conn, string $mainIdentifier): ?int
 {
-  $nextVersionSql = "select max(version) as max_version from tlh_dig_transliteration_lines where main_identifier = ?;";
+  // TODO: move to sql queries!
+  $nextVersionStatement = $conn->prepare(nextVersionSql);
 
-  $nextVersionStatement = $conn->prepare($nextVersionSql);
+  if (!$nextVersionStatement) {
+    error_log("Could not prepare statement...");
+    return null;
+  }
+
   $nextVersionStatement->bind_param('s', $mainIdentifier);
   $nextVersionExecuted = $nextVersionStatement->execute();
 
@@ -67,10 +74,16 @@ function selectNextManuscriptTransliterationVersion(mysqli $conn, string $mainId
     return null;
   }
 
-  $version = $nextVersionStatement->get_result()->fetch_assoc()['max_version'] + 1;
+  $currentVersion = $nextVersionStatement->get_result()->fetch_assoc()['max_version'];
+
   $nextVersionStatement->close();
 
-  return $version;
+  if (!is_int($currentVersion)) {
+    error_log("Could not query next version from database!");
+    return null;
+  }
+
+  return $currentVersion + 1;
 }
 
 $manuscriptMutationsType = new ObjectType([

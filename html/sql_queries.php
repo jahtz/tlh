@@ -115,7 +115,15 @@ function allManuscriptsCount(): int
     return execute_select_query(
       allManuscriptsCountQuery,
       null,
-      fn(mysqli_result $result): int => $result->fetch_row()[0]
+      function (mysqli_result $result): int {
+        $value = $result->fetch_row()[0];
+
+        if (is_int($value)) {
+          return $value;
+        } else {
+          throw new Error('Could not query manuscripts count!');
+        }
+      }
     );
   } catch (Exception $e) {
     error_log($e);
