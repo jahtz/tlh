@@ -74,7 +74,7 @@ export function DocumentMergerContainer(): JSX.Element {
 
   function onMerge(mergedLines: MergeLine[]): void {
     let header: XmlElementNode;
-    if ("firstFile" in state && "secondFile" in state) {
+    if ('firstFile' in state && 'secondFile' in state) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       header=  mergeHeader(state.firstFile.document.header, state.secondFile.document.header);

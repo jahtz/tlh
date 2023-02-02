@@ -184,24 +184,24 @@ export function replaceLNR(node: XmlElementNode, publicationMap: Map<string, str
 
 export function resetPublicationMap(publMap: Map<string, string[]>) {
   const updatedMappings: Map<string, string> = new Map<string, string>();
-  Array.from(publMap.entries()).map((entry,i) => {
+  Array.from(publMap.entries()).map((entry) => {
     const index = entry[0];
     const mapping = entry[1];
     if (index.toString() != mapping[0]) {
-      updatedMappings.set(index, mapping[0])
+      updatedMappings.set(index, mapping[0]);
     }
     });
   if (updatedMappings!) {
-    Array.from(updatedMappings.entries()).map((mapping,i) => {
+    Array.from(updatedMappings.entries()).map((mapping) => {
       publMap.set(mapping[1], publMap.get(mapping[0])!);
       publMap.delete(mapping[0]);
     });
   }
-  Array.from(updatedMappings!.entries()).map((entry,i) => {
+  Array.from(updatedMappings!.entries()).map((entry) => {
     const index = entry[0];
     const mapping = entry[1];
     if (index.toString() != mapping[0]) {
-      updatedMappings.set(index, mapping[0])
+      updatedMappings.set(index, mapping[0]);
     }
   });
   return publMap;

@@ -1,6 +1,6 @@
-import {MergeDocument, MergeLine, mergeLines, lineNumberRegex, txtPublicationRegex, lineNumberRegexNew, replaceLNR, resetPublicationMap} from './mergeDocument';
+import {MergeDocument, MergeLine, mergeLines, replaceLNR, resetPublicationMap} from './mergeDocument';
 import React, {useState} from 'react';
-import {zipWithOffset, ZipWithOffsetResult} from './zipWithOffset';
+import {zipWithOffset} from './zipWithOffset';
 import {useTranslation} from 'react-i18next';
 import {IoAddCircleOutline,IoRemoveCircleOutline, IoChevronDown, IoChevronUp} from 'react-icons/io5';
 import {NodeDisplay} from '../xmlEditor/NodeDisplay';
@@ -22,12 +22,11 @@ export function MergeDocumentLine({line}: { line: MergeLine }): JSX.Element {
   );
 }
 
-export function DocumentMerger({firstDocument, secondDocument, onMerge, MergedPublicationMapping}: IProps): JSX.Element {
+export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps): JSX.Element {
 
 
   const {t} = useTranslation('common');
   const [offset, setOffset] = useState(0);
-  const [, updateState] = useState();
   const forceUpdate = React.useReducer(() => ({}), {})[1] as () => void;
 
   let firstLines = firstDocument.lines;
@@ -44,8 +43,8 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge, MergedPu
   removeDoubleUndefined();
 
   let data = zipWithOffset(firstLines, secondLines, offset);
-  const leftList = (() => {const list = []; for (let i = 0; i < data.length; i++) {list.push(data[i][0]);} return list;})();
-  const rightList = (() => {const list = []; for (let i = 0; i < data.length; i++) {list.push(data[i][1]);} return list;})();
+  const leftList = (() => { const list = []; for (let i = 0; i < data.length; i++) { list.push(data[i][0]); } return list; })();
+  const rightList = (() => { const list = []; for (let i = 0; i < data.length; i++) { list.push(data[i][1]); } return list; })();
   publicationMap = resetPublicationMap(publicationMap);
   console.log(publicationMap);
   console.log(data);
@@ -55,13 +54,6 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge, MergedPu
   let startIndex = 0;
   let currentIndex = 0;
 
-
-
-  function updateLN(lines:ZipWithOffsetResult<MergeLine>, publMap: Map<string, string[]>): void {
-    let noEmptyfunction: number;
-    noEmptyfunction = 0;
-    noEmptyfunction++;
-  }
   function handleDrag(): void {
     startIndex = currentIndex;
   }
@@ -107,7 +99,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge, MergedPu
     //removeDoubleUndefined();
     data = zipWithOffset(firstLines, secondLines, offset);
     forceUpdate();
-  }
+  };
 
   function removeLine(isLeft: boolean, index: number): void {
     if(isLeft && firstLines[index] === undefined) {
@@ -121,12 +113,12 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge, MergedPu
   function updateLNR(publication: string, newIndex: number, oldPublMap: Map<string, string[]>, doFirst: boolean, doSecond:boolean) {
     const publIndices: number[] = [];
 
-    Array.from(oldPublMap.values()).map((item,i) => {
+    Array.from(oldPublMap.values()).map((item) => {
       publIndices.push(parseInt(item[0]));
     });
     //check if valid
     if (newIndex > 0 && !(publIndices!.includes(newIndex, 0))) {
-      Array.from(oldPublMap.entries()).map((entry,i) => {
+      Array.from(oldPublMap.entries()).map((entry) => {
         const oldIndex = entry[0];
         const item = entry[1];
         if (item[1] == publication) {
@@ -137,18 +129,18 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge, MergedPu
         }
       });
       if(doFirst) {
-        Array.from(firstLines).map((entry, index) => {
+        Array.from(firstLines).map((entry) => {
           if (entry) {
             const lnn = entry!.lineNumberNode;
-            lnn.attributes["lnr"] = replaceLNR(lnn, oldPublMap);
+            lnn.attributes['lnr'] = replaceLNR(lnn, oldPublMap);
           }
         });
       }
       if(doSecond) {
-        Array.from(secondLines).map((entry, index) => {
+        Array.from(secondLines).map((entry) => {
           if (entry) {
             const lnn = entry!.lineNumberNode;
-            lnn.attributes["lnr"] = replaceLNR(lnn, oldPublMap);
+            lnn.attributes['lnr'] = replaceLNR(lnn, oldPublMap);
           }
         });
       }
@@ -194,14 +186,14 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge, MergedPu
         <li className="grid-child-element-header publication">
           <span className="publication grid-child-element">{publicationString[1]}</span>
           <span className="publication grid-child-element">€&nbsp;
-            <input type="number" defaultValue={publicationString[0]} onChange={(event) => {publicationMap = updateLNR(publicationString[1], Number.parseInt(event.target.value), publicationMap, true, true); publicationMap = resetPublicationMap(publicationMap); forceUpdate();}}></input></span>
+            <input type="number" defaultValue= { publicationString[0] } onChange= { (event) => { publicationMap = updateLNR(publicationString[1], Number.parseInt(event.target.value), publicationMap, true, true); publicationMap = resetPublicationMap(publicationMap); forceUpdate(); }}></input></span>
         </li>
     );
   }
   function LeftList() {
     return (
       <ul className="grid-child-element draggablediv" draggable="true" onDragStart={handleDrag} onDragEnd={() => handleDragEnd(true)}>
-        {leftList.map((entry, index) => <li className={index%5==4 && "marker" || undefined} onMouseOver={() => listMouseOver(index)} onDragOver={() => handleDragOver(true, index)} data-index={index} key={index}>
+        {leftList.map((entry, index) => <li className={index%5==4 && 'marker' || undefined} onMouseOver={() => listMouseOver(index)} onDragOver={() => handleDragOver(true, index)} data-index={index} key={index}>
           <button onClick={() => addLine(true, index)}><IoAddCircleOutline/></button>
           {entry && <MergeDocumentLine line={entry}/>}
           {entry === undefined && <>
@@ -215,7 +207,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge, MergedPu
   function RightList() {
     return (
       <ul className="grid-child-element draggablediv" draggable="true" onDragStart={handleDrag} onDragEnd={() => handleDragEnd(false)}>
-        {rightList.map((entry, index) => <li className={index%5==4 && "marker" || undefined} onMouseOver={() => listMouseOver(index)} onDragOver={() => handleDragOver(false, index)} data-index={index} key={index}>
+        {rightList.map((entry, index) => <li className={index%5==4 && 'marker' || undefined} onMouseOver={() => listMouseOver(index)} onDragOver={() => handleDragOver(false, index)} data-index={index} key={index}>
           <button onClick={() => addLine(false, index)}><IoAddCircleOutline/></button>
           {entry && <MergeDocumentLine line={entry}/>}
           {entry === undefined && <>
