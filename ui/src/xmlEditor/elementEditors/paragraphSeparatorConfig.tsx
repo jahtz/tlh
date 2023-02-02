@@ -1,8 +1,8 @@
-import {displayReplace, XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from '../editorConfig';
+import {displayReplace, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 import {XmlElementNode} from '../../xmlModel/xmlModel';
 
-export const paragraphSeparatorConfig: XmlSingleEditableNodeConfig<XmlElementNode<'parsep' | 'parsep_dbl'>> = {
+export const paragraphSeparatorConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'parsep' | 'parsep_dbl'>> = {
   replace: (node, _renderedChildren, isSelected) => displayReplace(
     <span className={isSelected ? selectedNodeClass : ''}>
       {node.tagName === 'parsep' ? '¬¬¬' : '==='}
@@ -11,6 +11,11 @@ export const paragraphSeparatorConfig: XmlSingleEditableNodeConfig<XmlElementNod
   edit: (props) => <ParagraphSeparatorEditor {...props}/>,
   readNode: (node) => node as XmlElementNode<'parsep' | 'parsep_dbl'>,
   writeNode: (node) => node,
+  insertablePositions: {
+    beforeElement: ['w'],
+    afterElement: ['lb', 'w'],
+    asLastChildOf: ['div1']
+  }
 };
 
 const separatorTypes: ('parsep' | 'parsep_dbl')[] = ['parsep', 'parsep_dbl'];
