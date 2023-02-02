@@ -1,14 +1,14 @@
-import {MutationResult, QueryResult} from '@apollo/client';
+import {MutationResult, OperationVariables, QueryResult} from '@apollo/client';
 import classNames from 'classnames';
 import {useTranslation} from 'react-i18next';
 
-interface IProps<T, U> {
+interface IProps<T, U extends OperationVariables> {
   query: QueryResult<T, U> | MutationResult<T>;
   children: (t: T) => JSX.Element;
   notCalledMessage?: JSX.Element;
 }
 
-export function WithQuery<T, U>({query: {data, loading, error, called}, children, notCalledMessage}: IProps<T, U>): JSX.Element {
+export function WithQuery<T, U extends OperationVariables>({query: {data, loading, error, called}, children, notCalledMessage}: IProps<T, U>): JSX.Element {
 
   const {t} = useTranslation('common');
 

@@ -25,12 +25,12 @@ import {Preferences} from './Preferences';
 import {XmlComparatorContainer} from './xmlComparator/XmlComparatorContainer';
 import {ManuscriptDocument, ManuscriptMetaDataFragment, ManuscriptQuery, ManuscriptQueryVariables} from './graphql';
 import {apolloClient} from './apolloClient';
-import {TypedDocumentNode} from '@apollo/client';
+import {OperationVariables, TypedDocumentNode} from '@apollo/client';
 import {ManuscriptData} from './manuscript/ManuscriptData';
 import {UploadPicturesForm} from './manuscript/UploadPicturesForm';
 import {TransliterationInput} from './manuscript/TransliterationInput';
 
-async function apolloLoader<T, V>(query: TypedDocumentNode<T, V>, variables: V): Promise<T | undefined> {
+async function apolloLoader<T, V extends OperationVariables>(query: TypedDocumentNode<T, V>, variables: V): Promise<T | undefined> {
   return apolloClient
     .query<T, V>({query, variables})
     .then(({data}) => data || undefined);
