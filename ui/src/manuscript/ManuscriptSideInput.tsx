@@ -1,5 +1,4 @@
-import {ManuscriptSide} from '../graphql';
-import {manuscriptSides} from '../model/manuscriptProperties/manuscriptSide';
+import {MANUSCRIPT_SIDE, ManuscriptSide} from '../graphql';
 import {useTranslation} from 'react-i18next';
 
 interface IProps {
@@ -19,7 +18,7 @@ export function ManuscriptSideInput({currentSide, update}: IProps): JSX.Element 
              onChange={(event) => update(event.target.value as ManuscriptSide)}/>
 
       <datalist id="manuscriptSides">
-        {manuscriptSides.map((side) => <option key={side} value={side}/>)}
+        {MANUSCRIPT_SIDE.map((side) => <option key={side} value={side}/>)}
       </datalist>
     </div>
   );

@@ -1,7 +1,8 @@
 import classNames from 'classnames';
 import {ErrorMessage, Field} from 'formik';
-import {allPalaeographicClassifications, getNameForPalaeoClassification} from '../palaeoClassification';
+import {getNameForPalaeoClassification} from '../model/manuscriptProperties/palaeoClassification';
 import {useTranslation} from 'react-i18next';
+import {PALAEOGRAPHIC_CLASSIFICATION} from '../graphql';
 
 interface IProps {
   palaeographicClassificationSure: boolean;
@@ -22,7 +23,7 @@ export function PalaeographicClassificationField({palaeographicClassificationSur
 
       <div className="mt-2 flex">
         <Field as="select" id="palaeographicClassification" name="palaeographicClassification" className={classes}>
-          {allPalaeographicClassifications.map((pc) =>
+          {PALAEOGRAPHIC_CLASSIFICATION.map((pc) =>
             <option key={pc} value={pc}>{getNameForPalaeoClassification(pc, t)}</option>
           )}
         </Field>

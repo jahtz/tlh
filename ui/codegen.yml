@@ -12,8 +12,11 @@ generates:
       - "schema-ast"
 
   src/graphql.ts:
+    config:
+      useMembers: true
     plugins:
       - "typescript"
       - "typescript-operations"
       - "typescript-react-apollo"
+      - "typescript-enum-array"
 

@@ -1,6 +1,5 @@
-import {ManuscriptColumn, ManuscriptColumnModifier} from '../graphql';
+import {MANUSCRIPT_COLUMN, MANUSCRIPT_COLUMN_MODIFIER, ManuscriptColumn, ManuscriptColumnModifier} from '../graphql';
 import {useTranslation} from 'react-i18next';
-import {manuscriptColumnModifiers, manuscriptColumns} from '../model/manuscriptProperties/manuscriptColumn';
 
 interface IProps {
   column: ManuscriptColumn;
@@ -26,11 +25,11 @@ export function ManuscriptColumnInput({column, updateColumn, columnModifier, upd
       <button type="button" className="p-2 rounded-r bg-red-600 text-white" onClick={deleteColumnInput}>X</button>
 
       <datalist id="manuscriptColumns">
-        {manuscriptColumns.map((column, index) => <option key={index} value={column}/>)}
+        {MANUSCRIPT_COLUMN.map((column, index) => <option key={index} value={column}/>)}
       </datalist>
 
       <datalist id="manuscriptColumnModifiers">
-        {manuscriptColumnModifiers.map((columnModifier, index) => <option key={index} value={columnModifier}/>)}
+        {MANUSCRIPT_COLUMN_MODIFIER.map((columnModifier, index) => <option key={index} value={columnModifier}/>)}
       </datalist>
     </div>
   );

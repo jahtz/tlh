@@ -1,16 +1,6 @@
 import {ManuscriptSide} from '../../graphql';
 import {TFunction} from 'i18next';
 
-export const manuscriptSides: ManuscriptSide[] = [
-  ManuscriptSide.NotIdentifiable,
-  ManuscriptSide.Obverse, ManuscriptSide.Reverse,
-  ManuscriptSide.LeftEdge, ManuscriptSide.RightEdge,
-  ManuscriptSide.UpperEdge, ManuscriptSide.LowerEdge,
-  ManuscriptSide.SideA, ManuscriptSide.SideB,
-  ManuscriptSide.InscriptionNumber, ManuscriptSide.SealInscription
-];
-
-
 export function getXmlNameForManuscriptSide(side: ManuscriptSide): string {
   switch (side) {
     case ManuscriptSide.NotIdentifiable:

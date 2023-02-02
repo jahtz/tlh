@@ -201,7 +201,9 @@ export type QueryManuscriptArgs = {
 
 export type TransliterationColumn = {
   __typename?: 'TransliterationColumn';
+  column: ManuscriptColumn;
   columnIndex: Scalars['Int'];
+  columnModifier: ManuscriptColumnModifier;
   lines: Array<TransliterationLine>;
 };
 
@@ -214,10 +216,10 @@ export type TransliterationColumnInput = {
 
 export type TransliterationLine = {
   __typename?: 'TransliterationLine';
-  input?: Maybe<Scalars['String']>;
+  input: Scalars['String'];
   inputIndex: Scalars['Int'];
   lineNumber?: Maybe<LineNumber>;
-  result: Scalars['String'];
+  result?: Maybe<Scalars['String']>;
 };
 
 export type TransliterationLineInput = {
@@ -291,18 +293,18 @@ export type CreateManuscriptMutationVariables = Exact<{
 
 export type CreateManuscriptMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', createManuscript?: string | null } | null };
 
-export type TransliterationColumnFragment = { __typename?: 'TransliterationColumn', columnIndex: number, lines: Array<{ __typename?: 'TransliterationLine', inputIndex: number, input?: string | null, result: string, lineNumber?: { __typename?: 'LineNumber', number: number, isConfirmed: boolean } | null }> };
+export type TransliterationColumnFragment = { __typename?: 'TransliterationColumn', columnIndex: number, lines: Array<{ __typename?: 'TransliterationLine', inputIndex: number, input: string, result?: string | null, lineNumber?: { __typename?: 'LineNumber', number: number, isConfirmed: boolean } | null }> };
 
-export type TransliterationSideFragment = { __typename?: 'TransliterationSide', sideIndex: number, side: ManuscriptSide, version: number, columns: Array<{ __typename?: 'TransliterationColumn', columnIndex: number, lines: Array<{ __typename?: 'TransliterationLine', inputIndex: number, input?: string | null, result: string, lineNumber?: { __typename?: 'LineNumber', number: number, isConfirmed: boolean } | null }> }> };
+export type TransliterationSideFragment = { __typename?: 'TransliterationSide', sideIndex: number, side: ManuscriptSide, version: number, columns: Array<{ __typename?: 'TransliterationColumn', columnIndex: number, lines: Array<{ __typename?: 'TransliterationLine', inputIndex: number, input: string, result?: string | null, lineNumber?: { __typename?: 'LineNumber', number: number, isConfirmed: boolean } | null }> }> };
 
-export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }>, transliterations?: Array<{ __typename?: 'TransliterationSide', sideIndex: number, side: ManuscriptSide, version: number, columns: Array<{ __typename?: 'TransliterationColumn', columnIndex: number, lines: Array<{ __typename?: 'TransliterationLine', inputIndex: number, input?: string | null, result: string, lineNumber?: { __typename?: 'LineNumber', number: number, isConfirmed: boolean } | null }> }> }> | null };
+export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }>, transliterations?: Array<{ __typename?: 'TransliterationSide', sideIndex: number, side: ManuscriptSide, version: number, columns: Array<{ __typename?: 'TransliterationColumn', columnIndex: number, lines: Array<{ __typename?: 'TransliterationLine', inputIndex: number, input: string, result?: string | null, lineNumber?: { __typename?: 'LineNumber', number: number, isConfirmed: boolean } | null }> }> }> | null };
 
 export type ManuscriptQueryVariables = Exact<{
   mainIdentifier: Scalars['String'];
 }>;
 
 
-export type ManuscriptQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }>, transliterations?: Array<{ __typename?: 'TransliterationSide', sideIndex: number, side: ManuscriptSide, version: number, columns: Array<{ __typename?: 'TransliterationColumn', columnIndex: number, lines: Array<{ __typename?: 'TransliterationLine', inputIndex: number, input?: string | null, result: string, lineNumber?: { __typename?: 'LineNumber', number: number, isConfirmed: boolean } | null }> }> }> | null } | null };
+export type ManuscriptQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }>, transliterations?: Array<{ __typename?: 'TransliterationSide', sideIndex: number, side: ManuscriptSide, version: number, columns: Array<{ __typename?: 'TransliterationColumn', columnIndex: number, lines: Array<{ __typename?: 'TransliterationLine', inputIndex: number, input: string, result?: string | null, lineNumber?: { __typename?: 'LineNumber', number: number, isConfirmed: boolean } | null }> }> }> | null } | null };
 
 export type ManuscriptIdentWithCreatorFragment = { __typename?: 'ManuscriptMetaData', pictureUrls: Array<string>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
@@ -713,3 +715,9 @@ export function useUploadTransliterationMutation(baseOptions?: Apollo.MutationHo
 export type UploadTransliterationMutationHookResult = ReturnType<typeof useUploadTransliterationMutation>;
 export type UploadTransliterationMutationResult = Apollo.MutationResult<UploadTransliterationMutation>;
 export type UploadTransliterationMutationOptions = Apollo.BaseMutationOptions<UploadTransliterationMutation, UploadTransliterationMutationVariables>;
+export const MANUSCRIPT_COLUMN: ManuscriptColumn[] = [ManuscriptColumn.ColumnDivider, ManuscriptColumn.I, ManuscriptColumn.Ii, ManuscriptColumn.Iii, ManuscriptColumn.Iv, ManuscriptColumn.Ix, ManuscriptColumn.LeftColumn, ManuscriptColumn.MiddleColumn, ManuscriptColumn.None, ManuscriptColumn.RightColumn, ManuscriptColumn.V, ManuscriptColumn.Vi, ManuscriptColumn.Vii, ManuscriptColumn.Viii, ManuscriptColumn.X, ManuscriptColumn.Xi, ManuscriptColumn.Xii];
+export const MANUSCRIPT_COLUMN_MODIFIER: ManuscriptColumnModifier[] = [ManuscriptColumnModifier.None, ManuscriptColumnModifier.Slash, ManuscriptColumnModifier.SlashQuestion];
+export const MANUSCRIPT_IDENTIFIER_TYPE: ManuscriptIdentifierType[] = [ManuscriptIdentifierType.CollectionNumber, ManuscriptIdentifierType.ExcavationNumber, ManuscriptIdentifierType.PublicationShortReference];
+export const MANUSCRIPT_SIDE: ManuscriptSide[] = [ManuscriptSide.InscriptionNumber, ManuscriptSide.LeftEdge, ManuscriptSide.LowerEdge, ManuscriptSide.NotIdentifiable, ManuscriptSide.Obverse, ManuscriptSide.Reverse, ManuscriptSide.RightEdge, ManuscriptSide.SealInscription, ManuscriptSide.SideA, ManuscriptSide.SideB, ManuscriptSide.UpperEdge];
+export const MANUSCRIPT_STATUS: ManuscriptStatus[] = [ManuscriptStatus.Approved, ManuscriptStatus.Created, ManuscriptStatus.ExecutiveReviewMerged, ManuscriptStatus.ExecutiveReviewed, ManuscriptStatus.InCreation, ManuscriptStatus.ReviewMerged, ManuscriptStatus.Reviewed];
+export const PALAEOGRAPHIC_CLASSIFICATION: PalaeographicClassification[] = [PalaeographicClassification.AssyroMittanianScript, PalaeographicClassification.LateNewScript, PalaeographicClassification.MiddleAssyrianScript, PalaeographicClassification.MiddleBabylonianScript, PalaeographicClassification.MiddleScript, PalaeographicClassification.NewScript, PalaeographicClassification.OldAssyrianScript, PalaeographicClassification.OldScript, PalaeographicClassification.Unclassified];

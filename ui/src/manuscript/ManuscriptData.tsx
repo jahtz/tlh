@@ -3,7 +3,7 @@ import {Link, Navigate, useLoaderData} from 'react-router-dom';
 import {ManuscriptIdentifierFragment, ManuscriptMetaDataFragment} from '../graphql';
 import {useSelector} from 'react-redux';
 import {activeUserSelector, User} from '../newStore';
-import {getNameForPalaeoClassification} from '../palaeoClassification';
+import {getNameForPalaeoClassification} from '../model/manuscriptProperties/palaeoClassification';
 import {PicturesBlock} from './PicturesBlock';
 import {createTransliterationUrl, homeUrl, uploadPicturesUrl} from '../urls';
 

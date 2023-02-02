@@ -1,17 +1,5 @@
-import {PalaeographicClassification} from './graphql';
+import {PalaeographicClassification} from '../../graphql';
 import {TFunction} from 'i18next';
-
-export const allPalaeographicClassifications: PalaeographicClassification[] = [
-  PalaeographicClassification.OldScript,
-  PalaeographicClassification.MiddleScript,
-  PalaeographicClassification.NewScript,
-  PalaeographicClassification.LateNewScript,
-  PalaeographicClassification.OldAssyrianScript,
-  PalaeographicClassification.MiddleBabylonianScript,
-  PalaeographicClassification.MiddleAssyrianScript,
-  PalaeographicClassification.AssyroMittanianScript,
-  PalaeographicClassification.Unclassified
-];
 
 export function getNameForPalaeoClassification(pc: PalaeographicClassification, t: TFunction): string {
   switch (pc) {

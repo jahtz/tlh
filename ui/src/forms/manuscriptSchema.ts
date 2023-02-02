@@ -1,14 +1,16 @@
 import {array as yupArray, boolean as yupBoolean, mixed as yupMixed, number as yupNumber, object as yupObject, SchemaOf, string as yupString} from 'yup';
-import {CreateManuscriptMutationVariables, ManuscriptIdentifierInput, ManuscriptIdentifierType, PalaeographicClassification} from '../graphql';
+import {
+  CreateManuscriptMutationVariables,
+  MANUSCRIPT_IDENTIFIER_TYPE,
+  ManuscriptIdentifierInput,
+  PALAEOGRAPHIC_CLASSIFICATION,
+  PalaeographicClassification
+} from '../graphql';
 
 const manuscriptIdentifierSchema: SchemaOf<ManuscriptIdentifierInput> = yupObject({
   identifier: yupString().required(),
   identifierType: yupMixed()
-    .oneOf([
-      ManuscriptIdentifierType.CollectionNumber,
-      ManuscriptIdentifierType.ExcavationNumber,
-      ManuscriptIdentifierType.PublicationShortReference
-    ])
+    .oneOf(MANUSCRIPT_IDENTIFIER_TYPE)
     .required()
 }).required();
 
@@ -17,17 +19,7 @@ export const manuscriptSchema: SchemaOf<CreateManuscriptMutationVariables> = yup
     mainIdentifier: manuscriptIdentifierSchema.required(),
     otherIdentifiers: yupArray(manuscriptIdentifierSchema).notRequired(),
     palaeographicClassification: yupMixed<PalaeographicClassification>()
-      .oneOf([
-        PalaeographicClassification.Unclassified,
-        PalaeographicClassification.AssyroMittanianScript,
-        PalaeographicClassification.LateNewScript,
-        PalaeographicClassification.MiddleAssyrianScript,
-        PalaeographicClassification.MiddleBabylonianScript,
-        PalaeographicClassification.MiddleScript,
-        PalaeographicClassification.NewScript,
-        PalaeographicClassification.OldAssyrianScript,
-        PalaeographicClassification.OldScript
-      ])
+      .oneOf(PALAEOGRAPHIC_CLASSIFICATION)
       .required(),
     palaeographicClassificationSure: yupBoolean().required(),
     cthClassification: yupNumber().notRequired(),
