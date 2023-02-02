@@ -1,0 +1,1 @@
+rclone copy html/ hethport3:htdocs/$VERSION --progress --transfers=8
