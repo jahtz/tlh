@@ -16,7 +16,6 @@ use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
 use model\{ManuscriptLanguage, ManuscriptMetaData, TransliterationSideInput, User};
-use phpDocumentor\Reflection\Types\Null_;
 use ReallySimpleJWT\Token;
 use function model\allManuscriptLanguages;
 
@@ -43,19 +42,19 @@ $queryType = new ObjectType([
         'paginationSize' => Type::nonNull(Type::int()),
         'page' => Type::nonNull(Type::int())
       ],
-      'resolve' => fn(Null_ $_rootValue, array $args): array => allManuscriptMetaData($args['paginationSize'], $args['page'])
+      'resolve' => fn(?int $_rootValue, array $args): array => allManuscriptMetaData($args['paginationSize'], $args['page'])
     ],
     'manuscript' => [
       'type' => ManuscriptMetaData::$graphQLType,
       'args' => [
         'mainIdentifier' => Type::nonNull(Type::string())
       ],
-      'resolve' => fn(Null_ $_rootValue, array $args): ?ManuscriptMetaData => manuscriptMetaDataById($args['mainIdentifier'])
+      'resolve' => fn(?int $_rootValue, array $args): ?ManuscriptMetaData => manuscriptMetaDataById($args['mainIdentifier'])
     ]
   ]
 ]);
 
-const  nextVersionSql = "select max(version) as max_version from tlh_dig_transliteration_lines where main_identifier = ?;";
+const nextVersionSql = "select max(version) as max_version from tlh_dig_transliteration_lines where main_identifier = ?;";
 
 function selectNextManuscriptTransliterationVersion(mysqli $conn, string $mainIdentifier): ?int
 {
@@ -229,7 +228,7 @@ $mutationType = new ObjectType([
         'userInput' => Type::nonNull(User::$graphQLInputObjectType)
       ],
       'type' => Type::string(),
-      'resolve' => fn(Null_ $_rootValue, array $args) => register($args)
+      'resolve' => fn(?int $_rootValue, array $args) => register($args)
     ],
     'login' => [
       'args' => [
@@ -237,11 +236,11 @@ $mutationType = new ObjectType([
         'password' => Type::nonNull(Type::string())
       ],
       'type' => Type::string(),
-      'resolve' => fn(Null_ $_rootValue, array $args) => verifyUser($args['username'], $args['password'])
+      'resolve' => fn(?int $_rootValue, array $args) => verifyUser($args['username'], $args['password'])
     ],
     'me' => [
       'type' => $loggedInUserMutationsType,
-      'resolve' => fn(Null_ $_rootValue, array $_args): ?string => resolveUser()
+      'resolve' => fn(?int $_rootValue, array $_args): ?string => resolveUser()
     ]
   ]
 ]);
