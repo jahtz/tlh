@@ -7,22 +7,27 @@ import {handleSaveToPC} from '../xmlEditor/XmlDocumentEditorContainer';
 
 interface IProps {
   lines: MergeLine[];
+  header: XmlElementNode;
 }
 
-export function MergedDocumentView({lines}: IProps): JSX.Element {
+export function MergedDocumentView({lines, header}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
   function onExport(): void {
-    const newRoot: XmlElementNode = {
-      tagName: 'merged',
+
+    const newText: XmlElementNode = {
+      tagName: 'text',
       attributes: {},
-      children: lines
+      children:
+        lines
         .map<XmlNode[]>(({lineNumberNode, rest}) => [lineNumberNode, ...rest])
         .flat()
     };
+    const xmlMeta = '<?xml version="1.0" encoding="UTF-8"?>\n' +
+      '<?xml-stylesheet href="HPMxml.css" type="text/css"?>';
 
-    const exported = writeNode(newRoot).join('\n');
+    const exported = xmlMeta + writeNode(header).join('\n') + writeNode( newText).join('\n');
 
     handleSaveToPC(exported, 'merged.xml');
   }

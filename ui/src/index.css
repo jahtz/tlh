@@ -118,3 +118,68 @@ code {
 .cl {
   background-color: lawngreen;
 }
+.grid-container-element {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+.grid-child-element {
+  margin: 4px;
+  border: 1px solid darkgrey;
+  border-radius: 5px;
+}
+
+.grid-child-element li {
+  height: 1.8rem !important;
+}
+
+.grid-child-element .mt-4 {
+  margin-left: 1rem;
+  display: inline;
+}
+
+.grid-child-element .marker {
+  background-color: #d3d3d3;
+}
+
+.grid-child-element button {
+  margin-right: 5px;
+}
+
+.grid-container-element-header {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+.grid-child-element-header {
+  margin: 4px;
+  border: 1px solid darkgrey;
+  border-radius: 5px;
+}
+.publication {
+  border-radius: 0px !important;
+  border:0px !important;
+}
+.publication span {
+  display: inline-block;
+  width: 6rem;
+}
+.publication input {
+  width: 3rem;
+}
+/*
+.leftList, rightList {
+  display: inline;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.mergeList {
+  display: inline-block;
+  width: 50%;
+}*/

@@ -1,6 +1,6 @@
 import {NavLink, useNavigate} from 'react-router-dom';
 import {
-  createManuscriptUrl,
+  createManuscriptUrl, documentMergerUrl,
   editTranscriptionDocumentUrl,
   editTransliterationDocumentUrl,
   homeUrl,
@@ -41,6 +41,7 @@ export function NavBar(): JSX.Element {
       <NavLink className="p-4 ml-4 hover:bg-slate-700" to={editTransliterationDocumentUrl}>{t('editDocument')}</NavLink>
       <NavLink className="p-4 ml-2 hover:bg-slate-700" to={editTranscriptionDocumentUrl}>{t('editTranscriptioDocument')}</NavLink>
       <NavLink className="p-4 ml-4 hover:bg-slate-700" to={xmlComparatorUrl}>{t('xmlComparator')}</NavLink>
+      <NavLink className="p-4 ml-4 hover:bg-slate-700" to={documentMergerUrl}>{t('documentMerger')}</NavLink>
 
       <div className="flex-grow"/>
 
