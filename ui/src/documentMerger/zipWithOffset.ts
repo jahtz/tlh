@@ -22,7 +22,7 @@ export function zipWithOffset<T>(first: T[], second: T[], offset: number): ZipWi
       ? second[secondIndex]
       : undefined;
 
-    if (!!left || !!right) {
+    if ((!!left || !!right) && !(left === undefined && right === undefined)) {
       result.push([left, right]);
     }
   }
