@@ -1,8 +1,6 @@
 overwrite: true
 
-# TODO: deactivate while dependency broken (https://github.com/dotansimha/graphql-code-generator/issues/7934)...
-# schema: "http://localhost:8066/graphql.php"
-schema: schema.graphql
+schema: "http://localhost:8066/graphql.php"
 documents: "src/**/*.graphql"
 
 generates:
