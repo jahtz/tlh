@@ -14,7 +14,7 @@ import {joinStrings} from './foreignWordsParser';
 
 // Word content
 
-export const numeralContentParser: Parser<string> = regexp(/[[\d]+/);
+export const numeralContentParser: Parser<string> = regexp(/\d+/);
 
 type SimpleWordContent = Correction | DamageType | Sign | FootNote | KolonMark | Determinative | MaterLectionis | string;
 
@@ -35,18 +35,17 @@ export const simpleWordContentParser: Parser<SimpleWordContent> = alt<SimpleWord
 
 type WordContent = Akkadogramm | Sumerogramm | SimpleWordContent;
 
-const otherSyllablesWordContentParser: Parser<WordContent> = alt<WordContent>(
-  akkadogramm,
-  innerWordSumerogramm,
-  simpleWordContentParser
-);
-
 const firstSyllableWordContentParser: Parser<WordContent> = alt<WordContent>(
   firstSyllableAkkadogramm,
   firstSyllableSumerogramm,
   simpleWordContentParser
 );
 
+const otherSyllablesWordContentParser: Parser<WordContent> = alt<WordContent>(
+  akkadogramm,
+  innerWordSumerogramm,
+  simpleWordContentParser
+);
 
 // Word
 
