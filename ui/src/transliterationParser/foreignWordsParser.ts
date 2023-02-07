@@ -1,12 +1,14 @@
-import {xmlElementNode, XmlElementNode, XmlNonEmptyNode} from '../xmlModel/xmlModel';
-import {alt, oneOf, Parser, seq, seqMap, string} from 'parsimmon';
-import {clearUpperMultiStringContent, upperText} from './parserBasics';
+import {XmlElementNode} from '../xmlModel/xmlModel';
+import {alt, Parser, seqMap} from 'parsimmon';
+import {upperText} from './parserBasics';
 import {optionalIndexNumber} from './indexNumberParser';
 import {Correction, correctionParser as corrections} from './correctionParser';
 import {damageParser as damages, DamageType} from './damageParser';
 import {inscribedLetterMarker} from './inscribedLetterMarkerParser';
 
-const foreignCharacterParser: Parser<(DamageType | Correction | string)[]> = seqMap(
+export type ForeignCharacter = DamageType | Correction | string;
+
+export const foreignCharacterParser: Parser<ForeignCharacter[]> = seqMap(
   upperText,
   alt<DamageType | Correction | string>(
     corrections,
@@ -51,45 +53,3 @@ export function joinStrings(values: NodeOrString[]): NodeOrString[] {
 
   return [...newValues, ...(remaining !== undefined ? [remaining] : [])];
 }
-
-// Akkadogramm
-
-export type Akkadogramm = XmlElementNode<'aGr'>;
-
-export const akkadogramm = (...contents: (XmlNonEmptyNode | string)[]) => xmlElementNode('aGr', {}, contents.map(clearUpperMultiStringContent));
-
-export const akkadogrammParser: Parser<Akkadogramm> = seqMap(
-  alt(
-    string('_').result([]),
-    string('-').notFollowedBy(string('-')).result(['-']),
-  ),
-  foreignCharacterParser,
-  seq(
-    oneOf('-+'),
-    foreignCharacterParser
-  ).many(),
-  (mark: string[], first: (DamageType | Correction | string)[], rest) => akkadogramm(...joinStrings([...mark, ...first, ...rest.flat().flat()]))
-);
-
-// Sumerogramm
-
-export type Sumerogramm = XmlElementNode<'sGr'>;
-
-export const sumerogramm = (...contents: (XmlNonEmptyNode | string)[]) => xmlElementNode('sGr', {}, contents.map(clearUpperMultiStringContent));
-
-export const sumerogrammParser: Parser<Sumerogramm> = seqMap(
-  string('--').result('-').times(0, 1),
-  foreignCharacterParser,
-  seq(
-    string('.'),
-    foreignCharacterParser
-  ).many(),
-  (start, first, rest) => {
-
-    // FIXME: starting minus belongs to prior text...
-    const startingMinus = start.length === 1
-      ? [start[0]]
-      : [];
-
-    return sumerogramm(...startingMinus, ...joinStrings([...first, ...rest.flat().flat()]));
-  });

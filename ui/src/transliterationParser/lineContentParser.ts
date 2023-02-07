@@ -1,7 +1,7 @@
-import {Failure, Result as ParsimmonResult} from 'parsimmon';
-import {XmlElementNode} from '../xmlModel/xmlModel';
+import {alt, Failure, Result as ParsimmonResult, string} from 'parsimmon';
+import {XmlElementNode, xmlTextNode} from '../xmlModel/xmlModel';
 import {ParagraphSeparatorNode, paragraphSeparatorParser} from './paragraphSeparatorParser';
-import {wordParser} from './wordParser';
+import {parsedWord, wordParser} from './wordParser';
 
 // Other
 
@@ -30,6 +30,11 @@ interface ContentParseSuccess {
 
 export type ContentParseResult = ContentParseError | ContentParseSuccess;
 
+const lineContentParser = alt(
+  string('x').result([xmlTextNode('x')]),
+  wordParser
+).map((x) => parsedWord(...x));
+
 export function parseTransliterationLineContent(content: string): ContentParseResult {
   // split by spaces not in accolades to get single contents (word, parsep or parsep_dbl)
   const stringContents: string[] = content.split(spaceNotInAccoladesRegex);
@@ -46,7 +51,7 @@ export function parseTransliterationLineContent(content: string): ContentParseRe
     ? [stringContents.slice(0, stringContents.length - 1), lastContentParSepParseResult.value]
     : [stringContents, undefined];
 
-  const wordResults = wordContents.map((input) => wordParser.parse(input));
+  const wordResults = wordContents.map((input) => lineContentParser.parse(input));
 
   const [words, errors] = partitionResults(wordResults);
 
