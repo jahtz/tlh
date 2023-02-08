@@ -17,7 +17,7 @@ export function parseTransliterationLine(input: string): LineParseResult {
   const contentParseResult = parseTransliterationLineContent(content);
 
   if ('errors' in contentParseResult) {
-    return {type: 'LineWordParsingError', input, errors: contentParseResult.errors};
+    return {type: 'LineWordParsingError', lineNumber, input, errors: contentParseResult.errors};
   }
 
   const {words, maybeParagraphSeparator} = contentParseResult;

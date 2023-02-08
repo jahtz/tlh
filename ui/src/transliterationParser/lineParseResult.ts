@@ -13,6 +13,7 @@ interface LinePreParsingError {
 interface LineWordParsingError {
   type: 'LineWordParsingError';
   input: string;
+  lineNumber: LineNumberInput;
   errors: Failure[];
 }
 
