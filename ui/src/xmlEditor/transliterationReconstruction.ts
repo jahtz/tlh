@@ -1,4 +1,4 @@
-import {isXmlCommentNode, isXmlTextNode, XmlNode} from '../xmlModel/xmlModel';
+import {isXmlCommentNode, isXmlTextNode, XmlNode} from 'simple_xml';
 
 export function reconstructTransliteration(node: XmlNode, isFirstChild = false): string {
 

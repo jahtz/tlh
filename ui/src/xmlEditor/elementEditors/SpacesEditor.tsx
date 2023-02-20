@@ -1,6 +1,6 @@
 import {XmlEditableNodeIProps} from '../editorConfig';
 import {WordNodeData} from './wordNodeData';
-import {XmlElementNode} from '../../xmlModel/xmlModel';
+import {XmlElementNode} from 'simple_xml';
 import {useTranslation} from 'react-i18next';
 
 export function SpacesEditor({data, updateEditedNode}: XmlEditableNodeIProps<WordNodeData>): JSX.Element {

@@ -13,7 +13,7 @@ import {
 import {defaultSideInput, SideInput, TransliterationSideInputDisplay} from './TransliterationSideInputDisplay';
 import {Navigate, useLoaderData} from 'react-router-dom';
 import update from 'immutability-helper';
-import {LineParseResult, writeLineParseSuccessToXml} from '../transliterationParser/lineParseResult';
+import {LineParseResult, writeLineParseSuccessToXml} from 'simtex';
 
 interface IState {
   sides: SideInput[];

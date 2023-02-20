@@ -1,5 +1,5 @@
 import {NodeDisplay} from './NodeDisplay';
-import {XmlElementNode} from '../xmlModel/xmlModel';
+import {XmlElementNode} from 'simple_xml';
 import {DeleteButton, SelectableButton} from '../genericElements/Buttons';
 import {useTranslation} from 'react-i18next';
 import {FontSizeSelector, FontSizeSelectorProps} from './FontSizeSelector';

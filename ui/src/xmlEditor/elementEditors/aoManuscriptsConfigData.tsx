@@ -1,5 +1,5 @@
 import {displayReplace, XmlSingleEditableNodeConfig} from '../editorConfig';
-import {isXmlElementNode, isXmlTextNode, XmlElementNode, XmlTextNode} from '../../xmlModel/xmlModel';
+import {isXmlElementNode, isXmlTextNode, XmlElementNode, XmlTextNode} from 'simple_xml';
 import {AoManuscriptsEditor} from './AoManuscriptsEditor';
 import update from 'immutability-helper';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';

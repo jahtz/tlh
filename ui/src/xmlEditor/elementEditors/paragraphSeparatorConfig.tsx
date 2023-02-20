@@ -1,6 +1,6 @@
 import {displayReplace, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
-import {XmlElementNode} from '../../xmlModel/xmlModel';
+import {XmlElementNode} from 'simple_xml';
 
 export const paragraphSeparatorConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'parsep' | 'parsep_dbl'>> = {
   replace: (node, _renderedChildren, isSelected) => displayReplace(

@@ -3,7 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {LanguageInput} from '../LanguageInput';
 import classNames from 'classnames';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
-import {XmlElementNode} from '../../xmlModel/xmlModel';
+import {XmlElementNode} from 'simple_xml';
 
 export const lineBreakNodeConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'lb'>> = {
   replace: (node, _renderedChildren, isSelected, isLeftSide) => displayReplace(

@@ -9,7 +9,7 @@ import {
   SingleMorphologicalAnalysisWithSingleEnclitics,
   writeMorphAnalysisValue
 } from '../../model/morphologicalAnalysis';
-import {isXmlElementNode, XmlElementNode} from '../../xmlModel/xmlModel';
+import {isXmlElementNode, XmlElementNode} from 'simple_xml';
 import {displayReplace, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {WordNodeEditor} from './WordNodeEditor';

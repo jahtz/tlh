@@ -1,4 +1,4 @@
-import {XmlElementNode} from '../xmlModel/xmlModel';
+import {XmlElementNode} from 'simple_xml';
 import {Argument as ClassNamesArgument} from 'classnames';
 import {InsertablePositions} from './insertablePositions';
 import {Spec} from 'immutability-helper';

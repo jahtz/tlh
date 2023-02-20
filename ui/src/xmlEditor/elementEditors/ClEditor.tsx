@@ -1,6 +1,7 @@
 import {displayReplace, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import {useTranslation} from 'react-i18next';
-import {buildActionSpec, getElementByPath, XmlElementNode} from '../../xmlModel/xmlModel';
+import {getElementByPath, XmlElementNode} from 'simple_xml';
+import {buildActionSpec} from '../XmlDocumentEditor';
 
 export const clEditorConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'cl'>> = {
   replace: (node, renderedChildren, isSelected, isLeftSide) => displayReplace(

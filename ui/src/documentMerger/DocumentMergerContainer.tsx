@@ -3,11 +3,9 @@ import {FileLoader} from '../forms/FileLoader';
 import {useState} from 'react';
 import update from 'immutability-helper';
 import {DocumentMerger} from './DocumentMerger';
-import {loadNewXml} from '../xmlModel/xmlReading';
-import {MergeDocument, MergeLine, readMergeDocument, mergeHeader} from './mergeDocument';
+import {isLeft, loadNewXml, XmlElementNode} from 'simple_xml';
+import {MergeDocument, mergeHeader, MergeLine, readMergeDocument} from './mergeDocument';
 import {MergedDocumentView} from './MergedDocumentView';
-import {isLeft} from '../xmlModel/either';
-import {XmlElementNode} from '../xmlModel/xmlModel';
 
 interface MergeFile {
   filename: string;
@@ -77,7 +75,7 @@ export function DocumentMergerContainer(): JSX.Element {
     if ('firstFile' in state && 'secondFile' in state) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      header=  mergeHeader(state.firstFile.document.header, state.secondFile.document.header);
+      header = mergeHeader(state.firstFile.document.header, state.secondFile.document.header);
 
     }
     setState((state) => update(state, {
@@ -97,7 +95,8 @@ export function DocumentMergerContainer(): JSX.Element {
       {(state._type === 'EmptyState' && <FileLoader onLoad={loadFirstDocument} accept={'text/xml'} text={t('loadFirstFile')}/>)
         || (state._type === 'FirstFileLoadedState' && <FileLoader onLoad={loadSecondDocument} accept={'text/xml'} text={t('loadSecondFile')}/>)
         || (state._type === 'SecondFileLoadedState' &&
-          <DocumentMerger firstDocument={state.firstFile.document} secondDocument={state.secondFile.document} MergedPublicationMapping={state.secondFile.document.MergedPublicationMapping} onMerge={onMerge}/>)
+          <DocumentMerger firstDocument={state.firstFile.document} secondDocument={state.secondFile.document}
+                          MergedPublicationMapping={state.secondFile.document.MergedPublicationMapping} onMerge={onMerge}/>)
         || (state._type === 'MergedState' && <MergedDocumentView lines={state.mergedLines} header={state.header}/>)}
 
     </div>

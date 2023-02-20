@@ -1,13 +1,11 @@
 import {useState} from 'react';
 import {NodeDisplay, NodeDisplayIProps} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
-import {XmlElementNode} from '../xmlModel/xmlModel';
+import {isLeft, parseNewXml, XmlElementNode} from 'simple_xml';
 import classNames from 'classnames';
-import {parseNewXml} from '../xmlModel/xmlReading';
 import {xml} from '@codemirror/lang-xml';
 import ReactCodeMirror from '@uiw/react-codemirror';
 import {writeXml} from './XmlDocumentEditor';
-import {isLeft} from '../xmlModel/either';
 import update from 'immutability-helper';
 import {FontSizeSelector} from './FontSizeSelector';
 import {NodePath} from './insertablePositions';

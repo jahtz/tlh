@@ -1,13 +1,12 @@
 import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {wordParser} from '../../transliterationParser/wordParser';
 import {Result} from 'parsimmon';
-import {XmlElementNode} from '../../xmlModel/xmlModel';
+import {writeNode, XmlElementNode} from 'simple_xml';
 import classNames from 'classnames';
 import {fetchMorphologicalAnalyses} from '../../model/morphologicalAnalysis';
 import {NodeDisplay} from '../NodeDisplay';
-import {writeNode} from '../../xmlModel/xmlWriting';
 import update from 'immutability-helper';
+import {wordParser} from 'simtex';
 
 interface IProps {
   initialTransliteration: string;

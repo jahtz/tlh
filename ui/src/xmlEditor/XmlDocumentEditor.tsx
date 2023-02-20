@@ -1,10 +1,9 @@
 import {useEffect, useState} from 'react';
-import {buildActionSpec, findFirstXmlElementByTagName, isXmlElementNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
+import {findFirstXmlElementByTagName, isXmlElementNode, writeNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './editorConfig';
 import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
 import {editorKeyConfigSelector} from '../newStore';
-import {writeNode} from '../xmlModel/xmlWriting';
 import update, {Spec} from 'immutability-helper';
 import {EditorLeftSide, EditorLeftSideProps} from './EditorLeftSide';
 import {EditorEmptyRightSide} from './EditorEmptyRightSide';
@@ -15,6 +14,13 @@ import {ReadFile} from '../xmlComparator/XmlComparatorContainer';
 import {XmlComparator} from '../xmlComparator/XmlComparator';
 import {NodeEditorRightSide} from './NodeEditorRightSide';
 import {FontSizeSelectorProps} from './FontSizeSelector';
+
+export function buildActionSpec(innerAction: Spec<XmlNode>, path: number[]): Spec<XmlNode> {
+  return path.reduceRight(
+    (acc, index) => ({children: {[index]: acc}}),
+    innerAction
+  );
+}
 
 interface IProps {
   node: XmlNode;

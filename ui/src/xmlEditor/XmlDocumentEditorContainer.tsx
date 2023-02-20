@@ -1,9 +1,7 @@
 import {useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
-import {XmlNode} from '../xmlModel/xmlModel';
+import {isLeft, loadNewXml, XmlNode} from 'simple_xml';
 import {XmlDocumentEditor} from './XmlDocumentEditor';
-import {loadNewXml} from '../xmlModel/xmlReading';
-import {isLeft} from '../xmlModel/either';
 import {XmlEditorConfig} from './editorConfig';
 
 const localStorageEditorStateKey = 'editorState';

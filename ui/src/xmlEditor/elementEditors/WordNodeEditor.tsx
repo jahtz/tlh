@@ -3,7 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {useState} from 'react';
 import {MorphologicalAnalysis, MultiMorphologicalAnalysisWithMultiEnclitics} from '../../model/morphologicalAnalysis';
 import {MorphAnalysisOptionContainer} from '../morphAnalysisOption/MorphAnalysisOptionContainer';
-import {isXmlElementNode, lastChildNode, xmlElementNode, XmlElementNode} from '../../xmlModel/xmlModel';
+import {isXmlElementNode, lastChildNode, xmlElementNode, XmlElementNode} from 'simple_xml';
 import {MorphAnalysisOptionEditor} from '../morphAnalysisOption/MorphAnalysisOptionEditor';
 import {reconstructTransliteration} from '../transliterationReconstruction';
 import {WordContentEditor} from './WordContentEditor';

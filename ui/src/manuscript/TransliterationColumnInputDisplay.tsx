@@ -1,10 +1,9 @@
 import {useTranslation} from 'react-i18next';
-import {LineParseResult} from '../transliterationParser/lineParseResult';
 import {SideParseResultComponent} from './SideParseResultComponent';
-import {parseTransliterationLine} from '../transliterationParser/lineParser';
 import {ManuscriptColumn, ManuscriptColumnModifier} from '../graphql';
 import {ManuscriptColumnInput} from './ManuscriptColumnInput';
 import {Spec} from 'immutability-helper';
+import {LineParseResult, parseTransliterationLine} from 'simtex';
 
 export interface ColumnInput {
   column: ManuscriptColumn;

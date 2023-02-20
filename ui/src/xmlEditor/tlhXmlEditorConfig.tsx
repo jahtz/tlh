@@ -1,5 +1,5 @@
 import {displayReplace, XmlEditorConfig} from './editorConfig';
-import {isXmlCommentNode, isXmlTextNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
+import {isXmlCommentNode, isXmlTextNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {noteNodeConfig} from './elementEditors/NoteNodeEditor';
 import {aoManuscriptsConfig} from './elementEditors/aoManuscriptsConfigData';
 import {lineBreakNodeConfig} from './elementEditors/LineBreakEditor';
