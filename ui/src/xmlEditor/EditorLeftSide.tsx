@@ -78,25 +78,29 @@ export function EditorLeftSide({
           <FontSizeSelector currentFontSize={state.fontSize} updateFontSize={changeFontSize}/>
 
           {state.xmlSource
-            ? <>
-              <button className="mr-2 px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource}
-                      title={t('cancelEditXmlSource') || 'cancelEditXmlSource'}>
-                &#x270E;
-              </button>
-              <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={onXmlSourceUpdate}
-                      title={t('applyXmlSourceChange') || 'applyXmlSourceChange'}>
-                &#x270E;
-              </button>
-            </>
-            : <>
-              <button onClick={() => setState((state) => update(state, {useSerifFont: {$apply: (use) => !use}}))}
-                      className="mr-2 px-2 border border-slate-500 rounded">
-                {state.useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
-              </button>
-              <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={activateShowSource} title={t('editSource') || 'editSource'}>
-                &#x270E;
-              </button>
-            </>}
+            ? (
+              <>
+                <button className="mr-2 px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource}
+                        title={t('cancelEditXmlSource') || 'cancelEditXmlSource'}>
+                  &#x270E;
+                </button>
+                <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={onXmlSourceUpdate}
+                        title={t('applyXmlSourceChange') || 'applyXmlSourceChange'}>
+                  &#x270E;
+                </button>
+              </>
+            )
+            : (
+              <>
+                <button onClick={() => setState((state) => update(state, {useSerifFont: {$apply: (use) => !use}}))}
+                        className="mr-2 px-2 border border-slate-500 rounded">
+                  {state.useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
+                </button>
+                <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={activateShowSource} title={t('editSource') || 'editSource'}>
+                  &#x270E;
+                </button>
+              </>
+            )}
 
           <button className="mr-2 px-2 rounded bg-green-400 text-white font-bold" onClick={exportXml} title={t('exportXml') || 'exportXml'}>
             &#x1F5AB;
