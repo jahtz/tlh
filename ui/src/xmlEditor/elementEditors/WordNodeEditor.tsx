@@ -129,8 +129,6 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
 
   // editing question
 
-  const isAddingEditingQuestion = state === editEditingQuestionState;
-
   const setEditingQuestion = (value: string | undefined) => updateAttribute('editingQuestion', value);
 
   const onEditingQuestionSubmit = (value: string): void => {
@@ -146,8 +144,6 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
   };
 
   // footnote
-
-  const isAddingFootNote = state === editFootNoteState;
 
   const lastChild = lastChildNode(data.node);
 
@@ -176,17 +172,20 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
 
   // Html
 
+  const onFocus = () => setKeyHandlingEnabled(false);
+  const onBlur = () => setKeyHandlingEnabled(true);
+  const onCancel = () => setState(defaultState);
+
   return state._type === 'EditContent'
     ? <WordContentEditor initialTransliteration={state.editContent} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>
     : (
       <>
         <div className="mt-2">
-          <LanguageInput initialValue={data.node.attributes.lg} onChange={(lg) => updateAttribute('lg', lg.trim() || '')}
-                         onFocus={() => setKeyHandlingEnabled(false)} onBlur={() => setKeyHandlingEnabled(true)}/>
+          <LanguageInput initialValue={data.node.attributes.lg} onChange={(lg) => updateAttribute('lg', lg.trim() || '')} onFocus={onFocus} onBlur={onBlur}/>
         </div>
 
         <div className="mt-2 grid grid-cols-3 gap-2">
-          <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={enableEditWordState} title={t('editContent') || 'editContent'}>
+          <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={enableEditWordState}>
             &#9998; {t('editContent')}
           </button>
           <button type="button" onClick={onEditEditingQuestionButtonClick} className="p-2 rounded bg-teal-400 text-white w-full">
@@ -197,14 +196,13 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
           </button>
         </div>
 
-        {isAddingEditingQuestion &&
+        {state === editEditingQuestionState &&
           <WordStringChildEditor title={t('editingQuestion')} initialValue={data.node.attributes.editingQuestion} onDelete={onRemoveEditingQuestion}
-                                 onCancel={() => setState(defaultState)} onSubmit={onEditingQuestionSubmit}
-                                 onFocus={() => setKeyHandlingEnabled(false)} onBlur={() => setKeyHandlingEnabled(true)}/>}
+                                 onCancel={onCancel} onSubmit={onEditingQuestionSubmit} onFocus={onFocus} onBlur={onBlur}/>}
 
-        {isAddingFootNote &&
-          <WordStringChildEditor title={t('footNote')} initialValue={footNote} onDelete={onRemoveFootNote} onCancel={() => setState(defaultState)}
-                                 onSubmit={onFootNoteSubmit} onFocus={() => setKeyHandlingEnabled(false)} onBlur={() => setKeyHandlingEnabled(true)}/>}
+        {state === editFootNoteState &&
+          <WordStringChildEditor title={t('footNote')} initialValue={footNote} onDelete={onRemoveFootNote} onCancel={onCancel} onSubmit={onFootNoteSubmit}
+                                 onFocus={onFocus} onBlur={onBlur}/>}
 
         {data.node.attributes.editingQuestion && /* TODO: styling... */
           <div className="p-2 text-center">{t('editingQuestion')}: {data.node.attributes.editingQuestion}!</div>}
@@ -234,7 +232,8 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
                   )}
               </div>
             )
-            : data.morphologies.map((m, index) => <div className="mt-2" key={m.number}>
+            : data.morphologies.map((m, index) =>
+              <div className="mt-2" key={m.number}>
                 <MorphAnalysisOptionContainer
                   morphologicalAnalysis={m}
                   toggleAnalysisSelection={(letterIndex, encLetterIndex, targetState) => toggleAnalysisSelection(index, letterIndex, encLetterIndex, targetState)}

@@ -27,18 +27,17 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
 
   const {t} = useTranslation('common');
   const [isReduced, setIsReduced] = useState(false);
-  const [lastAllSelected, setLastAllSelected] = useState<Numerus>();
+  const [lastNumerusSelected, setLastNumerusSelected] = useState<Numerus>();
 
   const {number, translation, referenceWord, paradigmClass, determinative} = morphologicalAnalysis;
   const isSingleAnalysisOption = isSingleMorphologicalAnalysis(morphologicalAnalysis);
 
   function selectAll(ma: MultiMorphologicalAnalysis, numerus?: Numerus): void {
+    const targetState = lastNumerusSelected !== undefined
+      ? lastNumerusSelected !== numerus
+      : numerus !== undefined;
 
-    const targetState = lastAllSelected !== undefined
-      ? lastAllSelected !== numerus
-      : undefined;
-
-    setLastAllSelected((current) => current === numerus ? undefined : numerus);
+    setLastNumerusSelected((current) => current === numerus ? undefined : numerus);
 
     ma.analysisOptions
       .forEach(({analysis}, index) => {
@@ -67,11 +66,11 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
           <button type="button" className={classNames('p-2', 'border', 'border-teal-300')} onClick={() => selectAll(morphologicalAnalysis)} tabIndex={-1}>
             {t('all')}
           </button>
-          <button type="button" className={classNames('p-2', 'border', 'border-teal-300', {'bg-teal-300': lastAllSelected === Numerus.Singular})}
+          <button type="button" className={classNames('p-2', 'border', 'border-teal-300', {'bg-teal-300': lastNumerusSelected === Numerus.Singular})}
                   onClick={() => selectAll(morphologicalAnalysis, Numerus.Singular)} tabIndex={-1}>
             {t('SG')}
           </button>
-          <button type="button" className={classNames('p-2', 'border', 'border-teal-300', {'bg-teal-300': lastAllSelected === Numerus.Plural})}
+          <button type="button" className={classNames('p-2', 'border', 'border-teal-300', {'bg-teal-300': lastNumerusSelected === Numerus.Plural})}
                   onClick={() => selectAll(morphologicalAnalysis, Numerus.Plural)} tabIndex={-1}>
             {t('PL')}
           </button>
@@ -85,8 +84,8 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
 
       {!isReduced && <div className="mt-2">
         {isSingleAnalysisOption
-          ? <SingleMorphAnalysisOptionButton morphAnalysis={morphologicalAnalysis}
-                                             toggleAnalysisSelection={(encLetterIndex) => toggleAnalysisSelection(undefined, encLetterIndex, undefined)}/>
+          ? <SingleMorphAnalysisOptionButton
+            morphAnalysis={morphologicalAnalysis} toggleAnalysisSelection={(encLetterIndex) => toggleAnalysisSelection(undefined, encLetterIndex, undefined)}/>
           : <MultiMorphAnalysisOptionButtons morphAnalysis={morphologicalAnalysis}
                                              toggleAnalysisSelection={(letterIndex, encLetterIndex) => toggleAnalysisSelection(letterIndex, encLetterIndex, undefined)}/>}
 
