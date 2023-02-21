@@ -6,13 +6,13 @@ import {homeUrl} from '../urls';
 import {Navigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {activeUserSelector, login} from '../newStore';
-import {object as yupObject, SchemaOf, string as yupString} from 'yup';
+import {object as yupObject, Schema, string as yupString} from 'yup';
 import {borderColors} from './colors';
 import classNames from 'classnames';
 
 const initialValues: LoginMutationVariables = {username: '', password: ''};
 
-const validationSchema: SchemaOf<LoginMutationVariables> = yupObject({
+const validationSchema: Schema<LoginMutationVariables> = yupObject({
   username: yupString().min(4).max(50).required(),
   password: yupString().min(4).max(50).required()
 }).required();

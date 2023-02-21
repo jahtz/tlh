@@ -2,11 +2,11 @@ import {useRegisterMutation, UserInput} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
 import {MyField} from './BulmaFields';
-import {object as yupObject, SchemaOf, string as yupString} from 'yup';
+import {object as yupObject, Schema, string as yupString} from 'yup';
 
 const initialValues: UserInput = {username: '', password: '', passwordRepeat: '', name: '', email: '', affiliation: ''};
 
-const validationSchema: SchemaOf<UserInput> = yupObject({
+const validationSchema: Schema<UserInput> = yupObject({
   username: yupString().min(4).max(50).required(),
   password: yupString().min(4).max(50).required(),
   passwordRepeat: yupString().min(4).max(50).required(),

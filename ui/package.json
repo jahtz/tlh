@@ -27,7 +27,7 @@
     "react-scripts": "^5.0.1",
     "simple_xml": "github:hethport/simple_xml#v0.1.1",
     "simtex": "github:hethport/simtex_ts#current",
-    "yup": "^0.32.9"
+    "yup": "^1.0.0"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^2.0.1",
