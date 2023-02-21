@@ -36,7 +36,7 @@ export function SingleMorphAnalysisOptionButton({morphAnalysis, toggleAnalysisSe
         <>
           {morphAnalysis.encliticsAnalysis.analysisOptions.map(({letter, analysis, selected}, index) =>
             <SelectableButton key={letter} selected={selected} otherClasses={['mb-1', ...otherClasses]} onClick={() => toggleAnalysisSelection(index)}>
-              <>{letter} - {analysis} <EncliticsAnalysisDisplay enclitics={morphAnalysis.encliticsAnalysis.enclitics} analysis={analysis}/></>
+              <>{letter} - {morphAnalysis.analysis} <EncliticsAnalysisDisplay enclitics={morphAnalysis.encliticsAnalysis.enclitics} analysis={analysis}/></>
             </SelectableButton>
           )}
         </>
