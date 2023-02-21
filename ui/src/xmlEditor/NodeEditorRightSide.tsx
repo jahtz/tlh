@@ -41,8 +41,11 @@ export function NodeEditorRightSide({
         <div className="float-right">
           <FontSizeSelector {...fontSizeSelectorProps}/>
 
-          {jumpElement && <button type="button" className="ml-2 px-2 rounded border border-slate-500" onClick={() => jumpElement(false)}
-                                  title={t('previousTag')}>&larr;</button>}
+          {jumpElement &&
+            <button type="button" className="ml-2 px-2 rounded border border-slate-500" onClick={() => jumpElement(false)}
+                    title={t('previousTag') || 'previousTag'}>
+              &larr;
+            </button>}
 
           {deleteNode && <DeleteButton onClick={deleteNode} otherClasses={['ml-2', 'px-2', 'rounded']}/>}
 
@@ -50,10 +53,15 @@ export function NodeEditorRightSide({
             <>{t('update')}</>
           </SelectableButton>
 
-          <button type="button" className="ml-2 px-2 rounded border border-slate-500" onClick={cancelSelection} title={t('cancelSelection')}>&#x2715;</button>
+          <button type="button" className="ml-2 px-2 rounded border border-slate-500" onClick={cancelSelection}
+                  title={t('cancelSelection') || 'cancelSelection'}>
+            &#x2715;
+          </button>
 
-          {jumpElement && <button type="button" className="ml-2 px-2 rounded border border-slate-500" onClick={() => jumpElement(true)}
-                                  title={t('nextTag')}>&rarr;</button>}
+          {jumpElement &&
+            <button type="button" className="ml-2 px-2 rounded border border-slate-500" onClick={() => jumpElement(true)} title={t('nextTag') || 'nextTag'}>
+              &rarr;
+            </button>}
         </div>
       </div>
 

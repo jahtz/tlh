@@ -69,16 +69,16 @@ export function MorphAnalysisOptionEditor({initialMorphologicalAnalysis, onSubmi
         <div className="px-4 py-2 rounded-l bg-gray-100 border-l border-y border-slate-500">{morphAnalysis.number}</div>
 
         <input type="text" name="translation" defaultValue={morphAnalysis.translation} className="flex-grow p-2 border border-slate-500"
-               placeholder={t('translation')} onChange={(event) => setTranslation(event.target.value)}/>
+               placeholder={t('translation') || 'translation'} onChange={(event) => setTranslation(event.target.value)}/>
 
         <input type="text" name="referenceWord" defaultValue={morphAnalysis.referenceWord} className="flex-grow p-2 border-r border-y border-slate-500"
-               placeholder={t('referenceWord')} onChange={(event) => setReferenceWord(event.target.value)}/>
+               placeholder={t('referenceWord') || 'referenceWord'} onChange={(event) => setReferenceWord(event.target.value)}/>
 
         <input type="text" name="determinative" defaultValue={morphAnalysis.determinative} className="flex-1 p-2 border-r border-y border-slate-500"
-               placeholder={t('determinative')} onChange={(event) => setDeterminativ(event.target.value)}/>
+               placeholder={t('determinative') || 'determinative'} onChange={(event) => setDeterminativ(event.target.value)}/>
 
         <input type="text" name="paradigmClass" defaultValue={morphAnalysis.paradigmClass} className="flex-1 p-2 rounded-r border-r border-y border-slate-500"
-               placeholder={t('paradigmClass')} onChange={(event) => setParadigmClass(event.target.value)}/>
+               placeholder={t('paradigmClass') || 'paradigmClass'} onChange={(event) => setParadigmClass(event.target.value)}/>
       </div>
 
       {isMultiMorphologicalAnalysis(morphAnalysis)
@@ -87,8 +87,8 @@ export function MorphAnalysisOptionEditor({initialMorphologicalAnalysis, onSubmi
             {morphAnalysis.analysisOptions.map(({letter, analysis}, index) =>
               <div key={letter} className="mt-2 flex flex-row">
                 <div className="px-4 py-2 rounded-l bg-gray-100 border-l border-y border-slate-500">{letter}</div>
-                <input type="text" defaultValue={analysis} className="flex-grow p-2 border-l border-y border-slate-500" placeholder={t('analysis')}
-                       onChange={(event) => updateMultiMorphAnalysisOption(index, event.target.value)}/>
+                <input type="text" defaultValue={analysis} className="flex-grow p-2 border-l border-y border-slate-500"
+                       placeholder={t('analysis') || 'analysis'} onChange={(event) => updateMultiMorphAnalysisOption(index, event.target.value)}/>
                 <button type="button" className="px-4 py-2 rounded-r bg-red-500 text-white" onClick={() => removeMultiMorphAnalysisOption(index)}>-</button>
               </div>)}
 
@@ -113,8 +113,8 @@ export function MorphAnalysisOptionEditor({initialMorphologicalAnalysis, onSubmi
                 {morphAnalysis.encliticsAnalysis.analysisOptions.map(({letter, analysis}, index) =>
                   <div key={letter} className="mt-2 flex flex-row">
                     <div className="px-4 py-2 rounded-l bg-gray-100 border-l border-y border-slate-500">{letter}</div>
-                    <input type="text" defaultValue={analysis} className="flex-grow p-2 border-l border-y border-slate-500" placeholder={t('analysis')}
-                           onChange={(event) => updateMultiEncliticsAnalysisOption(index, event.target.value)}/>
+                    <input type="text" defaultValue={analysis} className="flex-grow p-2 border-l border-y border-slate-500"
+                           placeholder={t('analysis') || 'analysis'} onChange={(event) => updateMultiEncliticsAnalysisOption(index, event.target.value)}/>
                     <button type="button" className="px-4 py-2 rounded-r bg-red-500 text-white" onClick={() => removeMultiEncliticsAnalysisOption(index)}>
                       -
                     </button>

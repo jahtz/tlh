@@ -33,6 +33,8 @@ export function EditButton({onClick, otherClasses}: BaseProps): JSX.Element {
   const className = classNames('ml-2', 'px-2', 'rounded', 'bg-blue-500', 'text-white', otherClasses);
 
   return (
-    <button type="button" className={className} onClick={onClick} title={t('editContent')}>&#9998;</button>
+    <button type="button" className={className} onClick={onClick} title={t('editContent') || 'editContent'}>
+      &#9998;
+    </button>
   );
 }

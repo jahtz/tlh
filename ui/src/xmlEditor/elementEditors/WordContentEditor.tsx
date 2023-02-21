@@ -55,7 +55,7 @@ export function WordContentEditor({initialTransliteration, cancelEdit, updateNod
         <label htmlFor="newTransliteration" className="p-2 rounded-l border-l border-y border-slate-500 font-bold">{t('newTransliteration')}:</label>
 
         <input defaultValue={initialTransliteration} className="flex-grow rounded-r border border-slate-500 p-2" id="newTransliteration"
-               placeholder={t('newTransliteration')} onChange={(event) => setState(readTransliteration(event.target.value))}/>
+               placeholder={t('newTransliteration') || 'newTransliteration'} onChange={(event) => setState(readTransliteration(event.target.value))}/>
       </div>
 
       <hr className="mt-4"/>

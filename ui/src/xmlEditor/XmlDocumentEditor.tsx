@@ -138,7 +138,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
     let author: string | null | undefined = state.author;
 
     if (!author) {
-      author = prompt(t('authorAbbreviation?'));
+      author = prompt(t('authorAbbreviation?') || 'authorAbbreviation?');
 
       if (!author) {
         alert(t('noExportWithoutAuthor'));
@@ -240,7 +240,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
   }
 
   function deleteNode(path: number[]): void {
-    if (confirm(t('deleteThisElement'))) {
+    if (confirm(t('deleteThisElement') || 'deleteThisElement')) {
       setState((state) => update(state, {
           rootNode: path.slice(0, -1).reduceRight<Spec<XmlNode>>(
             (acc, index) => ({children: {[index]: acc}}),
@@ -342,7 +342,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
       }
       : undefined,
     closeFile: () => {
-      if (!state.changed || confirm(t('closeFileOnUnfinishedChangesMessage'))) {
+      if (!state.changed || confirm(t('closeFileOnUnfinishedChangesMessage') || 'closeFileOnUnfinishedChangesMessage')) {
         closeFile();
       }
     },

@@ -92,8 +92,9 @@ export function DocumentMergerContainer(): JSX.Element {
         {'secondFile' in state && <button type="button" className="p-2 rounded border border-slate-500">{state.secondFile.filename}</button>}
       </div>}
 
-      {(state._type === 'EmptyState' && <FileLoader onLoad={loadFirstDocument} accept={'text/xml'} text={t('loadFirstFile')}/>)
-        || (state._type === 'FirstFileLoadedState' && <FileLoader onLoad={loadSecondDocument} accept={'text/xml'} text={t('loadSecondFile')}/>)
+      {(state._type === 'EmptyState' && <FileLoader onLoad={loadFirstDocument} accept={'text/xml'} text={t('loadFirstFile') || 'loadFirstFile'}/>)
+        || (state._type === 'FirstFileLoadedState' &&
+          <FileLoader onLoad={loadSecondDocument} accept={'text/xml'} text={t('loadSecondFile') || 'loadSecondFile'}/>)
         || (state._type === 'SecondFileLoadedState' &&
           <DocumentMerger firstDocument={state.firstFile.document} secondDocument={state.secondFile.document}
                           MergedPublicationMapping={state.secondFile.document.MergedPublicationMapping} onMerge={onMerge}/>)

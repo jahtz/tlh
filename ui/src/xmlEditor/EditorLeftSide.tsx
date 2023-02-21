@@ -79,10 +79,12 @@ export function EditorLeftSide({
 
           {state.xmlSource
             ? <>
-              <button className="mr-2 px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource} title={t('cancelEditXmlSource')}>
+              <button className="mr-2 px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource}
+                      title={t('cancelEditXmlSource') || 'cancelEditXmlSource'}>
                 &#x270E;
               </button>
-              <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={onXmlSourceUpdate} title={t('applyXmlSourceChange')}>
+              <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={onXmlSourceUpdate}
+                      title={t('applyXmlSourceChange') || 'applyXmlSourceChange'}>
                 &#x270E;
               </button>
             </>
@@ -91,14 +93,18 @@ export function EditorLeftSide({
                       className="mr-2 px-2 border border-slate-500 rounded">
                 {state.useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
               </button>
-              <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={activateShowSource} title={t('editSource')}>
+              <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={activateShowSource} title={t('editSource') || 'editSource'}>
                 &#x270E;
               </button>
             </>}
 
-          <button className="mr-2 px-2 rounded bg-green-400 text-white font-bold" onClick={exportXml} title={t('exportXml')}>&#x1F5AB;</button>
+          <button className="mr-2 px-2 rounded bg-green-400 text-white font-bold" onClick={exportXml} title={t('exportXml') || 'exportXml'}>
+            &#x1F5AB;
+          </button>
 
-          <button className="px-2 rounded bg-red-600 text-white font-bold" onClick={closeFile} title={t('closeFile')}>&#10799;</button>
+          <button className="px-2 rounded bg-red-600 text-white font-bold" onClick={closeFile} title={t('closeFile') || 'closeFile'}>
+            &#10799;
+          </button>
         </div>
       </div>
 

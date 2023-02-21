@@ -23,9 +23,8 @@ function NoteNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: XmlEdit
 
       <div className="mb-4">
         <label htmlFor="content" className="font-bold">{t('content')}:</label>
-        <input type="text" id="content" className="mt-2 p-2 rounded border border-slate-500 w-full" placeholder={t('content')}
-               defaultValue={data.attributes.c}
-               onFocus={() => setKeyHandlingEnabled(false)}
+        <input type="text" id="content" className="mt-2 p-2 rounded border border-slate-500 w-full" placeholder={t('content') || 'content'}
+               defaultValue={data.attributes.c} onFocus={() => setKeyHandlingEnabled(false)}
                onChange={(event) => updateEditedNode({attributes: {c: {$set: event.target.value}}})}/>
       </div>
     </>

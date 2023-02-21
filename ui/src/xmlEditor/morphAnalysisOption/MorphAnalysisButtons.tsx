@@ -77,7 +77,8 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
           </button>
         </>}
 
-        <button type="button" className="p-2 rounded-r border border-slate-500" onClick={enableEditMode} title={t('editMorphologicalAnalyses')}>
+        <button type="button" className="p-2 rounded-r border border-slate-500" onClick={enableEditMode}
+                title={t('editMorphologicalAnalyses') || 'editMorphologicalAnalyses'}>
           &#x2699;
         </button>
       </div>

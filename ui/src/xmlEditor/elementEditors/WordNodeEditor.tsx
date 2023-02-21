@@ -186,7 +186,7 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
         </div>
 
         <div className="mt-2 grid grid-cols-3 gap-2">
-          <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={enableEditWordState} title={t('editContent')}>
+          <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={enableEditWordState} title={t('editContent') || 'editContent'}>
             &#9998; {t('editContent')}
           </button>
           <button type="button" onClick={onEditEditingQuestionButtonClick} className="p-2 rounded bg-teal-400 text-white w-full">
