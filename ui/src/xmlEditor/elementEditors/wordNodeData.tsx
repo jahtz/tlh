@@ -21,14 +21,14 @@ import {selectedNodeClass} from '../tlhXmlEditorConfig';
  * TODO: deprecate?
  */
 export interface WordNodeData {
-  node: XmlElementNode;
+  node: XmlElementNode<'w'>;
   morphologies: MorphologicalAnalysis[];
 }
 
 export function readWordNodeData(node: XmlElementNode): WordNodeData {
   const selectedMorphologies = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
 
-  return {node, morphologies: readMorphologiesFromNode(node, selectedMorphologies)};
+  return {node: node as XmlElementNode<'w'>, morphologies: readMorphologiesFromNode(node, selectedMorphologies)};
 }
 
 export function extractSelMorphAnalysesFromSingleMorphWithoutEnc({selected, number}: SingleMorphologicalAnalysisWithoutEnclitics): string[] {
@@ -111,8 +111,6 @@ function isOnlySpaces({children}: XmlElementNode): boolean {
   return children.length === 1 && isXmlElementNode(children[0]) && children[0].tagName === 'space';
 }
 
-const emptyNodeTextColor = 'text-red-600';
-
 function backgroundColor(node: XmlElementNode, isSelected: boolean, selectedMorphology: string | undefined): string | undefined {
   // Prio 1: current selection
   if (isSelected) {
@@ -137,10 +135,6 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
 
     const selectedMorph = node.attributes.mrp0sel?.trim();
 
-    if (node.tagName === 'del_in' || node.tagName === 'del_fin') {
-      console.info(selectedMorph);
-    }
-
     const isForeignLanguage = selectedMorph !== undefined
       ? Object.keys(foreignLanguageColors).includes(selectedMorph)
       : false;
@@ -153,9 +147,9 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
         : [
           backgroundColor(node, isSelected, selectedMorph),
           {
-            [emptyNodeTextColor]: node.children.length === 0,
-            [foreignLanguageColors[node.attributes.mrp0sel || '']]: isForeignLanguage,
+            'text-red-600': node.children.length === 0,
             'font-bold': isForeignLanguage,
+            [foreignLanguageColors[node.attributes.mrp0sel || '']]: isForeignLanguage,
           }
         ]
     );
