@@ -1,4 +1,4 @@
-import {XmlElementNode} from 'simple_xml';
+import {XmlElementNode, XmlReadConfig, XmlWriteConfig} from 'simple_xml';
 import {Argument as ClassNamesArgument} from 'classnames';
 import {InsertablePositions} from './insertablePositions';
 import {Spec} from 'immutability-helper';
@@ -43,6 +43,8 @@ export interface XmlInsertableSingleEditableNodeConfig<T = XmlElementNode> exten
 export type XmlEditorNodeConfig = XmlSingleNodeConfig | XmlSingleEditableNodeConfig | XmlInsertableSingleEditableNodeConfig;
 
 export interface XmlEditorConfig {
+  readConfig: XmlReadConfig;
+  writeConfig: XmlWriteConfig;
   nodeConfigs: {
     [tagName: string]: XmlEditorNodeConfig;
   };

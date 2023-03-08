@@ -3,7 +3,6 @@ import {FileLoader} from '../forms/FileLoader';
 import {isLeft, loadNewXml, XmlNode} from 'simple_xml';
 import {XmlDocumentEditor} from './XmlDocumentEditor';
 import {XmlEditorConfig} from './editorConfig';
-import {tlhXmlReadConfig} from './tlhXmlReadConfig';
 
 const localStorageEditorStateKey = 'editorState';
 
@@ -42,7 +41,7 @@ export function XmlDocumentEditorContainer({editorConfig}: IProps): JSX.Element 
   const [state, setState] = useState<LoadedDocument | undefined>(initialState());
 
   async function readFile(file: File): Promise<void> {
-    const parseResult = await loadNewXml(file, tlhXmlReadConfig);
+    const parseResult = await loadNewXml(file, editorConfig.readConfig);
 
     if (isLeft(parseResult)) {
       alert(parseResult.value);

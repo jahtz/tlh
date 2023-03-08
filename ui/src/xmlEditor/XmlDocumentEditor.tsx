@@ -104,10 +104,12 @@ function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode
   return rootNode;
 }
 
-export function writeXml(node: XmlElementNode, editorConfig: XmlEditorConfig = tlhXmlEditorConfig): string {
+export function writeXml(node: XmlElementNode): string {
+  const editorConfig = tlhXmlEditorConfig;
+
   const nodeToExport = editorConfig.beforeExport(node);
 
-  const exported = writeNode(nodeToExport);
+  const exported = writeNode(nodeToExport, editorConfig.writeConfig);
 
   return editorConfig.afterExport(exported.join('\n'));
 }
@@ -153,7 +155,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
     setState((state) => update(state, {changed: {$set: false}}));
 
     download(
-      writeXml(toExport, editorConfig)
+      writeXml(toExport)
     );
   }
 
