@@ -34,6 +34,7 @@ interface MergedState {
   _type: 'MergedState';
   mergedLines: MergeLine[];
   header: XmlElementNode;
+  publicationMapping: Map<string, string[]>;
 }
 
 type IState = EmptyState | FirstFileLoadedState | SecondFileLoadedState | MergedState;
@@ -72,7 +73,7 @@ export function DocumentMergerContainer(): JSX.Element {
     }
   }
 
-  function onMerge(mergedLines: MergeLine[]): void {
+  function onMerge(mergedLines: MergeLine[], publicationMapping: Map<string, string[]>): void {
     let header: XmlElementNode;
     if ('firstFile' in state && 'secondFile' in state) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -81,7 +82,7 @@ export function DocumentMergerContainer(): JSX.Element {
 
     }
     setState((state) => update(state, {
-      $set: {_type: 'MergedState', mergedLines, header}
+      $set: {_type: 'MergedState', mergedLines, header, publicationMapping}
     }));
   }
 
@@ -98,7 +99,7 @@ export function DocumentMergerContainer(): JSX.Element {
         || (state._type === 'FirstFileLoadedState' && <FileLoader onLoad={loadSecondDocument} accept={'text/xml'} text={t('loadSecondFile')}/>)
         || (state._type === 'SecondFileLoadedState' &&
           <DocumentMerger firstDocument={state.firstFile.document} secondDocument={state.secondFile.document} MergedPublicationMapping={state.secondFile.document.MergedPublicationMapping} onMerge={onMerge}/>)
-        || (state._type === 'MergedState' && <MergedDocumentView lines={state.mergedLines} header={state.header}/>)}
+        || (state._type === 'MergedState' && <MergedDocumentView lines={state.mergedLines} header={state.header} publicationMapping={state.publicationMapping}/>)}
 
     </div>
   );

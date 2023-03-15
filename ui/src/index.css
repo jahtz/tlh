@@ -133,6 +133,8 @@ code {
 
 .grid-child-element li {
   height: 1.8rem !important;
+  font-size: 12px; /* fallback */
+  font-size: clamp(1px, 1vw, 16px);
 }
 
 .grid-child-element .mt-4 {
