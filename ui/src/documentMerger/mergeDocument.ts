@@ -39,7 +39,6 @@ export function readMergeDocument(rootNode: XmlElementNode): MergeDocument {
   element.children.forEach((node) => {
     if (isXmlElementNode(node) && node.tagName === 'lb') {
       node.attributes['lnr'] = replaceLNR(node, publicationMap);
-
       result.lines.push({lineNumberNode: node, rest: []});
     } else if (result.lines.length === 0) {
       result.prior.push(node);
@@ -86,7 +85,7 @@ function computeNewLineNumber(lnr: string | undefined, rnr: string | undefined):
 
   // TODO: make lineNumber a node!
   return leftMatch && leftMatch.groups && rightMatch && rightMatch.groups
-    ? `{€${leftMatch.groups.fragment}+${rightMatch.groups.fragment}} ${leftMatch.groups.lines} / ${rightMatch.groups.lines}`
+    ? `{€${leftMatch.groups.fragment}+${rightMatch.groups.fragment}} ${leftMatch.groups.lines}/${rightMatch.groups.lines}`
     : undefined;
 }
 
@@ -100,15 +99,17 @@ function mergeLine(
 
   const lineNumber = computeNewLineNumber(lnr, rnr) || (lnr + rnr);
 
+  const language = leftLineNumberNode.attributes.lg || '';
+  const txtid = leftLineNumberNode.attributes.txtid || '';
   const lineNumberNode: XmlElementNode = {
-    tagName: 'lb', children: [], attributes: {'lnr': lineNumber}
+    tagName: 'lb', children: [], attributes: {'txtid': txtid, 'lnr': lineNumber, 'lg': language}
   };
 
   return {lineNumberNode, rest: [...leftRest, mergeSeparatorElement, ...rightRest]};
 }
 
 function parsePublicationMapping(txtPublication: string, publMap: Map<string, string[]>) {
-  // <publcationString, {oldPubNr, newPublNr}>
+  // <publicationString, {oldPubNr, newPublNr}>
   const publMatch = txtPublication.match(txtPublicationRegex);
   let publName: string;
   let publNumber = 1;
@@ -133,7 +134,17 @@ function parsePublicationMapping(txtPublication: string, publMap: Map<string, st
   return publMap;
 }
 
-export function mergeHeader(firstDocumentHeader: XmlElementNode, secondDocumentHeader: XmlElementNode) {
+export function mergeHeader(firstDocumentHeader: XmlElementNode, secondDocumentHeader: XmlElementNode): XmlElementNode{
+  /*
+  too much recursion
+
+  const oldFirstDocumentHeader: XmlElementNode = firstDocumentHeader;
+  oldFirstDocumentHeader.tagName = 'doc';
+  oldFirstDocumentHeader.children.forEach((node) => {
+    if (isXmlElementNode(node) && node.tagName === 'docID') {
+      node.tagName = 'mDocID';
+    }
+  });*/
   secondDocumentHeader.tagName = 'doc';
   secondDocumentHeader.children.forEach((node) => {
     if (isXmlElementNode(node) && node.tagName === 'docID') {
@@ -143,8 +154,14 @@ export function mergeHeader(firstDocumentHeader: XmlElementNode, secondDocumentH
   const meta = findFirstXmlElementByTagName(firstDocumentHeader, 'meta');
   if (meta?.children) {
     const merged = xmlElementNode<'merged'>('merged');
+    //merged.children.push(oldFirstDocumentHeader);
     merged.children.push(secondDocumentHeader);
     meta.children.push(merged);
+  }
+  const docID = findFirstXmlElementByTagName(firstDocumentHeader, 'docID');
+  if (docID && isXmlTextNode(docID.children[0])) {
+    const newDocID: string = docID.children[0].textContent + '+';
+    docID.children[0].textContent = newDocID;
   }
   return firstDocumentHeader;
 }
@@ -156,12 +173,15 @@ export function replaceLNR(node: XmlElementNode, publicationMap: Map<string, str
   const lineMatch = textLine.match(lineNumberRegexNew);
   if (textLine && lineMatch && lineMatch.groups) {
     let lineIndex = lineMatch.groups.index;
+    console.log(lineMatch.groups);
     if (lineIndex.includes('+')) {
-      const lineIndices = lineIndex.split('+');
+      const lineIndices = lineIndex.replace('€', '').split('+');
       if (lineIndices.length == 2 && publicationMap.get(lineIndices[1]) && publicationMap.get(lineIndices[0])) {
+        // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
         lineIndices[1] = lineIndices[1].replace(lineIndices[1], publicationMap.get(lineIndices[1])![0]);
-        lineIndices[0] = lineIndices[0].replace(lineIndices[0].substring(1), publicationMap.get(lineIndices[0]?.substring(1))![0]);
-        lineIndex = lineIndices.join('+');
+        // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
+        lineIndices[0] = lineIndices[0].replace(lineIndices[0], publicationMap.get(lineIndices[0])![0]);
+        lineIndex = '€' + lineIndices.join('+');
       }
     } else {
 
@@ -172,11 +192,13 @@ export function replaceLNR(node: XmlElementNode, publicationMap: Map<string, str
         console.log(lineIndex.substring(1));
         console.log(publicationMap.get(lineIndex.substring(1)));
       }
+      // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
       lineIndex = lineIndex.replace(lineIndex.substring(1), publicationMap.get(lineIndex.substring(1))![0]);
     }
     textLine = textLine.replace(lineMatch.groups.index, lineIndex);
 
-  } else {
+  } else if( publicationMap.values()) {
+    // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
     textLine = '{€' + Array.from(publicationMap.values()).pop()![0] + '}' + textLine;
   }
   return textLine;
@@ -191,18 +213,22 @@ export function resetPublicationMap(publMap: Map<string, string[]>) {
       updatedMappings.set(index, mapping[0]);
     }
   });
-  if (updatedMappings!) {
+  if (updatedMappings) {
     Array.from(updatedMappings.entries()).map((mapping) => {
-      publMap.set(mapping[1], publMap.get(mapping[0])!);
-      publMap.delete(mapping[0]);
+      const pMap: string[] | undefined = publMap.get(mapping[0]);
+      if (pMap !== undefined ) {
+        publMap.set(mapping[1], pMap);
+        publMap.delete(mapping[0]);
+      }
+    });
+    Array.from(updatedMappings.entries()).map((entry) => {
+      const index = entry[0];
+      const mapping = entry[1];
+      if (index.toString() != mapping[0]) {
+        updatedMappings.set(index, mapping[0]);
+      }
     });
   }
-  Array.from(updatedMappings!.entries()).map((entry) => {
-    const index = entry[0];
-    const mapping = entry[1];
-    if (index.toString() != mapping[0]) {
-      updatedMappings.set(index, mapping[0]);
-    }
-  });
+
   return publMap;
 }

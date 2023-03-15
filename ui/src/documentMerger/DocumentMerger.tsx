@@ -9,7 +9,7 @@ interface IProps {
   firstDocument: MergeDocument;
   secondDocument: MergeDocument;
   //publicationMap: Map<string, string[]>;
-  onMerge: (lines: MergeLine[]) => void;
+  onMerge: (lines: MergeLine[], publicationMapping: Map<string, string[]>) => void;
   MergedPublicationMapping: Map<string, string[]> | undefined;
 }
 
@@ -61,7 +61,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
   console.log(data);
 
   function performMerge(): void {
-    onMerge(mergeLines(data));
+    onMerge(mergeLines(data), publicationMap);
   }
 
   let startIndex = 0;
@@ -102,10 +102,10 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
   const addLine = (isLeft: boolean, index: number): void => {
     const undef: unknown = undefined;
     if (isLeft) {
-      index = index + offset;
+      if (offset < 0) index = index + offset;
       firstLines = firstLines.splice(index + 1, 0, undef as MergeLine);
     } else {
-      index = index - offset;
+      if (offset > 0) index = index - offset;
       secondLines = secondLines.splice(index + 1, 0, undef as MergeLine);
     }
     //removeDoubleUndefined();
@@ -115,8 +115,10 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
 
   function removeLine(isLeft: boolean, index: number): void {
     if (isLeft && firstLines[index] === undefined) {
+      if (offset < 0) index = index + offset;
       firstLines.splice(index, 1);
     } else if (secondLines[index] === undefined) {
+      if (offset > 0) index = index - offset;
       secondLines.splice(index, 1);
     }
     forceUpdate();
@@ -174,8 +176,12 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
 
       leftIndices.push(newIndex);
       rightIndices.splice(rightIndices.indexOf(newIndex, 0), 1);
-      rightMap = updateLNR(rightMap.get(intersect)![1], parseInt(newIndex.toString()), rightMap, false, true);
-    }
+
+      const mapIntersect = rightMap.get(intersect);
+      if (mapIntersect) {
+        rightMap = updateLNR(mapIntersect[1], parseInt(newIndex.toString()), rightMap, false, true);
+      }
+     }
     const mergedMap: Map<string, string[]> = new Map([...Array.from(leftMap.entries()), ...Array.from(rightMap.entries())]);
     return mergedMap;
   }
