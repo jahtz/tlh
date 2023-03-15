@@ -1,9 +1,7 @@
 import {useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
-import {XmlNode} from '../xmlModel/xmlModel';
+import {isLeft, loadNewXml, XmlNode} from 'simple_xml';
 import {XmlDocumentEditor} from './XmlDocumentEditor';
-import {loadNewXml} from '../xmlModel/xmlReading';
-import {isLeft} from '../xmlModel/either';
 import {XmlEditorConfig} from './editorConfig';
 
 const localStorageEditorStateKey = 'editorState';
@@ -43,7 +41,7 @@ export function XmlDocumentEditorContainer({editorConfig}: IProps): JSX.Element 
   const [state, setState] = useState<LoadedDocument | undefined>(initialState());
 
   async function readFile(file: File): Promise<void> {
-    const parseResult = await loadNewXml(file);
+    const parseResult = await loadNewXml(file, editorConfig.readConfig);
 
     if (isLeft(parseResult)) {
       alert(parseResult.value);

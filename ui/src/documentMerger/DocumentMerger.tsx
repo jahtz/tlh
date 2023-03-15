@@ -176,8 +176,12 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
 
       leftIndices.push(newIndex);
       rightIndices.splice(rightIndices.indexOf(newIndex, 0), 1);
-      rightMap = updateLNR(rightMap.get(intersect)![1], parseInt(newIndex.toString()), rightMap, false, true);
-    }
+
+      const mapIntersect = rightMap.get(intersect);
+      if (mapIntersect) {
+        rightMap = updateLNR(mapIntersect[1], parseInt(newIndex.toString()), rightMap, false, true);
+      }
+     }
     const mergedMap: Map<string, string[]> = new Map([...Array.from(leftMap.entries()), ...Array.from(rightMap.entries())]);
     return mergedMap;
   }

@@ -1,8 +1,8 @@
 import {MergeLine} from './mergeDocument';
 import {MergeDocumentLine} from './DocumentMerger';
 import {useTranslation} from 'react-i18next';
-import {findFirstXmlElementByTagName, isXmlTextNode, xmlElementNode, XmlElementNode, XmlNode, xmlTextNode} from '../xmlModel/xmlModel';
-import {writeNode} from '../xmlModel/xmlWriting';
+
+import {writeNode, XmlElementNode, XmlNode, findFirstXmlElementByTagName, isXmlTextNode, xmlElementNode, xmlTextNode} from 'simple_xml';
 import {handleSaveToPC} from '../xmlEditor/XmlDocumentEditorContainer';
 import xmlFormat from 'xml-formatter';
 

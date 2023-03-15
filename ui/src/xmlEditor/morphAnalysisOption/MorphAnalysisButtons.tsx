@@ -5,47 +5,32 @@ import {isSingleMorphologicalAnalysis, MorphologicalAnalysis, MultiMorphological
 import {CanToggleAnalysisSelection} from './MorphAnalysisOptionContainer';
 import {MultiMorphAnalysisOptionButtons} from './MultiMorphAnalysisOptionButtons';
 import classNames from 'classnames';
+import {analysisIsInNumerus, numeri, NumerusOption, stringifyNumerus} from './numerusOption';
 
 interface IProps extends CanToggleAnalysisSelection {
   morphologicalAnalysis: MorphologicalAnalysis;
   enableEditMode: () => void;
 }
 
-enum Numerus {
-  Singular = 'SG', Plural = 'PL'
-}
-
-export function analysisIsInNumerus(analysis: string, numerus: Numerus): boolean {
-  const firstAnalysisPart = analysis.includes('_')
-    ? analysis.split('_')[0]
-    : analysis;
-
-  return firstAnalysisPart.includes(numerus) || firstAnalysisPart.includes('ABL') || firstAnalysisPart.includes('INS') || firstAnalysisPart.includes('ALL');
-}
-
 export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysisSelection, enableEditMode}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [isReduced, setIsReduced] = useState(false);
-  const [lastAllSelected, setLastAllSelected] = useState<Numerus>();
+  const [lastNumerusSelected, setLastNumerusSelected] = useState<NumerusOption>();
 
   const {number, translation, referenceWord, paradigmClass, determinative} = morphologicalAnalysis;
   const isSingleAnalysisOption = isSingleMorphologicalAnalysis(morphologicalAnalysis);
 
-  function selectAll(ma: MultiMorphologicalAnalysis, numerus?: Numerus): void {
+  function selectAll(ma: MultiMorphologicalAnalysis, numerus: NumerusOption): void {
+    const targetState: boolean = lastNumerusSelected === undefined || lastNumerusSelected !== numerus;
 
-    const targetState = lastAllSelected !== undefined
-      ? lastAllSelected !== numerus
-      : undefined;
+    setLastNumerusSelected((current) => current === numerus ? undefined : numerus);
 
-    setLastAllSelected((current) => current === numerus ? undefined : numerus);
-
-    ma.analysisOptions
-      .forEach(({analysis}, index) => {
-        if (!numerus || analysisIsInNumerus(analysis, numerus)) {
-          toggleAnalysisSelection(index, undefined, targetState);
-        }
-      });
+    ma.analysisOptions.forEach(({analysis}, index) => {
+      if (numerus === undefined || analysisIsInNumerus(analysis, numerus)) {
+        toggleAnalysisSelection(index, undefined, targetState);
+      }
+    });
   }
 
   return (
@@ -64,28 +49,23 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
         </div>
 
         {!isSingleAnalysisOption && <>
-          <button type="button" className={classNames('p-2', 'border', 'border-teal-300')} onClick={() => selectAll(morphologicalAnalysis)} tabIndex={-1}>
-            {t('all')}
-          </button>
-          <button type="button" className={classNames('p-2', 'border', 'border-teal-300', {'bg-teal-300': lastAllSelected === Numerus.Singular})}
-                  onClick={() => selectAll(morphologicalAnalysis, Numerus.Singular)} tabIndex={-1}>
-            {t('SG')}
-          </button>
-          <button type="button" className={classNames('p-2', 'border', 'border-teal-300', {'bg-teal-300': lastAllSelected === Numerus.Plural})}
-                  onClick={() => selectAll(morphologicalAnalysis, Numerus.Plural)} tabIndex={-1}>
-            {t('PL')}
-          </button>
+          {numeri.map((numerus) =>
+            <button key={numerus} type="button" className={classNames('p-2', 'border', 'border-teal-300', {'bg-teal-300': lastNumerusSelected === numerus})}
+                    onClick={() => selectAll(morphologicalAnalysis, numerus)} tabIndex={-1}>
+              {stringifyNumerus(numerus, t)}
+            </button>)}
         </>}
 
-        <button type="button" className="p-2 rounded-r border border-slate-500" onClick={enableEditMode} title={t('editMorphologicalAnalyses')}>
+        <button type="button" className="p-2 rounded-r border border-slate-500" onClick={enableEditMode}
+                title={t('editMorphologicalAnalyses') || 'editMorphologicalAnalyses'}>
           &#x2699;
         </button>
       </div>
 
       {!isReduced && <div className="mt-2">
         {isSingleAnalysisOption
-          ? <SingleMorphAnalysisOptionButton morphAnalysis={morphologicalAnalysis}
-                                             toggleAnalysisSelection={(encLetterIndex) => toggleAnalysisSelection(undefined, encLetterIndex, undefined)}/>
+          ? <SingleMorphAnalysisOptionButton
+            morphAnalysis={morphologicalAnalysis} toggleAnalysisSelection={(encLetterIndex) => toggleAnalysisSelection(undefined, encLetterIndex, undefined)}/>
           : <MultiMorphAnalysisOptionButtons morphAnalysis={morphologicalAnalysis}
                                              toggleAnalysisSelection={(letterIndex, encLetterIndex) => toggleAnalysisSelection(letterIndex, encLetterIndex, undefined)}/>}
 

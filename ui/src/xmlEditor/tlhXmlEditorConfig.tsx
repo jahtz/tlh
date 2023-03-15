@@ -1,5 +1,5 @@
 import {displayReplace, XmlEditorConfig} from './editorConfig';
-import {isXmlCommentNode, isXmlTextNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
+import {isXmlCommentNode, isXmlTextNode, LetterCorrection, XmlElementNode, XmlNode} from 'simple_xml';
 import {noteNodeConfig} from './elementEditors/NoteNodeEditor';
 import {aoManuscriptsConfig} from './elementEditors/aoManuscriptsConfigData';
 import {lineBreakNodeConfig} from './elementEditors/LineBreakEditor';
@@ -10,7 +10,6 @@ import {paragraphSeparatorConfig} from './elementEditors/paragraphSeparatorConfi
 import {clEditorConfig} from './elementEditors/ClEditor';
 
 export const selectedNodeClass = 'bg-teal-400';
-
 
 export function reCountNodeNumbers(rootNode: XmlElementNode, tagName: string, attrName: string): void {
 
@@ -34,8 +33,29 @@ export function reCountNodeNumbers(rootNode: XmlElementNode, tagName: string, at
   go(rootNode, 1);
 }
 
+const letterCorrections: LetterCorrection = [
+  // Corrections
+  ['š', 'š' /* kombi zu 161 */], ['Š', 'Š' /* kombi zu 160 */],
+  ['ḫ̮', 'ḫ'], ['Ḫ̮', 'Ḫ'], ['ḫ', 'ḫ'], ['Ḫ', 'Ḫ'], ['h', 'ḫ'], ['H', 'Ḫ'],
+  ['̮', '' /* Achtung, überzähliger Bogen unter Het! schlecht sichtbar */],
+  ['〈', '〈' /* U+3008 aus CJK zu  U+2329 */], ['〉', '〉'],
+  // Harmonizations
+  ['á', 'á'], ['à', 'à'], ['â', 'â'], ['ā', 'ā'],
+  ['é', 'é'], ['è', 'è'], ['ê', 'ê'], ['ē', 'ē'],
+  ['í', 'í'], ['ì', 'ì'], ['î', 'î'], ['ī', 'ī'],
+  ['ú', 'ú'], ['ù', 'ù'], ['û', 'û'], ['ū', 'ū'],
+];
 
 export const tlhXmlEditorConfig: XmlEditorConfig = {
+  readConfig: {
+    w: {
+      letterCorrections,
+      keepSpaces: true
+    }
+  },
+  writeConfig: {
+    inlineChildrenOf: ['w']
+  },
   nodeConfigs: {
     docID: {
       replace: () => displayReplace(<span/>)

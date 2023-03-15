@@ -1,7 +1,7 @@
 import {useTranslation} from 'react-i18next';
 import {BulmaTabs} from '../genericElements/BulmaTabs';
-import {LineParseResult, writeLineParseResultToXml} from '../transliterationParser/lineParseResult';
 import {LineParseResultDisplay} from './LineParseResultDisplay';
+import {LineParseResult, writeLineParseResultToXml} from 'simtex';
 
 interface IProps {
   lineParseResults: LineParseResult[];

@@ -2,7 +2,7 @@ import {displayReplace, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeCo
 import {useTranslation} from 'react-i18next';
 import classNames from 'classnames';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
-import {XmlElementNode, xmlElementNode} from '../../xmlModel/xmlModel';
+import {XmlElementNode, xmlElementNode} from 'simple_xml';
 
 export const clbNodeConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'clb'>> = {
   replace: (node, _element, isSelected) => displayReplace(

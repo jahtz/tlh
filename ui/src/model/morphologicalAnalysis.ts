@@ -1,6 +1,6 @@
 import {LetteredAnalysisOption, parseMultiAnalysisString, SelectableLetteredAnalysisOption} from './analysisOptions';
 import {tlhAnalyzerUrl} from '../urls';
-import {XmlElementNode} from '../xmlModel/xmlModel';
+import {XmlElementNode} from 'simple_xml';
 import {EncliticsAnalysis, isSingleEncliticsAnalysis, MultiEncliticsAnalysis, SingleEncliticsAnalysis, writeEncliticsAnalysis} from './encliticsAnalysis';
 import {SelectedMorphAnalysis, SelectedMultiMorphAnalysisWithEnclitic, selectedMultiMorphAnalysisWithEnclitics} from './selectedMorphologicalAnalysis';
 

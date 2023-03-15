@@ -1,10 +1,9 @@
 import {useEffect, useState} from 'react';
-import {buildActionSpec, findFirstXmlElementByTagName, isXmlElementNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
+import {findFirstXmlElementByTagName, isXmlElementNode, writeNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './editorConfig';
 import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
 import {editorKeyConfigSelector} from '../newStore';
-import {writeNode} from '../xmlModel/xmlWriting';
 import update, {Spec} from 'immutability-helper';
 import {EditorLeftSide, EditorLeftSideProps} from './EditorLeftSide';
 import {EditorEmptyRightSide} from './EditorEmptyRightSide';
@@ -15,6 +14,13 @@ import {ReadFile} from '../xmlComparator/XmlComparatorContainer';
 import {XmlComparator} from '../xmlComparator/XmlComparator';
 import {NodeEditorRightSide} from './NodeEditorRightSide';
 import {FontSizeSelectorProps} from './FontSizeSelector';
+
+export function buildActionSpec(innerAction: Spec<XmlNode>, path: number[]): Spec<XmlNode> {
+  return path.reduceRight(
+    (acc, index) => ({children: {[index]: acc}}),
+    innerAction
+  );
+}
 
 interface IProps {
   node: XmlNode;
@@ -98,10 +104,12 @@ function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode
   return rootNode;
 }
 
-export function writeXml(node: XmlElementNode, editorConfig: XmlEditorConfig = tlhXmlEditorConfig): string {
+export function writeXml(node: XmlElementNode): string {
+  const editorConfig = tlhXmlEditorConfig;
+
   const nodeToExport = editorConfig.beforeExport(node);
 
-  const exported = writeNode(nodeToExport);
+  const exported = writeNode(nodeToExport, editorConfig.writeConfig);
 
   return editorConfig.afterExport(exported.join('\n'));
 }
@@ -132,7 +140,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
     let author: string | null | undefined = state.author;
 
     if (!author) {
-      author = prompt(t('authorAbbreviation?'));
+      author = prompt(t('authorAbbreviation?') || 'authorAbbreviation?');
 
       if (!author) {
         alert(t('noExportWithoutAuthor'));
@@ -147,7 +155,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
     setState((state) => update(state, {changed: {$set: false}}));
 
     download(
-      writeXml(toExport, editorConfig)
+      writeXml(toExport)
     );
   }
 
@@ -234,7 +242,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
   }
 
   function deleteNode(path: number[]): void {
-    if (confirm(t('deleteThisElement'))) {
+    if (confirm(t('deleteThisElement') || 'deleteThisElement')) {
       setState((state) => update(state, {
           rootNode: path.slice(0, -1).reduceRight<Spec<XmlNode>>(
             (acc, index) => ({children: {[index]: acc}}),
@@ -336,7 +344,7 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
       }
       : undefined,
     closeFile: () => {
-      if (!state.changed || confirm(t('closeFileOnUnfinishedChangesMessage'))) {
+      if (!state.changed || confirm(t('closeFileOnUnfinishedChangesMessage') || 'closeFileOnUnfinishedChangesMessage')) {
         closeFile();
       }
     },

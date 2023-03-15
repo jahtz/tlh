@@ -1,4 +1,4 @@
-import {LineParseResult} from '../transliterationParser/lineParseResult';
+import {LineParseResult} from 'simtex';
 import {NodeDisplay} from '../xmlEditor/NodeDisplay';
 
 interface IProps {

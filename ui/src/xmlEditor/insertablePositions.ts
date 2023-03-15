@@ -1,4 +1,4 @@
-import {isXmlElementNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
+import {isXmlElementNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {Spec} from 'immutability-helper';
 
 export type NodePath = number[];

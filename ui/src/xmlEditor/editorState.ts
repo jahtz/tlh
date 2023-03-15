@@ -1,4 +1,4 @@
-import {XmlElementNode} from '../xmlModel/xmlModel';
+import {XmlElementNode} from 'simple_xml';
 import {InsertablePositions} from './insertablePositions';
 import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './editorConfig';
 

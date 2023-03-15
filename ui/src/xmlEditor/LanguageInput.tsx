@@ -18,7 +18,7 @@ export function LanguageInput({initialValue, onChange, onFocus, onBlur}: IProps)
     <div className="flex">
       <label htmlFor="language" className="p-2 rounded-l border-l border-y border-slate-500 bg-slate-100 font-bold">{t('language')}:</label>
 
-      <input defaultValue={initialValue} id="language" className="flex-grow p-2 rounded-r border border-slate-500" placeholder={t('language')}
+      <input defaultValue={initialValue} id="language" className="flex-grow p-2 rounded-r border border-slate-500" placeholder={t('language') || 'language'}
              list="languages" onChange={(event) => onChange(event.target.value)} onFocus={onFocus} onBlur={onBlur}/>
 
       <datalist id="languages">

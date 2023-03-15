@@ -1,13 +1,11 @@
 import {useState} from 'react';
 import {NodeDisplay, NodeDisplayIProps} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
-import {XmlElementNode} from '../xmlModel/xmlModel';
+import {isLeft, parseNewXml, XmlElementNode} from 'simple_xml';
 import classNames from 'classnames';
-import {parseNewXml} from '../xmlModel/xmlReading';
 import {xml} from '@codemirror/lang-xml';
 import ReactCodeMirror from '@uiw/react-codemirror';
 import {writeXml} from './XmlDocumentEditor';
-import {isLeft} from '../xmlModel/either';
 import update from 'immutability-helper';
 import {FontSizeSelector} from './FontSizeSelector';
 import {NodePath} from './insertablePositions';
@@ -80,27 +78,37 @@ export function EditorLeftSide({
           <FontSizeSelector currentFontSize={state.fontSize} updateFontSize={changeFontSize}/>
 
           {state.xmlSource
-            ? <>
-              <button className="mr-2 px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource} title={t('cancelEditXmlSource')}>
-                &#x270E;
-              </button>
-              <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={onXmlSourceUpdate} title={t('applyXmlSourceChange')}>
-                &#x270E;
-              </button>
-            </>
-            : <>
-              <button onClick={() => setState((state) => update(state, {useSerifFont: {$apply: (use) => !use}}))}
-                      className="mr-2 px-2 border border-slate-500 rounded">
-                {state.useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
-              </button>
-              <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={activateShowSource} title={t('editSource')}>
-                &#x270E;
-              </button>
-            </>}
+            ? (
+              <>
+                <button className="mr-2 px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource}
+                        title={t('cancelEditXmlSource') || 'cancelEditXmlSource'}>
+                  &#x270E;
+                </button>
+                <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={onXmlSourceUpdate}
+                        title={t('applyXmlSourceChange') || 'applyXmlSourceChange'}>
+                  &#x270E;
+                </button>
+              </>
+            )
+            : (
+              <>
+                <button onClick={() => setState((state) => update(state, {useSerifFont: {$apply: (use) => !use}}))}
+                        className="mr-2 px-2 border border-slate-500 rounded">
+                  {state.useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
+                </button>
+                <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={activateShowSource} title={t('editSource') || 'editSource'}>
+                  &#x270E;
+                </button>
+              </>
+            )}
 
-          <button className="mr-2 px-2 rounded bg-green-400 text-white font-bold" onClick={exportXml} title={t('exportXml')}>&#x1F5AB;</button>
+          <button className="mr-2 px-2 rounded bg-green-400 text-white font-bold" onClick={exportXml} title={t('exportXml') || 'exportXml'}>
+            &#x1F5AB;
+          </button>
 
-          <button className="px-2 rounded bg-red-600 text-white font-bold" onClick={closeFile} title={t('closeFile')}>&#10799;</button>
+          <button className="px-2 rounded bg-red-600 text-white font-bold" onClick={closeFile} title={t('closeFile') || 'closeFile'}>
+            &#10799;
+          </button>
         </div>
       </div>
 

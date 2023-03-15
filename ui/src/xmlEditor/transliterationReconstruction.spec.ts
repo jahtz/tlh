@@ -1,5 +1,5 @@
 import {reconstructTransliteration} from './transliterationReconstruction';
-import {XmlNode} from '../xmlModel/xmlModel';
+import {XmlNode} from 'simple_xml';
 
 const attributes = {};
 const children: XmlNode[] = [];

@@ -1,6 +1,5 @@
-import {findFirstXmlElementByTagName, isXmlElementNode, isXmlTextNode, xmlElementNode, XmlElementNode, XmlNode} from '../xmlModel/xmlModel';
+import {findFirstXmlElementByTagName, isXmlElementNode, isXmlTextNode, xmlElementNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {ZipWithOffsetResult} from './zipWithOffset';
-import * as domain from 'domain';
 
 export const lineNumberRegex = /{€(?<fragment>\d)}\s*(?<lines>[\W\w]+)/;
 export const txtPublicationRegex = /(?<publication>[\W\w]+)({€(?<lnr>\d+)})/;

@@ -9,7 +9,7 @@ import {
   SingleMorphologicalAnalysisWithSingleEnclitics,
   writeMorphAnalysisValue
 } from '../../model/morphologicalAnalysis';
-import {isXmlElementNode, XmlElementNode} from '../../xmlModel/xmlModel';
+import {isXmlElementNode, XmlElementNode} from 'simple_xml';
 import {displayReplace, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {WordNodeEditor} from './WordNodeEditor';
@@ -21,14 +21,14 @@ import {selectedNodeClass} from '../tlhXmlEditorConfig';
  * TODO: deprecate?
  */
 export interface WordNodeData {
-  node: XmlElementNode;
+  node: XmlElementNode<'w'>;
   morphologies: MorphologicalAnalysis[];
 }
 
 export function readWordNodeData(node: XmlElementNode): WordNodeData {
   const selectedMorphologies = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
 
-  return {node, morphologies: readMorphologiesFromNode(node, selectedMorphologies)};
+  return {node: node as XmlElementNode<'w'>, morphologies: readMorphologiesFromNode(node, selectedMorphologies)};
 }
 
 export function extractSelMorphAnalysesFromSingleMorphWithoutEnc({selected, number}: SingleMorphologicalAnalysisWithoutEnclitics): string[] {
@@ -111,42 +111,47 @@ function isOnlySpaces({children}: XmlElementNode): boolean {
   return children.length === 1 && isXmlElementNode(children[0]) && children[0].tagName === 'space';
 }
 
-const editingQuestionBgColor = 'bg-blue-300';
-const emptyNodeTextColor = 'text-red-600';
-const needsMorphologySelectionBgColor = 'bg-yellow-300';
+function backgroundColor(node: XmlElementNode, isSelected: boolean, selectedMorphology: string | undefined): string | undefined {
+  // Prio 1: current selection
+  if (isSelected) {
+    return selectedNodeClass;
+  }
+
+  // Prio 2: has editing question
+  if (node.attributes.editingQuestion !== undefined) {
+    return 'bg-blue-300';
+  }
+
+  // Prio 3: has no morphology selected
+  if (selectedMorphology !== undefined && selectedMorphology.length === 0 && selectedMorphology !== '???' && selectedMorphology !== 'DEL') {
+    return 'bg-yellow-300';
+  }
+
+  return undefined;
+}
 
 export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData> = {
   replace: (node, renderedChildren, isSelected) => {
 
-    const selectedMorph = node.attributes.mrp0sel;
-
-    if (node.tagName === 'del_in' || node.tagName === 'del_fin') {
-      console.info(selectedMorph);
-    }
-
-    const isDeletion = selectedMorph === 'DEL';
+    const selectedMorph = node.attributes.mrp0sel?.trim();
 
     const isForeignLanguage = selectedMorph !== undefined
       ? Object.keys(foreignLanguageColors).includes(selectedMorph)
       : false;
-
-    const hasNoMorphologySelected = selectedMorph !== undefined && selectedMorph.trim().length === 0 && selectedMorph !== '???';
 
     const hasEditingQuestion = node.attributes.editingQuestion !== undefined;
 
     const classes = classNames(node.attributes.lg || '',
       isOnlySpaces(node)
         ? [isSelected ? selectedNodeClass : 'bg-gray-200']
-        : (
+        : [
+          backgroundColor(node, isSelected, selectedMorph),
           {
-            [needsMorphologySelectionBgColor]: !isSelected && !isDeletion && hasNoMorphologySelected,
-            [emptyNodeTextColor]: node.children.length === 0,
-            [foreignLanguageColors[node.attributes.mrp0sel || '']]: isForeignLanguage,
+            'text-red-600': node.children.length === 0,
             'font-bold': isForeignLanguage,
-            [editingQuestionBgColor]: hasEditingQuestion,
-            [selectedNodeClass]: isSelected,
+            [foreignLanguageColors[node.attributes.mrp0sel || '']]: isForeignLanguage,
           }
-        )
+        ]
     );
 
     return displayReplace(
