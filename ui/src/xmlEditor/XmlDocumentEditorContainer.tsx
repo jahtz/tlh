@@ -67,7 +67,6 @@ export function XmlDocumentEditorContainer({editorConfig}: IProps): JSX.Element 
         : (
           <div className="container mx-auto">
             <FileLoader accept="text/xml" onLoad={readFile}/>
-            {/* TODO: let users open recently closed files? */}
           </div>
         )}
     </div>

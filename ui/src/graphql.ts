@@ -42,7 +42,7 @@ export type LoggedInUserMutationsManuscriptArgs = {
   mainIdentifier: Scalars['String'];
 };
 
-export enum ManuscriptColumn {
+export const enum ManuscriptColumn {
   ColumnDivider = 'ColumnDivider',
   I = 'I',
   Ii = 'II',
@@ -60,13 +60,13 @@ export enum ManuscriptColumn {
   X = 'X',
   Xi = 'XI',
   Xii = 'XII'
-}
+};
 
-export enum ManuscriptColumnModifier {
+export const enum ManuscriptColumnModifier {
   None = 'None',
   Slash = 'Slash',
   SlashQuestion = 'SlashQuestion'
-}
+};
 
 export type ManuscriptIdentifier = {
   __typename?: 'ManuscriptIdentifier';
@@ -79,11 +79,11 @@ export type ManuscriptIdentifierInput = {
   identifierType: ManuscriptIdentifierType;
 };
 
-export enum ManuscriptIdentifierType {
+export const enum ManuscriptIdentifierType {
   CollectionNumber = 'CollectionNumber',
   ExcavationNumber = 'ExcavationNumber',
   PublicationShortReference = 'PublicationShortReference'
-}
+};
 
 export type ManuscriptLanguage = {
   __typename?: 'ManuscriptLanguage';
@@ -126,7 +126,7 @@ export type ManuscriptMutationsUpdateTransliterationArgs = {
   values: Array<TransliterationSideInput>;
 };
 
-export enum ManuscriptSide {
+export const enum ManuscriptSide {
   InscriptionNumber = 'InscriptionNumber',
   LeftEdge = 'LeftEdge',
   LowerEdge = 'LowerEdge',
@@ -138,9 +138,9 @@ export enum ManuscriptSide {
   SideA = 'SideA',
   SideB = 'SideB',
   UpperEdge = 'UpperEdge'
-}
+};
 
-export enum ManuscriptStatus {
+export const enum ManuscriptStatus {
   Approved = 'Approved',
   Created = 'Created',
   ExecutiveReviewMerged = 'ExecutiveReviewMerged',
@@ -148,7 +148,7 @@ export enum ManuscriptStatus {
   InCreation = 'InCreation',
   ReviewMerged = 'ReviewMerged',
   Reviewed = 'Reviewed'
-}
+};
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -168,7 +168,7 @@ export type MutationRegisterArgs = {
   userInput: UserInput;
 };
 
-export enum PalaeographicClassification {
+export const enum PalaeographicClassification {
   AssyroMittanianScript = 'AssyroMittanianScript',
   LateNewScript = 'LateNewScript',
   MiddleAssyrianScript = 'MiddleAssyrianScript',
@@ -178,7 +178,7 @@ export enum PalaeographicClassification {
   OldAssyrianScript = 'OldAssyrianScript',
   OldScript = 'OldScript',
   Unclassified = 'Unclassified'
-}
+};
 
 export type Query = {
   __typename?: 'Query';
@@ -715,9 +715,3 @@ export function useUploadTransliterationMutation(baseOptions?: Apollo.MutationHo
 export type UploadTransliterationMutationHookResult = ReturnType<typeof useUploadTransliterationMutation>;
 export type UploadTransliterationMutationResult = Apollo.MutationResult<UploadTransliterationMutation>;
 export type UploadTransliterationMutationOptions = Apollo.BaseMutationOptions<UploadTransliterationMutation, UploadTransliterationMutationVariables>;
-export const MANUSCRIPT_COLUMN: ManuscriptColumn[] = [ManuscriptColumn.ColumnDivider, ManuscriptColumn.I, ManuscriptColumn.Ii, ManuscriptColumn.Iii, ManuscriptColumn.Iv, ManuscriptColumn.Ix, ManuscriptColumn.LeftColumn, ManuscriptColumn.MiddleColumn, ManuscriptColumn.None, ManuscriptColumn.RightColumn, ManuscriptColumn.V, ManuscriptColumn.Vi, ManuscriptColumn.Vii, ManuscriptColumn.Viii, ManuscriptColumn.X, ManuscriptColumn.Xi, ManuscriptColumn.Xii];
-export const MANUSCRIPT_COLUMN_MODIFIER: ManuscriptColumnModifier[] = [ManuscriptColumnModifier.None, ManuscriptColumnModifier.Slash, ManuscriptColumnModifier.SlashQuestion];
-export const MANUSCRIPT_IDENTIFIER_TYPE: ManuscriptIdentifierType[] = [ManuscriptIdentifierType.CollectionNumber, ManuscriptIdentifierType.ExcavationNumber, ManuscriptIdentifierType.PublicationShortReference];
-export const MANUSCRIPT_SIDE: ManuscriptSide[] = [ManuscriptSide.InscriptionNumber, ManuscriptSide.LeftEdge, ManuscriptSide.LowerEdge, ManuscriptSide.NotIdentifiable, ManuscriptSide.Obverse, ManuscriptSide.Reverse, ManuscriptSide.RightEdge, ManuscriptSide.SealInscription, ManuscriptSide.SideA, ManuscriptSide.SideB, ManuscriptSide.UpperEdge];
-export const MANUSCRIPT_STATUS: ManuscriptStatus[] = [ManuscriptStatus.Approved, ManuscriptStatus.Created, ManuscriptStatus.ExecutiveReviewMerged, ManuscriptStatus.ExecutiveReviewed, ManuscriptStatus.InCreation, ManuscriptStatus.ReviewMerged, ManuscriptStatus.Reviewed];
-export const PALAEOGRAPHIC_CLASSIFICATION: PalaeographicClassification[] = [PalaeographicClassification.AssyroMittanianScript, PalaeographicClassification.LateNewScript, PalaeographicClassification.MiddleAssyrianScript, PalaeographicClassification.MiddleBabylonianScript, PalaeographicClassification.MiddleScript, PalaeographicClassification.NewScript, PalaeographicClassification.OldAssyrianScript, PalaeographicClassification.OldScript, PalaeographicClassification.Unclassified];

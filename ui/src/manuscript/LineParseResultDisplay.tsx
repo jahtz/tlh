@@ -1,29 +1,26 @@
-import {LineParseResult} from 'simtex';
 import {NodeDisplay} from '../xmlEditor/NodeDisplay';
+import {LineParseResult} from './TransliterationColumnInputDisplay';
 
 interface IProps {
-  lineParseResult: LineParseResult;
+  line: LineParseResult;
 }
 
-export function LineParseResultDisplay({lineParseResult}: IProps): JSX.Element {
+export function LineParseResultDisplay({line: {statusLevel, events, nodes}}: IProps): JSX.Element {
 
-  if (lineParseResult.type === 'LinePreParsingError') {
-    return <div>TODO: 1</div>;
-  }
-
-  if (lineParseResult.type === 'LineWordParsingError') {
-    return <div>TODO: 2</div>;
-  }
-
-  const {lineNumber: {number, isConfirmed}, words, maybeParagraphSeparator} = lineParseResult;
+  const statusEvents = events.sort((a, b) => a.level.valueOf() - b.level.valueOf());
 
   return (
     <div>
-      <sup>{number}{isConfirmed ? '\'' : ''}</sup>
-      &nbsp;
-      {words.map((word, index) => <span key={index}><NodeDisplay node={word} isLeftSide={false}/>&nbsp;</span>)}
+      <span className="text-gray-500">({statusLevel})</span>
 
-      {maybeParagraphSeparator && <NodeDisplay node={maybeParagraphSeparator} isLeftSide={false}/>}
+      &nbsp;{nodes.map((node, index) => <NodeDisplay key={index} node={node} isLeftSide={false}/>)}
+
+      {statusEvents.map(({code, level, message}, index) =>
+        <p key={index} className="italic text-cyan-600">
+          {level} - {code}: {message}
+        </p>
+      )}
     </div>
   );
+
 }

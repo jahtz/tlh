@@ -2,12 +2,24 @@ import classNames from 'classnames';
 import {ErrorMessage, Field} from 'formik';
 import {getNameForPalaeoClassification} from '../model/manuscriptProperties/palaeoClassification';
 import {useTranslation} from 'react-i18next';
-import {PALAEOGRAPHIC_CLASSIFICATION} from '../graphql';
+import {PalaeographicClassification} from '../graphql';
 
 interface IProps {
   palaeographicClassificationSure: boolean;
   setPalaeographicClassificationSure: (value: boolean) => void;
 }
+
+export const palaeographicClassifications: PalaeographicClassification[] = [
+  PalaeographicClassification.AssyroMittanianScript,
+  PalaeographicClassification.LateNewScript,
+  PalaeographicClassification.MiddleAssyrianScript,
+  PalaeographicClassification.MiddleBabylonianScript,
+  PalaeographicClassification.MiddleScript,
+  PalaeographicClassification.NewScript,
+  PalaeographicClassification.OldAssyrianScript,
+  PalaeographicClassification.OldScript,
+  PalaeographicClassification.Unclassified,
+];
 
 export function PalaeographicClassificationField({palaeographicClassificationSure, setPalaeographicClassificationSure}: IProps): JSX.Element {
 
@@ -23,7 +35,7 @@ export function PalaeographicClassificationField({palaeographicClassificationSur
 
       <div className="mt-2 flex">
         <Field as="select" id="palaeographicClassification" name="palaeographicClassification" className={classes}>
-          {PALAEOGRAPHIC_CLASSIFICATION.map((pc) =>
+          {palaeographicClassifications.map((pc) =>
             <option key={pc} value={pc}>{getNameForPalaeoClassification(pc, t)}</option>
           )}
         </Field>

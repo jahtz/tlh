@@ -42,10 +42,7 @@ export function calculateInsertablePositions(
     result.push([...currentPath.slice(0, currentPath.length - 1), currentPath[currentPath.length - 1] + 1].join('.'));
   }
 
-  // FIXME: children!
   const childResults: string[] = node.children.flatMap((n, index) => calculateInsertablePositions(positions, n, [...currentPath, index]));
-
-  // console.info(result);
 
   return [...result, ...childResults];
 }

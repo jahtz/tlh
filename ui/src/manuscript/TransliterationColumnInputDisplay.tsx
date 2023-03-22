@@ -1,19 +1,34 @@
 import {useTranslation} from 'react-i18next';
-import {SideParseResultComponent} from './SideParseResultComponent';
+import {ColumnParseResultComponent} from './ColumnParseResultComponent';
 import {ManuscriptColumn, ManuscriptColumnModifier} from '../graphql';
 import {ManuscriptColumnInput} from './ManuscriptColumnInput';
 import {Spec} from 'immutability-helper';
-import {LineParseResult, parseTransliterationLine} from 'simtex';
+import {StatusEventCode, StatusLevel, TLHParser} from 'simtex';
+import {XmlNode} from 'simple_xml';
+
+export interface IStatusEvent {
+  readonly level: StatusLevel,
+  readonly code: StatusEventCode,
+  readonly message: string
+}
+
+export interface LineParseResult {
+  readonly statusLevel: StatusLevel;
+  readonly events: IStatusEvent[];
+  readonly nodes: XmlNode[];
+}
 
 export interface ColumnInput {
   column: ManuscriptColumn;
   columnModifier: ManuscriptColumnModifier;
+  parserStatusLevel: StatusLevel;
   currentLineParseResult: LineParseResult[];
 }
 
 export const defaultColumnInput: ColumnInput = {
   column: ManuscriptColumn.I,
   columnModifier: ManuscriptColumnModifier.None,
+  parserStatusLevel: StatusLevel.ok,
   currentLineParseResult: []
 };
 
@@ -26,9 +41,26 @@ export function TransliterationColumnInputDisplay({column, columnModifier, curre
 
   const {t} = useTranslation('common');
 
-  const updateTransliteration = (value: string): void => updateColumnInput(
-    {currentLineParseResult: {$set: value.split('\n').map((input) => parseTransliterationLine(input))}}
-  );
+  const updateTransliteration = (value: string): void => {
+    const parser = new TLHParser(value);
+
+    const parserLevel: StatusLevel = parser.getStatus().getLevel();
+
+    const lineResults = parser.getLines().map<LineParseResult>((line) => {
+      return {
+        statusLevel: line.getStatus().getLevel(),
+        events: line.getStatus().getEvents().map((statusEvent) => (
+          {level: statusEvent.getLevel(), code: statusEvent.getCode(), message: statusEvent.getMessage()}
+        )),
+        nodes: line.exportXml()
+      };
+    });
+
+    updateColumnInput({
+      parserStatusLevel: {$set: parserLevel},
+      currentLineParseResult: {$set: lineResults}
+    });
+  };
 
   return (
     <div className="mt-2 p-2 rounded border border-slate-500">
@@ -51,7 +83,7 @@ export function TransliterationColumnInputDisplay({column, columnModifier, curre
           <label className="font-bold block text-center">{t('parseResult')}:</label>
 
           {currentLineParseResult.length > 0
-            ? <SideParseResultComponent lineParseResults={currentLineParseResult}/>
+            ? <ColumnParseResultComponent lines={currentLineParseResult}/>
             : <div className="p-2 italic text-cyan-500 text-center">{t('no_result_yet')}...</div>}
         </section>
       </div>

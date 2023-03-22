@@ -46,9 +46,8 @@ function searchEditableNode(
   currentPath: number[],
   forward: boolean,
 ): number[] | undefined {
-  // FIXME: ignore nodes...
 
-  function go(node: XmlElementNode, currentPath: number[]): number[] | undefined {
+  const go = (node: XmlElementNode, currentPath: number[]): number[] | undefined => {
 
     if (node.tagName === tagName) {
       return [];
@@ -76,7 +75,7 @@ function searchEditableNode(
         return [i, ...foundChild];
       }
     }
-  }
+  };
 
   return go(rootNode, currentPath);
 }
@@ -136,7 +135,6 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
   });
 
   function exportXml(): void {
-    // FIXME: add annot node...
     let author: string | null | undefined = state.author;
 
     if (!author) {
@@ -224,14 +222,12 @@ export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download,
       const tagName = state.editorState.node.tagName;
 
       if (editorKeyConfig.updateAndNextEditableNodeKeys.includes(event.key)) {
-        // FIXME: update and jump...
         applyUpdates(
           searchEditableNode(tagName, state.rootNode as XmlElementNode, state.editorState.path, true)
         );
       } else if (editorKeyConfig.nextEditableNodeKeys.includes(event.key)) {
         jumpEditableNodes(tagName, true);
       } else if (editorKeyConfig.updateAndPreviousEditableNodeKeys.includes(event.key)) {
-        // FIXME: update and jump...
         applyUpdates(
           searchEditableNode(tagName, state.rootNode as XmlElementNode, state.editorState.path, false)
         );
