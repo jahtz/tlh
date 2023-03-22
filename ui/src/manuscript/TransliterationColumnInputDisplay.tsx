@@ -3,17 +3,32 @@ import {ColumnParseResultComponent} from './ColumnParseResultComponent';
 import {ManuscriptColumn, ManuscriptColumnModifier} from '../graphql';
 import {ManuscriptColumnInput} from './ManuscriptColumnInput';
 import {Spec} from 'immutability-helper';
-import {Line, TLHParser} from 'simtex';
+import {StatusEventCode, StatusLevel, TLHParser} from 'simtex';
+import {XmlNode} from 'simple_xml';
+
+export interface IStatusEvent {
+  readonly level: StatusLevel,
+  readonly code: StatusEventCode,
+  readonly message: string
+}
+
+export interface LineParseResult {
+  readonly statusLevel: StatusLevel;
+  readonly events: IStatusEvent[];
+  readonly nodes: XmlNode[];
+}
 
 export interface ColumnInput {
   column: ManuscriptColumn;
   columnModifier: ManuscriptColumnModifier;
-  currentLineParseResult: Line[];
+  parserStatusLevel: StatusLevel;
+  currentLineParseResult: LineParseResult[];
 }
 
 export const defaultColumnInput: ColumnInput = {
   column: ManuscriptColumn.I,
   columnModifier: ManuscriptColumnModifier.None,
+  parserStatusLevel: StatusLevel.ok,
   currentLineParseResult: []
 };
 
@@ -29,9 +44,22 @@ export function TransliterationColumnInputDisplay({column, columnModifier, curre
   const updateTransliteration = (value: string): void => {
     const parser = new TLHParser(value);
 
-    const lines: Line[] = parser.getLines();
+    const parserLevel: StatusLevel = parser.getStatus().getLevel();
 
-    updateColumnInput({currentLineParseResult: {$set: lines}});
+    const lineResults = parser.getLines().map<LineParseResult>((line) => {
+      return {
+        statusLevel: line.getStatus().getLevel(),
+        events: line.getStatus().getEvents().map((statusEvent) => (
+          {level: statusEvent.getLevel(), code: statusEvent.getCode(), message: statusEvent.getMessage()}
+        )),
+        nodes: line.exportXml()
+      };
+    });
+
+    updateColumnInput({
+      parserStatusLevel: {$set: parserLevel},
+      currentLineParseResult: {$set: lineResults}
+    });
   };
 
   return (

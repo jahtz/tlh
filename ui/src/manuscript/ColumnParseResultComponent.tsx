@@ -1,16 +1,16 @@
 import {useTranslation} from 'react-i18next';
 import {BulmaTabs} from '../genericElements/BulmaTabs';
 import {LineParseResultDisplay} from './LineParseResultDisplay';
-import {Line} from 'simtex';
 import {writeNode} from 'simple_xml';
 import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
+import {LineParseResult} from './TransliterationColumnInputDisplay';
 
 interface IProps {
-  lines: Line[];
+  lines: LineParseResult[];
 }
 
-const exportLines = (lines: Line[]): string[] => lines.map(
-  (line) => line.exportXml().map((node) => writeNode(node, tlhXmlEditorConfig.writeConfig)).join(' ')
+const exportLines = (lines: LineParseResult[]): string[] => lines.map(
+  ({nodes}) => nodes.map((node) => writeNode(node, tlhXmlEditorConfig.writeConfig)).join(' ')
 );
 
 export function ColumnParseResultComponent({lines}: IProps): JSX.Element {

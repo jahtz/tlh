@@ -1,27 +1,23 @@
-import {Line, StatusEvent} from 'simtex';
 import {NodeDisplay} from '../xmlEditor/NodeDisplay';
+import {LineParseResult} from './TransliterationColumnInputDisplay';
 
 interface IProps {
-  line: Line;
+  line: LineParseResult;
 }
 
-export function LineParseResultDisplay({line}: IProps): JSX.Element {
+export function LineParseResultDisplay({line: {statusLevel, events, nodes}}: IProps): JSX.Element {
 
-  const status = line.getStatus();
-
-  const statusEvents: StatusEvent[] = status
-    .getEvents()
-    .sort((a, b) => a.getLevel().valueOf() - b.getLevel().valueOf());
+  const statusEvents = events.sort((a, b) => a.level.valueOf() - b.level.valueOf());
 
   return (
     <div>
-      <span className="text-gray-500">({status.getLevel()})</span>
+      <span className="text-gray-500">({statusLevel})</span>
 
-      &nbsp;{line.exportXml().map((node, index) => <NodeDisplay key={index} node={node} isLeftSide={false}/>)}
+      &nbsp;{nodes.map((node, index) => <NodeDisplay key={index} node={node} isLeftSide={false}/>)}
 
-      {statusEvents.map((statusEvent, index) =>
+      {statusEvents.map(({code, level, message}, index) =>
         <p key={index} className="italic text-cyan-600">
-          {statusEvent.getLevel()} - {statusEvent.getCode()}: {statusEvent.getMessage()}
+          {level} - {code}: {message}
         </p>
       )}
     </div>

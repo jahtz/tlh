@@ -13,7 +13,7 @@ import {
 import {defaultSideInput, SideInput, TransliterationSideInputDisplay} from './TransliterationSideInputDisplay';
 import {Navigate, useLoaderData} from 'react-router-dom';
 import update from 'immutability-helper';
-import {Line} from 'simtex';
+import {LineParseResult} from './TransliterationColumnInputDisplay';
 
 interface IState {
   sides: SideInput[];
@@ -23,7 +23,7 @@ const defaultState: IState = {
   sides: [defaultSideInput]
 };
 
-function convertLineParseResult2TransliterationLineInput(lineParseResult: Line, lineIndex: number): TransliterationLineInput {
+function convertLineParseResult2TransliterationLineInput(lineParseResult: LineParseResult, lineIndex: number): TransliterationLineInput {
 
   // FIXME: implement!
   throw new Error('TODO!');
