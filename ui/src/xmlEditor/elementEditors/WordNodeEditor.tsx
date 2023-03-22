@@ -31,7 +31,6 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
     if (letterIndex !== undefined) {
       // Multi morph
       if (encLetterIndex !== undefined) {
-        // TODO: Multi enclitics
 
         const x = selectedMultiMorphAnalysisWithEnclitics(
           morphIndex + 1,

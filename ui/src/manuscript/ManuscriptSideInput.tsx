@@ -1,10 +1,24 @@
-import {MANUSCRIPT_SIDE, ManuscriptSide} from '../graphql';
+import {ManuscriptSide} from '../graphql';
 import {useTranslation} from 'react-i18next';
 
 interface IProps {
   currentSide: ManuscriptSide;
   update: (side: ManuscriptSide) => void;
 }
+
+const manuscriptSides: ManuscriptSide[] = [
+  ManuscriptSide.InscriptionNumber,
+  ManuscriptSide.LeftEdge,
+  ManuscriptSide.LowerEdge,
+  ManuscriptSide.NotIdentifiable,
+  ManuscriptSide.Obverse,
+  ManuscriptSide.Reverse,
+  ManuscriptSide.RightEdge,
+  ManuscriptSide.SealInscription,
+  ManuscriptSide.SideA,
+  ManuscriptSide.SideB,
+  ManuscriptSide.UpperEdge,
+];
 
 export function ManuscriptSideInput({currentSide, update}: IProps): JSX.Element {
 
@@ -18,7 +32,7 @@ export function ManuscriptSideInput({currentSide, update}: IProps): JSX.Element 
              onChange={(event) => update(event.target.value as ManuscriptSide)}/>
 
       <datalist id="manuscriptSides">
-        {MANUSCRIPT_SIDE.map((side) => <option key={side} value={side}/>)}
+        {manuscriptSides.map((side) => <option key={side} value={side}/>)}
       </datalist>
     </div>
   );

@@ -1,13 +1,19 @@
 import {useTranslation} from 'react-i18next';
 import {BulmaTabs} from '../genericElements/BulmaTabs';
 import {LineParseResultDisplay} from './LineParseResultDisplay';
-import {LineParseResult, writeLineParseResultToXml} from 'simtex';
+import {Line} from 'simtex';
+import {writeNode} from 'simple_xml';
+import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
 
 interface IProps {
-  lineParseResults: LineParseResult[];
+  lines: Line[];
 }
 
-export function SideParseResultComponent({lineParseResults}: IProps): JSX.Element {
+const exportLines = (lines: Line[]): string[] => lines.map(
+  (line) => line.exportXml().map((node) => writeNode(node, tlhXmlEditorConfig.writeConfig)).join(' ')
+);
+
+export function ColumnParseResultComponent({lines}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -17,7 +23,7 @@ export function SideParseResultComponent({lineParseResults}: IProps): JSX.Elemen
         name: t('rendered'),
         render: () => (
           <div>
-            {lineParseResults.map((lpr, index) => <LineParseResultDisplay key={index} lineParseResult={lpr}/>)}
+            {lines.map((lpr, index) => <LineParseResultDisplay key={index} line={lpr}/>)}
           </div>
         )
       },
@@ -25,7 +31,7 @@ export function SideParseResultComponent({lineParseResults}: IProps): JSX.Elemen
         name: t('asXml'),
         render: () => (
           <div className="p-2 rounded border border-slate-300 shadow shadow-slate-200">
-            {lineParseResults.map((l) => writeLineParseResultToXml(l)).map((xmlLine, index) => <p key={index}>{xmlLine}</p>)}
+            {exportLines(lines).map((xmlLine, index) => <p key={index}>{xmlLine}</p>)}
           </div>
         )
       }

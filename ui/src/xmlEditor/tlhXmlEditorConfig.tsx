@@ -109,7 +109,6 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
   },
   afterExport: (exported: string) => exported
     .replace(/®/g, '\n\t')
-    // FIXME: collides with fragments! {€1}
     .replace(/{/g, '\n\t\t{')
     .replace(/\+=/g, '\n\t\t   += ')
     .replace(/<w/g, '\n <w')

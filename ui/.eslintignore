@@ -2,3 +2,5 @@ src/reportWebVitals.tsx
 src/graphql.ts
 src/reportWebVitals.ts
 src/serviceWorker.ts
+
+codegen.ts

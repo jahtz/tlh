@@ -6,8 +6,8 @@ import classNames from 'classnames';
 import {fetchMorphologicalAnalyses} from '../../model/morphologicalAnalysis';
 import {NodeDisplay} from '../NodeDisplay';
 import update from 'immutability-helper';
-import {wordParser} from 'simtex';
 import {reconstructTransliteration} from '../transliterationReconstruction';
+import {Word} from 'simtex';
 
 interface IProps {
   oldNode: XmlElementNode;
@@ -15,10 +15,11 @@ interface IProps {
   updateNode: (node: XmlElementNode) => void;
 }
 
-type IState = Result<XmlElementNode>;
+function readTransliteration(transliteration: string): Result<XmlElementNode> {
+  // TODO: language!
+  const word: Word = Word.parseWord(null, transliteration);
 
-function readTransliteration(transliteration: string): IState {
-  return wordParser.parse(transliteration);
+  return {status: true, value: word.exportXml()};
 }
 
 export function WordContentEditor({oldNode, /*initialTransliteration,*/ cancelEdit, updateNode}: IProps): JSX.Element {
@@ -27,7 +28,7 @@ export function WordContentEditor({oldNode, /*initialTransliteration,*/ cancelEd
 
   const initialTransliteration = oldNode.children.map((c, index) => reconstructTransliteration(c, index === 0)).join('');
 
-  const [state, setState] = useState<IState>(readTransliteration(initialTransliteration));
+  const [state, setState] = useState<Result<XmlElementNode>>(readTransliteration(initialTransliteration));
 
   function submitEdit() {
     state.status && updateNode(state.value);

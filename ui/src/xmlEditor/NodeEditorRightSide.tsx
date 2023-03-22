@@ -29,7 +29,7 @@ export function NodeEditorRightSide({
   cancelSelection
 }: IProps): JSX.Element {
 
-  // FIXME: import editing question here for all elements?
+  // TODO: import editing question here for all elements?
 
   const {t} = useTranslation('common');
 

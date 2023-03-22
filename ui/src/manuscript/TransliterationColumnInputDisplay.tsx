@@ -1,14 +1,14 @@
 import {useTranslation} from 'react-i18next';
-import {SideParseResultComponent} from './SideParseResultComponent';
+import {ColumnParseResultComponent} from './ColumnParseResultComponent';
 import {ManuscriptColumn, ManuscriptColumnModifier} from '../graphql';
 import {ManuscriptColumnInput} from './ManuscriptColumnInput';
 import {Spec} from 'immutability-helper';
-import {LineParseResult, parseTransliterationLine} from 'simtex';
+import {Line, TLHParser} from 'simtex';
 
 export interface ColumnInput {
   column: ManuscriptColumn;
   columnModifier: ManuscriptColumnModifier;
-  currentLineParseResult: LineParseResult[];
+  currentLineParseResult: Line[];
 }
 
 export const defaultColumnInput: ColumnInput = {
@@ -26,9 +26,13 @@ export function TransliterationColumnInputDisplay({column, columnModifier, curre
 
   const {t} = useTranslation('common');
 
-  const updateTransliteration = (value: string): void => updateColumnInput(
-    {currentLineParseResult: {$set: value.split('\n').map((input) => parseTransliterationLine(input))}}
-  );
+  const updateTransliteration = (value: string): void => {
+    const parser = new TLHParser(value);
+
+    const lines: Line[] = parser.getLines();
+
+    updateColumnInput({currentLineParseResult: {$set: lines}});
+  };
 
   return (
     <div className="mt-2 p-2 rounded border border-slate-500">
@@ -51,7 +55,7 @@ export function TransliterationColumnInputDisplay({column, columnModifier, curre
           <label className="font-bold block text-center">{t('parseResult')}:</label>
 
           {currentLineParseResult.length > 0
-            ? <SideParseResultComponent lineParseResults={currentLineParseResult}/>
+            ? <ColumnParseResultComponent lines={currentLineParseResult}/>
             : <div className="p-2 italic text-cyan-500 text-center">{t('no_result_yet')}...</div>}
         </section>
       </div>

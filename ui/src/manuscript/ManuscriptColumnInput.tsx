@@ -1,4 +1,4 @@
-import {MANUSCRIPT_COLUMN, MANUSCRIPT_COLUMN_MODIFIER, ManuscriptColumn, ManuscriptColumnModifier} from '../graphql';
+import {ManuscriptColumn, ManuscriptColumnModifier} from '../graphql';
 import {useTranslation} from 'react-i18next';
 
 interface IProps {
@@ -8,6 +8,16 @@ interface IProps {
   updateColumnModifier: (columnModifier: ManuscriptColumnModifier) => void;
   deleteColumnInput: () => void;
 }
+
+const manuscriptColumns: ManuscriptColumn[] = [
+  ManuscriptColumn.ColumnDivider, ManuscriptColumn.I, ManuscriptColumn.Ii, ManuscriptColumn.Iii, ManuscriptColumn.Iv, ManuscriptColumn.Ix,
+  ManuscriptColumn.LeftColumn, ManuscriptColumn.MiddleColumn, ManuscriptColumn.None, ManuscriptColumn.RightColumn, ManuscriptColumn.V, ManuscriptColumn.Vi,
+  ManuscriptColumn.Vii, ManuscriptColumn.Viii, ManuscriptColumn.X, ManuscriptColumn.Xi, ManuscriptColumn.Xii,
+];
+
+const manuscriptColumnModifiers: ManuscriptColumnModifier[] = [
+  ManuscriptColumnModifier.None, ManuscriptColumnModifier.Slash, ManuscriptColumnModifier.SlashQuestion
+];
 
 export function ManuscriptColumnInput({column, updateColumn, columnModifier, updateColumnModifier, deleteColumnInput}: IProps): JSX.Element {
 
@@ -25,11 +35,11 @@ export function ManuscriptColumnInput({column, updateColumn, columnModifier, upd
       <button type="button" className="p-2 rounded-r bg-red-600 text-white" onClick={deleteColumnInput}>X</button>
 
       <datalist id="manuscriptColumns">
-        {MANUSCRIPT_COLUMN.map((column, index) => <option key={index} value={column}/>)}
+        {manuscriptColumns.map((column, index) => <option key={index} value={column}/>)}
       </datalist>
 
       <datalist id="manuscriptColumnModifiers">
-        {MANUSCRIPT_COLUMN_MODIFIER.map((columnModifier, index) => <option key={index} value={columnModifier}/>)}
+        {manuscriptColumnModifiers.map((columnModifier, index) => <option key={index} value={columnModifier}/>)}
       </datalist>
     </div>
   );

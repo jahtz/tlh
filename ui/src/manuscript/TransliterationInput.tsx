@@ -13,7 +13,7 @@ import {
 import {defaultSideInput, SideInput, TransliterationSideInputDisplay} from './TransliterationSideInputDisplay';
 import {Navigate, useLoaderData} from 'react-router-dom';
 import update from 'immutability-helper';
-import {LineParseResult, writeLineParseSuccessToXml} from 'simtex';
+import {Line} from 'simtex';
 
 interface IState {
   sides: SideInput[];
@@ -23,8 +23,12 @@ const defaultState: IState = {
   sides: [defaultSideInput]
 };
 
-function convertLineParseResult2TransliterationLineInput(lineParseResult: LineParseResult, lineIndex: number): TransliterationLineInput {
+function convertLineParseResult2TransliterationLineInput(lineParseResult: Line, lineIndex: number): TransliterationLineInput {
 
+  // FIXME: implement!
+  throw new Error('TODO!');
+
+  /*
   if (lineParseResult.type === 'LinePreParsingError' || lineParseResult.type === 'LineWordParsingError') {
     return {input: lineParseResult.input, lineIndex};
   }
@@ -32,6 +36,8 @@ function convertLineParseResult2TransliterationLineInput(lineParseResult: LinePa
   const {input, lineNumber} = lineParseResult;
 
   return {lineIndex, input, lineNumber, result: writeLineParseSuccessToXml(lineParseResult)};
+
+   */
 }
 
 export function TransliterationInput(): JSX.Element {
