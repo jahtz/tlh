@@ -8,6 +8,7 @@ import {NodeDisplay} from '../NodeDisplay';
 import update from 'immutability-helper';
 import {reconstructTransliteration} from '../transliterationReconstruction';
 import {Word} from 'simtex';
+import {tlhXmlEditorConfig} from '../tlhXmlEditorConfig';
 
 interface IProps {
   oldNode: XmlElementNode;
@@ -40,7 +41,7 @@ export function WordContentEditor({oldNode, /*initialTransliteration,*/ cancelEd
       return;
     }
 
-    fetchMorphologicalAnalyses(writeNode(state.value).join(''), 'Hit')
+    fetchMorphologicalAnalyses(writeNode(state.value, tlhXmlEditorConfig.writeConfig).join(''), 'Hit')
       .then((res) => {
         if (res) {
           setState((state) => update(state, {value: {attributes: {$set: res}}}));
@@ -78,7 +79,7 @@ export function WordContentEditor({oldNode, /*initialTransliteration,*/ cancelEd
                 <div className="p-2 rounded bg-white">
                   <NodeDisplay node={state.value} currentSelectedPath={undefined} isLeftSide={false}/>
                 </div>
-                <div className="mt-2 p-2 rounded bg-white">{writeNode(state.value).join('')}</div>
+                <div className="mt-2 p-2 rounded bg-white">{writeNode(state.value, tlhXmlEditorConfig.writeConfig).join('')}</div>
               </>
             )
             : <pre>{JSON.stringify(state, null, 2)}</pre>
