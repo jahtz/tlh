@@ -3,11 +3,7 @@
     "webonyx/graphql-php": "^v15.0.0",
     "rbdwllr/reallysimplejwt": "^4.0.0",
     "myclabs/php-enum": "^1.7.7",
-    "ext-json": "*",
-    "ext-xml": "*",
-    "ext-mysqli": "*",
-    "ext-mbstring": "*",
-    "ext-random": "*"
+    "ext-json": "*"
   },
   "config": {
     "vendor-dir": "html/vendor",
