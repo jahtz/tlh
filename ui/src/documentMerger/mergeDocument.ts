@@ -158,6 +158,7 @@ export function mergeHeader(firstDocumentHeader: XmlElementNode, secondDocumentH
     merged.children.push(secondDocumentHeader);
     meta.children.push(merged);
   }
+  // TODO: create new parent meta header
   const docID = findFirstXmlElementByTagName(firstDocumentHeader, 'docID');
   if (docID && isXmlTextNode(docID.children[0])) {
     const newDocID: string = docID.children[0].textContent + '+';
