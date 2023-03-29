@@ -1,40 +1,5 @@
-import {Field, FieldProps} from 'formik';
-import classNames from 'classnames';
 import {ChangeEvent} from 'react';
 
-interface CustomFieldProps extends FieldProps {
-  label: string;
-  id: string;
-}
-
-/**
- * @deprecated
- *
- * @param label
- * @param id
- * @param field
- * @param form
- * @param props
- * @constructor
- */
-export function MyField({label, id, field, form, ...props}: CustomFieldProps): JSX.Element {
-
-  const classes = classNames(
-    'p-2', 'rounded', 'border', 'w-full', 'mt-2',
-    form.touched[field.name]
-      ? (form.errors[field.name] ? 'border-red-500' : 'border-green-500')
-      : 'border-gray-400'
-  );
-
-  return (
-    <div className="mb-4">
-      <label htmlFor={id} className="font-bold">{label}:</label>
-      <Field {...props} {...field} id={id} placeholder={label} className={classes}/>
-    </div>
-  );
-}
-
-// Object Select
 
 export interface SelectOption<T> {
   value: T;
