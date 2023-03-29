@@ -1,6 +1,6 @@
 import {XmlElementNode} from 'simple_xml';
 import {InsertablePositions} from './insertablePositions';
-import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './editorConfig';
+import {XmlEditorConfig} from './editorConfig';
 
 // Default state
 
@@ -14,19 +14,15 @@ export const defaultRightSideState: DefaultEditorState = {
 
 // Edit node state
 
-export interface IEditNodeEditorState<T> {
+export interface IEditNodeEditorState {
   _type: 'EditNodeRightState';
   node: XmlElementNode;
-  data: T;
   changed: boolean;
   path: number[];
 }
 
-export function editNodeEditorState<T extends XmlElementNode>(node: XmlElementNode, editorConfig: XmlEditorConfig, path: number[]): IEditNodeEditorState<T> {
-
-  const config = editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>;
-
-  return {_type: 'EditNodeRightState', node, data: config.readNode(node), path, changed: false};
+export function editNodeEditorState(node: XmlElementNode, editorConfig: XmlEditorConfig, path: number[]): IEditNodeEditorState {
+  return {_type: 'EditNodeRightState', node, path, changed: false};
 }
 
 // Add node state
@@ -53,4 +49,4 @@ export const compareChangesEditorState: ICompareChangesEditorState = {
 
 // right side state
 
-export type EditorState<T> = DefaultEditorState | IEditNodeEditorState<T> | IAddNodeEditorState | ICompareChangesEditorState;
+export type EditorState = DefaultEditorState | IEditNodeEditorState | IAddNodeEditorState | ICompareChangesEditorState;

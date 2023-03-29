@@ -1,7 +1,31 @@
-import {XmlEditableNodeIProps} from '../editorConfig';
-import {AoSource, readSource, SourceType, sourceTypes} from './aoManuscriptsConfigData';
+import {displayReplace, XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from '../editorConfig';
 import {DeleteButton} from '../../genericElements/Buttons';
-import {isXmlElementNode, isXmlTextNode, XmlElementNode, xmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
+import {isXmlElementNode, isXmlTextNode, XmlElementNode, xmlElementNode, XmlNode, XmlTextNode, xmlTextNode} from 'simple_xml';
+import {selectedNodeClass} from '../tlhXmlEditorConfig';
+
+type SourceType = 'AO:TxtPubl' | 'AO:InvNr';
+const sourceTypes: SourceType[] = ['AO:TxtPubl', 'AO:InvNr'];
+
+export interface AoSource {
+  type: SourceType;
+  name: string;
+}
+
+export function readSource(node: XmlElementNode): AoSource {
+  if (node.tagName === 'AO:TxtPubl' || node.tagName === 'AO:InvNr') {
+    return {type: node.tagName, name: (node.children[0] as XmlTextNode).textContent};
+  } else {
+    throw new Error(`Could not read Source with tagName ${node.tagName}`);
+  }
+}
+
+export const aoManuscriptsConfig: XmlSingleEditableNodeConfig = {
+  replace: (node, renderedChildren, isSelected) => displayReplace(
+    <span className={isSelected ? selectedNodeClass : ''}>{renderedChildren}</span>
+  ),
+  edit: (props) => <AoManuscriptsEditor {...props}/>
+};
+
 
 interface AoTextNumberFieldProps {
   source: AoSource;
@@ -26,9 +50,9 @@ const newEntry: XmlNode[] = [
   xmlElementNode('AO:TxtPubl', {}, [xmlTextNode('')])
 ];
 
-export function AoManuscriptsEditor({data, updateEditedNode}: XmlEditableNodeIProps<XmlElementNode<'AO:Manuscripts'>>): JSX.Element {
+function AoManuscriptsEditor({node, updateEditedNode}: XmlEditableNodeIProps): JSX.Element {
 
-  const content: (AoSource | string)[] = data.children.map((n) => {
+  const content: (AoSource | string)[] = node.children.map((n) => {
     if (isXmlElementNode(n)) {
       return readSource(n);
     } else if (isXmlTextNode(n)) {

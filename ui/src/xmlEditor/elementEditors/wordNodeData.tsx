@@ -5,26 +5,8 @@ import {WordNodeEditor} from './WordNodeEditor';
 import {SpacesEditor} from './SpacesEditor';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 
-export function readWordNodeData(node: XmlElementNode): XmlElementNode<'w'> {
-  return node as XmlElementNode<'w'>;
-}
-
-export function writeWordNodeData(node: XmlElementNode<'w'>): XmlElementNode {
-  const {
-    tagName,
-    attributes: {trans, mrp0sel, ...rest},
-    children
-  } = node;
-
-  return {
-    tagName,
-    // put attributes trans and mrp0sel at start of tag...
-    attributes: {trans, mrp0sel, ...rest},
-    children
-  };
-}
-
 const foreignLanguageColors: { [key: string]: string } = {
+  // FIXME: other colors!
   HURR: 'Hur',
   HATT: 'Hat',
   // PAL: '',
@@ -54,7 +36,7 @@ function backgroundColor(node: XmlElementNode, isSelected: boolean, selectedMorp
   return undefined;
 }
 
-export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'w'>> = {
+export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig = {
   replace: (node, renderedChildren, isSelected) => {
 
     const selectedMorph = node.attributes.mrp0sel?.trim();
@@ -87,11 +69,9 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNod
       </>
     );
   },
-  edit: (props) => isOnlySpaces(props.data)
+  edit: (props) => isOnlySpaces(props.node)
     ? <SpacesEditor {...props}/>
     : <WordNodeEditor {...props}/>,
-  readNode: readWordNodeData,
-  writeNode: writeWordNodeData,
   insertablePositions: {
     beforeElement: ['w'],
     afterElement: ['lb', 'w'],

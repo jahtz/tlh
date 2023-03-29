@@ -3,14 +3,12 @@ import {useTranslation} from 'react-i18next';
 import {getElementByPath, XmlElementNode} from 'simple_xml';
 import {buildActionSpec} from '../XmlDocumentEditor';
 
-export const clEditorConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'cl'>> = {
+export const clEditorConfig: XmlInsertableSingleEditableNodeConfig = {
   replace: (node, renderedChildren, isSelected, isLeftSide) => displayReplace(
     <><span className="px-1 cl">{node.attributes.id || ' '}</span>&nbsp;</>,
     isLeftSide ? <>{renderedChildren}<br/></> : undefined
   ),
   edit: (props) => <ClEditor {...props} />,
-  readNode: (n) => n as XmlElementNode<'cl'>,
-  writeNode: (n) => n,
   dontRenderChildrenInline: true,
   insertablePositions: {
     beforeElement: ['cl', 'w'],
@@ -34,7 +32,7 @@ export const clEditorConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNod
   }
 };
 
-function ClEditor({data, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNodeIProps<XmlElementNode<'cl'>>): JSX.Element {
+function ClEditor({node, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNodeIProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -42,7 +40,7 @@ function ClEditor({data, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNo
     <>
       <label htmlFor="id" className="font-bold block">{t('id')}:</label>
       <input id="id" className="mt-2 p-2 rounded border border-slate-200 w-full"
-             defaultValue={data.attributes.id}
+             defaultValue={node.attributes.id}
              onFocus={() => setKeyHandlingEnabled(false)}
              onChange={(event) => updateEditedNode({attributes: {id: {$set: event.target.value}}})}/>
     </>

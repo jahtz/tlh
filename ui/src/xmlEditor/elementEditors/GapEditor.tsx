@@ -7,7 +7,7 @@ function isLineGapNode(node: XmlElementNode): boolean {
   return 't' in node.attributes && node.attributes.t === 'line';
 }
 
-export const gapConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'gap'>> = {
+export const gapConfig: XmlInsertableSingleEditableNodeConfig = {
   replace: (node, _renderedChildren, isSelected, isLeftSide) => displayReplace(
     <>
       {isLineGapNode(node) && isLeftSide && <br/>}
@@ -15,8 +15,6 @@ export const gapConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'ga
     </>
   ),
   edit: (props) => <GapEditor {...props}/>,
-  readNode: (n) => n as XmlElementNode<'gap'>,
-  writeNode: (n) => n,
   insertablePositions: {
     beforeElement: ['w'],
     afterElement: ['lb', 'w'],
@@ -24,7 +22,7 @@ export const gapConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'ga
   }
 };
 
-function GapEditor({data, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNodeIProps<XmlElementNode<'gap'>>): JSX.Element {
+function GapEditor({node, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNodeIProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -32,7 +30,7 @@ function GapEditor({data, updateEditedNode, setKeyHandlingEnabled}: XmlEditableN
     <>
       <label htmlFor="content" className="font-bold">{t('content')}:</label>
       <input type="text" id="content" className="mt-2 p-2 rounded border border-slate-500 w-full"
-             defaultValue={data.attributes.c}
+             defaultValue={node.attributes.c}
              onFocus={() => setKeyHandlingEnabled(false)}
              onChange={(event) => updateEditedNode({attributes: {c: {$set: event.target.value}}})}/>
     </>

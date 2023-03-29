@@ -3,11 +3,10 @@ import {Argument as ClassNamesArgument} from 'classnames';
 import {InsertablePositions} from './insertablePositions';
 import {Spec} from 'immutability-helper';
 
-export interface XmlEditableNodeIProps<T = XmlElementNode> {
-  data: T;
+export interface XmlEditableNodeIProps {
+  node: XmlElementNode;
   path: number[];
-  updateEditedNode: (spec: Spec<T>) => void;
-  // updateAttribute: (key: string, value: string | undefined) => void;
+  updateEditedNode: (spec: Spec<XmlElementNode>) => void;
   setKeyHandlingEnabled: (enabled: boolean) => void;
 }
 
@@ -26,17 +25,15 @@ export interface XmlSingleNodeConfig {
   dontRenderChildrenInline?: boolean;
 }
 
-export interface XmlSingleEditableNodeConfig<T extends XmlElementNode = XmlElementNode> extends XmlSingleNodeConfig {
-  edit: (props: XmlEditableNodeIProps<T>) => JSX.Element;
-  readNode: (node: XmlElementNode) => T;
-  writeNode: (t: T, originalNode: XmlElementNode) => XmlElementNode;
+export interface XmlSingleEditableNodeConfig extends XmlSingleNodeConfig {
+  edit: (props: XmlEditableNodeIProps) => JSX.Element;
 }
 
-export function isXmlEditableNodeConfig<T extends XmlElementNode>(c: XmlEditorNodeConfig): c is XmlSingleEditableNodeConfig<T> {
+export function isXmlEditableNodeConfig(c: XmlEditorNodeConfig): c is XmlSingleEditableNodeConfig {
   return 'edit' in c;
 }
 
-export interface XmlInsertableSingleEditableNodeConfig<T extends XmlElementNode = XmlElementNode> extends XmlSingleEditableNodeConfig<T> {
+export interface XmlInsertableSingleEditableNodeConfig extends XmlSingleEditableNodeConfig {
   insertablePositions: InsertablePositions;
 }
 

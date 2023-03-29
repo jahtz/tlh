@@ -31,10 +31,10 @@ interface IProps {
   autoSave: (rootNode: XmlNode) => void;
 }
 
-interface IState<T extends XmlElementNode> {
+interface IState {
   keyHandlingEnabled: boolean;
   rootNode: XmlNode;
-  editorState: EditorState<T>;
+  editorState: EditorState;
   changed: boolean;
   author?: string;
   rightSideFontSize: number;
@@ -113,11 +113,11 @@ export function writeXml(node: XmlElementNode): string {
   return editorConfig.afterExport(exported.join('\n'));
 }
 
-export function XmlDocumentEditor<T extends XmlElementNode>({node: initialNode, editorConfig, download, filename, closeFile, autoSave}: IProps): JSX.Element {
+export function XmlDocumentEditor({node: initialNode, editorConfig, download, filename, closeFile, autoSave}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);
-  const [state, setState] = useState<IState<T>>({
+  const [state, setState] = useState<IState>({
     keyHandlingEnabled: true,
     rootNode: initialNode,
     editorState: defaultRightSideState,
@@ -159,16 +159,14 @@ export function XmlDocumentEditor<T extends XmlElementNode>({node: initialNode, 
 
   function onNodeSelect(node: XmlElementNode, path: number[]): void {
     setState((state) => update(state, {
-      editorState: {
-        $apply: (editorState) => editorState._type === 'EditNodeRightState' && editorState.path.join('.') === path.join('.')
-          ? defaultRightSideState
-          : editNodeEditorState(node, editorConfig, path)
-      }
+      editorState: (currentEditorState) => currentEditorState._type === 'EditNodeRightState' && currentEditorState.path.join('.') === path.join('.')
+        ? defaultRightSideState
+        : editNodeEditorState(node, editorConfig, path)
     }));
   }
 
   function applyUpdates(nextEditablePath?: number[]): void {
-    let newEditorState: IEditNodeEditorState<T> | undefined = undefined;
+    let newEditorState: IEditNodeEditorState | undefined = undefined;
 
     if (nextEditablePath !== undefined) {
       const node = findElement(state.rootNode as XmlElementNode, nextEditablePath);
@@ -182,7 +180,7 @@ export function XmlDocumentEditor<T extends XmlElementNode>({node: initialNode, 
       ? update(state, {
         rootNode: state.editorState.path.reduceRight<Spec<XmlNode>>(
           (acc, index) => ({children: {[index]: acc}}),
-          {$set: (editorConfig.nodeConfigs[state.editorState.node.tagName] as XmlSingleEditableNodeConfig<T>).writeNode(state.editorState.data, state.editorState.node)}
+          {$set: state.editorState.node}
         ),
         editorState: newEditorState
           ? {$set: newEditorState}
@@ -193,13 +191,11 @@ export function XmlDocumentEditor<T extends XmlElementNode>({node: initialNode, 
     );
   }
 
-  function updateEditedNode(updateSpec: Spec<T>): void {
+  function updateEditedNode(updateSpec: Spec<XmlElementNode>): void {
     setState((state) => update(state, {
-      editorState: {
-        $apply: (editorState) => editorState._type === 'EditNodeRightState'
-          ? update(editorState, {data: updateSpec, changed: {$set: true}})
-          : editorState
-      }
+      editorState: (editorState) => editorState._type === 'EditNodeRightState'
+        ? update(editorState, {node: updateSpec, changed: {$set: true}})
+        : editorState
     }));
   }
 
@@ -251,7 +247,7 @@ export function XmlDocumentEditor<T extends XmlElementNode>({node: initialNode, 
     }
   }
 
-  function renderNodeEditor({node, data, path, changed}: IEditNodeEditorState<T>): JSX.Element {
+  function renderNodeEditor({node, path, changed}: IEditNodeEditorState): JSX.Element {
 
     const fontSizeSelectorProps: FontSizeSelectorProps = {
       currentFontSize: state.rightSideFontSize,
@@ -260,7 +256,7 @@ export function XmlDocumentEditor<T extends XmlElementNode>({node: initialNode, 
 
     const setKeyHandlingEnabled = (value: boolean) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}}));
 
-    const config = editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>;
+    const config = editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig;
 
     // const updateAttribute = (key: string, value: string | undefined) => updateEditedNode({attributes: {[key]: {$set: value}}});
 
@@ -271,7 +267,7 @@ export function XmlDocumentEditor<T extends XmlElementNode>({node: initialNode, 
                            cancelSelection={() => setState((state) => update(state, {editorState: {$set: defaultRightSideState}}))}
                            jumpElement={(forward) => jumpEditableNodes(node.tagName, forward)}
                            fontSizeSelectorProps={fontSizeSelectorProps}>
-        {config.edit({data, path, updateEditedNode, setKeyHandlingEnabled})}
+        {config.edit({node, path, updateEditedNode, setKeyHandlingEnabled})}
       </NodeEditorRightSide>
     );
   }

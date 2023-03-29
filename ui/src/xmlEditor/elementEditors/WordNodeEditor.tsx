@@ -6,24 +6,23 @@ import {MorphAnalysisOptionContainer} from '../morphAnalysisOption/MorphAnalysis
 import {isXmlElementNode, lastChildNode, xmlElementNode, XmlElementNode} from 'simple_xml';
 import {MorphAnalysisOptionEditor} from '../morphAnalysisOption/MorphAnalysisOptionEditor';
 import {WordContentEditor} from './WordContentEditor';
-import {readWordNodeData} from './wordNodeData';
 import {LanguageInput} from '../LanguageInput';
 import {readSelectedMorphology, SelectedMorphAnalysis} from '../../model/selectedMorphologicalAnalysis';
 import {WordStringChildEditor} from './WordStringChildEditor';
 
 type States = 'DefaultState' | 'AddMorphology' | 'EditEditingQuestion' | 'EditFootNoteState' | 'EditContent';
 
-export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNodeIProps<XmlElementNode<'w'>>): JSX.Element {
+export function WordNodeEditor({node, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNodeIProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [state, setState] = useState<States>('DefaultState');
 
   // TODO
-  const selectedMorphologies: SelectedMorphAnalysis[] = data.attributes.mrp0sel !== undefined
-    ? readSelectedMorphology(data.attributes.mrp0sel)
+  const selectedMorphologies: SelectedMorphAnalysis[] = node.attributes.mrp0sel !== undefined
+    ? readSelectedMorphology(node.attributes.mrp0sel)
     : [];
 
-  const morphologies: MorphologicalAnalysis[] = readMorphologiesFromNode(data, selectedMorphologies);
+  const morphologies: MorphologicalAnalysis[] = readMorphologiesFromNode(node, selectedMorphologies);
 
   function toggleMorphology(currentMrp0sel: string, morphNumber: number, letter: string | undefined, encLetter: string | undefined, targetState: boolean | undefined): string {
 
@@ -56,7 +55,7 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
   }
 
   function handleEditUpdate(node: XmlElementNode): void {
-    updateEditedNode({$set: readWordNodeData(node)});
+    updateEditedNode({$set: node});
     cancelEdit();
   }
 
@@ -115,7 +114,7 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
 
   // footnote
 
-  const lastChild = lastChildNode(data);
+  const lastChild = lastChildNode(node);
 
   const footNote = lastChild !== undefined && isXmlElementNode(lastChild) && lastChild.tagName === 'note'
     ? lastChild.attributes.c
@@ -126,7 +125,7 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
   const addOrUpdateFootNote = (value: string): void => updateEditedNode(
     footNote === undefined
       ? {children: {$push: [xmlElementNode('note', {c: value})]}}
-      : {children: {[data.children.length - 1]: {attributes: {c: {$set: value}}}}});
+      : {children: {[node.children.length - 1]: {attributes: {c: {$set: value}}}}});
 
   const onFootNoteSubmit = (value: string): void => {
     addOrUpdateFootNote(value);
@@ -135,7 +134,7 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
 
   const onRemoveFootNote = (): void => {
     if (footNote !== undefined) {
-      updateEditedNode({children: {$splice: [[data.children.length - 1, 1]]}});
+      updateEditedNode({children: {$splice: [[node.children.length - 1, 1]]}});
     }
     setState('DefaultState');
   };
@@ -147,13 +146,13 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
   const onCancel = () => setState('DefaultState');
 
   if (state === 'EditContent') {
-    return <WordContentEditor oldNode={data} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>;
+    return <WordContentEditor oldNode={node} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>;
   }
 
   return (
     <>
       <div className="mt-2">
-        <LanguageInput initialValue={data.attributes.lg} onChange={(lg) => updateAttribute('lg', lg.trim() || '')} onFocus={onFocus} onBlur={onBlur}/>
+        <LanguageInput initialValue={node.attributes.lg} onChange={(lg) => updateAttribute('lg', lg.trim() || '')} onFocus={onFocus} onBlur={onBlur}/>
       </div>
 
       <div className="mt-2 grid grid-cols-3 gap-2">
@@ -169,15 +168,15 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
       </div>
 
       {state === 'EditEditingQuestion' &&
-        <WordStringChildEditor title={t('editingQuestion')} initialValue={data.attributes.editingQuestion} onDelete={onRemoveEditingQuestion}
+        <WordStringChildEditor title={t('editingQuestion')} initialValue={node.attributes.editingQuestion} onDelete={onRemoveEditingQuestion}
                                onCancel={onCancel} onSubmit={onEditingQuestionSubmit} onFocus={onFocus} onBlur={onBlur}/>}
 
       {state === 'EditFootNoteState' &&
         <WordStringChildEditor title={t('footNote')} initialValue={footNote} onDelete={onRemoveFootNote} onCancel={onCancel} onSubmit={onFootNoteSubmit}
                                onFocus={onFocus} onBlur={onBlur}/>}
 
-      {data.attributes.editingQuestion && /* TODO: styling... */
-        <div className="p-2 text-center">{t('editingQuestion')}: {data.attributes.editingQuestion}!</div>}
+      {node.attributes.editingQuestion && /* TODO: styling... */
+        <div className="p-2 text-center">{t('editingQuestion')}: {node.attributes.editingQuestion}!</div>}
 
       {footNote && /* TODO: styling... */ <div className="p-2 text-center">{t('footNote')}: {footNote}</div>}
 
@@ -186,7 +185,7 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
       <section>
         <h2 className="mb-2 font-bold text-center">
           {t('morphologicalAnalysis_plural')}
-          {data.attributes.mrp0sel !== undefined && <span>(mrp0sel=&quot;{data.attributes.mrp0sel}&quot;)</span>}
+          {node.attributes.mrp0sel !== undefined && <span>(mrp0sel=&quot;{node.attributes.mrp0sel}&quot;)</span>}
         </h2>
 
         {morphologies.length === 0
@@ -194,7 +193,7 @@ export function WordNodeEditor({data, updateEditedNode, setKeyHandlingEnabled}: 
             <div>
               <div className="p-2 rounded bg-amber-400 text-center">{t('noMorphologicalAnalysesFound')}</div>
 
-              {data.attributes.mrp0sel === 'DEL'
+              {node.attributes.mrp0sel === 'DEL'
                 ? <div className="mt-2 p-2 rounded bg-blue-600 text-white text-center w-full">mrp0sel=&quot;DEL&quot;</div>
                 : (
                   <button type="button" className="mt-2 p-2 rounded border border-slate-500 text-center w-full"
