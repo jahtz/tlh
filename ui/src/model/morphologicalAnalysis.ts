@@ -198,7 +198,6 @@ export function readMorphologicalAnalysis(number: number, content: string | null
         // remove field selected for unit tests...
         analysisOptions: analysisOptions.map(({letter, analysis}) => ({letter, analysis})),
         paradigmClass,
-        // TODO: remove field selected for unit tests...
         encliticsAnalysis,
         determinative: determinative,
         selectedAnalysisCombinations
@@ -289,8 +288,7 @@ export function writeMorphAnalysisAttribute(ma: MorphologicalAnalysis): string[]
 
 // Fetching from TLHaly
 
-export function fetchMorphologicalAnalyses(w: string, tl = 'Hit'): Promise<Record<string, string> | undefined> {
-  // FIXME: set language!
+export function fetchMorphologicalAnalyses(w: string, tl: string): Promise<Record<string, string> | undefined> {
   const formData = new FormData();
   formData.append('w', w);
   formData.append('tl', tl);

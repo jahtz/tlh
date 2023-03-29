@@ -41,6 +41,7 @@ export function WordContentEditor({oldNode, /*initialTransliteration,*/ cancelEd
       return;
     }
 
+    // FIXME: set language!
     fetchMorphologicalAnalyses(writeNode(state.value, tlhXmlEditorConfig.writeConfig).join(''), 'Hit')
       .then((res) => {
         if (res) {
