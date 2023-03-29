@@ -31,7 +31,7 @@ interface IProps {
   autoSave: (rootNode: XmlNode) => void;
 }
 
-interface IState<T> {
+interface IState<T extends XmlElementNode> {
   keyHandlingEnabled: boolean;
   rootNode: XmlNode;
   editorState: EditorState<T>;
@@ -113,7 +113,7 @@ export function writeXml(node: XmlElementNode): string {
   return editorConfig.afterExport(exported.join('\n'));
 }
 
-export function XmlDocumentEditor<T>({node: initialNode, editorConfig, download, filename, closeFile, autoSave}: IProps): JSX.Element {
+export function XmlDocumentEditor<T extends XmlElementNode>({node: initialNode, editorConfig, download, filename, closeFile, autoSave}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);

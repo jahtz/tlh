@@ -12,13 +12,15 @@ extends:
 parser: '@typescript-eslint/parser'
 
 parserOptions:
+  ecmaVersion: 12
   ecmaFeatures:
     jsx: true
-  ecmaVersion: 12
   sourceType: module
+  project: ./tsconfig.json
 
 plugins:
   - react
+  - deprecation
   - '@typescript-eslint'
 
 rules:
@@ -29,3 +31,4 @@ rules:
   semi-spacing: [ 'warn', { before: false, after: true } ]
   block-spacing: [ 'warn', 'always' ]
   '@typescript-eslint/no-extra-non-null-assertion': [ 'warn' ]
+  deprecation/deprecation: 'warn'

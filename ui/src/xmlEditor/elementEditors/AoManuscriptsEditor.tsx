@@ -1,6 +1,7 @@
 import {XmlEditableNodeIProps} from '../editorConfig';
-import {AoManuscriptsData, AoSource, SourceType, sourceTypes} from './aoManuscriptsConfigData';
+import {AoSource, readSource, SourceType, sourceTypes} from './aoManuscriptsConfigData';
 import {DeleteButton} from '../../genericElements/Buttons';
+import {isXmlElementNode, isXmlTextNode, XmlElementNode, xmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
 
 interface AoTextNumberFieldProps {
   source: AoSource;
@@ -20,31 +21,36 @@ function AoTextNumberField({source: {type, name}, updateType, updateText}: AoTex
   );
 }
 
-export function AoManuscriptsEditor({data, updateEditedNode}: XmlEditableNodeIProps<AoManuscriptsData>): JSX.Element {
+const newEntry: XmlNode[] = [
+  xmlTextNode('+'),
+  xmlElementNode('AO:TxtPubl', {}, [xmlTextNode('')])
+];
 
-  function updateType(index: number, newType: SourceType): void {
-    updateEditedNode({content: {[index]: {type: {$set: newType}}}});
-  }
+export function AoManuscriptsEditor({data, updateEditedNode}: XmlEditableNodeIProps<XmlElementNode<'AO:Manuscripts'>>): JSX.Element {
 
-  function updateText(index: number, newText: string): void {
-    updateEditedNode({content: {[index]: {name: {$set: newText}}}});
-  }
+  const content: (AoSource | string)[] = data.children.map((n) => {
+    if (isXmlElementNode(n)) {
+      return readSource(n);
+    } else if (isXmlTextNode(n)) {
+      return n.textContent.trim();
+    } else {
+      return `<!-- ${n.comment} -->`;
+    }
+  });
 
-  function updatePlus(index: number, newText: string): void {
-    updateEditedNode({content: {[index]: {$set: newText}}});
-  }
+  const updateType = (index: number, newType: SourceType): void => updateEditedNode({children: {[index]: {tagName: {$set: newType}}}});
 
-  function addEntry(): void {
-    updateEditedNode({content: {$push: ['+', {type: 'AO:TxtPubl', name: ''}]}});
-  }
+  const updateText = (index: number, newText: string): void => updateEditedNode({children: {[index]: {children: {0: {textContent: {$set: newText}}}}}});
 
-  function deleteEntry(index: number): void {
-    updateEditedNode({content: {$splice: [[index, 1]]}});
-  }
+  const updatePlus = (index: number, newText: string): void => updateEditedNode({children: {[index]: {textContent: {$set: newText}}}});
+
+  const addEntry = (): void => updateEditedNode({children: {$push: newEntry}});
+
+  const deleteEntry = (index: number): void => updateEditedNode({children: {$splice: [[index, 1]]}});
 
   return (
     <div>
-      {data.content.map((source, index) =>
+      {content.map((source, index) =>
         <div className="mt-2 flex" key={index}>
           {typeof source === 'string'
             ? <input key={index} className="flex-grow p-2 rounded-l border border-slate-500" type="text" defaultValue={source}

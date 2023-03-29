@@ -22,7 +22,7 @@ export interface IEditNodeEditorState<T> {
   path: number[];
 }
 
-export function editNodeEditorState<T>(node: XmlElementNode, editorConfig: XmlEditorConfig, path: number[]): IEditNodeEditorState<T> {
+export function editNodeEditorState<T extends XmlElementNode>(node: XmlElementNode, editorConfig: XmlEditorConfig, path: number[]): IEditNodeEditorState<T> {
 
   const config = editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig<T>;
 

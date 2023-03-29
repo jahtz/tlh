@@ -1,103 +1,27 @@
-import {
-  MorphologicalAnalysis,
-  MultiMorphologicalAnalysisWithMultiEnclitics,
-  MultiMorphologicalAnalysisWithoutEnclitics,
-  MultiMorphologicalAnalysisWithSingleEnclitics,
-  readMorphologiesFromNode,
-  SingleMorphologicalAnalysisWithMultiEnclitics,
-  SingleMorphologicalAnalysisWithoutEnclitics,
-  SingleMorphologicalAnalysisWithSingleEnclitics,
-  writeMorphAnalysisValue
-} from '../../model/morphologicalAnalysis';
 import {isXmlElementNode, XmlElementNode} from 'simple_xml';
 import {displayReplace, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {WordNodeEditor} from './WordNodeEditor';
 import {SpacesEditor} from './SpacesEditor';
-import {readSelectedMorphology} from '../../model/selectedMorphologicalAnalysis';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 
-/**
- * TODO: deprecate?
- */
-export interface WordNodeData {
-  node: XmlElementNode<'w'>;
-  morphologies: MorphologicalAnalysis[];
+export function readWordNodeData(node: XmlElementNode): XmlElementNode<'w'> {
+  return node as XmlElementNode<'w'>;
 }
 
-export function readWordNodeData(node: XmlElementNode): WordNodeData {
-  const selectedMorphologies = readSelectedMorphology(node.attributes.mrp0sel?.trim() || '');
+export function writeWordNodeData(node: XmlElementNode<'w'>): XmlElementNode {
+  const {
+    tagName,
+    attributes: {trans, mrp0sel, ...rest},
+    children
+  } = node;
 
-  return {node: node as XmlElementNode<'w'>, morphologies: readMorphologiesFromNode(node, selectedMorphologies)};
-}
-
-export function extractSelMorphAnalysesFromSingleMorphWithoutEnc({selected, number}: SingleMorphologicalAnalysisWithoutEnclitics): string[] {
-  return selected ? [number.toString()] : [];
-}
-
-export function extractSelMorphAnalysesFromSingleMorphWithSingleEnc({selected, number}: SingleMorphologicalAnalysisWithSingleEnclitics): string[] {
-  return selected ? [number.toString()] : [];
-}
-
-export function extractSelMorphAnalysesFromSingleMorphWithMultiEnc({number, encliticsAnalysis}: SingleMorphologicalAnalysisWithMultiEnclitics): string[] {
-  return encliticsAnalysis.analysisOptions.filter(({selected}) => selected).map(({letter}) => `${number}${letter}`);
-}
-
-export function extractSelMorphAnalysesFromMultiMorphWithoutEnc({number, analysisOptions}: MultiMorphologicalAnalysisWithoutEnclitics): string[] {
-  return analysisOptions.filter(({selected}) => selected).map(({letter}) => `${number}${letter}`);
-}
-
-export function extractSelMorphAnalysesFromMultiMorphWithSingleEnc({number, analysisOptions}: MultiMorphologicalAnalysisWithSingleEnclitics): string[] {
-  return analysisOptions.filter(({selected}) => selected).map(({letter}) => `${number}${letter}`);
-}
-
-export function extractSelMorphAnalysesFromMultiMorphWithMultiEnc({
-  number,
-  selectedAnalysisCombinations
-}: MultiMorphologicalAnalysisWithMultiEnclitics): string[] {
-  return selectedAnalysisCombinations.map(({morphLetter, encLetter}) => `${number}${morphLetter}${encLetter}`);
-}
-
-function extractSelectedMorphologicalAnalyses(ma: MorphologicalAnalysis): string[] {
-  switch (ma._type) {
-    case 'MultiMorphAnalysisWithoutEnclitics':
-      return extractSelMorphAnalysesFromMultiMorphWithoutEnc(ma);
-    case 'MultiMorphAnalysisWithSingleEnclitics':
-      return extractSelMorphAnalysesFromMultiMorphWithSingleEnc(ma);
-    case 'MultiMorphAnalysisWithMultiEnclitics':
-      return extractSelMorphAnalysesFromMultiMorphWithMultiEnc(ma);
-    case 'SingleMorphAnalysisWithoutEnclitics':
-      return extractSelMorphAnalysesFromSingleMorphWithoutEnc(ma);
-    case 'SingleMorphAnalysisWithSingleEnclitics':
-      return extractSelMorphAnalysesFromSingleMorphWithSingleEnc(ma);
-    case 'SingleMorphAnalysisWithMultiEnclitics':
-      return extractSelMorphAnalysesFromSingleMorphWithMultiEnc(ma);
-  }
-}
-
-export function writeWordNodeData({node: originalNode, morphologies}: WordNodeData): XmlElementNode {
-  const {tagName, attributes: originalAttributes, children} = originalNode;
-
-  const selectedAnalysisOptions: string[] = morphologies.flatMap(extractSelectedMorphologicalAnalyses);
-
-  const {trans, mrp0sel, ...rest} = originalAttributes;
-
-  const attributes: Record<string, string | undefined> = {
+  return {
+    tagName,
     // put attributes trans and mrp0sel at start of tag...
-
-    trans,
-    // FIXME: can mrp0sel == undefined be overwritten?
-    mrp0sel: (mrp0sel === undefined || mrp0sel.trim() === 'DEL')
-      ? mrp0sel
-      : selectedAnalysisOptions.join(' '),
-    ...rest
+    attributes: {trans, mrp0sel, ...rest},
+    children
   };
-
-  for (const ma of morphologies) {
-    attributes[`mrp${ma.number}`] = writeMorphAnalysisValue(ma);
-  }
-
-  return {tagName, attributes, children};
 }
 
 const foreignLanguageColors: { [key: string]: string } = {
@@ -130,7 +54,7 @@ function backgroundColor(node: XmlElementNode, isSelected: boolean, selectedMorp
   return undefined;
 }
 
-export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData> = {
+export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<XmlElementNode<'w'>> = {
   replace: (node, renderedChildren, isSelected) => {
 
     const selectedMorph = node.attributes.mrp0sel?.trim();
@@ -163,7 +87,7 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig<WordNodeData>
       </>
     );
   },
-  edit: (props) => isOnlySpaces(props.data.node)
+  edit: (props) => isOnlySpaces(props.data)
     ? <SpacesEditor {...props}/>
     : <WordNodeEditor {...props}/>,
   readNode: readWordNodeData,

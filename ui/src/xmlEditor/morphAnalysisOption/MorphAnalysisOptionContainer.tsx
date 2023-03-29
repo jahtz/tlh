@@ -4,7 +4,7 @@ import {MorphAnalysisOptionButtons} from './MorphAnalysisButtons';
 import {MorphAnalysisOptionEditor} from './MorphAnalysisOptionEditor';
 
 export interface CanToggleAnalysisSelection {
-  toggleAnalysisSelection: (letterIndex: number | undefined, encLetterIndex: number | undefined, targetState: boolean | undefined) => void;
+  toggleAnalysisSelection: (letter: string | undefined, encLetter: string | undefined, targetState: boolean | undefined) => void;
 }
 
 interface IProps extends CanToggleAnalysisSelection {

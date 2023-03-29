@@ -26,9 +26,9 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
 
     setLastNumerusSelected((current) => current === numerus ? undefined : numerus);
 
-    ma.analysisOptions.forEach(({analysis}, index) => {
+    ma.analysisOptions.forEach(({letter, analysis}) => {
       if (numerus === undefined || analysisIsInNumerus(analysis, numerus)) {
-        toggleAnalysisSelection(index, undefined, targetState);
+        toggleAnalysisSelection(letter, undefined, targetState);
       }
     });
   }
@@ -64,10 +64,10 @@ export function MorphAnalysisOptionButtons({morphologicalAnalysis, toggleAnalysi
 
       {!isReduced && <div className="mt-2">
         {isSingleAnalysisOption
-          ? <SingleMorphAnalysisOptionButton
-            morphAnalysis={morphologicalAnalysis} toggleAnalysisSelection={(encLetterIndex) => toggleAnalysisSelection(undefined, encLetterIndex, undefined)}/>
+          ? <SingleMorphAnalysisOptionButton morphAnalysis={morphologicalAnalysis}
+                                             toggleAnalysisSelection={(encLetter) => toggleAnalysisSelection(undefined, encLetter, undefined)}/>
           : <MultiMorphAnalysisOptionButtons morphAnalysis={morphologicalAnalysis}
-                                             toggleAnalysisSelection={(letterIndex, encLetterIndex) => toggleAnalysisSelection(letterIndex, encLetterIndex, undefined)}/>}
+                                             toggleAnalysisSelection={(letter, encLetter) => toggleAnalysisSelection(letter, encLetter, undefined)}/>}
 
       </div>}
     </div>

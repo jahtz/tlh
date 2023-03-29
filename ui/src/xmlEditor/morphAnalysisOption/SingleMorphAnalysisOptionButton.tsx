@@ -3,7 +3,7 @@ import {SelectableButton} from '../../genericElements/Buttons';
 
 interface IProps {
   morphAnalysis: SingleMorphologicalAnalysis;
-  toggleAnalysisSelection: (encLetterIndex: number | undefined) => void;
+  toggleAnalysisSelection: (encLetter: string | undefined) => void;
 }
 
 export function EncliticsAnalysisDisplay({enclitics, analysis}: { enclitics: string, analysis: string }): JSX.Element {
@@ -34,8 +34,8 @@ export function SingleMorphAnalysisOptionButton({morphAnalysis, toggleAnalysisSe
     case 'SingleMorphAnalysisWithMultiEnclitics':
       return (
         <>
-          {morphAnalysis.encliticsAnalysis.analysisOptions.map(({letter, analysis, selected}, index) =>
-            <SelectableButton key={letter} selected={selected} otherClasses={['mb-1', ...otherClasses]} onClick={() => toggleAnalysisSelection(index)}>
+          {morphAnalysis.encliticsAnalysis.analysisOptions.map(({letter, analysis, selected}) =>
+            <SelectableButton key={letter} selected={selected} otherClasses={['mb-1', ...otherClasses]} onClick={() => toggleAnalysisSelection(letter)}>
               <>{letter} - {morphAnalysis.analysis} <EncliticsAnalysisDisplay enclitics={morphAnalysis.encliticsAnalysis.enclitics} analysis={analysis}/></>
             </SelectableButton>
           )}

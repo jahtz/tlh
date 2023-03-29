@@ -9,7 +9,7 @@ interface IProps {
   morphAnalysisOption: LetteredAnalysisOption;
   enclitics: string;
   encliticsAnalysisOptions: SelectableLetteredAnalysisOption[];
-  toggleAnalysisSelection: (letterIndex: number) => void;
+  toggleAnalysisSelection: (letter: string) => void;
 }
 
 const otherClasses = ['p-2', 'rounded', 'w-full'];
@@ -26,7 +26,7 @@ export function MultiMorphMultiSelectionButton({ma, morphAnalysisOption, encliti
   }
 
   function selectAllEncLetters(): void {
-    encliticsAnalysisOptions.forEach((ea, index) => toggleAnalysisSelection(index));
+    encliticsAnalysisOptions.forEach((ea) => toggleAnalysisSelection(ea.letter));
   }
 
   const morphLetterIsSelected = encliticsAnalysisOptions.some(({letter}) => encLetterIsSelected(letter));
@@ -37,9 +37,9 @@ export function MultiMorphMultiSelectionButton({ma, morphAnalysisOption, encliti
         <>{letter} - {analysis}</>
       </SelectableButton>
 
-      {encliticsAnalysisOptions.map(({analysis: encAnalysis, letter: encLetter}, letterIndex) =>
+      {encliticsAnalysisOptions.map(({analysis: encAnalysis, letter: encLetter}) =>
         <SelectableButton key={encLetter} selected={encLetterIsSelected(encLetter)} otherClasses={['ml-1', ...otherClasses]}
-                          onClick={() => toggleAnalysisSelection(letterIndex)}>
+                          onClick={() => toggleAnalysisSelection(encLetter)}>
           <>{encLetter} <EncliticsAnalysisDisplay enclitics={enclitics} analysis={encAnalysis}/></>
         </SelectableButton>
       )}

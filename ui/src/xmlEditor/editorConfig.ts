@@ -26,17 +26,17 @@ export interface XmlSingleNodeConfig {
   dontRenderChildrenInline?: boolean;
 }
 
-export interface XmlSingleEditableNodeConfig<T = XmlElementNode> extends XmlSingleNodeConfig {
+export interface XmlSingleEditableNodeConfig<T extends XmlElementNode = XmlElementNode> extends XmlSingleNodeConfig {
   edit: (props: XmlEditableNodeIProps<T>) => JSX.Element;
   readNode: (node: XmlElementNode) => T;
   writeNode: (t: T, originalNode: XmlElementNode) => XmlElementNode;
 }
 
-export function isXmlEditableNodeConfig<T>(c: XmlEditorNodeConfig): c is XmlSingleEditableNodeConfig<T> {
+export function isXmlEditableNodeConfig<T extends XmlElementNode>(c: XmlEditorNodeConfig): c is XmlSingleEditableNodeConfig<T> {
   return 'edit' in c;
 }
 
-export interface XmlInsertableSingleEditableNodeConfig<T = XmlElementNode> extends XmlSingleEditableNodeConfig<T> {
+export interface XmlInsertableSingleEditableNodeConfig<T extends XmlElementNode = XmlElementNode> extends XmlSingleEditableNodeConfig<T> {
   insertablePositions: InsertablePositions;
 }
 
