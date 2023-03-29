@@ -23,6 +23,7 @@ const defaultState: IState = {
   sides: [defaultSideInput]
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function convertLineParseResult2TransliterationLineInput(lineParseResult: LineParseResult, lineIndex: number): TransliterationLineInput {
 
   // FIXME: implement!
