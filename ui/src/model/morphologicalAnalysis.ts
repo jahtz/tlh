@@ -277,15 +277,6 @@ export function writeMorphAnalysisValue(morphologicalAnalysis: MorphologicalAnal
   return [referenceWord, translation, analysisString, paradigmClass + (enc ? ' += ' + enc : ''), determinative || ''].join(' @ ');
 }
 
-function writeMorphologicalAnalysis(sma: MorphologicalAnalysis): string[] {
-  return [`mrp${sma.number}="${writeMorphAnalysisValue(sma)}"`];
-}
-
-
-export function writeMorphAnalysisAttribute(ma: MorphologicalAnalysis): string[] {
-  return writeMorphologicalAnalysis(ma);
-}
-
 // Fetching from TLHaly
 
 export function fetchMorphologicalAnalyses(w: string, tl: string): Promise<Record<string, string> | undefined> {
