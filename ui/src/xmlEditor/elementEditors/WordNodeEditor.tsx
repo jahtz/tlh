@@ -17,7 +17,6 @@ export function WordNodeEditor({node, updateEditedNode, setKeyHandlingEnabled}: 
   const {t} = useTranslation('common');
   const [state, setState] = useState<States>('DefaultState');
 
-  // TODO
   const selectedMorphologies: SelectedMorphAnalysis[] = node.attributes.mrp0sel !== undefined
     ? readSelectedMorphology(node.attributes.mrp0sel)
     : [];
@@ -175,10 +174,13 @@ export function WordNodeEditor({node, updateEditedNode, setKeyHandlingEnabled}: 
         <WordStringChildEditor title={t('footNote')} initialValue={footNote} onDelete={onRemoveFootNote} onCancel={onCancel} onSubmit={onFootNoteSubmit}
                                onFocus={onFocus} onBlur={onBlur}/>}
 
-      {node.attributes.editingQuestion && /* TODO: styling... */
-        <div className="p-2 text-center">{t('editingQuestion')}: {node.attributes.editingQuestion}!</div>}
+      {node.attributes.editingQuestion && <div className="my-2 p-2 rounded bg-teal-400 text-white text-center">
+        {t('editingQuestion')}: <span className="font-bold">{node.attributes.editingQuestion}</span>!
+      </div>}
 
-      {footNote && /* TODO: styling... */ <div className="p-2 text-center">{t('footNote')}: {footNote}</div>}
+      {footNote && <div className="my-2 p-2 rounded bg-slate-400 text-white text-center">
+        {t('footNote')}: <span className="font-bold">{footNote}</span>
+      </div>}
 
       <hr className="my-2"/>
 
