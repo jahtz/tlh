@@ -62,10 +62,11 @@ export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig = {
 
     return displayReplace(
       <>
+        &nbsp;
         <span className={classes} title={hasEditingQuestion ? node.attributes.q : undefined}>
           {node.children.length === 0 ? <span>&#x2715;</span> : renderedChildren}
         </span>
-        &nbsp;&nbsp;
+        &nbsp;
       </>
     );
   },

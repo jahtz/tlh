@@ -2,30 +2,23 @@ import {displayReplace, XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from
 import {DeleteButton} from '../../genericElements/Buttons';
 import {isXmlElementNode, isXmlTextNode, XmlElementNode, xmlElementNode, XmlNode, XmlTextNode, xmlTextNode} from 'simple_xml';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
+import {Spec} from 'immutability-helper';
 
 type SourceType = 'AO:TxtPubl' | 'AO:InvNr';
 const sourceTypes: SourceType[] = ['AO:TxtPubl', 'AO:InvNr'];
 
-export interface AoSource {
+interface AoSource {
   type: SourceType;
   name: string;
 }
 
-export function readSource(node: XmlElementNode): AoSource {
+function readSource(node: XmlElementNode): AoSource {
   if (node.tagName === 'AO:TxtPubl' || node.tagName === 'AO:InvNr') {
     return {type: node.tagName, name: (node.children[0] as XmlTextNode).textContent};
   } else {
     throw new Error(`Could not read Source with tagName ${node.tagName}`);
   }
 }
-
-export const aoManuscriptsConfig: XmlSingleEditableNodeConfig = {
-  replace: (node, renderedChildren, isSelected) => displayReplace(
-    <span className={isSelected ? selectedNodeClass : ''}>{renderedChildren}</span>
-  ),
-  edit: (props) => <AoManuscriptsEditor {...props}/>
-};
-
 
 interface AoTextNumberFieldProps {
   source: AoSource;
@@ -50,43 +43,46 @@ const newEntry: XmlNode[] = [
   xmlElementNode('AO:TxtPubl', {}, [xmlTextNode('')])
 ];
 
-function AoManuscriptsEditor({node, updateEditedNode}: XmlEditableNodeIProps): JSX.Element {
+export const aoManuscriptsConfig: XmlSingleEditableNodeConfig = {
+  replace: (node, renderedChildren, isSelected) => displayReplace(
+    <span className={isSelected ? selectedNodeClass : ''}>{renderedChildren}</span>
+  ),
+  edit: ({node, updateEditedNode}: XmlEditableNodeIProps): JSX.Element => {
 
-  const content: (AoSource | string)[] = node.children.map((n) => {
-    if (isXmlElementNode(n)) {
-      return readSource(n);
-    } else if (isXmlTextNode(n)) {
-      return n.textContent.trim();
-    } else {
-      return `<!-- ${n.comment} -->`;
-    }
-  });
+    const content: (AoSource | string)[] = node.children.map((n) => {
+      if (isXmlElementNode(n)) {
+        return readSource(n);
+      } else if (isXmlTextNode(n)) {
+        return n.textContent.trim();
+      } else {
+        return `<!-- ${n.comment} -->`;
+      }
+    });
 
-  const updateType = (index: number, newType: SourceType): void => updateEditedNode({children: {[index]: {tagName: {$set: newType}}}});
+    const updateChildNode = (index: number, spec: Spec<XmlNode>): void => updateEditedNode({children: {[index]: spec}});
 
-  const updateText = (index: number, newText: string): void => updateEditedNode({children: {[index]: {children: {0: {textContent: {$set: newText}}}}}});
+    const updateText = (index: number, newText: string): void => updateChildNode(index, {children: {0: {textContent: {$set: newText}}}});
+    const updatePlus = (index: number, newText: string): void => updateChildNode(index, {textContent: {$set: newText}});
 
-  const updatePlus = (index: number, newText: string): void => updateEditedNode({children: {[index]: {textContent: {$set: newText}}}});
+    const addEntry = (): void => updateEditedNode({children: {$push: newEntry}});
+    const deleteEntry = (index: number): void => updateEditedNode({children: {$splice: [[index, 1]]}});
 
-  const addEntry = (): void => updateEditedNode({children: {$push: newEntry}});
+    return (
+      <div>
+        {content.map((source, index) =>
+          <div className="mt-2 flex" key={index}>
+            {typeof source === 'string'
+              ? <input key={index} className="flex-grow p-2 rounded-l border border-slate-500" type="text" defaultValue={source}
+                       onChange={(event) => updatePlus(index, event.currentTarget.value)}/>
+              : <AoTextNumberField key={index} source={source} updateType={(value) => updateChildNode(index, {tagName: {$set: value}})}
+                                   updateText={(value) => updateText(index, value)}/>}
 
-  const deleteEntry = (index: number): void => updateEditedNode({children: {$splice: [[index, 1]]}});
+            <DeleteButton onClick={() => deleteEntry(index)} otherClasses={['px-4', 'py-2', 'rounded-r']}/>
+          </div>
+        )}
 
-  return (
-    <div>
-      {content.map((source, index) =>
-        <div className="mt-2 flex" key={index}>
-          {typeof source === 'string'
-            ? <input key={index} className="flex-grow p-2 rounded-l border border-slate-500" type="text" defaultValue={source}
-                     onChange={(event) => updatePlus(index, event.currentTarget.value)}/>
-            : <AoTextNumberField key={index} source={source} updateType={(value) => updateType(index, value)}
-                                 updateText={(value) => updateText(index, value)}/>}
-
-          <DeleteButton onClick={() => deleteEntry(index)} otherClasses={['px-4', 'py-2', 'rounded-r']}/>
-        </div>
-      )}
-
-      <button type="button" className="mt-2 p-2 rounded border bg-blue-600 text-white text-center w-full" onClick={addEntry}>+</button>
-    </div>
-  );
-}
+        <button type="button" className="mt-2 p-2 rounded border bg-blue-600 text-white text-center w-full" onClick={addEntry}>+</button>
+      </div>
+    );
+  }
+};

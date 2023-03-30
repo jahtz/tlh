@@ -199,6 +199,8 @@ export function XmlDocumentEditor({node: initialNode, editorConfig, download, fi
     }));
   }
 
+  const updateAttribute = (key: string, value: string | undefined): void => updateEditedNode({attributes: {[key]: {$set: value}}});
+
   function jumpEditableNodes(tagName: string, forward: boolean): void {
     if (state.editorState && 'path' in state.editorState) {
       const currentPath = state.editorState.path;
@@ -267,7 +269,7 @@ export function XmlDocumentEditor({node: initialNode, editorConfig, download, fi
                            cancelSelection={() => setState((state) => update(state, {editorState: {$set: defaultRightSideState}}))}
                            jumpElement={(forward) => jumpEditableNodes(node.tagName, forward)}
                            fontSizeSelectorProps={fontSizeSelectorProps}>
-        {config.edit({node, path, updateEditedNode, setKeyHandlingEnabled})}
+        {config.edit({node, path, updateEditedNode, updateAttribute, setKeyHandlingEnabled})}
       </NodeEditorRightSide>
     );
   }

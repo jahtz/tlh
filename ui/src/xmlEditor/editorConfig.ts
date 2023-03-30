@@ -7,6 +7,7 @@ export interface XmlEditableNodeIProps {
   node: XmlElementNode;
   path: number[];
   updateEditedNode: (spec: Spec<XmlElementNode>) => void;
+  updateAttribute: (key: string, value: string | undefined) => void;
   setKeyHandlingEnabled: (enabled: boolean) => void;
 }
 

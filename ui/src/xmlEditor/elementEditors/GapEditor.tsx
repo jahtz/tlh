@@ -14,25 +14,23 @@ export const gapConfig: XmlInsertableSingleEditableNodeConfig = {
       <span className={classNames('gap', {'marked': isSelected})}>{node.attributes.c}</span>
     </>
   ),
-  edit: (props) => <GapEditor {...props}/>,
   insertablePositions: {
     beforeElement: ['w'],
     afterElement: ['lb', 'w'],
     asLastChildOf: ['div1']
+  },
+  edit: ({node, updateAttribute, setKeyHandlingEnabled}: XmlEditableNodeIProps): JSX.Element => {
+
+    const {t} = useTranslation('common');
+
+    return (
+      <>
+        <label htmlFor="content" className="font-bold">{t('content')}:</label>
+        <input type="text" id="content" className="mt-2 p-2 rounded border border-slate-500 w-full"
+               defaultValue={node.attributes.c}
+               onFocus={() => setKeyHandlingEnabled(false)}
+               onChange={(event) => updateAttribute('c', event.target.value)}/>
+      </>
+    );
   }
 };
-
-function GapEditor({node, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNodeIProps): JSX.Element {
-
-  const {t} = useTranslation('common');
-
-  return (
-    <>
-      <label htmlFor="content" className="font-bold">{t('content')}:</label>
-      <input type="text" id="content" className="mt-2 p-2 rounded border border-slate-500 w-full"
-             defaultValue={node.attributes.c}
-             onFocus={() => setKeyHandlingEnabled(false)}
-             onChange={(event) => updateEditedNode({attributes: {c: {$set: event.target.value}}})}/>
-    </>
-  );
-}
