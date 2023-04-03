@@ -54,7 +54,10 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     }
   },
   writeConfig: {
-    inlineChildrenOf: ['w']
+    w: {
+      inlineChildren: true,
+      orderAttributes: ({mrp0sel, trans, ...rest}) => [['trans', trans], ['mrp0sel', mrp0sel], ...Object.entries(rest)]
+    }
   },
   nodeConfigs: {
     docID: {
