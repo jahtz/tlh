@@ -84,6 +84,10 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     laes_in: {replace: () => displayReplace(<span>⸢</span>)},
     laes_fin: {replace: () => displayReplace(<span>⸣</span>)},
 
+    materlect: {
+      replace: (node) => displayReplace(<span className="materLectionis">{node.attributes.c}</span>)
+    },
+
     gap: gapConfig,
     subscr: {replace: (node) => displayReplace(<sub>{node.attributes.c}</sub>)},
 
