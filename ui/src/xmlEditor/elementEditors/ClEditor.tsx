@@ -1,4 +1,4 @@
-import {displayReplace, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {displayReplace, inputClasses, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import {useTranslation} from 'react-i18next';
 import {getElementByPath, XmlElementNode} from 'simple_xml';
 import {buildActionSpec} from '../XmlDocumentEditor';
@@ -9,6 +9,7 @@ export const clEditorConfig: XmlInsertableSingleEditableNodeConfig = {
     isLeftSide ? <>{renderedChildren}<br/></> : undefined
   ),
   dontRenderChildrenInline: true,
+  edit: (props) => <ClEditor {...props}/>,
   insertablePositions: {
     beforeElement: ['cl', 'w'],
     afterElement: ['cl', 'w'],
@@ -28,19 +29,18 @@ export const clEditorConfig: XmlInsertableSingleEditableNodeConfig = {
 
       return buildActionSpec({children: {$splice: [[clIndex, 1, firstNewNode, secondNewNode]]}}, path.slice(0, -2));
     }
-  },
-  edit: ({node, updateAttribute, setKeyHandlingEnabled}: XmlEditableNodeIProps): JSX.Element => {
-
-    const {t} = useTranslation('common');
-
-    return (
-      <>
-        <label htmlFor="id" className="font-bold block">{t('id')}:</label>
-        <input id="id" className="mt-2 p-2 rounded border border-slate-200 w-full"
-               defaultValue={node.attributes.id}
-               onFocus={() => setKeyHandlingEnabled(false)}
-               onChange={(event) => updateAttribute('id', event.target.value)}/>
-      </>
-    );
   }
 };
+
+function ClEditor({node, updateAttribute, setKeyHandlingEnabled}: XmlEditableNodeIProps): JSX.Element {
+
+  const {t} = useTranslation('common');
+
+  return (
+    <>
+      <label htmlFor="id" className="font-bold block">{t('id')}:</label>
+      <input type="text" id="id" className={inputClasses} defaultValue={node.attributes.id} onFocus={() => setKeyHandlingEnabled(false)}
+             onChange={(event) => updateAttribute('id', event.target.value)}/>
+    </>
+  );
+}

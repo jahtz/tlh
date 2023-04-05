@@ -3,6 +3,8 @@ import {Argument as ClassNamesArgument} from 'classnames';
 import {InsertablePositions} from './insertablePositions';
 import {Spec} from 'immutability-helper';
 
+export const inputClasses = 'mt-2 p-2 rounded border border-slate-500 w-full';
+
 export interface XmlEditableNodeIProps {
   node: XmlElementNode;
   path: number[];

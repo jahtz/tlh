@@ -14,12 +14,14 @@ export const paragraphSeparatorConfig: XmlInsertableSingleEditableNodeConfig = {
     afterElement: ['lb', 'w'],
     asLastChildOf: ['div1']
   },
-  edit: ({node, updateEditedNode}: XmlEditableNodeIProps): JSX.Element => {
-    return (
-      <select className="p-2 rounded border border-slate-500 bg-white w-full" defaultValue={node.tagName}
-              onChange={(event) => updateEditedNode({tagName: {$set: event.target.value as 'parsep' | 'parsep_dbl'}})}>
-        {separatorTypes.map((st) => <option key={st}>{st}</option>)}
-      </select>
-    );
-  }
+  edit: (props) => <ParagraphSeparatorEditor {...props}/>
 };
+
+function ParagraphSeparatorEditor({node, updateEditedNode}: XmlEditableNodeIProps): JSX.Element {
+  return (
+    <select className="p-2 rounded border border-slate-500 bg-white w-full" defaultValue={node.tagName}
+            onChange={(event) => updateEditedNode({tagName: {$set: event.target.value as 'parsep' | 'parsep_dbl'}})}>
+      {separatorTypes.map((st) => <option key={st}>{st}</option>)}
+    </select>
+  );
+}

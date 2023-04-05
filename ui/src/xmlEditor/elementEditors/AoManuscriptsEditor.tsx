@@ -47,42 +47,44 @@ export const aoManuscriptsConfig: XmlSingleEditableNodeConfig = {
   replace: (node, renderedChildren, isSelected) => displayReplace(
     <span className={isSelected ? selectedNodeClass : ''}>{renderedChildren}</span>
   ),
-  edit: ({node, updateEditedNode}: XmlEditableNodeIProps): JSX.Element => {
-
-    const content: (AoSource | string)[] = node.children.map((n) => {
-      if (isXmlElementNode(n)) {
-        return readSource(n);
-      } else if (isXmlTextNode(n)) {
-        return n.textContent.trim();
-      } else {
-        return `<!-- ${n.comment} -->`;
-      }
-    });
-
-    const updateChildNode = (index: number, spec: Spec<XmlNode>): void => updateEditedNode({children: {[index]: spec}});
-
-    const updateText = (index: number, newText: string): void => updateChildNode(index, {children: {0: {textContent: {$set: newText}}}});
-    const updatePlus = (index: number, newText: string): void => updateChildNode(index, {textContent: {$set: newText}});
-
-    const addEntry = (): void => updateEditedNode({children: {$push: newEntry}});
-    const deleteEntry = (index: number): void => updateEditedNode({children: {$splice: [[index, 1]]}});
-
-    return (
-      <div>
-        {content.map((source, index) =>
-          <div className="mt-2 flex" key={index}>
-            {typeof source === 'string'
-              ? <input key={index} className="flex-grow p-2 rounded-l border border-slate-500" type="text" defaultValue={source}
-                       onChange={(event) => updatePlus(index, event.currentTarget.value)}/>
-              : <AoTextNumberField key={index} source={source} updateType={(value) => updateChildNode(index, {tagName: {$set: value}})}
-                                   updateText={(value) => updateText(index, value)}/>}
-
-            <DeleteButton onClick={() => deleteEntry(index)} otherClasses={['px-4', 'py-2', 'rounded-r']}/>
-          </div>
-        )}
-
-        <button type="button" className="mt-2 p-2 rounded border bg-blue-600 text-white text-center w-full" onClick={addEntry}>+</button>
-      </div>
-    );
-  }
+  edit: (props) => <AoManuscriptsEditor {...props}/>
 };
+
+function AoManuscriptsEditor({node, updateEditedNode}: XmlEditableNodeIProps): JSX.Element {
+
+  const content: (AoSource | string)[] = node.children.map((n) => {
+    if (isXmlElementNode(n)) {
+      return readSource(n);
+    } else if (isXmlTextNode(n)) {
+      return n.textContent.trim();
+    } else {
+      return `<!-- ${n.comment} -->`;
+    }
+  });
+
+  const updateChildNode = (index: number, spec: Spec<XmlNode>): void => updateEditedNode({children: {[index]: spec}});
+
+  const updateText = (index: number, newText: string): void => updateChildNode(index, {children: {0: {textContent: {$set: newText}}}});
+  const updatePlus = (index: number, newText: string): void => updateChildNode(index, {textContent: {$set: newText}});
+
+  const addEntry = (): void => updateEditedNode({children: {$push: newEntry}});
+  const deleteEntry = (index: number): void => updateEditedNode({children: {$splice: [[index, 1]]}});
+
+  return (
+    <div>
+      {content.map((source, index) =>
+        <div className="mt-2 flex" key={index}>
+          {typeof source === 'string'
+            ? <input key={index} className="flex-grow p-2 rounded-l border border-slate-500" type="text" defaultValue={source}
+                     onChange={(event) => updatePlus(index, event.currentTarget.value)}/>
+            : <AoTextNumberField key={index} source={source} updateType={(value) => updateChildNode(index, {tagName: {$set: value}})}
+                                 updateText={(value) => updateText(index, value)}/>}
+
+          <DeleteButton onClick={() => deleteEntry(index)} otherClasses={['px-4', 'py-2', 'rounded-r']}/>
+        </div>
+      )}
+
+      <button type="button" className="mt-2 p-2 rounded border bg-blue-600 text-white text-center w-full" onClick={addEntry}>+</button>
+    </div>
+  );
+}
