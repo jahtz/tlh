@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import {fetchMorphologicalAnalyses} from '../../model/morphologicalAnalysis';
 import {NodeDisplay} from '../NodeDisplay';
 import update from 'immutability-helper';
-import {reconstructTransliteration} from '../transliterationReconstruction';
+import {reconstructTransliterationForWordNode} from '../transliterationReconstruction';
 import {Word} from 'simtex';
 import {tlhXmlEditorConfig} from '../tlhXmlEditorConfig';
 
@@ -27,7 +27,7 @@ export function WordContentEditor({oldNode, /*initialTransliteration,*/ cancelEd
 
   const {t} = useTranslation('common');
 
-  const initialTransliteration = oldNode.children.map((c, index) => reconstructTransliteration(c, index === 0)).join('');
+  const initialTransliteration = reconstructTransliterationForWordNode(oldNode);
 
   const [state, setState] = useState<Result<XmlElementNode>>(readTransliteration(initialTransliteration));
 
