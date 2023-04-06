@@ -2,9 +2,16 @@ import {displayReplace, inputClasses, XmlEditableNodeIProps, XmlInsertableSingle
 import {useTranslation} from 'react-i18next';
 import {LanguageInput} from '../LanguageInput';
 import classNames from 'classnames';
-import {selectedNodeClass} from '../tlhXmlEditorConfig';
+import {selectedNodeClass, tlhXmlEditorConfig} from '../tlhXmlEditorConfig';
+import {writeNode, XmlNode} from 'simple_xml';
+import {getSiblingsUntil} from '../../nodeIterators';
 
-export const lineBreakNodeConfig: XmlInsertableSingleEditableNodeConfig = {
+interface GetCuneiformResponse {
+  number: number;
+  cuneiform: string;
+}
+
+export const lineBreakNodeConfig: XmlInsertableSingleEditableNodeConfig<XmlNode[]> = {
   replace: (node, _renderedChildren, isSelected, isLeftSide) => displayReplace(
     <>
       {isLeftSide && <br/>}
@@ -16,13 +23,25 @@ export const lineBreakNodeConfig: XmlInsertableSingleEditableNodeConfig = {
     beforeElement: ['lb', 'w', 'gap'],
     asLastChildOf: ['div1']
   },
-  edit: (props) => <LineBreakEditor {...props}/>
+  edit: (props) => <LineBreakEditor {...props}/>,
+  getAdditionalInfo: (rootNode, path) => getSiblingsUntil(rootNode, path, 'lb')
 };
 
-
-function LineBreakEditor({node, updateAttribute, setKeyHandlingEnabled}: XmlEditableNodeIProps): JSX.Element {
+function LineBreakEditor({node, updateAttribute, setKeyHandlingEnabled, additionalInfo}: XmlEditableNodeIProps<XmlNode[]>): JSX.Element {
 
   const {t} = useTranslation('common');
+
+  const updateCuneiform = async (): Promise<void> => {
+    const body = JSON.stringify({
+      number: 1,
+      content: additionalInfo.map((node) => writeNode(node, tlhXmlEditorConfig.writeConfig)).join(' ')
+    });
+
+    const response = await fetch('https://www.hethport3.uni-wuerzburg.de/TLHcuni/create_cuneiform_single.php', {method: 'POST', body})
+      .then<GetCuneiformResponse>((response) => response.json());
+
+    updateAttribute('cu', response.cuneiform);
+  };
 
   return (
     <>
@@ -38,14 +57,16 @@ function LineBreakEditor({node, updateAttribute, setKeyHandlingEnabled}: XmlEdit
       </div>
 
       <div className="mb-4">
-        <label htmlFor="cuneiform" className="font-bold">{t('cuneiform')}</label>
-        <input type="text" id="cuneiform" className={inputClasses} defaultValue={node.attributes.cu} onFocus={() => setKeyHandlingEnabled(false)}
-               onChange={(event) => updateAttribute('cu', event.target.value)}/>
+        <LanguageInput initialValue={node.attributes.lg} onChange={(value) => updateAttribute('lg', value)}/>
       </div>
 
       <div className="mb-4">
-        <LanguageInput initialValue={node.attributes.lg} onChange={(value) => updateAttribute('lg', value)}/>
+        <label htmlFor="cuneiform" className="font-bold">{t('cuneiform')}</label>
+        <input type="text" id="cuneiform" className={inputClasses} defaultValue={node.attributes.cu} onFocus={() => setKeyHandlingEnabled(false)}
+               onChange={(event) => updateAttribute('cu', event.target.value)}/>
+        <button type="button" className="mt-2 p-2 rounded bg-amber-500 text-white w-full" onClick={updateCuneiform}>{t('updateCuneiform')}</button>
       </div>
+
     </>
   );
 }

@@ -29,7 +29,7 @@ npm i
 ```bash
 cd html
 
-php7 -S 0.0.0.0:8066
+php -S 0.0.0.0:8066
 ```
 
 ### Starting the ui

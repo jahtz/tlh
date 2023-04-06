@@ -5,12 +5,13 @@ import {Spec} from 'immutability-helper';
 
 export const inputClasses = 'mt-2 p-2 rounded border border-slate-500 w-full';
 
-export interface XmlEditableNodeIProps {
+export interface XmlEditableNodeIProps<T = void> {
   node: XmlElementNode;
   path: number[];
   updateEditedNode: (spec: Spec<XmlElementNode>) => void;
   updateAttribute: (key: string, value: string | undefined) => void;
   setKeyHandlingEnabled: (enabled: boolean) => void;
+  additionalInfo: T;
 }
 
 export interface DisplayReplacement {
@@ -28,15 +29,16 @@ export interface XmlSingleNodeConfig {
   dontRenderChildrenInline?: boolean;
 }
 
-export interface XmlSingleEditableNodeConfig extends XmlSingleNodeConfig {
-  edit: (props: XmlEditableNodeIProps) => JSX.Element;
+export interface XmlSingleEditableNodeConfig<T = void> extends XmlSingleNodeConfig {
+  edit: (props: XmlEditableNodeIProps<T>) => JSX.Element;
+  getAdditionalInfo?: (rootNode: XmlElementNode, path: number[]) => T;
 }
 
 export function isXmlEditableNodeConfig(c: XmlEditorNodeConfig): c is XmlSingleEditableNodeConfig {
   return 'edit' in c;
 }
 
-export interface XmlInsertableSingleEditableNodeConfig extends XmlSingleEditableNodeConfig {
+export interface XmlInsertableSingleEditableNodeConfig<T = void> extends XmlSingleEditableNodeConfig<T> {
   insertablePositions: InsertablePositions;
 }
 

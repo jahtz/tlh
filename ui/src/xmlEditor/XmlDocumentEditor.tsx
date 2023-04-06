@@ -182,7 +182,7 @@ export function XmlDocumentEditor({node: initialNode, editorConfig, download, fi
           (acc, index) => ({children: {[index]: acc}}),
           {$set: state.editorState.node}
         ),
-        editorState: newEditorState
+        editorState: newEditorState !== undefined
           ? {$set: newEditorState}
           : {changed: {$set: false}},
         changed: {$set: true}
@@ -260,6 +260,10 @@ export function XmlDocumentEditor({node: initialNode, editorConfig, download, fi
 
     const config = editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig;
 
+    const additionalInfo = config.getAdditionalInfo !== undefined
+      ? config.getAdditionalInfo(state.rootNode as XmlElementNode, path)
+      : undefined;
+
     return (
       <NodeEditorRightSide key={path.join('.')} originalNode={node} changed={changed}
                            deleteNode={() => deleteNode(path)}
@@ -267,7 +271,7 @@ export function XmlDocumentEditor({node: initialNode, editorConfig, download, fi
                            cancelSelection={() => setState((state) => update(state, {editorState: {$set: defaultRightSideState}}))}
                            jumpElement={(forward) => jumpEditableNodes(node.tagName, forward)}
                            fontSizeSelectorProps={fontSizeSelectorProps}>
-        {config.edit({node, path, updateEditedNode, updateAttribute, setKeyHandlingEnabled})}
+        {config.edit({node, path, updateEditedNode, updateAttribute, setKeyHandlingEnabled, additionalInfo})}
       </NodeEditorRightSide>
     );
   }
