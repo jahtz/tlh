@@ -1,4 +1,5 @@
 # Common fragments
+
 fragment ManuscriptIdentifier on ManuscriptIdentifier {
   identifierType
   identifier
@@ -23,18 +24,13 @@ mutation Register($userInput: UserInput!) {
 }
 
 # /login
-# fragment LoggedInUser on LoggedInUser {
-#   username
-#   name
-#   jwt
-#   affiliation
-# }
 
 mutation Login($username: String!, $password: String!) {
   login(username: $username, password: $password)
 }
 
 # /
+
 fragment ManuscriptBasicData on ManuscriptMetaData {
   mainIdentifier {
     ...ManuscriptIdentifier
@@ -48,6 +44,8 @@ query Index($paginationSize: Int! = 10, $page: Int! = 0) {
   allManuscripts(paginationSize: $paginationSize, page: $page) {
     ...ManuscriptBasicData
   }
+  myManuscripts
+  manuscriptsToReview
 }
 
 # /createManuscript

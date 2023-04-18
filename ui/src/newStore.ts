@@ -16,13 +16,12 @@ const userKey = 'user';
 function userFromToken(token: string): User {
   return {
     ...JSON.parse(
-      Buffer.from(
+      // eslint-disable-next-line deprecation/deprecation
+      atob(
         token.split('.')[1]
           .replace(/-/g, '+')
           .replace(/_/g, '/'),
-        'base64'
       )
-        .join('')
     ),
     token
   };

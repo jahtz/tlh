@@ -155,6 +155,28 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
   }
 }
 
+/**
+ * @param string $username
+ *
+ * @return string[]
+ */
+function selectAllOwnManuscripts(string $username): array
+{
+  try {
+    return execute_select_query(
+      "select main_identifier from tlh_dig_manuscript_metadatas where creator_username = ?;",
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('i', $username),
+      fn(mysqli_result $result) => array_map(
+        fn(array $row): string => (string)$row['main_identifier'],
+        $result->fetch_all(MYSQLI_ASSOC)
+      )
+    );
+  } catch (Exception $e) {
+    error_log($e->getMessage());
+    return [];
+  }
+}
+
 function manuscriptMetaDataById(string $mainIdentifier): ?ManuscriptMetaData
 {
   try {

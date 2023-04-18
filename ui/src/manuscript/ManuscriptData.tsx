@@ -8,7 +8,7 @@ import {PicturesBlock} from './PicturesBlock';
 import {createTransliterationUrl, homeUrl, uploadPicturesUrl} from '../urls';
 import {TLHParser} from 'simtex';
 import {convertLine} from './LineParseResult';
-import {ColumnParseResultComponent, TransliterationParseResultDisplay} from './ColumnParseResultComponent';
+import {TransliterationParseResultDisplay} from './ColumnParseResultComponent';
 
 export function ManuscriptData(): JSX.Element {
 

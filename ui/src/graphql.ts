@@ -135,6 +135,8 @@ export type Query = {
   manuscript?: Maybe<ManuscriptMetaData>;
   manuscriptCount: Scalars['Int'];
   manuscriptLanguages: Array<ManuscriptLanguage>;
+  manuscriptsToReview?: Maybe<Array<Scalars['String']>>;
+  myManuscripts?: Maybe<Array<Scalars['String']>>;
 };
 
 
@@ -195,7 +197,7 @@ export type IndexQueryVariables = Exact<{
 }>;
 
 
-export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }> };
+export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, myManuscripts?: Array<string> | null, manuscriptsToReview?: Array<string> | null, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }> };
 
 export type CreateManuscriptMutationVariables = Exact<{
   manuscriptMetaData?: InputMaybe<ManuscriptMetaDataInput>;
@@ -399,6 +401,8 @@ export const IndexDocument = gql`
   allManuscripts(paginationSize: $paginationSize, page: $page) {
     ...ManuscriptBasicData
   }
+  myManuscripts
+  manuscriptsToReview
 }
     ${ManuscriptBasicDataFragmentDoc}`;
 

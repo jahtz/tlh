@@ -85,6 +85,8 @@ type Query {
   manuscript(mainIdentifier: String!): ManuscriptMetaData
   manuscriptCount: Int!
   manuscriptLanguages: [ManuscriptLanguage!]!
+  manuscriptsToReview: [String!]
+  myManuscripts: [String!]
 }
 
 type Transliteration {

@@ -7,7 +7,7 @@ export function App(): JSX.Element {
     <div className="flex flex-col h-screen max-h-screen">
       <NavBar/>
 
-      <div className="p-2 h-full max-h-full flex-auto">
+      <div className="p-4 h-full max-h-full flex-auto">
         <Outlet/>
       </div>
     </div>

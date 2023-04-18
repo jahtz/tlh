@@ -45,6 +45,26 @@ $queryType = new ObjectType([
       ],
       'resolve' => fn(?int $_rootValue, array $args): array => allManuscriptMetaData($args['paginationSize'], $args['page'])
     ],
+    'myManuscripts' => [
+      'type' => Type::listOf(Type::nonNull(Type::string())),
+      'resolve' => function (): ?array {
+        $username = resolveUser();
+
+        return $username !== null
+          ? selectAllOwnManuscripts($username)
+          : null;
+      },
+    ],
+    'manuscriptsToReview' => [
+      'type' => Type::listOf(Type::nonNull(Type::string())),
+      'resolve' => function (): ?array {
+        $username = resolveUser();
+
+        return $username !== null
+          ? [/* TODO! */]
+          : null;
+      }
+    ],
     'manuscript' => [
       'type' => ManuscriptMetaData::$graphQLType,
       'args' => [
