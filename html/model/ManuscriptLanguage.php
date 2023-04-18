@@ -4,11 +4,11 @@ namespace model;
 
 use GraphQL\Type\Definition\{ObjectType, Type};
 
-const nameName = 'name';
-const abbreviationName = 'abbreviation';
-
 class ManuscriptLanguage
 {
+  const nameName = 'name';
+  const abbreviationName = 'abbreviation';
+
   static ObjectType $graphQLType;
 
   public string $name;
@@ -24,11 +24,11 @@ class ManuscriptLanguage
 ManuscriptLanguage::$graphQLType = new ObjectType([
   'name' => 'ManuscriptLanguage',
   'fields' => [
-    nameName => [
+    ManuscriptLanguage::nameName => [
       'type' => Type::nonNull(Type::string()),
       'resolve' => fn(ManuscriptLanguage $language): string => $language->name
     ],
-    abbreviationName => [
+    ManuscriptLanguage:: abbreviationName => [
       'type' => Type::nonNull(Type::string()),
       'resolve' => fn(ManuscriptLanguage $language): string => $language->abbreviation
     ]

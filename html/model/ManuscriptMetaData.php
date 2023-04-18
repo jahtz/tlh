@@ -3,10 +3,12 @@
 namespace model;
 
 require_once __DIR__ . '/ManuscriptIdentifier.php';
-// require_once __DIR__ . '/TransliterationLine.php';
-require_once __DIR__ . '/TransliterationSide.php';
+require_once __DIR__ . '/Transliteration.php';
+require_once __DIR__ . '/../sql_queries.php';
 
+use Exception;
 use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
+use mysqli_stmt;
 
 /**
  * @param string $manuscriptMainIdentifier
@@ -96,6 +98,33 @@ class ManuscriptMetaData
       $creatorUsername
     );
   }
+
+  function saveNewTransliteration(string $transliteration): bool
+  {
+    try {
+      $conn = connect_to_db();
+
+      $version = execute_query_with_connection(
+        $conn,
+        "select max(version) as max_version from tlh_dig_transliterations where main_identifier = ?;",
+        fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $this->mainIdentifier->identifier),
+        function (mysqli_stmt $stmt): ?int {
+          $row = $stmt->get_result()->fetch_assoc();
+          return $row != null ? (int)$row['max_version'] + 1 : null;
+        }
+      );
+
+      return execute_query_with_connection(
+        $conn,
+        "insert into tlh_dig_transliterations (main_identifier, version, input) values (?, ?, ?);",
+        fn(mysqli_stmt $stmt) => $stmt->bind_param('sis', $this->mainIdentifier->identifier, $version, $transliteration),
+        fn(mysqli_stmt $_stmt) => true
+      );
+    } catch (Exception $exception) {
+      error_log($exception);
+      return false;
+    }
+  }
 }
 
 // GraphQL
@@ -131,9 +160,9 @@ ManuscriptMetaData::$graphQLType = new ObjectType([
       'type' => Type::nonNull(Type::listOf(Type::nonNull(Type::string()))),
       'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): array => getPictures($manuscriptMetaData->mainIdentifier->identifier)
     ],
-    'transliterations' => [
-      'type' => Type::listOf(Type::nonNull(TransliterationSide::$graphQLObjectType)),
-      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): array => TransliterationSide::selectTransliterationSides($manuscriptMetaData->mainIdentifier->identifier)
+    'transliteration' => [
+      'type' => Transliteration::$graphQLObjectType,
+      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): ?Transliteration => Transliteration::selectNewestTransliteration($manuscriptMetaData->mainIdentifier->identifier)
     ]
   ]
 ]);

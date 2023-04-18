@@ -1,42 +1,6 @@
-type LineNumber {
-  isConfirmed: Boolean!
-  number: Int!
-}
-
-input LineNumberInput {
-  isConfirmed: Boolean!
-  number: Int!
-}
-
 type LoggedInUserMutations {
   createManuscript(values: ManuscriptMetaDataInput): String
   manuscript(mainIdentifier: String!): ManuscriptMutations
-}
-
-enum ManuscriptColumn {
-  ColumnDivider
-  I
-  II
-  III
-  IV
-  IX
-  LeftColumn
-  MiddleColumn
-  None
-  RightColumn
-  V
-  VI
-  VII
-  VIII
-  X
-  XI
-  XII
-}
-
-enum ManuscriptColumnModifier {
-  None
-  Slash
-  SlashQuestion
 }
 
 type ManuscriptIdentifier {
@@ -71,7 +35,7 @@ type ManuscriptMetaData {
   pictureUrls: [String!]!
   provenance: String
   status: ManuscriptStatus
-  transliterations: [TransliterationSide!]
+  transliteration: Transliteration
 }
 
 input ManuscriptMetaDataInput {
@@ -85,21 +49,7 @@ input ManuscriptMetaDataInput {
 }
 
 type ManuscriptMutations {
-  updateTransliteration(values: [TransliterationSideInput!]!): Boolean!
-}
-
-enum ManuscriptSide {
-  InscriptionNumber
-  LeftEdge
-  LowerEdge
-  NotIdentifiable
-  Obverse
-  Reverse
-  RightEdge
-  SealInscription
-  SideA
-  SideB
-  UpperEdge
+  updateTransliteration(input: String!): Boolean!
 }
 
 enum ManuscriptStatus {
@@ -137,45 +87,9 @@ type Query {
   manuscriptLanguages: [ManuscriptLanguage!]!
 }
 
-type TransliterationColumn {
-  column: ManuscriptColumn!
-  columnIndex: Int!
-  columnModifier: ManuscriptColumnModifier!
-  lines: [TransliterationLine!]!
-}
-
-input TransliterationColumnInput {
-  column: ManuscriptColumn!
-  columnIndex: Int!
-  columnModifier: ManuscriptColumnModifier!
-  lines: [TransliterationLineInput!]!
-}
-
-type TransliterationLine {
+type Transliteration {
   input: String!
-  inputIndex: Int!
-  lineNumber: LineNumber
-  result: String
-}
-
-input TransliterationLineInput {
-  input: String!
-  lineIndex: Int!
-  lineNumber: LineNumberInput
-  result: String
-}
-
-type TransliterationSide {
-  columns: [TransliterationColumn!]!
-  side: ManuscriptSide!
-  sideIndex: Int!
   version: Int!
-}
-
-input TransliterationSideInput {
-  columns: [TransliterationColumnInput!]!
-  side: ManuscriptSide!
-  sideIndex: Int!
 }
 
 input UserInput {

@@ -5,7 +5,6 @@ require_once __DIR__ . '/mysqliconn.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 require_once __DIR__ . '/model/ManuscriptMetaData.php';
-require_once __DIR__ . '/model/TransliterationLine.php';
 require_once __DIR__ . '/model/User.php';
 
 use model\{ManuscriptIdentifier, ManuscriptMetaData, User};
@@ -15,7 +14,7 @@ use model\{ManuscriptIdentifier, ManuscriptMetaData, User};
  *
  * @param mysqli $connection
  * @param string $sql
- * @param ?callable(mysqli_stmt) $bindParams
+ * @param ?callable(mysqli_stmt):void $bindParams
  * @param callable(mysqli_stmt):T $f
  *
  * @return mixed
@@ -60,7 +59,7 @@ function execute_query_with_connection(mysqli $connection, string $sql, ?callabl
  * @template T
  *
  * @param string $sql
- * @param ?callable(mysqli_stmt) $bindParams
+ * @param ?callable(mysqli_stmt):void $bindParams
  * @param callable(mysqli_stmt):T $f
  * @return mixed
  *
@@ -83,6 +82,7 @@ function execute_query(string $sql, ?callable $bindParams, callable $f)
 
 /**
  * @template T
+ *
  * @param string $sql
  * @param callable|null $bindParams
  * @param callable(mysqli_result):T $f

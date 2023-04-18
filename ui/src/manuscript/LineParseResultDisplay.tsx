@@ -1,5 +1,5 @@
 import {NodeDisplay} from '../xmlEditor/NodeDisplay';
-import {LineParseResult} from './TransliterationColumnInputDisplay';
+import {LineParseResult} from './LineParseResult';
 
 interface IProps {
   line: LineParseResult;

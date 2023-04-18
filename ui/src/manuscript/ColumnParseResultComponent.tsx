@@ -3,7 +3,7 @@ import {BulmaTabs} from '../genericElements/BulmaTabs';
 import {LineParseResultDisplay} from './LineParseResultDisplay';
 import {writeNode} from 'simple_xml';
 import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
-import {LineParseResult} from './TransliterationColumnInputDisplay';
+import {LineParseResult} from './LineParseResult';
 
 interface IProps {
   lines: LineParseResult[];

@@ -2,15 +2,18 @@
 
 namespace model;
 
-require_once __DIR__ . '/ManuscriptIdentifierType.php';
+use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
 
-use GraphQL\Type\Definition\{InputObjectType, ObjectType, Type};
-
-const identifierTypeName = 'identifierType';
-const identifierName = 'identifier';
+$manuscriptIdentifierTypeGraphQLType = new EnumType([
+  'name' => 'ManuscriptIdentifierType',
+  'values' => ['ExcavationNumber', 'CollectionNumber', 'PublicationShortReference']
+]);
 
 class ManuscriptIdentifier
 {
+  const identifierTypeName = 'identifierType';
+  const identifierName = 'identifier';
+
   static ObjectType $graphQLType;
   static InputObjectType $graphQLInputObjectType;
 
@@ -25,7 +28,7 @@ class ManuscriptIdentifier
 
   static function fromGraphQLInput(array $input): ManuscriptIdentifier
   {
-    return new ManuscriptIdentifier($input[identifierTypeName], $input[identifierName]);
+    return new ManuscriptIdentifier($input[ManuscriptIdentifier::identifierTypeName], $input[ManuscriptIdentifier::identifierName]);
   }
 
   static function fromDbAssocArray(array $row): ManuscriptIdentifier
@@ -37,11 +40,11 @@ class ManuscriptIdentifier
 ManuscriptIdentifier::$graphQLType = new ObjectType([
   'name' => 'ManuscriptIdentifier',
   'fields' => [
-    identifierTypeName => [
-      'type' => Type::nonNull(ManuscriptIdentifierType::$graphQLType),
+    ManuscriptIdentifier::identifierTypeName => [
+      'type' => Type::nonNull($manuscriptIdentifierTypeGraphQLType),
       'resolve' => fn(ManuscriptIdentifier $manuscriptIdentifier): string => $manuscriptIdentifier->identifierType
     ],
-    identifierName => [
+    ManuscriptIdentifier::identifierName => [
       'type' => Type::nonNull(Type::string()),
       'resolve' => fn(ManuscriptIdentifier $manuscriptIdentifier): string => $manuscriptIdentifier->identifier
     ]
@@ -51,7 +54,7 @@ ManuscriptIdentifier::$graphQLType = new ObjectType([
 ManuscriptIdentifier::$graphQLInputObjectType = new InputObjectType([
   'name' => 'ManuscriptIdentifierInput',
   'fields' => [
-    identifierTypeName => Type::nonNull(ManuscriptIdentifierType::$graphQLType),
-    identifierName => Type::nonNull(Type::string())
+    ManuscriptIdentifier::identifierTypeName => Type::nonNull($manuscriptIdentifierTypeGraphQLType),
+    ManuscriptIdentifier::identifierName => Type::nonNull(Type::string())
   ]
 ]);

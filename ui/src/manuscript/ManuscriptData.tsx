@@ -7,7 +7,7 @@ import {getNameForPalaeoClassification} from '../model/manuscriptProperties/pala
 import {PicturesBlock} from './PicturesBlock';
 import {createTransliterationUrl, homeUrl, uploadPicturesUrl} from '../urls';
 
-export function ManuscriptData(/*{manuscript}: ManuscriptBaseIProps*/): JSX.Element {
+export function ManuscriptData(): JSX.Element {
 
   const {t} = useTranslation('common');
   const activeUser: User | null = useSelector(activeUserSelector);
@@ -20,26 +20,15 @@ export function ManuscriptData(/*{manuscript}: ManuscriptBaseIProps*/): JSX.Elem
 
   const createdByUser: boolean = !!activeUser && activeUser.user_id === manuscript.creatorUsername;
 
-  function renderOtherIdentifiers(otherIdentifiers: ManuscriptIdentifierFragment[]): JSX.Element {
-    if (otherIdentifiers.length === 0) {
-      return <span className="is-italic">{t('Keine weiteren Identfikatoren gefunden')}.</span>;
-    }
-
-    return (
+  const renderOtherIdentifiers = (otherIdentifiers: ManuscriptIdentifierFragment[]): JSX.Element => otherIdentifiers.length === 0
+    ? <span className="is-italic">{t('noOtherIdentifiersFound')}.</span>
+    : (
       <div className="content">
         <ul>
-          {otherIdentifiers.map(({identifier, identifierType}) =>
-            <li key={identifier}>{identifier} ({identifierType})</li>
-          )}
+          {otherIdentifiers.map(({identifier, identifierType}) => <li key={identifier}>{identifier} ({identifierType})</li>)}
         </ul>
       </div>
     );
-  }
-
-
-  const sideParseResults = manuscript.transliterations
-    ? manuscript.transliterations/*.map(({result}) => JSON.parse(resultJson) as SideParseResult)*/
-    : undefined;
 
   return (
     <div className="container mx-auto">
@@ -97,17 +86,14 @@ export function ManuscriptData(/*{manuscript}: ManuscriptBaseIProps*/): JSX.Elem
       <div className="my-3">
         <h2 className="font-bold text-xl">{t('transliteration')}</h2>
 
-        {sideParseResults
+        {manuscript.transliteration !== undefined && manuscript.transliteration !== null
           ? (
             <div className="my-3">
-              {/*sideParseResults.map(({lineResults}, index) => <Transliteration key={index} lines={lineResults}/>)*/}
+              <p>{JSON.stringify(manuscript.transliteration) /* JSON.stringify(columns) */}</p>
+              {/* <Transliteration key={sideIndex} lines={lineResults}/>*/}
             </div>
           )
-          : (
-            <div className="notification is-info has-text-centered">
-              {t('noTransliterationCreatedYet')}.
-            </div>
-          )}
+          : <div className="notification is-info has-text-centered">{t('noTransliterationCreatedYet')}.</div>}
 
         {createdByUser &&
           <Link className="mt-2 p-2 block rounded bg-blue-500 text-white text-center w-full" to={`../${createTransliterationUrl}`}>

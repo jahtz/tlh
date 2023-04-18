@@ -61,26 +61,9 @@ mutation CreateManuscript($manuscriptMetaData : ManuscriptMetaDataInput) {
 
 # /manuscripts/:id
 
-fragment TransliterationColumn on TransliterationColumn {
-  columnIndex
-  lines {
-    inputIndex
-    lineNumber {
-      number
-      isConfirmed
-    }
-    input
-    result
-  }
-}
-
-fragment TransliterationSide on TransliterationSide {
-  sideIndex
-  side
+fragment Transliteration on Transliteration {
   version
-  columns {
-    ...TransliterationColumn
-  }
+  input
 }
 
 fragment ManuscriptMetaData on ManuscriptMetaData {
@@ -97,8 +80,8 @@ fragment ManuscriptMetaData on ManuscriptMetaData {
   provenance
   creatorUsername
   pictureUrls
-  transliterations {
-    ...TransliterationSide
+  transliteration {
+    ...Transliteration
   }
 }
 
@@ -134,10 +117,10 @@ query TransliterationInput($mainIdentifier: String!) {
   }
 }
 
-mutation uploadTransliteration($mainIdentifier: String!, $values: [TransliterationSideInput!]!) {
+mutation uploadTransliteration($mainIdentifier: String!, $input: String!) {
   me {
     manuscript(mainIdentifier: $mainIdentifier) {
-      updateTransliteration(values: $values)
+      updateTransliteration(input: $input)
     }
   }
 }

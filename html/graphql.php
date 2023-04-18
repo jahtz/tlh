@@ -8,14 +8,15 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 require_once __DIR__ . '/model/ManuscriptMetaData.php';
 require_once __DIR__ . '/model/ManuscriptLanguage.php';
+require_once __DIR__ . '/model/ManuscriptIdentifier.php';
 require_once __DIR__ . '/model/User.php';
-require_once __DIR__ . '/model/TransliterationSideInput.php';
+require_once __DIR__ . '/model/Transliteration.php';
 
 use GraphQL\Error\{DebugFlag, FormattedError};
 use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
-use model\{ManuscriptLanguage, ManuscriptMetaData, TransliterationSideInput, User};
+use model\{ManuscriptLanguage, ManuscriptMetaData, User};
 use ReallySimpleJWT\Token;
 use function model\allManuscriptLanguages;
 
@@ -54,81 +55,15 @@ $queryType = new ObjectType([
   ]
 ]);
 
-const nextVersionSql = "select max(version) as max_version from tlh_dig_transliteration_lines where main_identifier = ?;";
-
-function selectNextManuscriptTransliterationVersion(mysqli $conn, string $mainIdentifier): ?int
-{
-  // TODO: move to sql queries!
-  $nextVersionStatement = $conn->prepare(nextVersionSql);
-
-  if (!$nextVersionStatement) {
-    error_log("Could not prepare statement...");
-    return null;
-  }
-
-  $nextVersionStatement->bind_param('s', $mainIdentifier);
-  $nextVersionExecuted = $nextVersionStatement->execute();
-
-  if (!$nextVersionExecuted) {
-    error_log("Could not delete TransliterationLine from db: " . $nextVersionStatement->error);
-    return null;
-  }
-
-  $currentVersion = (int)$nextVersionStatement->get_result()->fetch_assoc()['max_version'];
-
-  $nextVersionStatement->close();
-
-  return $currentVersion + 1;
-}
-
 $manuscriptMutationsType = new ObjectType([
   'name' => 'ManuscriptMutations',
   'fields' => [
     'updateTransliteration' => [
       'type' => Type::nonNull(Type::boolean()),
       'args' => [
-        'values' => Type::nonNull(Type::listOf(Type::nonNull(TransliterationSideInput::$graphQLInputObjectType)))
+        'input' => Type::nonNull(Type::string())
       ],
-      'resolve' => function (ManuscriptMetaData $manuscriptMetaData, array $args): bool {
-        $mainIdentifier = $manuscriptMetaData->mainIdentifier->identifier;
-
-        $connection = connect_to_db();
-
-        $version = selectNextManuscriptTransliterationVersion($connection, $mainIdentifier);
-
-        if ($version === null) {
-          throw new Exception("Could not select next version...");
-        }
-
-        $sideInputs = array_map(fn(array $sideInput): TransliterationSideInput => TransliterationSideInput::fromGraphQLInput($sideInput), $args['values']);
-
-        // error_log(json_encode($sideInputs, JSON_PRETTY_PRINT));
-
-        $allSaved = true;
-
-        $connection->begin_transaction();
-
-        try {
-          foreach ($sideInputs as $transliterationSide) {
-            $allSaved = $allSaved && $transliterationSide->saveToDb($connection, $mainIdentifier, $version);
-          }
-
-          error_log("All saved: " . ($allSaved ? '1' : '0'));
-
-          if ($allSaved) {
-            $connection->commit();
-          } else {
-            $connection->rollback();
-          }
-        } catch (mysqli_sql_exception $e) {
-          error_log($e->getMessage());
-          $connection->rollback();
-        }
-
-        $connection->close();
-
-        return $allSaved;
-      }
+      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData, array $args): bool => $manuscriptMetaData->saveNewTransliteration($args['input'])
     ]
   ]
 ]);
