@@ -121,7 +121,7 @@ class ManuscriptMetaData
         fn(mysqli_stmt $_stmt) => true
       );
     } catch (Exception $exception) {
-      error_log($exception);
+      error_log($exception->getMessage());
       return false;
     }
   }

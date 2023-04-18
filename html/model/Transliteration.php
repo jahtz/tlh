@@ -36,8 +36,8 @@ class Transliteration
           return $row != null ? new Transliteration((int)$row['version'], (string)$row['input']) : null;
         }
       );
-    } catch (Exception $e) {
-      error_log($e);
+    } catch (Exception $exception) {
+      error_log($exception->getMessage());
       return null;
     }
   }
