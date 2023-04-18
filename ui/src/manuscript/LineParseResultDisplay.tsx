@@ -2,16 +2,17 @@ import {NodeDisplay} from '../xmlEditor/NodeDisplay';
 import {LineParseResult} from './LineParseResult';
 
 interface IProps {
+  showStatusLevel: boolean;
   line: LineParseResult;
 }
 
-export function LineParseResultDisplay({line: {statusLevel, events, nodes}}: IProps): JSX.Element {
+export function LineParseResultDisplay({showStatusLevel, line: {statusLevel, events, nodes}}: IProps): JSX.Element {
 
   const statusEvents = events.sort((a, b) => a.level.valueOf() - b.level.valueOf());
 
   return (
     <div>
-      <span className="text-gray-500">({statusLevel})</span>
+      {showStatusLevel && <span className="text-gray-500">({statusLevel})</span>}
 
       &nbsp;{nodes.map((node, index) => <NodeDisplay key={index} node={node} isLeftSide={false}/>)}
 

@@ -50,7 +50,7 @@ export function TransliterationInput(): JSX.Element {
           {parsed.length > 0
             ? (
               <div className="mt-2">
-                <ColumnParseResultComponent lines={parsed}/>
+                <ColumnParseResultComponent showStatusLevel={true} lines={parsed}/>
               </div>
             )
             : <div className="p-2 italic text-cyan-500 text-center">{t('no_result_yet')}...</div>}

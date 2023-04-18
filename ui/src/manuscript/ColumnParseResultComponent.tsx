@@ -6,6 +6,7 @@ import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
 import {LineParseResult} from './LineParseResult';
 
 interface IProps {
+  showStatusLevel: boolean;
   lines: LineParseResult[];
 }
 
@@ -13,7 +14,15 @@ const exportLines = (lines: LineParseResult[]): string[] => lines.map(
   ({nodes}) => nodes.map((node) => writeNode(node, tlhXmlEditorConfig.writeConfig)).join(' ')
 );
 
-export function ColumnParseResultComponent({lines}: IProps): JSX.Element {
+export function TransliterationParseResultDisplay({lines, showStatusLevel}: IProps): JSX.Element {
+  return (
+    <div>
+      {lines.map((lpr, index) => <LineParseResultDisplay key={index} showStatusLevel={showStatusLevel} line={lpr}/>)}
+    </div>
+  );
+}
+
+export function ColumnParseResultComponent({lines, showStatusLevel}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -21,11 +30,7 @@ export function ColumnParseResultComponent({lines}: IProps): JSX.Element {
     <BulmaTabs tabs={{
       rendered: {
         name: t('rendered'),
-        render: () => (
-          <div>
-            {lines.map((lpr, index) => <LineParseResultDisplay key={index} line={lpr}/>)}
-          </div>
-        )
+        render: () => <TransliterationParseResultDisplay showStatusLevel={showStatusLevel} lines={lines}/>
       },
       asXml: {
         name: t('asXml'),

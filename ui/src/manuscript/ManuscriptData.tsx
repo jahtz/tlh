@@ -1,11 +1,14 @@
 import {useTranslation} from 'react-i18next';
 import {Link, Navigate, useLoaderData} from 'react-router-dom';
-import {ManuscriptIdentifierFragment, ManuscriptMetaDataFragment} from '../graphql';
+import {ManuscriptMetaDataFragment} from '../graphql';
 import {useSelector} from 'react-redux';
 import {activeUserSelector, User} from '../newStore';
 import {getNameForPalaeoClassification} from '../model/manuscriptProperties/palaeoClassification';
 import {PicturesBlock} from './PicturesBlock';
 import {createTransliterationUrl, homeUrl, uploadPicturesUrl} from '../urls';
+import {TLHParser} from 'simtex';
+import {convertLine} from './LineParseResult';
+import {ColumnParseResultComponent, TransliterationParseResultDisplay} from './ColumnParseResultComponent';
 
 export function ManuscriptData(): JSX.Element {
 
@@ -20,15 +23,9 @@ export function ManuscriptData(): JSX.Element {
 
   const createdByUser: boolean = !!activeUser && activeUser.user_id === manuscript.creatorUsername;
 
-  const renderOtherIdentifiers = (otherIdentifiers: ManuscriptIdentifierFragment[]): JSX.Element => otherIdentifiers.length === 0
-    ? <span className="is-italic">{t('noOtherIdentifiersFound')}.</span>
-    : (
-      <div className="content">
-        <ul>
-          {otherIdentifiers.map(({identifier, identifierType}) => <li key={identifier}>{identifier} ({identifierType})</li>)}
-        </ul>
-      </div>
-    );
+  const parsedTransliteration = manuscript.transliteration !== undefined && manuscript.transliteration !== null
+    ? new TLHParser(manuscript.transliteration.input).getLines().map(convertLine)
+    : undefined;
 
   return (
     <div className="container mx-auto">
@@ -43,7 +40,17 @@ export function ManuscriptData(): JSX.Element {
           <tbody>
             <tr>
               <th className="text-right px-4 py-2">{t('otherIdentifier_plural')}</th>
-              <td className="px-4 py-2">{renderOtherIdentifiers(manuscript.otherIdentifiers)}</td>
+              <td className="px-4 py-2">
+                {manuscript.otherIdentifiers.length === 0
+                  ? <span className="italic">{t('noOtherIdentifiersFound')}.</span>
+                  : (
+                    <div className="content">
+                      <ul>
+                        {manuscript.otherIdentifiers.map(({identifier, identifierType}) => <li key={identifier}>{identifier} ({identifierType})</li>)}
+                      </ul>
+                    </div>
+                  )}
+              </td>
             </tr>
             <tr>
               <th className="text-right px-4 py-2">{t('palaeographicClassification')}</th>
@@ -88,11 +95,10 @@ export function ManuscriptData(): JSX.Element {
       <div className="my-3">
         <h2 className="font-bold text-xl">{t('transliteration')}</h2>
 
-        {manuscript.transliteration !== undefined && manuscript.transliteration !== null
+        {parsedTransliteration !== undefined
           ? (
             <div className="my-3">
-              <p>{JSON.stringify(manuscript.transliteration) /* JSON.stringify(columns) */}</p>
-              {/* <Transliteration key={sideIndex} lines={lineResults}/>*/}
+              <TransliterationParseResultDisplay showStatusLevel={false} lines={parsedTransliteration}/>
             </div>
           )
           : <div className="notification is-info has-text-centered">{t('noTransliterationCreatedYet')}.</div>}
