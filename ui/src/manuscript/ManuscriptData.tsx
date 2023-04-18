@@ -72,9 +72,11 @@ export function ManuscriptData(): JSX.Element {
         <h2 className="font-bold text-xl">{t('picture_plural')}</h2>
 
         {manuscript.pictureUrls.length === 0
-          ? <div className="notification is-info has-text-centered">
-            {t('noPicturesUploadedYet')}.
-          </div>
+          ? (
+            <div className="notification is-info has-text-centered">
+              {t('noPicturesUploadedYet')}.
+            </div>
+          )
           : <PicturesBlock mainIdentifier={manuscript.mainIdentifier.identifier} pictures={manuscript.pictureUrls}/>
         }
 

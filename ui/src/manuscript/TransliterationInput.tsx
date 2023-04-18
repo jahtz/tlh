@@ -30,13 +30,11 @@ export function TransliterationInput(): JSX.Element {
       .catch((error) => console.error('Could not upload transliteration:\n' + error));
   }
 
-  const parsed = new TLHParser(transliteration).getLines()
-    .map(convertLine);
+  const parsed = new TLHParser(transliteration).getLines().map(convertLine);
 
   return (
     <div className="container mx-auto">
       <h1 className="my-4 font-bold text-xl text-center">{t('createTransliteration')}</h1>
-
 
       <div className="mt-2 p-2 rounded border border-slate-500 grid grid-cols-3 gap-2">
         <section>
