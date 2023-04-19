@@ -137,7 +137,7 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
   {
     return executeMultiSelectQuery(
       "select main_identifier from tlh_dig_manuscript_metadatas where creator_username = ?;",
-      fn(mysqli_stmt $stmt) => $stmt->bind_param('i', $username),
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $username),
       fn(array $row): string => (string)$row['main_identifier'],
     );
   }

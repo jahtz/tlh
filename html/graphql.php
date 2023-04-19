@@ -57,6 +57,8 @@ $queryType = new ObjectType([
       'resolve' => function (): ?array {
         $username = resolveUser();
 
+        // FIXME: make sure user has review rights!
+
         return $username !== null ? selectManuscriptsToReview($username) : null;
       }
     ],
@@ -156,6 +158,10 @@ function verifyUser(string $username, string $password): ?string
 function resolveUser(): ?string
 {
   global $jwtSecret;
+
+  if (!isset($_SERVER['HTTP_AUTHORIZATION'])) {
+    return null;
+  }
 
   $jwt = $_SERVER['HTTP_AUTHORIZATION'];
 

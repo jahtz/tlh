@@ -4,7 +4,7 @@ require_once __DIR__ . '/model/Manuscript.php';
 require_once __DIR__ . '/model/User.php';
 
 use model\{Manuscript};
-use function sql_helpers\{execute_query_with_connection, execute_select_query};
+use function sql_helpers\{execute_query_with_connection, executeMultiSelectQuery};
 
 
 /**
@@ -13,25 +13,31 @@ use function sql_helpers\{execute_query_with_connection, execute_select_query};
  */
 function selectManuscriptsToReview(string $username): array
 {
-  try {
-    // FIXME: write sql query...
-    return execute_select_query(
-      "",
-      fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $username),
-      fn(mysqli_result $result) => array_map(
-        fn(array $row): string => (string)$row['main_identifier'],
-        $result->fetch_all(MYSQLI_ASSOC)
-      )
-    );
-  } catch (Exception $exception) {
-    error_log($exception->getMessage());
-    return [];
-  }
+  return executeMultiSelectQuery(
+    "
+select m.main_identifier
+from tlh_dig_manuscript_metadatas as m
+         left outer join tlh_dig_initial_transliterations as it on it.main_identifier = m.main_identifier
+         left outer join tlh_dig_first_reviews as fr on fr.main_identifier = it.main_identifier
+         left outer join tlh_dig_second_reviews as sr on sr.main_identifier = fr.main_identifier
+         left outer join tlh_dig_approved_transliterations as at on sr.main_identifier = at.main_identifier
+where m.creator_username <> ? -- user did not create manuscript
+    and it.input is not null -- has something to review
+    and fr.reviewer_username is null -- no first review yet (-> no second review!)
+    or (
+        fr.reviewer_username <> ? -- first review not from user
+        and (
+            sr.reviewer_username is null -- no second review yet
+            or sr.reviewer_username <> ? -- second review also not from user
+        )
+    );",
+    fn(mysqli_stmt $stmt) => $stmt->bind_param('sss', $username, $username, $username),
+    fn(array $row): string => (string)$row['main_identifier']
+  );
 }
 
 function insertManuscriptMetaData(Manuscript $mmd): bool
 {
-
   $db = connect_to_db();
 
   $otherIdentifierInsertStatement = $db->prepare("
@@ -39,7 +45,7 @@ insert into tlh_dig_manuscript_other_identifiers (main_identifier, identifier, i
 values (?, ?, ?)");
 
   if (!$otherIdentifierInsertStatement) {
-    error_log('Could not prepare insert statements!');
+    error_log('Could not prepare insert statements: ' . $db->error);
     return false;
   }
 
