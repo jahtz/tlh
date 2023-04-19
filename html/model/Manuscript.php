@@ -9,6 +9,7 @@ require_once __DIR__ . '/../sql_queries.php';
 require_once __DIR__ . '/../sql_helpers.php';
 
 use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
+use MySafeGraphQLException;
 use mysqli_stmt;
 use function sql_helpers\{executeMultiSelectQuery, executeSingleInsertQuery, executeSingleSelectQuery};
 
@@ -30,6 +31,7 @@ function getPictures(string $manuscriptMainIdentifier): array
 class Manuscript
 {
   static ObjectType $graphQLType;
+  static ObjectType $graphQLMutationsType;
   static InputObjectType $graphQLInputObjectType;
 
   public ManuscriptIdentifier $mainIdentifier;
@@ -168,11 +170,14 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
 
   // Transliterations
 
-  function insertProvisionalTransliteration(string $transliteration): bool
+  function upsertProvisionalTransliteration(string $transliteration): bool
   {
     return executeSingleInsertQuery(
-      "insert into tlh_dig_provisional_transliterations (main_identifier, input) values (?, ?);",
-      fn(mysqli_stmt $stmt) => $stmt->bind_param('ss', $this->mainIdentifier->identifier, $transliteration)
+      "
+insert into tlh_dig_provisional_transliterations (main_identifier, input)
+    values (?, ?)
+    on duplicate key update input = ?;",
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('sss', $this->mainIdentifier->identifier, $transliteration, $transliteration)
     );
   }
 
@@ -265,6 +270,29 @@ Manuscript::$graphQLType = new ObjectType([
     ]
   ]
 ]);
+
+Manuscript::$graphQLMutationsType = new ObjectType([
+  'name' => 'ManuscriptMutations',
+  'fields' => [
+    'updateTransliteration' => [
+      'type' => Type::nonNull(Type::boolean()),
+      'args' => [
+        'input' => Type::nonNull(Type::string())
+      ],
+      'resolve' => function (Manuscript $manuscript, array $args, ?string $username): bool {
+        if ($manuscript->creatorUsername !== $username) {
+          // make sure manuscript is from user
+          throw new MySafeGraphQLException("Can only change own transliterations!");
+        }
+
+        // FIXME: make sure manuscript is released yet (-> initialTransliteration!)!
+
+        return $manuscript->upsertProvisionalTransliteration($args['input']);
+      }
+    ]
+  ]
+]);
+
 
 Manuscript::$graphQLInputObjectType = new InputObjectType([
   'name' => 'ManuscriptMetaDataInput',

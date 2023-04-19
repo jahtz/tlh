@@ -46,19 +46,12 @@ $queryType = new ObjectType([
     ],
     'myManuscripts' => [
       'type' => Type::listOf(Type::nonNull(Type::string())),
-      'resolve' => function (): ?array {
-        $username = resolveUser();
-
-        return $username !== null ? Manuscript::selectManuscriptIdentifiersForUser($username) : null;
-      },
+      'resolve' => fn(?int $_rootValue, array $_args, ?string $username): ?array => $username !== null ? Manuscript::selectManuscriptIdentifiersForUser($username) : null,
     ],
     'manuscriptsToReview' => [
       'type' => Type::listOf(Type::nonNull(Type::string())),
-      'resolve' => function (): ?array {
-        $username = resolveUser();
-
+      'resolve' => function (?int $_rootValue, array $_args, ?string $username): ?array {
         // FIXME: make sure user has review rights!
-
         return $username !== null ? selectManuscriptsToReview($username) : null;
       }
     ],
@@ -68,19 +61,6 @@ $queryType = new ObjectType([
         'mainIdentifier' => Type::nonNull(Type::string())
       ],
       'resolve' => fn(?int $_rootValue, array $args): ?Manuscript => Manuscript::selectManuscriptById($args['mainIdentifier'])
-    ]
-  ]
-]);
-
-$manuscriptMutationsType = new ObjectType([
-  'name' => 'ManuscriptMutations',
-  'fields' => [
-    'updateTransliteration' => [
-      'type' => Type::nonNull(Type::boolean()),
-      'args' => [
-        'input' => Type::nonNull(Type::string())
-      ],
-      'resolve' => fn(Manuscript $manuscriptMetaData, array $args): bool => $manuscriptMetaData->insertProvisionalTransliteration($args['input'])
     ]
   ]
 ]);
@@ -108,7 +88,7 @@ $loggedInUserMutationsType = new ObjectType([
       }
     ],
     'manuscript' => [
-      'type' => $manuscriptMutationsType,
+      'type' => Manuscript::$graphQLMutationsType,
       'args' => [
         'mainIdentifier' => Type::nonNull(Type::string())
       ],
@@ -196,7 +176,7 @@ $mutationType = new ObjectType([
     ],
     'me' => [
       'type' => $loggedInUserMutationsType,
-      'resolve' => fn(?int $_rootValue, array $_args): ?string => resolveUser()
+      'resolve' => fn(?int $_rootValue, array $_args, ?string $username): ?string => $username
     ]
   ]
 ]);
@@ -213,8 +193,6 @@ try {
   $rawInput = file_get_contents('php://input');
   $input = json_decode($rawInput, true);
 
-  $authHeader = apache_request_headers()['Authorization'] ?? null;
-
   if ($input != null) {
 
     $variablesValues = $input['variables'] ?? null;
@@ -222,10 +200,8 @@ try {
 
     $debug = DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE | DebugFlag::RETHROW_INTERNAL_EXCEPTIONS | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS;
 
-    $query = $input['query'];
-
     /** @psalm-suppress UndefinedDocblockClass */
-    $output = GraphQL::executeQuery($schema, $query, null, $authHeader, $variablesValues, $operationName)->toArray($debug);
+    $output = GraphQL::executeQuery($schema, $input['query'], null, $contextValue = resolveUser(), $variablesValues, $operationName)->toArray($debug);
   } else {
     $output = [
       'data' => null,
@@ -240,7 +216,6 @@ try {
     'errors' => [FormattedError::createFromException($e)]
   ];
 }
-
 
 header('Content-Type: application/json; charset=UTF-8', true, 200);
 

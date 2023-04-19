@@ -3,11 +3,14 @@ import {newStore} from './newStore';
 
 
 const apolloAuthMiddleware = new ApolloLink((operation, forward) => {
-  operation.setContext({
-    headers: {
-      Authorization: newStore.getState().user?.user?.token || null
-    }
-  });
+
+  const state = newStore.getState();
+
+  const headers = state.user.user?.token
+    ? {Authorization: state.user?.user?.token || undefined}
+    : {};
+
+  operation.setContext({headers});
 
   return forward(operation);
 });
