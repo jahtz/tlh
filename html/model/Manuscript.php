@@ -4,7 +4,7 @@ namespace model;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/ManuscriptIdentifier.php';
-require_once __DIR__ . '/Transliteration.php';
+require_once __DIR__ . '/AllTransliterations.php';
 require_once __DIR__ . '/../sql_queries.php';
 require_once __DIR__ . '/../sql_helpers.php';
 
@@ -133,7 +133,7 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
   /**
    * @return string[]
    */
-  static function selectOwnManuscriptIdentifiers(string $username): array
+  static function selectManuscriptIdentifiersForUser(string $username): array
   {
     return executeMultiSelectQuery(
       "select main_identifier from tlh_dig_manuscript_metadatas where creator_username = ?;",
@@ -161,7 +161,7 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
   {
     return executeMultiSelectQuery(
       "select identifier_type, identifier from tlh_dig_manuscript_other_identifiers where main_identifier = ?;",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier),
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
       fn(array $row): ManuscriptIdentifier => ManuscriptIdentifier::fromDbAssocArray($row),
     );
   }
@@ -180,8 +180,44 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
   {
     return executeSingleSelectQuery(
       "select input from tlh_dig_provisional_transliterations where main_identifier = ?;",
-      fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
       fn(array $row): string => $row['input']
+    );
+  }
+
+  function selectAllTransliterations(): ?AllTransliterations
+  {
+    return executeSingleSelectQuery(
+      "
+select pt.input             as p_input,
+       it.input             as i_input,
+       fr.input             as fr_input,
+       fr.reviewer_username as fr_username,
+       sr.input             as sr_input,
+       sr.reviewer_username as sr_username,
+       at.input             as at_input,
+       at.approval_username as at_username
+from tlh_dig_manuscript_metadatas as m
+       left outer join tlh_dig_provisional_transliterations as pt on pt.main_identifier = m.main_identifier
+       left outer join tlh_dig_initial_transliterations as it on it.input = pt.input
+       left outer join tlh_dig_first_reviews as fr on fr.main_identifier = it.main_identifier
+       left outer join tlh_dig_second_reviews as sr on sr.main_identifier = fr.main_identifier
+       left outer join tlh_dig_approved_transliterations as at on at.main_identifier = sr.main_identifier
+where m.main_identifier = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
+      fn(array $row): AllTransliterations => new AllTransliterations(
+        $row['p_input'],
+        $row['i_input'],
+        isset($row['fr_input']) && isset($row['fr_username'])
+          ? new Review($row['fr_input'], $row['fr_username'])
+          : null,
+        isset($row['sr_input']) && isset($row['sr_username'])
+          ? new Review($row['sr_input'], $row['sr_username'])
+          : null,
+        isset($row['at_input']) && isset($row['at_username'])
+          ? new Review($row['at_input'], $row['at_username'])
+          : null
+      )
     );
   }
 }
@@ -222,6 +258,10 @@ Manuscript::$graphQLType = new ObjectType([
     'provisionalTransliteration' => [
       'type' => Type::string(),
       'resolve' => fn(Manuscript $manuscript): ?string => $manuscript->selectProvisionalTransliteration()
+    ],
+    'allTransliterations' => [
+      'type' => AllTransliterations::$graphQLType,
+      'resolve' => fn(Manuscript $manuscript): ?AllTransliterations => $manuscript->selectAllTransliterations()
     ]
   ]
 ]);

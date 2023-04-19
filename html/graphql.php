@@ -10,7 +10,6 @@ require_once __DIR__ . '/model/Manuscript.php';
 require_once __DIR__ . '/model/ManuscriptLanguage.php';
 require_once __DIR__ . '/model/ManuscriptIdentifier.php';
 require_once __DIR__ . '/model/User.php';
-require_once __DIR__ . '/model/Transliteration.php';
 
 use GraphQL\Error\{DebugFlag, FormattedError};
 use GraphQL\GraphQL;
@@ -50,7 +49,7 @@ $queryType = new ObjectType([
       'resolve' => function (): ?array {
         $username = resolveUser();
 
-        return $username !== null ? Manuscript::selectOwnManuscriptIdentifiers($username) : null;
+        return $username !== null ? Manuscript::selectManuscriptIdentifiersForUser($username) : null;
       },
     ],
     'manuscriptsToReview' => [

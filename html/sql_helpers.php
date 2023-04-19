@@ -14,7 +14,7 @@ require_once __DIR__ . '/mysqliconn.php';
  *
  * @param mysqli $connection
  * @param string $sql
- * @param ?callable(mysqli_stmt):void $bindParams
+ * @param ?callable(mysqli_stmt):bool $bindParams
  * @param callable(mysqli_stmt):T $f
  *
  * @return mixed
@@ -45,7 +45,7 @@ function execute_query_with_connection(mysqli $connection, string $sql, ?callabl
   try {
     $result = $f($statement);
   } catch (Exception $e) {
-    error_log($statement->error);
+    error_log("Could not transform: " . $statement->error);
     $statement->close();
     throw $e;
   }
@@ -59,7 +59,7 @@ function execute_query_with_connection(mysqli $connection, string $sql, ?callabl
  * @template T
  *
  * @param string $sql
- * @param ?callable(mysqli_stmt):void $bindParams
+ * @param ?callable(mysqli_stmt):bool $bindParams
  * @param callable(mysqli_stmt):T $f
  * @return mixed
  *
@@ -84,7 +84,7 @@ function executeQuery(string $sql, ?callable $bindParams, callable $f)
  * @template T
  *
  * @param string $sql
- * @param callable|null $bindParams
+ * @param ?callable(mysqli_stmt):bool $bindParams
  * @param callable(mysqli_result):T $f
  *
  * @return mixed
@@ -111,7 +111,7 @@ function execute_select_query(string $sql, ?callable $bindParams, callable $f)
  * @template T
  *
  * @param string $sql
- * @param ?callable(mysqli_stmt):void $bindParams
+ * @param ?callable(mysqli_stmt):bool $bindParams
  * @param callable(array): T $f
  *
  * @return ?T
@@ -136,7 +136,7 @@ function executeSingleSelectQuery(string $sql, ?callable $bindParams, callable $
  * @template T
  *
  * @param string $sql
- * @param ?callable(mysqli_stmt):void $bindParams
+ * @param ?callable(mysqli_stmt):bool $bindParams
  * @param callable(array):T $f
  *
  * @return T[]
