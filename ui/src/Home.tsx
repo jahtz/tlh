@@ -17,7 +17,7 @@ function Inner({manuscriptCount, allManuscripts, myManuscripts, manuscriptsToRev
   return (
     <>
       <div className="my-4 p-2 rounded border border-slate-500">
-        <h2 className="font-bold text-center text-xl">{t('manuscript_plural')}</h2>
+        <h2 className="font-bold text-center text-xl">{t('newestManuscripts')}</h2>
 
         <ManuscriptsOverview manuscriptCount={manuscriptCount} allManuscripts={allManuscripts} queryPage={queryPage}/>
       </div>

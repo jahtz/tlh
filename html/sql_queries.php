@@ -171,8 +171,30 @@ function selectAllOwnManuscripts(string $username): array
         $result->fetch_all(MYSQLI_ASSOC)
       )
     );
-  } catch (Exception $e) {
-    error_log($e->getMessage());
+  } catch (Exception $exception) {
+    error_log($exception->getMessage());
+    return [];
+  }
+}
+
+/**
+ * @param string $username
+ * @return string[]
+ */
+function selectManuscriptsToReview(string $username): array
+{
+  try {
+    // FIXME: write sql query...
+    return execute_select_query(
+      "",
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $username),
+      fn(mysqli_result $result) => array_map(
+        fn(array $row): string => (string)$row['main_identifier'],
+        $result->fetch_all(MYSQLI_ASSOC)
+      )
+    );
+  } catch (Exception $exception) {
+    error_log($exception->getMessage());
     return [];
   }
 }

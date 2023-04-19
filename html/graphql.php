@@ -50,9 +50,7 @@ $queryType = new ObjectType([
       'resolve' => function (): ?array {
         $username = resolveUser();
 
-        return $username !== null
-          ? selectAllOwnManuscripts($username)
-          : null;
+        return $username !== null ? selectAllOwnManuscripts($username) : null;
       },
     ],
     'manuscriptsToReview' => [
@@ -60,9 +58,7 @@ $queryType = new ObjectType([
       'resolve' => function (): ?array {
         $username = resolveUser();
 
-        return $username !== null
-          ? [/* TODO! */]
-          : null;
+        return $username !== null ? selectManuscriptsToReview($username) : null;
       }
     ],
     'manuscript' => [
