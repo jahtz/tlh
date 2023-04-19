@@ -2,13 +2,12 @@
 
 namespace model;
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
 use GraphQL\Type\Definition\{ObjectType, Type};
 
 class ManuscriptLanguage
 {
-  const nameName = 'name';
-  const abbreviationName = 'abbreviation';
-
   static ObjectType $graphQLType;
 
   public string $name;
@@ -24,11 +23,11 @@ class ManuscriptLanguage
 ManuscriptLanguage::$graphQLType = new ObjectType([
   'name' => 'ManuscriptLanguage',
   'fields' => [
-    ManuscriptLanguage::nameName => [
+    'name' => [
       'type' => Type::nonNull(Type::string()),
       'resolve' => fn(ManuscriptLanguage $language): string => $language->name
     ],
-    ManuscriptLanguage:: abbreviationName => [
+    'abbreviation' => [
       'type' => Type::nonNull(Type::string()),
       'resolve' => fn(ManuscriptLanguage $language): string => $language->abbreviation
     ]

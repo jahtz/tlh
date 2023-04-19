@@ -2,6 +2,8 @@
 
 namespace model;
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
 use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
 
 $manuscriptIdentifierTypeGraphQLType = new EnumType([

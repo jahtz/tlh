@@ -6,7 +6,7 @@ require_once __DIR__ . '/MySafeGraphQLException.php';
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-require_once __DIR__ . '/model/ManuscriptMetaData.php';
+require_once __DIR__ . '/model/Manuscript.php';
 require_once __DIR__ . '/model/ManuscriptLanguage.php';
 require_once __DIR__ . '/model/ManuscriptIdentifier.php';
 require_once __DIR__ . '/model/User.php';
@@ -16,7 +16,7 @@ use GraphQL\Error\{DebugFlag, FormattedError};
 use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
-use model\{ManuscriptLanguage, ManuscriptMetaData, User};
+use model\{Manuscript, ManuscriptLanguage, User};
 use ReallySimpleJWT\Token;
 use function model\allManuscriptLanguages;
 
@@ -35,22 +35,22 @@ $queryType = new ObjectType([
     ],
     'manuscriptCount' => [
       'type' => Type::nonNull(Type::int()),
-      'resolve' => fn(): int => allManuscriptsCount()
+      'resolve' => fn(): int => Manuscript::selectManuscriptsCount()
     ],
     'allManuscripts' => [
-      'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptMetaData::$graphQLType))),
+      'type' => Type::nonNull(Type::listOf(Type::nonNull(Manuscript::$graphQLType))),
       'args' => [
         'paginationSize' => Type::nonNull(Type::int()),
         'page' => Type::nonNull(Type::int())
       ],
-      'resolve' => fn(?int $_rootValue, array $args): array => allManuscriptMetaData($args['paginationSize'], $args['page'])
+      'resolve' => fn(?int $_rootValue, array $args): array => Manuscript::selectAllManuscriptsPaginated($args['paginationSize'], $args['page'])
     ],
     'myManuscripts' => [
       'type' => Type::listOf(Type::nonNull(Type::string())),
       'resolve' => function (): ?array {
         $username = resolveUser();
 
-        return $username !== null ? selectAllOwnManuscripts($username) : null;
+        return $username !== null ? Manuscript::selectOwnManuscriptIdentifiers($username) : null;
       },
     ],
     'manuscriptsToReview' => [
@@ -62,11 +62,11 @@ $queryType = new ObjectType([
       }
     ],
     'manuscript' => [
-      'type' => ManuscriptMetaData::$graphQLType,
+      'type' => Manuscript::$graphQLType,
       'args' => [
         'mainIdentifier' => Type::nonNull(Type::string())
       ],
-      'resolve' => fn(?int $_rootValue, array $args): ?ManuscriptMetaData => manuscriptMetaDataById($args['mainIdentifier'])
+      'resolve' => fn(?int $_rootValue, array $args): ?Manuscript => Manuscript::selectManuscriptById($args['mainIdentifier'])
     ]
   ]
 ]);
@@ -79,7 +79,7 @@ $manuscriptMutationsType = new ObjectType([
       'args' => [
         'input' => Type::nonNull(Type::string())
       ],
-      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData, array $args): bool => $manuscriptMetaData->saveNewTransliteration($args['input'])
+      'resolve' => fn(Manuscript $manuscriptMetaData, array $args): bool => $manuscriptMetaData->insertProvisionalTransliteration($args['input'])
     ]
   ]
 ]);
@@ -90,10 +90,10 @@ $loggedInUserMutationsType = new ObjectType([
     'createManuscript' => [
       'type' => Type::string(),
       'args' => [
-        'values' => ManuscriptMetaData::$graphQLInputObjectType
+        'values' => Manuscript::$graphQLInputObjectType
       ],
       'resolve' => function (string $username, array $args): string {
-        $manuscript = ManuscriptMetaData::fromGraphQLInput($args['values'], $username);
+        $manuscript = Manuscript::fromGraphQLInput($args['values'], $username);
 
         $manuscriptIdentifier = $manuscript->mainIdentifier->identifier;
 
@@ -111,7 +111,7 @@ $loggedInUserMutationsType = new ObjectType([
       'args' => [
         'mainIdentifier' => Type::nonNull(Type::string())
       ],
-      'resolve' => fn(string $_username, array $args): ?ManuscriptMetaData => manuscriptMetaDataById($args['mainIdentifier'])
+      'resolve' => fn(string $_username, array $args): ?Manuscript => Manuscript::selectManuscriptById($args['mainIdentifier'])
     ]
   ]
 ]);
@@ -127,7 +127,7 @@ function register(array $args): string
     throw new MySafeGraphQLException("Could not read input!");
   }
 
-  if (insertUserIntoDatabase($user)) {
+  if ($user->insertUserIntoDatabase()) {
     return $user->username;
   } else {
     throw new MySafeGraphQLException("Could not insert user into database!");
@@ -138,7 +138,7 @@ function verifyUser(string $username, string $password): ?string
 {
   global $jwtSecret, $jwtValidityTime;
 
-  $user = maybeUserFromDatabase($username);
+  $user = User::selectUserFromDatabase($username);
 
   if ($user === null) {
     return null;

@@ -13,8 +13,12 @@ export function TransliterationInput(): JSX.Element {
 
   const manuscript = useLoaderData() as ManuscriptMetaDataFragment | undefined;
 
+  if(!manuscript) {
+    return <Navigate to={homeUrl}/>;
+  }
+
   const {t} = useTranslation('common');
-  const [transliteration, setTransliteration] = useState(manuscript?.transliteration?.input || '');
+  const [transliteration, setTransliteration] = useState(manuscript.provisionalTransliteration || '');
   const currentUser = useSelector(activeUserSelector);
 
   const [uploadTransliteration, {/*data,*/ loading, error}] = useUploadTransliterationMutation();

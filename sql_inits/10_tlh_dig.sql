@@ -1,7 +1,11 @@
 use hpm;
 
 drop table if exists
-  tlh_dig_transliterations,
+  tlh_dig_approved_transliterations,
+  tlh_dig_second_reviews,
+  tlh_dig_first_reviews,
+  tlh_dig_initial_transliterations,
+  tlh_dig_provisional_transliterations,
   tlh_dig_manuscript_other_identifiers,
   tlh_dig_manuscript_metadatas,
   tlh_dig_users;
@@ -47,10 +51,30 @@ create table if not exists tlh_dig_manuscript_other_identifiers (
 
 -- transliterations
 
-create table if not exists tlh_dig_transliterations (
-  main_identifier varchar(20) not null references tlh_dig_manuscript_metadatas (main_identifier) on update cascade on delete cascade,
-  version         int         not null,
-  input           text        not null,
+create table if not exists tlh_dig_provisional_transliterations (
+  main_identifier varchar(20) not null primary key references tlh_dig_manuscript_metadatas (main_identifier) on update cascade on delete cascade,
+  input           text        not null
+);
 
-  primary key (main_identifier, version)
+create table if not exists tlh_dig_initial_transliterations (
+  main_identifier varchar(20) not null primary key references tlh_dig_manuscript_metadatas (main_identifier) on update cascade on delete cascade,
+  input           text        not null
+);
+
+create table if not exists tlh_dig_first_reviews (
+  main_identifier   varchar(20)  not null primary key references tlh_dig_initial_transliterations (main_identifier) on update cascade on delete cascade,
+  input             text         not null,
+  reviewer_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete restrict
+);
+
+create table if not exists tlh_dig_second_reviews (
+  main_identifier   varchar(20)  not null primary key references tlh_dig_first_reviews (main_identifier) on update cascade on delete cascade,
+  input             text         not null,
+  reviewer_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete restrict
+);
+
+create table if not exists tlh_dig_approved_transliterations (
+  main_identifier   varchar(20)  not null primary key references tlh_dig_second_reviews (main_identifier) on update cascade on delete cascade,
+  input             text         not null,
+  approval_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete restrict
 );

@@ -2,13 +2,15 @@
 
 namespace model;
 
+require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/ManuscriptIdentifier.php';
 require_once __DIR__ . '/Transliteration.php';
 require_once __DIR__ . '/../sql_queries.php';
+require_once __DIR__ . '/../sql_helpers.php';
 
-use Exception;
 use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
 use mysqli_stmt;
+use function sql_helpers\{executeMultiSelectQuery, executeSingleInsertQuery, executeSingleSelectQuery};
 
 /**
  * @param string $manuscriptMainIdentifier
@@ -25,7 +27,7 @@ function getPictures(string $manuscriptMainIdentifier): array
   return array_filter(scandir($folder), fn(string $value): bool => !in_array($value, ['.', '..']));
 }
 
-class ManuscriptMetaData
+class Manuscript
 {
   static ObjectType $graphQLType;
   static InputObjectType $graphQLInputObjectType;
@@ -65,9 +67,9 @@ class ManuscriptMetaData
     $this->creatorUsername = $creatorUsername;
   }
 
-  static function fromDbAssocArray(array $row): ManuscriptMetaData
+  static function fromDbAssocArray(array $row): Manuscript
   {
-    return new ManuscriptMetaData(
+    return new Manuscript(
       new ManuscriptIdentifier($row['main_identifier_type'], $row['main_identifier']),
       [],
       $row['palaeo_classification'],
@@ -80,13 +82,13 @@ class ManuscriptMetaData
     );
   }
 
-  static function fromGraphQLInput(array $input, string $creatorUsername): ManuscriptMetaData
+  static function fromGraphQLInput(array $input, string $creatorUsername): Manuscript
   {
     $otherIdentifiers = array_key_exists('otherIdentifiers', $input)
       ? array_map(fn(array $x): ManuscriptIdentifier => ManuscriptIdentifier::fromGraphQLInput($x), $input['otherIdentifiers'])
       : null;
 
-    return new ManuscriptMetaData(
+    return new Manuscript(
       ManuscriptIdentifier::fromGraphQLInput($input['mainIdentifier']),
       $otherIdentifiers,
       $input['palaeographicClassification'],
@@ -99,31 +101,88 @@ class ManuscriptMetaData
     );
   }
 
-  function saveNewTransliteration(string $transliteration): bool
+  static function selectManuscriptsCount(): int
   {
-    try {
-      $conn = connect_to_db();
+    return executeSingleSelectQuery(
+      "select count(*) as manuscript_count from tlh_dig_manuscript_metadatas;",
+      null,
+      fn(array $row): int => (int)$row['manuscript_count']
+    ) ?? -1;
+  }
 
-      $version = execute_query_with_connection(
-        $conn,
-        "select max(version) as max_version from tlh_dig_transliterations where main_identifier = ?;",
-        fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $this->mainIdentifier->identifier),
-        function (mysqli_stmt $stmt): ?int {
-          $row = $stmt->get_result()->fetch_assoc();
-          return $row != null ? (int)$row['max_version'] + 1 : null;
-        }
-      );
+  /**
+   * @return Manuscript[]
+   */
+  static function selectAllManuscriptsPaginated(int $paginationSize, int $page): array
+  {
+    $paginationSize = max(10, $paginationSize);
 
-      return execute_query_with_connection(
-        $conn,
-        "insert into tlh_dig_transliterations (main_identifier, version, input) values (?, ?, ?);",
-        fn(mysqli_stmt $stmt) => $stmt->bind_param('sis', $this->mainIdentifier->identifier, $version, $transliteration),
-        fn(mysqli_stmt $_stmt) => true
-      );
-    } catch (Exception $exception) {
-      error_log($exception->getMessage());
-      return false;
-    }
+    $first = $page * $paginationSize;
+    $last = ($page + 1) * $paginationSize;
+
+    return executeMultiSelectQuery(
+      "
+select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username
+    from tlh_dig_manuscript_metadatas
+    limit ?, ?;",
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('ii', $first, $last),
+      fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
+    );
+  }
+
+  /**
+   * @return string[]
+   */
+  static function selectOwnManuscriptIdentifiers(string $username): array
+  {
+    return executeMultiSelectQuery(
+      "select main_identifier from tlh_dig_manuscript_metadatas where creator_username = ?;",
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('i', $username),
+      fn(array $row): string => (string)$row['main_identifier'],
+    );
+  }
+
+  static function selectManuscriptById(string $mainIdentifier): ?Manuscript
+  {
+    return executeSingleSelectQuery(
+      "
+select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username
+    from tlh_dig_manuscript_metadatas
+    where main_identifier = ?;",
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
+      fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
+    );
+  }
+
+  /**
+   * @return ManuscriptIdentifier[]
+   */
+  function selectOtherIdentifiers(): array
+  {
+    return executeMultiSelectQuery(
+      "select identifier_type, identifier from tlh_dig_manuscript_other_identifiers where main_identifier = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier),
+      fn(array $row): ManuscriptIdentifier => ManuscriptIdentifier::fromDbAssocArray($row),
+    );
+  }
+
+  // Transliterations
+
+  function insertProvisionalTransliteration(string $transliteration): bool
+  {
+    return executeSingleInsertQuery(
+      "insert into tlh_dig_provisional_transliterations (main_identifier, input) values (?, ?);",
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('ss', $this->mainIdentifier->identifier, $transliteration)
+    );
+  }
+
+  function selectProvisionalTransliteration(): ?string
+  {
+    return executeSingleSelectQuery(
+      "select input from tlh_dig_provisional_transliterations where main_identifier = ?;",
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
+      fn(array $row): string => $row['input']
+    );
   }
 }
 
@@ -141,7 +200,7 @@ $manuscriptStatusEnumType = new EnumType([
   'values' => ['InCreation', 'Created', 'Reviewed', 'ReviewMerged', 'ExecutiveReviewed', 'ExecutiveReviewMerged', 'Approved']
 ]);
 
-ManuscriptMetaData::$graphQLType = new ObjectType([
+Manuscript::$graphQLType = new ObjectType([
   'name' => 'ManuscriptMetaData',
   'fields' => [
     'mainIdentifier' => Type::nonNull(ManuscriptIdentifier::$graphQLType),
@@ -154,20 +213,20 @@ ManuscriptMetaData::$graphQLType = new ObjectType([
     'status' => $manuscriptStatusEnumType,
     'otherIdentifiers' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptIdentifier::$graphQLType))),
-      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): array => getOtherIdentifiers($manuscriptMetaData->mainIdentifier->identifier)
+      'resolve' => fn(Manuscript $manuscript): array => $manuscript->selectOtherIdentifiers()
     ],
     'pictureUrls' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(Type::string()))),
-      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): array => getPictures($manuscriptMetaData->mainIdentifier->identifier)
+      'resolve' => fn(Manuscript $manuscript): array => getPictures($manuscript->mainIdentifier->identifier)
     ],
-    'transliteration' => [
-      'type' => Transliteration::$graphQLObjectType,
-      'resolve' => fn(ManuscriptMetaData $manuscriptMetaData): ?Transliteration => Transliteration::selectNewestTransliteration($manuscriptMetaData->mainIdentifier->identifier)
+    'provisionalTransliteration' => [
+      'type' => Type::string(),
+      'resolve' => fn(Manuscript $manuscript): ?string => $manuscript->selectProvisionalTransliteration()
     ]
   ]
 ]);
 
-ManuscriptMetaData::$graphQLInputObjectType = new InputObjectType([
+Manuscript::$graphQLInputObjectType = new InputObjectType([
   'name' => 'ManuscriptMetaDataInput',
   'fields' => [
     'mainIdentifier' => Type::nonNull(ManuscriptIdentifier::$graphQLInputObjectType),

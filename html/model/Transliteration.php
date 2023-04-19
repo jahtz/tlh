@@ -4,10 +4,9 @@ namespace model;
 
 require_once __DIR__ . '/../sql_queries.php';
 
-use Exception;
 use GraphQL\Type\Definition\{ObjectType, Type};
-use mysqli_result;
 use mysqli_stmt;
+use function sql_helpers\executeSingleSelectQuery;
 
 class Transliteration
 {
@@ -27,19 +26,11 @@ class Transliteration
 
   static function selectNewestTransliteration(string $mainIdentifier): ?Transliteration
   {
-    try {
-      return execute_select_query(
-        "select version, input from tlh_dig_transliterations where main_identifier = ? order by version desc limit 1;",
-        fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
-        function (mysqli_result $result): ?Transliteration {
-          $row = $result->fetch_assoc();
-          return $row != null ? new Transliteration((int)$row['version'], (string)$row['input']) : null;
-        }
-      );
-    } catch (Exception $exception) {
-      error_log($exception->getMessage());
-      return null;
-    }
+    return executeSingleSelectQuery(
+      "select input from tlh_dig_provisional_transliterations where main_identifier = ?;",
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
+      fn(array $row): Transliteration => new Transliteration((int)$row['version'], (string)$row['input'])
+    );
   }
 }
 

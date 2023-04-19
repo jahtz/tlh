@@ -2,6 +2,9 @@
 
 require_once __DIR__ . '/sql_queries.php';
 require_once __DIR__ . '/cors.php';
+require_once __DIR__ . '/model/Manuscript.php';
+
+use model\Manuscript;
 
 cors();
 
@@ -19,7 +22,7 @@ function fileTypeAllowed(string $fileType): bool
 function doUpload(string $manuscriptId): string
 {
   // check if manuscript exists
-  if (!manuscriptMetaDataById($manuscriptId)) {
+  if (!Manuscript::selectManuscriptById($manuscriptId)) {
     throw new Exception('No such manifest exists!');
   }
 

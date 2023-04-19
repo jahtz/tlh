@@ -23,8 +23,8 @@ export function ManuscriptData(): JSX.Element {
 
   const createdByUser: boolean = !!activeUser && activeUser.user_id === manuscript.creatorUsername;
 
-  const parsedTransliteration = manuscript.transliteration !== undefined && manuscript.transliteration !== null
-    ? new TLHParser(manuscript.transliteration.input).getLines().map(convertLine)
+  const parsedTransliteration = manuscript.provisionalTransliteration !== undefined && manuscript.provisionalTransliteration !== null
+    ? new TLHParser(manuscript.provisionalTransliteration).getLines().map(convertLine)
     : undefined;
 
   return (

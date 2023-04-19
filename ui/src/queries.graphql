@@ -56,13 +56,7 @@ mutation CreateManuscript($manuscriptMetaData : ManuscriptMetaDataInput) {
   }
 }
 
-
 # /manuscripts/:id
-
-fragment Transliteration on Transliteration {
-  version
-  input
-}
 
 fragment ManuscriptMetaData on ManuscriptMetaData {
   mainIdentifier {
@@ -78,9 +72,7 @@ fragment ManuscriptMetaData on ManuscriptMetaData {
   provenance
   creatorUsername
   pictureUrls
-  transliteration {
-    ...Transliteration
-  }
+  provisionalTransliteration
 }
 
 query Manuscript($mainIdentifier: String!) {

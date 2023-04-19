@@ -65,8 +65,8 @@ export type ManuscriptMetaData = {
   palaeographicClassificationSure: Scalars['Boolean'];
   pictureUrls: Array<Scalars['String']>;
   provenance?: Maybe<Scalars['String']>;
+  provisionalTransliteration?: Maybe<Scalars['String']>;
   status?: Maybe<ManuscriptStatus>;
-  transliteration?: Maybe<Transliteration>;
 };
 
 export type ManuscriptMetaDataInput = {
@@ -150,12 +150,6 @@ export type QueryManuscriptArgs = {
   mainIdentifier: Scalars['String'];
 };
 
-export type Transliteration = {
-  __typename?: 'Transliteration';
-  input: Scalars['String'];
-  version: Scalars['Int'];
-};
-
 export type UserInput = {
   affiliation?: InputMaybe<Scalars['String']>;
   email: Scalars['String'];
@@ -206,16 +200,14 @@ export type CreateManuscriptMutationVariables = Exact<{
 
 export type CreateManuscriptMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', createManuscript?: string | null } | null };
 
-export type TransliterationFragment = { __typename?: 'Transliteration', version: number, input: string };
-
-export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }>, transliteration?: { __typename?: 'Transliteration', version: number, input: string } | null };
+export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, provisionalTransliteration?: string | null, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }> };
 
 export type ManuscriptQueryVariables = Exact<{
   mainIdentifier: Scalars['String'];
 }>;
 
 
-export type ManuscriptQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }>, transliteration?: { __typename?: 'Transliteration', version: number, input: string } | null } | null };
+export type ManuscriptQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, provisionalTransliteration?: string | null, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }> } | null };
 
 export type ManuscriptIdentWithCreatorFragment = { __typename?: 'ManuscriptMetaData', pictureUrls: Array<string>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
@@ -262,12 +254,6 @@ export const ManuscriptBasicDataFragmentDoc = gql`
   creatorUsername
 }
     ${ManuscriptIdentifierFragmentDoc}`;
-export const TransliterationFragmentDoc = gql`
-    fragment Transliteration on Transliteration {
-  version
-  input
-}
-    `;
 export const ManuscriptMetaDataFragmentDoc = gql`
     fragment ManuscriptMetaData on ManuscriptMetaData {
   mainIdentifier {
@@ -283,12 +269,9 @@ export const ManuscriptMetaDataFragmentDoc = gql`
   provenance
   creatorUsername
   pictureUrls
-  transliteration {
-    ...Transliteration
-  }
+  provisionalTransliteration
 }
-    ${ManuscriptIdentifierFragmentDoc}
-${TransliterationFragmentDoc}`;
+    ${ManuscriptIdentifierFragmentDoc}`;
 export const ManuscriptIdentWithCreatorFragmentDoc = gql`
     fragment ManuscriptIdentWithCreator on ManuscriptMetaData {
   mainIdentifier {

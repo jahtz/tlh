@@ -34,8 +34,8 @@ type ManuscriptMetaData {
   palaeographicClassificationSure: Boolean!
   pictureUrls: [String!]!
   provenance: String
+  provisionalTransliteration: String
   status: ManuscriptStatus
-  transliteration: Transliteration
 }
 
 input ManuscriptMetaDataInput {
@@ -87,11 +87,6 @@ type Query {
   manuscriptLanguages: [ManuscriptLanguage!]!
   manuscriptsToReview: [String!]
   myManuscripts: [String!]
-}
-
-type Transliteration {
-  input: String!
-  version: Int!
 }
 
 input UserInput {

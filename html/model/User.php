@@ -2,11 +2,15 @@
 
 namespace model;
 
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../sql_helpers.php';
+
 use GraphQL\Type\Definition\{InputObjectType, Type};
+use mysqli_stmt;
+use function sql_helpers\{executeSingleInsertQuery, executeSingleSelectQuery};
 
 class User
 {
-
   static InputObjectType $graphQLInputObjectType;
 
   public string $username;
@@ -24,9 +28,21 @@ class User
     $this->email = $email;
   }
 
-  static function fromDbAssocArray(array $dbArray): User
+  static function selectUserFromDatabase(string $username): ?User
   {
-    return new User($dbArray['username'], $dbArray['pw_hash'], $dbArray['name'], $dbArray['affiliation'], $dbArray['email']);
+    return executeSingleSelectQuery(
+      "select username, pw_hash, name, affiliation, email from tlh_dig_users where username = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $username),
+      fn(array $row): User => new User($row['username'], $row['pw_hash'], $row['name'], $row['affiliation'], $row['email'])
+    );
+  }
+
+  function insertUserIntoDatabase(): bool
+  {
+    return executeSingleInsertQuery(
+      "insert into tlh_dig_users (username, pw_hash, name, affiliation, email) values (?, ?, ?, ?, ?);",
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('sssss', $this->username, $this->pwHash, $this->name, $this->affiliation, $this->email)
+    );
   }
 
   static function fromGraphQLInput(array $graphQLInputObject): ?User
