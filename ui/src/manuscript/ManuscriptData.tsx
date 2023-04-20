@@ -32,7 +32,7 @@ export function ManuscriptData(): JSX.Element {
 
   const onReleaseTransliteration = (): void => {
     releaseTransliteration({variables: {mainIdentifier}})
-      .then(() => void 0)
+      .then(() => window.location.reload())
       .catch((error) => console.error(error));
   };
 
