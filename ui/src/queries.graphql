@@ -73,11 +73,20 @@ fragment ManuscriptMetaData on ManuscriptMetaData {
   creatorUsername
   pictureUrls
   provisionalTransliteration
+  transliterationReleased
 }
 
 query Manuscript($mainIdentifier: String!) {
   manuscript(mainIdentifier: $mainIdentifier) {
     ...ManuscriptMetaData
+  }
+}
+
+mutation ReleaseTransliteration($mainIdentifier: String!) {
+  me {
+    manuscript(mainIdentifier: $mainIdentifier) {
+      releaseTransliteration
+    }
   }
 }
 

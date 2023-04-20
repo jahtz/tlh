@@ -15,6 +15,15 @@ export type Scalars = {
   Float: number;
 };
 
+export type AllTransliterations = {
+  __typename?: 'AllTransliterations';
+  approvalReview?: Maybe<Review>;
+  firstReview?: Maybe<Review>;
+  initialInput?: Maybe<Scalars['String']>;
+  provisionalInput?: Maybe<Scalars['String']>;
+  secondReview?: Maybe<Review>;
+};
+
 export type LoggedInUserMutations = {
   __typename?: 'LoggedInUserMutations';
   createManuscript?: Maybe<Scalars['String']>;
@@ -56,6 +65,7 @@ export type ManuscriptLanguage = {
 
 export type ManuscriptMetaData = {
   __typename?: 'ManuscriptMetaData';
+  allTransliterations?: Maybe<AllTransliterations>;
   bibliography?: Maybe<Scalars['String']>;
   creatorUsername: Scalars['String'];
   cthClassification?: Maybe<Scalars['Int']>;
@@ -67,6 +77,7 @@ export type ManuscriptMetaData = {
   provenance?: Maybe<Scalars['String']>;
   provisionalTransliteration?: Maybe<Scalars['String']>;
   status?: Maybe<ManuscriptStatus>;
+  transliterationReleased: Scalars['Boolean'];
 };
 
 export type ManuscriptMetaDataInput = {
@@ -81,6 +92,7 @@ export type ManuscriptMetaDataInput = {
 
 export type ManuscriptMutations = {
   __typename?: 'ManuscriptMutations';
+  releaseTransliteration: Scalars['Boolean'];
   updateTransliteration: Scalars['Boolean'];
 };
 
@@ -150,6 +162,12 @@ export type QueryManuscriptArgs = {
   mainIdentifier: Scalars['String'];
 };
 
+export type Review = {
+  __typename?: 'Review';
+  input: Scalars['String'];
+  reviewerUsername: Scalars['String'];
+};
+
 export type UserInput = {
   affiliation?: InputMaybe<Scalars['String']>;
   email: Scalars['String'];
@@ -200,14 +218,21 @@ export type CreateManuscriptMutationVariables = Exact<{
 
 export type CreateManuscriptMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', createManuscript?: string | null } | null };
 
-export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, provisionalTransliteration?: string | null, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }> };
+export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, provisionalTransliteration?: string | null, transliterationReleased: boolean, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }> };
 
 export type ManuscriptQueryVariables = Exact<{
   mainIdentifier: Scalars['String'];
 }>;
 
 
-export type ManuscriptQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, provisionalTransliteration?: string | null, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }> } | null };
+export type ManuscriptQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, provisionalTransliteration?: string | null, transliterationReleased: boolean, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }> } | null };
+
+export type ReleaseTransliterationMutationVariables = Exact<{
+  mainIdentifier: Scalars['String'];
+}>;
+
+
+export type ReleaseTransliterationMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', manuscript?: { __typename?: 'ManuscriptMutations', releaseTransliteration: boolean } | null } | null };
 
 export type ManuscriptIdentWithCreatorFragment = { __typename?: 'ManuscriptMetaData', pictureUrls: Array<string>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
@@ -270,6 +295,7 @@ export const ManuscriptMetaDataFragmentDoc = gql`
   creatorUsername
   pictureUrls
   provisionalTransliteration
+  transliterationReleased
 }
     ${ManuscriptIdentifierFragmentDoc}`;
 export const ManuscriptIdentWithCreatorFragmentDoc = gql`
@@ -485,6 +511,41 @@ export function useManuscriptLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type ManuscriptQueryHookResult = ReturnType<typeof useManuscriptQuery>;
 export type ManuscriptLazyQueryHookResult = ReturnType<typeof useManuscriptLazyQuery>;
 export type ManuscriptQueryResult = Apollo.QueryResult<ManuscriptQuery, ManuscriptQueryVariables>;
+export const ReleaseTransliterationDocument = gql`
+    mutation ReleaseTransliteration($mainIdentifier: String!) {
+  me {
+    manuscript(mainIdentifier: $mainIdentifier) {
+      releaseTransliteration
+    }
+  }
+}
+    `;
+export type ReleaseTransliterationMutationFn = Apollo.MutationFunction<ReleaseTransliterationMutation, ReleaseTransliterationMutationVariables>;
+
+/**
+ * __useReleaseTransliterationMutation__
+ *
+ * To run a mutation, you first call `useReleaseTransliterationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReleaseTransliterationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [releaseTransliterationMutation, { data, loading, error }] = useReleaseTransliterationMutation({
+ *   variables: {
+ *      mainIdentifier: // value for 'mainIdentifier'
+ *   },
+ * });
+ */
+export function useReleaseTransliterationMutation(baseOptions?: Apollo.MutationHookOptions<ReleaseTransliterationMutation, ReleaseTransliterationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ReleaseTransliterationMutation, ReleaseTransliterationMutationVariables>(ReleaseTransliterationDocument, options);
+      }
+export type ReleaseTransliterationMutationHookResult = ReturnType<typeof useReleaseTransliterationMutation>;
+export type ReleaseTransliterationMutationResult = Apollo.MutationResult<ReleaseTransliterationMutation>;
+export type ReleaseTransliterationMutationOptions = Apollo.BaseMutationOptions<ReleaseTransliterationMutation, ReleaseTransliterationMutationVariables>;
 export const UploadPicturesDocument = gql`
     query UploadPictures($mainIdentifier: String!) {
   manuscript(mainIdentifier: $mainIdentifier) {

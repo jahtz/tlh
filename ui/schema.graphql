@@ -1,3 +1,11 @@
+type AllTransliterations {
+  approvalReview: Review
+  firstReview: Review
+  initialInput: String
+  provisionalInput: String
+  secondReview: Review
+}
+
 type LoggedInUserMutations {
   createManuscript(values: ManuscriptMetaDataInput): String
   manuscript(mainIdentifier: String!): ManuscriptMutations
@@ -25,6 +33,7 @@ type ManuscriptLanguage {
 }
 
 type ManuscriptMetaData {
+  allTransliterations: AllTransliterations
   bibliography: String
   creatorUsername: String!
   cthClassification: Int
@@ -36,6 +45,7 @@ type ManuscriptMetaData {
   provenance: String
   provisionalTransliteration: String
   status: ManuscriptStatus
+  transliterationReleased: Boolean!
 }
 
 input ManuscriptMetaDataInput {
@@ -49,6 +59,7 @@ input ManuscriptMetaDataInput {
 }
 
 type ManuscriptMutations {
+  releaseTransliteration: Boolean!
   updateTransliteration(input: String!): Boolean!
 }
 
@@ -87,6 +98,11 @@ type Query {
   manuscriptLanguages: [ManuscriptLanguage!]!
   manuscriptsToReview: [String!]
   myManuscripts: [String!]
+}
+
+type Review {
+  input: String!
+  reviewerUsername: String!
 }
 
 input UserInput {

@@ -1,6 +1,6 @@
 import {useTranslation} from 'react-i18next';
 import {Link, Navigate, useLoaderData} from 'react-router-dom';
-import {ManuscriptMetaDataFragment} from '../graphql';
+import {ManuscriptMetaDataFragment, useReleaseTransliterationMutation} from '../graphql';
 import {useSelector} from 'react-redux';
 import {activeUserSelector, User} from '../newStore';
 import {getNameForPalaeoClassification} from '../model/manuscriptProperties/palaeoClassification';
@@ -14,6 +14,7 @@ export function ManuscriptData(): JSX.Element {
 
   const {t} = useTranslation('common');
   const activeUser: User | null = useSelector(activeUserSelector);
+  const [releaseTransliteration] = useReleaseTransliterationMutation();
 
   const manuscript = useLoaderData() as ManuscriptMetaDataFragment | undefined;
 
@@ -27,10 +28,18 @@ export function ManuscriptData(): JSX.Element {
     ? new TLHParser(manuscript.provisionalTransliteration).getLines().map(convertLine)
     : undefined;
 
+  const mainIdentifier = manuscript.mainIdentifier.identifier;
+
+  const onReleaseTransliteration = (): void => {
+    releaseTransliteration({variables: {mainIdentifier}})
+      .then(() => void 0)
+      .catch((error) => console.error(error));
+  };
+
   return (
     <div className="container mx-auto">
       <h1 className="font-bold text-2xl text-center">
-        {t('manuscript{{mainIdentifier}}', {mainIdentifier: manuscript.mainIdentifier.identifier})}: {t('generalData_plural')}
+        {t('manuscript{{mainIdentifier}}', {mainIdentifier})}: {t('generalData_plural')}
       </h1>
 
       <div className="my-3">
@@ -103,10 +112,22 @@ export function ManuscriptData(): JSX.Element {
           )
           : <div className="notification is-info has-text-centered">{t('noTransliterationCreatedYet')}.</div>}
 
-        {createdByUser &&
-          <Link className="mt-2 p-2 block rounded bg-blue-500 text-white text-center w-full" to={`../${createTransliterationUrl}`}>
-            {t('createTransliteration')}
-          </Link>}
+        {createdByUser && !manuscript.transliterationReleased &&
+          <>
+            {parsedTransliteration !== undefined
+              ? (
+                <div className="my-2 grid grid-cols-2 gap-2">
+                  <Link className="p-2 block rounded bg-blue-500 text-white text-center w-full" to={`../${createTransliterationUrl}`}>
+                    {t('updateTransliteration')}
+                  </Link>
+                  <button type="button" className="p-2 rounded bg-green-500 text-white text-center w-full" onClick={onReleaseTransliteration}>
+                    {t('releaseTransliteration')}
+                  </button>
+                </div>
+              )
+              : <Link className="mt-2 p-2 block rounded bg-blue-500 text-white text-center w-full"
+                      to={`../${createTransliterationUrl}`}>{t('createTransliteration')}</Link>}
+          </>}
       </div>
     </div>
   );

@@ -190,6 +190,23 @@ insert into tlh_dig_provisional_transliterations (main_identifier, input)
     );
   }
 
+  function selectInitialTransliteration(): ?string
+  {
+    return executeSingleSelectQuery(
+      "select input from tlh_dig_initial_transliterations where main_identifier = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
+      fn(array $row): string => $row['input']
+    );
+  }
+
+  function insertInitialTransliteration(string $input): bool
+  {
+    return executeSingleInsertQuery(
+      "insert into tlh_dig_initial_transliterations (main_identifier, input) values (?, ?)",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $this->mainIdentifier->identifier, $input)
+    );
+  }
+
   function selectAllTransliterations(): ?AllTransliterations
   {
     return executeSingleSelectQuery(
@@ -264,6 +281,10 @@ Manuscript::$graphQLType = new ObjectType([
       'type' => Type::string(),
       'resolve' => fn(Manuscript $manuscript): ?string => $manuscript->selectProvisionalTransliteration()
     ],
+    'transliterationReleased' => [
+      'type' => Type::nonNull(Type::boolean()),
+      'resolve' => fn(Manuscript $manuscript) => !is_null($manuscript->selectInitialTransliteration())
+    ],
     'allTransliterations' => [
       'type' => AllTransliterations::$graphQLType,
       'resolve' => fn(Manuscript $manuscript): ?AllTransliterations => $manuscript->selectAllTransliterations()
@@ -285,9 +306,32 @@ Manuscript::$graphQLMutationsType = new ObjectType([
           throw new MySafeGraphQLException("Can only change own transliterations!");
         }
 
-        // FIXME: make sure manuscript is released yet (-> initialTransliteration!)!
+        // FIXME: make sure transliteration is released yet (-> initialTransliteration!)!
 
         return $manuscript->upsertProvisionalTransliteration($args['input']);
+      }
+    ],
+    'releaseTransliteration' => [
+      'type' => Type::nonNull(Type::boolean()),
+      'resolve' => function (Manuscript $manuscript, array $args, ?string $username): bool {
+        if ($manuscript->creatorUsername !== $username) {
+          throw new MySafeGraphQLException('Can only release own transliterations!');
+        }
+
+        if (!is_null($manuscript->selectInitialTransliteration())) {
+          // check if transliteration is already released...
+          return true;
+        }
+
+        // FIXME: check if there is a provisional transliteration!
+
+        $provisionalTransliteration = $manuscript->selectProvisionalTransliteration();
+
+        if (is_null($provisionalTransliteration)) {
+          throw new MySafeGraphQLException('Can\'t release a non-existing transliteration!');
+        }
+
+        return $manuscript->insertInitialTransliteration($provisionalTransliteration);
       }
     ]
   ]
