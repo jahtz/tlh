@@ -11,7 +11,7 @@ require_once __DIR__ . '/../sql_helpers.php';
 use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
 use MySafeGraphQLException;
 use mysqli_stmt;
-use function sql_helpers\{executeMultiSelectQuery, executeSingleInsertQuery, executeSingleSelectQuery};
+use function sql_helpers\{executeMultiSelectQuery, executeSingleChangeQuery, executeSingleSelectQuery};
 
 /**
  * @param string $manuscriptMainIdentifier
@@ -115,19 +115,17 @@ class Manuscript
   /**
    * @return Manuscript[]
    */
-  static function selectAllManuscriptsPaginated(int $paginationSize, int $page): array
+  static function selectAllManuscriptsPaginated(int $page): array
   {
-    $paginationSize = max(10, $paginationSize);
-
-    $first = $page * $paginationSize;
-    $last = ($page + 1) * $paginationSize;
+    $pageSize = 10;
+    $first = $page * $pageSize;
 
     return executeMultiSelectQuery(
       "
 select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, status, creator_username
     from tlh_dig_manuscript_metadatas
     limit ?, ?;",
-      fn(mysqli_stmt $stmt) => $stmt->bind_param('ii', $first, $last),
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('ii', $first, $pageSize),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
     );
   }
@@ -172,7 +170,7 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
 
   function upsertProvisionalTransliteration(string $transliteration): bool
   {
-    return executeSingleInsertQuery(
+    return executeSingleChangeQuery(
       "
 insert into tlh_dig_provisional_transliterations (main_identifier, input)
     values (?, ?)
@@ -201,7 +199,7 @@ insert into tlh_dig_provisional_transliterations (main_identifier, input)
 
   function insertInitialTransliteration(string $input): bool
   {
-    return executeSingleInsertQuery(
+    return executeSingleChangeQuery(
       "insert into tlh_dig_initial_transliterations (main_identifier, input) values (?, ?)",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $this->mainIdentifier->identifier, $input)
     );
@@ -300,8 +298,8 @@ Manuscript::$graphQLMutationsType = new ObjectType([
       'args' => [
         'input' => Type::nonNull(Type::string())
       ],
-      'resolve' => function (Manuscript $manuscript, array $args, ?string $username): bool {
-        if ($manuscript->creatorUsername !== $username) {
+      'resolve' => function (Manuscript $manuscript, array $args, ?User $user): bool {
+        if ($manuscript->creatorUsername !== $user->username) {
           // make sure manuscript is from user
           throw new MySafeGraphQLException("Can only change own transliterations!");
         }
@@ -313,8 +311,8 @@ Manuscript::$graphQLMutationsType = new ObjectType([
     ],
     'releaseTransliteration' => [
       'type' => Type::nonNull(Type::boolean()),
-      'resolve' => function (Manuscript $manuscript, array $args, ?string $username): bool {
-        if ($manuscript->creatorUsername !== $username) {
+      'resolve' => function (Manuscript $manuscript, array $args, ?User $user): bool {
+        if ($manuscript->creatorUsername !== $user->username) {
           throw new MySafeGraphQLException('Can only release own transliterations!');
         }
 

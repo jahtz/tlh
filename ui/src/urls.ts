@@ -19,6 +19,8 @@ export const xmlComparatorUrl = '/xmlComparator';
 
 export const documentMergerUrl = '/documentMerger';
 
+export const userManagementUrl = '/userManagement';
+
 // Fragments
 
 export const manuscriptsUrlFragment = 'manuscripts';

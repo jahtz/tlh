@@ -26,8 +26,9 @@ export type AllTransliterations = {
 
 export type LoggedInUserMutations = {
   __typename?: 'LoggedInUserMutations';
-  createManuscript?: Maybe<Scalars['String']>;
+  createManuscript: Scalars['String'];
   manuscript?: Maybe<ManuscriptMutations>;
+  updateUserRights: Rights;
 };
 
 
@@ -38,6 +39,12 @@ export type LoggedInUserMutationsCreateManuscriptArgs = {
 
 export type LoggedInUserMutationsManuscriptArgs = {
   mainIdentifier: Scalars['String'];
+};
+
+
+export type LoggedInUserMutationsUpdateUserRightsArgs = {
+  newRights: Rights;
+  username: Scalars['String'];
 };
 
 export type ManuscriptIdentifier = {
@@ -149,12 +156,13 @@ export type Query = {
   manuscriptLanguages: Array<ManuscriptLanguage>;
   manuscriptsToReview?: Maybe<Array<Scalars['String']>>;
   myManuscripts?: Maybe<Array<Scalars['String']>>;
+  userCount: Scalars['Int'];
+  users: Array<User>;
 };
 
 
 export type QueryAllManuscriptsArgs = {
   page: Scalars['Int'];
-  paginationSize: Scalars['Int'];
 };
 
 
@@ -162,10 +170,30 @@ export type QueryManuscriptArgs = {
   mainIdentifier: Scalars['String'];
 };
 
+
+export type QueryUsersArgs = {
+  page: Scalars['Int'];
+};
+
 export type Review = {
   __typename?: 'Review';
   input: Scalars['String'];
   reviewerUsername: Scalars['String'];
+};
+
+export const enum Rights {
+  Author = 'Author',
+  ExecutiveEditor = 'ExecutiveEditor',
+  Reviewer = 'Reviewer'
+};
+
+export type User = {
+  __typename?: 'User';
+  affiliation?: Maybe<Scalars['String']>;
+  email: Scalars['String'];
+  name: Scalars['String'];
+  rights: Rights;
+  username: Scalars['String'];
 };
 
 export type UserInput = {
@@ -204,7 +232,6 @@ export type LoginMutation = { __typename?: 'Mutation', login?: string | null };
 export type ManuscriptBasicDataFragment = { __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
 export type IndexQueryVariables = Exact<{
-  paginationSize?: Scalars['Int'];
   page?: Scalars['Int'];
 }>;
 
@@ -216,7 +243,7 @@ export type CreateManuscriptMutationVariables = Exact<{
 }>;
 
 
-export type CreateManuscriptMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', createManuscript?: string | null } | null };
+export type CreateManuscriptMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', createManuscript: string } | null };
 
 export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, provisionalTransliteration?: string | null, transliterationReleased: boolean, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }> };
 
@@ -257,6 +284,23 @@ export type UploadTransliterationMutationVariables = Exact<{
 
 
 export type UploadTransliterationMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', manuscript?: { __typename?: 'ManuscriptMutations', updateTransliteration: boolean } | null } | null };
+
+export type UserFragment = { __typename?: 'User', username: string, name: string, affiliation?: string | null, email: string, rights: Rights };
+
+export type UsersOverviewQueryVariables = Exact<{
+  page: Scalars['Int'];
+}>;
+
+
+export type UsersOverviewQuery = { __typename?: 'Query', userCount: number, users: Array<{ __typename?: 'User', username: string, name: string, affiliation?: string | null, email: string, rights: Rights }> };
+
+export type UpdateUserRightsMutationVariables = Exact<{
+  username: Scalars['String'];
+  newRights: Rights;
+}>;
+
+
+export type UpdateUserRightsMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', updateUserRights: Rights } | null };
 
 export const ManuscriptLanguageFragmentDoc = gql`
     fragment ManuscriptLanguage on ManuscriptLanguage {
@@ -307,6 +351,15 @@ export const ManuscriptIdentWithCreatorFragmentDoc = gql`
   creatorUsername
 }
     ${ManuscriptIdentifierFragmentDoc}`;
+export const UserFragmentDoc = gql`
+    fragment User on User {
+  username
+  name
+  affiliation
+  email
+  rights
+}
+    `;
 export const AllManuscriptLanguagesDocument = gql`
     query AllManuscriptLanguages {
   manuscriptLanguages {
@@ -405,9 +458,9 @@ export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const IndexDocument = gql`
-    query Index($paginationSize: Int! = 10, $page: Int! = 0) {
+    query Index($page: Int! = 0) {
   manuscriptCount
-  allManuscripts(paginationSize: $paginationSize, page: $page) {
+  allManuscripts(page: $page) {
     ...ManuscriptBasicData
   }
   myManuscripts
@@ -427,7 +480,6 @@ export const IndexDocument = gql`
  * @example
  * const { data, loading, error } = useIndexQuery({
  *   variables: {
- *      paginationSize: // value for 'paginationSize'
  *      page: // value for 'page'
  *   },
  * });
@@ -654,3 +706,73 @@ export function useUploadTransliterationMutation(baseOptions?: Apollo.MutationHo
 export type UploadTransliterationMutationHookResult = ReturnType<typeof useUploadTransliterationMutation>;
 export type UploadTransliterationMutationResult = Apollo.MutationResult<UploadTransliterationMutation>;
 export type UploadTransliterationMutationOptions = Apollo.BaseMutationOptions<UploadTransliterationMutation, UploadTransliterationMutationVariables>;
+export const UsersOverviewDocument = gql`
+    query UsersOverview($page: Int!) {
+  userCount
+  users(page: $page) {
+    ...User
+  }
+}
+    ${UserFragmentDoc}`;
+
+/**
+ * __useUsersOverviewQuery__
+ *
+ * To run a query within a React component, call `useUsersOverviewQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUsersOverviewQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUsersOverviewQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *   },
+ * });
+ */
+export function useUsersOverviewQuery(baseOptions: Apollo.QueryHookOptions<UsersOverviewQuery, UsersOverviewQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<UsersOverviewQuery, UsersOverviewQueryVariables>(UsersOverviewDocument, options);
+      }
+export function useUsersOverviewLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UsersOverviewQuery, UsersOverviewQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<UsersOverviewQuery, UsersOverviewQueryVariables>(UsersOverviewDocument, options);
+        }
+export type UsersOverviewQueryHookResult = ReturnType<typeof useUsersOverviewQuery>;
+export type UsersOverviewLazyQueryHookResult = ReturnType<typeof useUsersOverviewLazyQuery>;
+export type UsersOverviewQueryResult = Apollo.QueryResult<UsersOverviewQuery, UsersOverviewQueryVariables>;
+export const UpdateUserRightsDocument = gql`
+    mutation UpdateUserRights($username: String!, $newRights: Rights!) {
+  me {
+    updateUserRights(username: $username, newRights: $newRights)
+  }
+}
+    `;
+export type UpdateUserRightsMutationFn = Apollo.MutationFunction<UpdateUserRightsMutation, UpdateUserRightsMutationVariables>;
+
+/**
+ * __useUpdateUserRightsMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserRightsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserRightsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserRightsMutation, { data, loading, error }] = useUpdateUserRightsMutation({
+ *   variables: {
+ *      username: // value for 'username'
+ *      newRights: // value for 'newRights'
+ *   },
+ * });
+ */
+export function useUpdateUserRightsMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserRightsMutation, UpdateUserRightsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserRightsMutation, UpdateUserRightsMutationVariables>(UpdateUserRightsDocument, options);
+      }
+export type UpdateUserRightsMutationHookResult = ReturnType<typeof useUpdateUserRightsMutation>;
+export type UpdateUserRightsMutationResult = Apollo.MutationResult<UpdateUserRightsMutation>;
+export type UpdateUserRightsMutationOptions = Apollo.BaseMutationOptions<UpdateUserRightsMutation, UpdateUserRightsMutationVariables>;

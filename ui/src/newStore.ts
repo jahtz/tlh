@@ -1,5 +1,5 @@
 import {AnyAction, configureStore, createSlice, EnhancedStore, PayloadAction} from '@reduxjs/toolkit';
-import {ManuscriptLanguage, ManuscriptLanguageFragment} from './graphql';
+import {ManuscriptLanguage, ManuscriptLanguageFragment, Rights} from './graphql';
 import {defaultEditorKeyConfig, EditorKeyConfig} from './xmlEditor/editorKeyConfig';
 import {ThunkMiddlewareFor} from '@reduxjs/toolkit/dist/getDefaultMiddleware';
 
@@ -28,10 +28,10 @@ function userFromToken(token: string): User {
 }
 
 export interface User {
-  user_id: string;
+  sub: string;
+  rights: Rights;
   exp: number;
   iss: string;
-  iat: number;
   token: string;
 }
 

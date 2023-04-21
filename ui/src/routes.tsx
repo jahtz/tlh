@@ -10,6 +10,7 @@ import {
   preferencesUrl,
   registerUrl,
   uploadPicturesUrl,
+  userManagementUrl,
   xmlComparatorUrl
 } from './urls';
 import {RegisterForm} from './forms/RegisterForm';
@@ -29,6 +30,7 @@ import {OperationVariables, TypedDocumentNode} from '@apollo/client';
 import {ManuscriptData} from './manuscript/ManuscriptData';
 import {UploadPicturesForm} from './manuscript/UploadPicturesForm';
 import {TransliterationInput} from './manuscript/TransliterationInput';
+import {UserManagement} from './UserManagement';
 
 async function apolloLoader<T, V extends OperationVariables>(query: TypedDocumentNode<T, V>, variables: V): Promise<T | undefined> {
   return apolloClient
@@ -58,6 +60,7 @@ export const router = createBrowserRouter([
 
         {path: registerUrl, element: <RegisterForm/>},
         {path: loginUrl, element: <LoginForm/>},
+        {path: userManagementUrl, element: <UserManagement/>},
 
         {path: createManuscriptUrl, element: <RequireAuth>{() => <CreateManuscriptForm/>}</RequireAuth>},
 

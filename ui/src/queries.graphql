@@ -39,9 +39,9 @@ fragment ManuscriptBasicData on ManuscriptMetaData {
   creatorUsername
 }
 
-query Index($paginationSize: Int! = 10, $page: Int! = 0) {
+query Index($page: Int! = 0) {
   manuscriptCount
-  allManuscripts(paginationSize: $paginationSize, page: $page) {
+  allManuscripts(page: $page) {
     ...ManuscriptBasicData
   }
   myManuscripts
@@ -121,5 +121,28 @@ mutation uploadTransliteration($mainIdentifier: String!, $input: String!) {
     manuscript(mainIdentifier: $mainIdentifier) {
       updateTransliteration(input: $input)
     }
+  }
+}
+
+# /userManagement
+
+fragment User on User {
+  username
+  name
+  affiliation
+  email
+  rights
+}
+
+query UsersOverview($page: Int!) {
+  userCount
+  users(page: $page) {
+    ...User
+  }
+}
+
+mutation UpdateUserRights($username: String!, $newRights: Rights!) {
+  me {
+    updateUserRights(username: $username, newRights: $newRights)
   }
 }

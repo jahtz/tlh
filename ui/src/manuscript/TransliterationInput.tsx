@@ -29,7 +29,7 @@ export function TransliterationInput(): JSX.Element {
 
   const [uploadTransliteration, {loading, error}] = useUploadTransliterationMutation();
 
-  if (!manuscript || !currentUser || currentUser.user_id !== manuscript.creatorUsername) {
+  if (!manuscript || !currentUser || currentUser.sub !== manuscript.creatorUsername) {
     return <Navigate to={homeUrl}/>;
   }
 

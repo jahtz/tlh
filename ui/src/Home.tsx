@@ -3,7 +3,7 @@ import {IndexQuery, useIndexLazyQuery} from './graphql';
 import {Link} from 'react-router-dom';
 import {WithQuery} from './WithQuery';
 import {createManuscriptUrl} from './urls';
-import {initialPage, ManuscriptsOverview, paginationSize} from './ManuscriptsOverview';
+import {initialPage, ManuscriptsOverview} from './ManuscriptsOverview';
 import {ManuscriptLinkButtons} from './ManuscriptLinkButtons';
 
 interface IProps extends IndexQuery {
@@ -47,7 +47,7 @@ export function Home(): JSX.Element {
   const [executeIndexQuery, indexQuery] = useIndexLazyQuery();
 
   function queryPage(page: number) {
-    executeIndexQuery({variables: {page, paginationSize}})
+    executeIndexQuery({variables: {page}})
       .catch((error) => console.error(error));
   }
 

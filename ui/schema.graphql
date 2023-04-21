@@ -7,8 +7,9 @@ type AllTransliterations {
 }
 
 type LoggedInUserMutations {
-  createManuscript(values: ManuscriptMetaDataInput): String
+  createManuscript(values: ManuscriptMetaDataInput): String!
   manuscript(mainIdentifier: String!): ManuscriptMutations
+  updateUserRights(newRights: Rights!, username: String!): Rights!
 }
 
 type ManuscriptIdentifier {
@@ -92,17 +93,33 @@ enum PalaeographicClassification {
 }
 
 type Query {
-  allManuscripts(page: Int!, paginationSize: Int!): [ManuscriptMetaData!]!
+  allManuscripts(page: Int!): [ManuscriptMetaData!]!
   manuscript(mainIdentifier: String!): ManuscriptMetaData
   manuscriptCount: Int!
   manuscriptLanguages: [ManuscriptLanguage!]!
   manuscriptsToReview: [String!]
   myManuscripts: [String!]
+  userCount: Int!
+  users(page: Int!): [User!]!
 }
 
 type Review {
   input: String!
   reviewerUsername: String!
+}
+
+enum Rights {
+  Author
+  ExecutiveEditor
+  Reviewer
+}
+
+type User {
+  affiliation: String
+  email: String!
+  name: String!
+  rights: Rights!
+  username: String!
 }
 
 input UserInput {

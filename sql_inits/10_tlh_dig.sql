@@ -13,15 +13,16 @@ drop table if exists
 -- users
 
 create table if not exists tlh_dig_users (
-  username    varchar(100) primary key not null,
-  pw_hash     varchar(255)             not null,
-  name        varchar(255)             not null,
+  username    varchar(100) primary key                       not null,
+  pw_hash     varchar(255)                                   not null,
+  name        varchar(255)                                   not null,
   affiliation varchar(255),
-  email       varchar(255) unique      not null
+  email       varchar(255) unique                            not null,
+  rights      enum ('Author', 'Reviewer', 'ExecutiveEditor') not null default 'Author'
 );
 
-insert into tlh_dig_users (username, pw_hash, name, email)
-values ('jack', '$2y$10$vjF0vsyhdJ7alN3Q.JwmLuvyF1HzAwStyolDD117vE.tM3KxIBjwy', 'Jack Bourne', '');
+insert into tlh_dig_users (username, pw_hash, name, email, rights)
+values ('jack', '$2y$10$vjF0vsyhdJ7alN3Q.JwmLuvyF1HzAwStyolDD117vE.tM3KxIBjwy', 'Jack Bourne', 'jack.bourne@example.com', 'ExecutiveEditor');
 
 -- manuscripts
 

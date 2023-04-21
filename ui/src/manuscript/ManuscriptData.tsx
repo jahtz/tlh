@@ -22,7 +22,7 @@ export function ManuscriptData(): JSX.Element {
     return <Navigate to={homeUrl}/>;
   }
 
-  const createdByUser: boolean = !!activeUser && activeUser.user_id === manuscript.creatorUsername;
+  const createdByUser: boolean = !!activeUser && activeUser.sub === manuscript.creatorUsername;
 
   const parsedTransliteration = manuscript.provisionalTransliteration !== undefined && manuscript.provisionalTransliteration !== null
     ? new TLHParser(manuscript.provisionalTransliteration).getLines().map(convertLine)

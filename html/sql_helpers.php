@@ -156,7 +156,7 @@ function executeMultiSelectQuery(string $sql, ?callable $bindParams, callable $f
   }
 }
 
-function executeSingleInsertQuery(string $sql, callable $bindParams): bool
+function executeSingleChangeQuery(string $sql, callable $bindParams): bool
 {
   try {
     return executeQuery($sql, $bindParams, fn() => true);

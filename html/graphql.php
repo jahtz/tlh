@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/sql_queries.php';
 require_once __DIR__ . '/cors.php';
+require_once __DIR__ . '/jwt_helpers.php';
 require_once __DIR__ . '/MySafeGraphQLException.php';
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -16,18 +17,44 @@ use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
 use model\{Manuscript, ManuscriptLanguage, User};
-use ReallySimpleJWT\Token;
+use function jwt_helpers\createJsonWebToken;
+use function jwt_helpers\extractJsonWebToken;
 use function model\allManuscriptLanguages;
 
-
-# Must be 12 characters in length, contain upper and lower case letters, a number, and a special character `*&!@%^#$``
-$jwtSecret = '1234%ASDf_0aosd';
-
-$jwtValidityTime = 24 * 60 * 60; // 24 h
 
 $queryType = new ObjectType([
   'name' => 'Query',
   'fields' => [
+    'userCount' => [
+      'type' => Type::nonNull(Type::int()),
+      'resolve' => function (?int $_rootValue, array $_args, ?User $user): int {
+        if (is_null($user)) {
+          throw new MySafeGraphQLException('User is not logged in!');
+        }
+        if($user->rights !== 'ExecutiveEditor') {
+          throw new MySafeGraphQLException('Only executive editors can view users!');
+        }
+
+        return User::selectCount();
+      }
+    ],
+    'users' => [
+      'type' => Type::nonNull(Type::listOf(Type::nonNull(User::$graphQLQueryType))),
+      'args' => [
+        'page' => Type::nonNull(Type::int())
+      ],
+      'resolve' => function (?int $_rootValue, array $args, ?User $user): array {
+        if (is_null($user)) {
+          throw new MySafeGraphQLException('User is not logged in!');
+        }
+        if ($user->rights !== 'ExecutiveEditor') {
+          throw new MySafeGraphQLException('Only executive editors can view users!');
+        }
+
+        return User::selectUsersPaginated($args['page']);
+      }
+    ],
+
     'manuscriptLanguages' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptLanguage::$graphQLType))),
       'resolve' => fn(): array => allManuscriptLanguages()
@@ -39,21 +66,17 @@ $queryType = new ObjectType([
     'allManuscripts' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(Manuscript::$graphQLType))),
       'args' => [
-        'paginationSize' => Type::nonNull(Type::int()),
         'page' => Type::nonNull(Type::int())
       ],
-      'resolve' => fn(?int $_rootValue, array $args): array => Manuscript::selectAllManuscriptsPaginated($args['paginationSize'], $args['page'])
+      'resolve' => fn(?int $_rootValue, array $args): array => Manuscript::selectAllManuscriptsPaginated($args['page'])
     ],
     'myManuscripts' => [
       'type' => Type::listOf(Type::nonNull(Type::string())),
-      'resolve' => fn(?int $_rootValue, array $_args, ?string $username): ?array => $username !== null ? Manuscript::selectManuscriptIdentifiersForUser($username) : null,
+      'resolve' => fn(?int $_rootValue, array $_args, ?User $user): ?array => $user !== null ? Manuscript::selectManuscriptIdentifiersForUser($user->username) : null,
     ],
     'manuscriptsToReview' => [
       'type' => Type::listOf(Type::nonNull(Type::string())),
-      'resolve' => function (?int $_rootValue, array $_args, ?string $username): ?array {
-        // FIXME: make sure user has review rights!
-        return $username !== null ? selectManuscriptsToReview($username) : null;
-      }
+      'resolve' => fn(?int $_rootValue, array $_args, ?User $user): ?array => $user !== null && $user->isReviewer() ? selectManuscriptsToReview($user->username) : null
     ],
     'manuscript' => [
       'type' => Manuscript::$graphQLType,
@@ -65,95 +88,46 @@ $queryType = new ObjectType([
   ]
 ]);
 
-$loggedInUserMutationsType = new ObjectType([
-  'name' => 'LoggedInUserMutations',
-  'fields' => [
-    'createManuscript' => [
-      'type' => Type::string(),
-      'args' => [
-        'values' => Manuscript::$graphQLInputObjectType
-      ],
-      'resolve' => function (string $username, array $args): string {
-        $manuscript = Manuscript::fromGraphQLInput($args['values'], $username);
-
-        $manuscriptIdentifier = $manuscript->mainIdentifier->identifier;
-
-        $manuscriptInserted = insertManuscriptMetaData($manuscript);
-
-        if ($manuscriptInserted) {
-          return $manuscriptIdentifier;
-        } else {
-          throw new MySafeGraphQLException("Could not save manuscript $manuscriptIdentifier to Database!");
-        }
-      }
-    ],
-    'manuscript' => [
-      'type' => Manuscript::$graphQLMutationsType,
-      'args' => [
-        'mainIdentifier' => Type::nonNull(Type::string())
-      ],
-      'resolve' => fn(string $_username, array $args): ?Manuscript => Manuscript::selectManuscriptById($args['mainIdentifier'])
-    ]
-  ]
-]);
-
 /**
  * @throws MySafeGraphQLException
  */
-function register(array $args): string
+function resolveRegister(array $args): string
 {
   $user = User::fromGraphQLInput($args['userInput']);
 
-  if ($user === null) {
-    throw new MySafeGraphQLException("Could not read input!");
-  }
-
-  if ($user->insertUserIntoDatabase()) {
+  if ($user->insert()) {
     return $user->username;
   } else {
     throw new MySafeGraphQLException("Could not insert user into database!");
   }
 }
 
-function verifyUser(string $username, string $password): ?string
+/**
+ * @throws MySafeGraphQLException
+ */
+function resolveLogin(string $username, string $password): ?string
 {
-  global $jwtSecret, $jwtValidityTime;
-
   $user = User::selectUserFromDatabase($username);
 
-  if ($user === null) {
-    return null;
-  }
-
-  if (password_verify($password, $user->pwHash)) {
-    return Token::create($user->username, $jwtSecret, time() + $jwtValidityTime, 'localhost');
-  } else {
-    return null;
-  }
+  return $user !== null && password_verify($password, $user->pwHash)
+    ? createJsonWebToken($user)
+    : null;
 }
 
 /**
  * @throws MySafeGraphQLException
  */
-function resolveUser(): ?string
+function resolveUser(): ?User
 {
-  global $jwtSecret;
+  $jwt = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
 
-  if (!isset($_SERVER['HTTP_AUTHORIZATION'])) {
+  if (is_null($jwt)) {
     return null;
   }
 
-  $jwt = $_SERVER['HTTP_AUTHORIZATION'];
+  $username = extractJsonWebToken($jwt);
 
-  if (!Token::validate($jwt, $jwtSecret)) {
-    throw new MySafeGraphQLException('Invalid login information. Maybe your login is expired? Try logging out and logging back in again.');
-  }
-
-  try {
-    return Token::getPayload($jwt, $jwtSecret)['user_id'];
-  } catch (Exception $e) {
-    throw new MySafeGraphQLException('Invalid login information. Maybe your login is expired? Try logging out and logging back in again.');
-  }
+  return User::selectUserFromDatabase($username);
 }
 
 $mutationType = new ObjectType([
@@ -164,7 +138,7 @@ $mutationType = new ObjectType([
         'userInput' => Type::nonNull(User::$graphQLInputObjectType)
       ],
       'type' => Type::string(),
-      'resolve' => fn(?int $_rootValue, array $args) => register($args)
+      'resolve' => fn(?int $_rootValue, array $args) => resolveRegister($args)
     ],
     'login' => [
       'args' => [
@@ -172,11 +146,11 @@ $mutationType = new ObjectType([
         'password' => Type::nonNull(Type::string())
       ],
       'type' => Type::string(),
-      'resolve' => fn(?int $_rootValue, array $args) => verifyUser($args['username'], $args['password'])
+      'resolve' => fn(?int $_rootValue, array $args) => resolveLogin($args['username'], $args['password'])
     ],
     'me' => [
-      'type' => $loggedInUserMutationsType,
-      'resolve' => fn(?int $_rootValue, array $_args, ?string $username): ?string => $username
+      'type' => User::$graphQLMutationsType,
+      'resolve' => fn(?int $_rootValue, array $_args, ?User $user): ?User => $user
     ]
   ]
 ]);
@@ -200,7 +174,6 @@ try {
 
     $debug = DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE | DebugFlag::RETHROW_INTERNAL_EXCEPTIONS | DebugFlag::RETHROW_UNSAFE_EXCEPTIONS;
 
-    /** @psalm-suppress UndefinedDocblockClass */
     $output = GraphQL::executeQuery($schema, $input['query'], null, $contextValue = resolveUser(), $variablesValues, $operationName)->toArray($debug);
   } else {
     $output = [
@@ -218,5 +191,4 @@ try {
 }
 
 header('Content-Type: application/json; charset=UTF-8', true, 200);
-
 echo json_encode($output);
