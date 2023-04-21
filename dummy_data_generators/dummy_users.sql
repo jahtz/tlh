@@ -6,7 +6,7 @@ SET
   @pw_hash = '2y$10$vjF0vsyhdJ7alN3Q.JwmLuvyF1HzAwStyolDD117vE.tM3KxIBjwy',
   @count = 20;
 
-DELIMITER  //
+DELIMITER //
 
 FOR var IN 0..@count
 DO
@@ -19,8 +19,7 @@ SET
 INSERT INTO tlh_dig_users (username, pw_hash, name, email)
 values (@username, @pw_hash, @name, @mail);
 
-END
-FOR;
-  //
+END FOR;
+//
 
 DELIMITER ;

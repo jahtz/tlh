@@ -7,20 +7,20 @@ interface IProps {
   manuscriptCount: number;
   allManuscripts: ManuscriptBasicDataFragment[];
   queryPage: (number: number) => void;
+  page: number;
 }
 
-export const initialPage = 0;
-
-export function ManuscriptsOverview({manuscriptCount, allManuscripts, queryPage}: IProps): JSX.Element {
+export function ManuscriptsOverview({manuscriptCount, allManuscripts, queryPage, page}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
   const columnNames = [t('mainIdentifier'), t('status'), t('creator')];
 
   return (
-    <PaginatedTable count={manuscriptCount} data={allManuscripts} columnNames={columnNames} queryPage={queryPage} emptyMessage={t('noManuscriptsYet')} page={0}>
+    <PaginatedTable count={manuscriptCount} data={allManuscripts} columnNames={columnNames} queryPage={queryPage} emptyMessage={t('noManuscriptsYet')}
+                    page={page}>
       {({mainIdentifier: {identifier, identifierType}, status, creatorUsername}) =>
-        <tr key={identifier} className="border-t border-slate-600">
+        <tr key={identifier} className="border-t border-slate-600 text-center">
           <td className="p-2">
             <Link to={`manuscripts/${encodeURIComponent(identifier)}/data`}>{identifier} ({identifierType})</Link>
           </td>

@@ -23,7 +23,7 @@ export function PaginatedTable<T>({count, data, columnNames, children, queryPage
       <>
         <table className="table-auto w-full border-collapse">
           <thead>
-            <tr className="text-left border-b-2 border-slate-500">
+            <tr className="text-center border-b-2 border-slate-500">
               {columnNames.map((columnName) => <th className="p-2" key={columnName}>{columnName}</th>)}
             </tr>
           </thead>
