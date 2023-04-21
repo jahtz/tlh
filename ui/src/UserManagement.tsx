@@ -26,12 +26,13 @@ function Inner({userCount, users, page, queryPage}: IProps): JSX.Element {
       .catch((error) => console.error(error));
   }
 
-  const columnNames = [t('name'), t('affilitation'), t('email'), t('rights')];
+  const columnNames = [t('username'), t('name'), t('affilitation'), t('email'), t('rights')];
 
   return (
     <PaginatedTable count={userCount} data={users} columnNames={columnNames} emptyMessage={t('noUsersYet')} page={page} queryPage={queryPage}>
       {({username, name, affiliation, email, rights}) =>
         <tr key={username} className="border-t border-slate-600 text-center">
+          <td className="p-2">{username}</td>
           <td className="p-2">{name}</td>
           <td className="p-2">{affiliation || '--'}</td>
           <td className="p-2">{email}</td>
