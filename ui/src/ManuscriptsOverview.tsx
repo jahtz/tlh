@@ -29,6 +29,4 @@ export function ManuscriptsOverview({manuscriptCount, allManuscripts, queryPage,
         </tr>}
     </PaginatedTable>
   );
-
-
 }
