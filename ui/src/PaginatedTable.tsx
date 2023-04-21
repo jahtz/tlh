@@ -1,4 +1,4 @@
-import {MyPagination} from './genericElements/pagination';
+import {MyPagination} from './genericElements/MyPagination';
 
 interface IProps<T> {
   count: number;
