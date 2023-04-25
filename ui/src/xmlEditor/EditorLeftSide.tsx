@@ -9,6 +9,7 @@ import {writeXml} from './XmlDocumentEditor';
 import update from 'immutability-helper';
 import {FontSizeSelector} from './FontSizeSelector';
 import {NodePath} from './insertablePositions';
+import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
 
 export interface EditorLeftSideProps extends NodeDisplayIProps {
   filename: string;
@@ -55,7 +56,7 @@ export function EditorLeftSide({
   }
 
   function onXmlSourceUpdate(): void {
-    const parseResult = parseNewXml(state.xmlSource as string);
+    const parseResult = parseNewXml(state.xmlSource as string, tlhXmlEditorConfig.readConfig);
 
     if (isLeft(parseResult)) {
       alert(parseResult.value);
