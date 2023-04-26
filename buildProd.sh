@@ -1,4 +1,14 @@
+#!/usr/bin/env bash
+
+set -e
+
 CLIENT_TARGET_DIR=html/public
+
+# ensure jq installed
+if ! command -v jq &>/dev/null; then
+  echo "jq could not be found..."
+  exit 1
+fi
 
 # create production build of client app
 cd ui || exit
