@@ -17,10 +17,8 @@ use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
 use model\{Manuscript, ManuscriptLanguage, User};
-use function jwt_helpers\createJsonWebToken;
-use function jwt_helpers\extractJsonWebToken;
+use function jwt_helpers\{createJsonWebToken, extractJsonWebToken};
 use function model\allManuscriptLanguages;
-
 
 $queryType = new ObjectType([
   'name' => 'Query',
@@ -31,7 +29,7 @@ $queryType = new ObjectType([
         if (is_null($user)) {
           throw new MySafeGraphQLException('User is not logged in!');
         }
-        if($user->rights !== 'ExecutiveEditor') {
+        if ($user->rights !== 'ExecutiveEditor') {
           throw new MySafeGraphQLException('Only executive editors can view users!');
         }
 
@@ -54,7 +52,6 @@ $queryType = new ObjectType([
         return User::selectUsersPaginated($args['page']);
       }
     ],
-
     'manuscriptLanguages' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptLanguage::$graphQLType))),
       'resolve' => fn(): array => allManuscriptLanguages()
@@ -102,9 +99,6 @@ function resolveRegister(array $args): string
   }
 }
 
-/**
- * @throws MySafeGraphQLException
- */
 function resolveLogin(string $username, string $password): ?string
 {
   $user = User::selectUserFromDatabase($username);

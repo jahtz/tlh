@@ -4,6 +4,7 @@ namespace model;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../sql_helpers.php';
+require_once __DIR__ . '/ManuscriptInput.php';
 
 use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
 use MySafeGraphQLException;
@@ -52,9 +53,7 @@ class User
 
   /**
    * @param array $input
-   *
    * @return User
-   *
    * @throws MySafeGraphQLException
    */
   static function fromGraphQLInput(array $input): User
@@ -132,12 +131,12 @@ User::$graphQLMutationsType = new ObjectType([
     'createManuscript' => [
       'type' => Type::nonNull(Type::string()),
       'args' => [
-        'values' => Manuscript::$graphQLInputObjectType
+        'values' => ManuscriptInput::$graphQLInputObjectType
       ],
       'resolve' => function (User $user, array $args): string {
-        $manuscript = Manuscript::fromGraphQLInput($args['values'], $user->username);
+        $manuscript = ManuscriptInput::fromGraphQLInput($args['values'], $user->username);
 
-        if (insertManuscriptMetaData($manuscript)) {
+        if ($manuscript->insert()) {
           return $manuscript->mainIdentifier->identifier;
         } else {
           throw new MySafeGraphQLException("Could not insert manuscript " . $manuscript->mainIdentifier->identifier);

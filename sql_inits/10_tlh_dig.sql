@@ -34,12 +34,12 @@ create table if not exists tlh_dig_manuscript_metadatas (
   provenance                 varchar(255),
   cth_classification         integer,
   bibliography               text,
-  status                     varchar(50)                                   not null default 'InCreation',
-  creator_username           varchar(100)                                  not null references tlh_dig_users (username) on update cascade on delete cascade
+  creator_username           varchar(100)                                  not null references tlh_dig_users (username) on update cascade on delete cascade,
+  creation_date              date                                          not null default now()
 );
 
-insert into tlh_dig_manuscript_metadatas (main_identifier, status, creator_username)
-values ('KBo 08/15', 'InCreation', 'jack');
+insert into tlh_dig_manuscript_metadatas (main_identifier, creator_username)
+values ('KBo 08/15', 'jack');
 
 create table if not exists tlh_dig_manuscript_other_identifiers (
   main_identifier varchar(20)                                                                not null references tlh_dig_manuscript_metadatas (main_identifier) on update cascade on delete cascade,
@@ -54,7 +54,8 @@ create table if not exists tlh_dig_manuscript_other_identifiers (
 
 create table if not exists tlh_dig_provisional_transliterations (
   main_identifier varchar(20) not null primary key references tlh_dig_manuscript_metadatas (main_identifier) on update cascade on delete cascade,
-  input           text        not null
+  input           text        not null,
+  creation_date   date        not null default now()
 );
 
 create table if not exists tlh_dig_initial_transliterations (

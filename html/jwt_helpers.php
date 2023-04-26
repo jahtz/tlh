@@ -13,10 +13,7 @@ use ReallySimpleJWT\Token;
 const jwtSecret = '1234%ASDf_0asd';
 const jwtValidityTime = 24 * 60 * 60; // 24 h
 
-/**
- * @throws MySafeGraphQLException
- */
-function createJsonWebToken(User $user): string
+function createJsonWebToken(User $user): ?string
 {
   try {
     return Token::builder()
@@ -29,7 +26,7 @@ function createJsonWebToken(User $user): string
       ->getToken();
   } catch (Exception $exception) {
     error_log("Error while creating JWT: " . $exception->getMessage());
-    throw new MySafeGraphQLException('Could not login...');
+    return null;
   }
 }
 
