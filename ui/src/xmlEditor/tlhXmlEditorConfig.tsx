@@ -1,5 +1,5 @@
 import {displayReplace, XmlEditorConfig} from './editorConfig';
-import {isXmlCommentNode, isXmlTextNode, LetterCorrection, XmlElementNode, XmlNode} from 'simple_xml';
+import {isXmlCommentNode, isXmlTextNode, LetterCorrection, xmlElementNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {noteNodeConfig} from './elementEditors/NoteNodeEditor';
 import {aoManuscriptsConfig} from './elementEditors/AoManuscriptsEditor';
 import {lineBreakNodeConfig} from './elementEditors/LineBreakEditor';
@@ -80,8 +80,8 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     sGr: {styling: () => ['sumerogramm']},
     d: {styling: () => ['determinativ']},
 
-    add_in: {replace: ()=> displayReplace(<span>〈</span>)},
-    add_fin: {replace: ()=> displayReplace(<span>〉</span>)},
+    add_in: {replace: () => displayReplace(<span>〈</span>)},
+    add_fin: {replace: () => displayReplace(<span>〉</span>)},
     del_in: {replace: () => displayReplace(<span>[</span>)},
     del_fin: {replace: () => displayReplace(<span>]</span>)},
     ras_in: {replace: () => displayReplace(<span>*</span>)},
@@ -99,7 +99,13 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     space: {
       replace: (node) => displayReplace(
         <>{Array.from({length: parseInt(node.attributes.c || '0') || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}</>
-      )
+      ),
+      insertablePositions: {
+        beforeElement: ['w'],
+        afterElement: ['lb', 'w'],
+        asLastChildOf: ['div1'],
+        newElement: () => xmlElementNode('w', {}, [xmlElementNode('space', {c: '1'})])
+      }
     },
 
     parsep: paragraphSeparatorConfig,
