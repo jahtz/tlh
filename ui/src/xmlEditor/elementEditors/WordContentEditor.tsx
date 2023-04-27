@@ -23,13 +23,17 @@ function readTransliteration(transliteration: string): Result<XmlElementNode> {
   return {status: true, value: word.exportXml()};
 }
 
-export function WordContentEditor({oldNode, /*initialTransliteration,*/ cancelEdit, updateNode}: IProps): JSX.Element {
+export function WordContentEditor({oldNode, cancelEdit, updateNode}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
   const initialTransliteration = reconstructTransliterationForWordNode(oldNode);
 
-  const [state, setState] = useState<Result<XmlElementNode>>(readTransliteration(initialTransliteration));
+  const [state, setState] = useState<Result<XmlElementNode>>(
+    initialTransliteration.status
+      ? readTransliteration(initialTransliteration.value)
+      : {status: false, index: {line: -1, column: -1, offset: -1}, expected: []}
+  );
 
   function submitEdit() {
     state.status && updateNode(state.value);
@@ -64,10 +68,17 @@ export function WordContentEditor({oldNode, /*initialTransliteration,*/ cancelEd
 
   return (
     <div>
+
+      {!initialTransliteration.status && <div className="my-4 p-2 rounded bg-red-600 text-white text-center">
+        <p className="font-bold">{t('errorWhileTransliterationReconstruction')}:</p>
+        <pre>{initialTransliteration.error}</pre>
+      </div>}
+
       <div className="flex">
         <label htmlFor="newTransliteration" className="p-2 rounded-l border-l border-y border-slate-500 font-bold">{t('newTransliteration')}:</label>
 
-        <input defaultValue={initialTransliteration} className="flex-grow rounded-r border border-slate-500 p-2" id="newTransliteration"
+        <input defaultValue={initialTransliteration.status ? initialTransliteration.value : ''} className="flex-grow rounded-r border border-slate-500 p-2"
+               id="newTransliteration"
                placeholder={t('newTransliteration') || 'newTransliteration'} onChange={(event) => setState(readTransliteration(event.target.value))}/>
       </div>
 

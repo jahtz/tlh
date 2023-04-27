@@ -80,6 +80,8 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     sGr: {styling: () => ['sumerogramm']},
     d: {styling: () => ['determinativ']},
 
+    add_in: {replace: ()=> displayReplace(<span>〈</span>)},
+    add_fin: {replace: ()=> displayReplace(<span>〉</span>)},
     del_in: {replace: () => displayReplace(<span>[</span>)},
     del_fin: {replace: () => displayReplace(<span>]</span>)},
     ras_in: {replace: () => displayReplace(<span>*</span>)},
