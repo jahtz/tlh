@@ -26,8 +26,7 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
       attributes: {},
       children: childNodes
     };
-    const xmlMeta = '<?xml version="1.0" encoding="UTF-8"?>\n' +
-      '<?xml-stylesheet href="HPMxml.css" type="text/css"?>';
+    const xmlMeta = '<AOxml xmlns:hpm="http://hethiter.net/ns/hpm/1.0" xmlns:AO="http://hethiter.net/ns/AO/1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">\n';
 
     const exported = xmlMeta + writeNode(header).join('\n') + '\n' + writeNode( newText).join('\n');
 
@@ -40,11 +39,20 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
   }
 
   function writePublMapping(): XmlNode[] {
-    const publications: XmlElementNode[] = [];
+    const publications: XmlNode[] = [];
     console.log(publicationMapping);
+    let i = 0;
     for (const publ of Array.from(publicationMapping.values())) {
+      if (i > 0) { publications.push(xmlTextNode('+'))}
       console.log(publ[1] + '{€' + publ[0] + '}');
-      publications.push(xmlElementNode('AO:TxtPubl', {}, [xmlTextNode(publ[1] + '{€' + publ[0] + '}')]));
+      publications.push(xmlElementNode('AO:TxtPubl',
+        {},
+        [xmlTextNode(
+          (publ[1] + '{€' + publ[0] + '}')
+            .replace('\n','')
+            .replace('\t', '')
+        )]));
+      i++;
     }
 
     return [xmlElementNode('AO:Manuscripts', {}, publications)];

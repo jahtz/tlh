@@ -182,8 +182,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
         rightMap = updateLNR(mapIntersect[1], parseInt(newIndex.toString()), rightMap, false, true);
       }
      }
-    const mergedMap: Map<string, string[]> = new Map([...Array.from(leftMap.entries()), ...Array.from(rightMap.entries())]);
-    return mergedMap;
+    return new Map([...Array.from(leftMap.entries()), ...Array.from(rightMap.entries())]);
   }
 
   function PublicationList({publMap}: { publMap: Map<string, string[]> }): JSX.Element {
@@ -257,15 +256,6 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
         <LeftList/>
         <RightList/>
       </div>
-
-      <table className="table-fixed w-full">
-        <tbody>
-          {data.map(([left, right], index) => <tr key={index}>
-            {left && <td colSpan={right ? 1 : 2} className="has-text-centered"><MergeDocumentLine line={left}/></td>}
-            {right && <td colSpan={left ? 1 : 2} className="has-text-centered"><MergeDocumentLine line={right}/></td>}
-          </tr>)}
-        </tbody>
-      </table>
     </>
   );
 }
