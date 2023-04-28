@@ -2,10 +2,12 @@ import {MergeLine} from './mergeDocument';
 import {MergeDocumentLine} from './DocumentMerger';
 import {useTranslation} from 'react-i18next';
 
-import {writeNode, XmlNode, findFirstXmlElementByTagName, isXmlTextNode, xmlElementNode, xmlTextNode, XmlElementNode} from 'simple_xml';
+import {writeNode, XmlNode, findFirstXmlElementByTagName, isXmlTextNode, xmlElementNode, xmlTextNode, XmlElementNode, isXmlElementNode} from 'simple_xml';
 import {handleSaveToPC} from '../xmlEditor/XmlDocumentEditorContainer';
 import {writeXml} from '../xmlEditor/XmlDocumentEditor';
 import xmlFormat from 'xml-formatter';
+import {Field} from 'formik';
+import classNames from 'classnames';
 
 interface IProps {
   lines: MergeLine[];
@@ -17,6 +19,7 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
 
   const {t} = useTranslation('common');
 
+  let mergerName = 'DocumentMerger';
   function onExport(): void {
     const lineNodes = lines
       .map<XmlNode[]>(({lineNumberNode, rest}) => [lineNumberNode, ...rest])
@@ -27,6 +30,20 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
       attributes: {},
       children: [xmlElementNode('div1', {'type':'transliteration'}, [xmlElementNode('text', {'xml:lang':'XXXlang'}, childNodes)])]
     };
+
+    header.children.forEach((node) => {
+      if (isXmlElementNode(node) && node.tagName === 'meta') {
+        node.children.forEach((cnode) => {
+            if (isXmlElementNode(cnode) && cnode.tagName === 'merge') {
+              cnode.attributes['editor'] = mergerName;
+              console.log(cnode.attributes['editor']);
+            }
+          }
+        );
+      }
+    });
+
+
 
     const AOxml: XmlElementNode = {
       tagName: 'AOxml',
@@ -72,8 +89,14 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
     return [xmlElementNode('AO:Manuscripts', {}, publications)];
   }
 
+  function setMergerReg(input: string) { mergerName = input; }
+
   return (
     <>
+      <div className="mb-4">
+        <label htmlFor="mergerName" className="font-bold">{t('editorName')}:</label>
+        <input name="mergerName" id="mergerName" placeholder="DocumentMerger" className="mt-2 p-2 rounded border w-full" onChange={e => setMergerReg(e.target.value)}></input>
+      </div>
       <button type="button" className="mb-2 p-2 rounded bg-blue-500 text-white w-full" onClick={onExport}>{t('export')}</button>
       <pre><code>{xmlFormat(writeNode(header).join('\n'), {
         indentation: '  ',
