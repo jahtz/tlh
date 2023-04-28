@@ -2,8 +2,9 @@ import {MergeLine} from './mergeDocument';
 import {MergeDocumentLine} from './DocumentMerger';
 import {useTranslation} from 'react-i18next';
 
-import {writeNode, XmlElementNode, XmlNode, findFirstXmlElementByTagName, isXmlTextNode, xmlElementNode, xmlTextNode} from 'simple_xml';
+import {writeNode, XmlNode, findFirstXmlElementByTagName, isXmlTextNode, xmlElementNode, xmlTextNode, XmlElementNode} from 'simple_xml';
 import {handleSaveToPC} from '../xmlEditor/XmlDocumentEditorContainer';
+import {writeXml} from '../xmlEditor/XmlDocumentEditor';
 import xmlFormat from 'xml-formatter';
 
 interface IProps {
@@ -21,14 +22,27 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
       .map<XmlNode[]>(({lineNumberNode, rest}) => [lineNumberNode, ...rest])
       .flat();
     const childNodes = writePublMapping().concat(lineNodes);
-    const newText: XmlElementNode = {
-      tagName: 'text',
+    const newBody: XmlElementNode = {
+      tagName: 'body',
       attributes: {},
-      children: childNodes
+      children: [xmlElementNode('div1', {'type':'transliteration'}, [xmlElementNode('text', {'xml:lang':'XXXlang'}, childNodes)])]
     };
-    const xmlMeta = '<AOxml xmlns:hpm="http://hethiter.net/ns/hpm/1.0" xmlns:AO="http://hethiter.net/ns/AO/1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">\n';
 
-    const exported = xmlMeta + writeNode(header).join('\n') + '\n' + writeNode( newText).join('\n');
+    const AOxml: XmlElementNode = {
+      tagName: 'AOxml',
+      attributes: {'xmlns:hpm':'http://hethiter.net/ns/hpm/1.0',
+                   'xmlns:AO': 'http://hethiter.net/ns/AO/1.0',
+                   'xmlns:dc': 'http://purl.org/dc/elements/1.1/',
+                   'xmlns:meta': 'urn:oasis:names:tc:opendocument:xmlns:meta:1.0',
+                   'xmlns:text': 'urn:oasis:names:tc:opendocument:xmlns:text:1.0',
+                   'xmlns:table': 'urn:oasis:names:tc:opendocument:xmlns:table:1.0',
+                   'xmlns:draw': 'urn:oasis:names:tc:opendocument:xmlns:drawing:1.0',
+                   'xmlns:xlink': 'http://www.w3.org/1999/xlink'
+      },
+      children: [header, newBody]
+    };
+
+    const exported = writeXml(AOxml);
 
     let filename = 'merged';
     const docIDnode = findFirstXmlElementByTagName(header, 'docID');
