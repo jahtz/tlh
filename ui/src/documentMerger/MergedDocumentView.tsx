@@ -6,8 +6,6 @@ import {writeNode, XmlNode, findFirstXmlElementByTagName, isXmlTextNode, xmlElem
 import {handleSaveToPC} from '../xmlEditor/XmlDocumentEditorContainer';
 import {writeXml} from '../xmlEditor/XmlDocumentEditor';
 import xmlFormat from 'xml-formatter';
-import {Field} from 'formik';
-import classNames from 'classnames';
 
 interface IProps {
   lines: MergeLine[];
