@@ -100,7 +100,7 @@ function mergeLine(
   const lineNumber = computeNewLineNumber(lnr, rnr) || (lnr + rnr);
 
   const language = leftLineNumberNode.attributes.lg || '';
-  const txtid = leftLineNumberNode.attributes.txtid || '';
+  const txtid = (leftLineNumberNode.attributes.txtid + '+').replace('++','+') || '';
   const lineNumberNode: XmlElementNode = {
     tagName: 'lb', children: [], attributes: {'txtid': txtid, 'lnr': lineNumber, 'lg': language}
   };
