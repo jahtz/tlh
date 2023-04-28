@@ -1,4 +1,4 @@
-import {findFirstXmlElementByTagName, isXmlElementNode, isXmlTextNode, xmlElementNode, XmlElementNode, XmlNode} from 'simple_xml';
+import {findFirstXmlElementByTagName, isXmlElementNode, isXmlTextNode, xmlElementNode, XmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
 import {ZipWithOffsetResult} from './zipWithOffset';
 
 export const lineNumberRegex = /{€(?<fragment>\d)}\s*(?<lines>[\W\w]+)/;
@@ -135,35 +135,42 @@ function parsePublicationMapping(txtPublication: string, publMap: Map<string, st
 }
 
 export function mergeHeader(firstDocumentHeader: XmlElementNode, secondDocumentHeader: XmlElementNode): XmlElementNode{
-  /*
-  too much recursion
+  const docID = findFirstXmlElementByTagName(firstDocumentHeader, 'docID');
+  let newDocID = 'docID';
+  if (docID && isXmlTextNode(docID.children[0])) {
+    newDocID = docID.children[0].textContent + '+';
+  }
 
-  const oldFirstDocumentHeader: XmlElementNode = firstDocumentHeader;
-  oldFirstDocumentHeader.tagName = 'doc';
-  oldFirstDocumentHeader.children.forEach((node) => {
+  firstDocumentHeader.tagName = 'doc';
+  firstDocumentHeader.children.forEach((node) => {
     if (isXmlElementNode(node) && node.tagName === 'docID') {
       node.tagName = 'mDocID';
     }
-  });*/
+  });
   secondDocumentHeader.tagName = 'doc';
   secondDocumentHeader.children.forEach((node) => {
     if (isXmlElementNode(node) && node.tagName === 'docID') {
       node.tagName = 'mDocID';
     }
   });
-  const meta = findFirstXmlElementByTagName(firstDocumentHeader, 'meta');
-  if (meta?.children) {
-    const merged = xmlElementNode<'merged'>('merged');
-    //merged.children.push(oldFirstDocumentHeader);
-    merged.children.push(secondDocumentHeader);
-    meta.children.push(merged);
-  }
-  const docID = findFirstXmlElementByTagName(firstDocumentHeader, 'docID');
-  if (docID && isXmlTextNode(docID.children[0])) {
-    const newDocID: string = docID.children[0].textContent + '+';
-    docID.children[0].textContent = newDocID;
-  }
-  return firstDocumentHeader;
+
+  const merged: XmlElementNode = {
+    tagName: 'merged',
+    attributes: {},
+    children: [firstDocumentHeader, secondDocumentHeader]
+  };
+
+  const newDocumentHeader: XmlElementNode = {
+    tagName: 'AOHeader',
+    attributes: {},
+    children: [xmlElementNode('docID',{}, [xmlTextNode(newDocID)]),
+      xmlElementNode('meta', {}, [
+        xmlElementNode('merge', {'date': new Date().toISOString(), 'editor':'DocumentMerger'}, []),
+        xmlElementNode('annotation', {}, [xmlElementNode('annot', {'editor':'auto', 'date':new Date().toISOString()})]),
+        merged
+      ]) ]
+  };
+  return newDocumentHeader;
 }
 
 export function replaceLNR(node: XmlElementNode, publicationMap: Map<string, string[]>) {
