@@ -57,7 +57,7 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
     console.log(publicationMapping);
     let i = 0;
     for (const publ of Array.from(publicationMapping.values())) {
-      if (i > 0) { publications.push(xmlTextNode('+'))}
+      if (i > 0) { publications.push(xmlTextNode('+')); }
       console.log(publ[1] + '{€' + publ[0] + '}');
       publications.push(xmlElementNode('AO:TxtPubl',
         {},
