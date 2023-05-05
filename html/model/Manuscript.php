@@ -3,10 +3,8 @@
 namespace model;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../sql_queries.php';
 require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/ManuscriptIdentifier.php';
-require_once __DIR__ . '/AllTransliterations.php';
 require_once __DIR__ . '/AbstractManuscript.php';
 
 use GraphQL\Type\Definition\{EnumType, ObjectType, Type};
@@ -14,19 +12,14 @@ use MySafeGraphQLException;
 use mysqli_stmt;
 use function sql_helpers\{executeMultiSelectQuery, executeSingleChangeQuery, executeSingleSelectQuery};
 
-/**
- * @param string $manuscriptMainIdentifier
- * @return string[]
- */
+/** @return string[] */
 function getPictures(string $manuscriptMainIdentifier): array
 {
   $folder = __DIR__ . "/../uploads/$manuscriptMainIdentifier/";
 
-  if (!file_exists($folder) || !is_dir($folder)) {
-    return [];
-  }
-
-  return array_filter(scandir($folder), fn(string $value): bool => !in_array($value, ['.', '..']));
+  return file_exists($folder) && is_dir($folder)
+    ? array_filter(scandir($folder), fn(string $value): bool => !in_array($value, ['.', '..']))
+    : [];
 }
 
 class Manuscript extends AbstractManuscript
@@ -38,7 +31,6 @@ class Manuscript extends AbstractManuscript
 
   function __construct(
     ManuscriptIdentifier $mainIdentifier,
-    ?array               $otherIdentifiers,
     string               $palaeographicClassification,
     bool                 $palaeographicClassificationSure,
     ?string              $provenance,
@@ -56,7 +48,6 @@ class Manuscript extends AbstractManuscript
   {
     return new Manuscript(
       new ManuscriptIdentifier($row['main_identifier_type'], $row['main_identifier']),
-      [],
       $row['palaeo_classification'],
       $row['palaeo_classification_sure'],
       $row['provenance'],
@@ -115,9 +106,7 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
     );
   }
 
-  /**
-   * @return ManuscriptIdentifier[]
-   */
+  /** @return ManuscriptIdentifier[] */
   function selectOtherIdentifiers(): array
   {
     return executeMultiSelectQuery(
@@ -132,10 +121,7 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
   function upsertProvisionalTransliteration(string $transliteration): bool
   {
     return executeSingleChangeQuery(
-      "
-insert into tlh_dig_provisional_transliterations (main_identifier, input)
-    values (?, ?)
-    on duplicate key update input = ?;",
+      "insert into tlh_dig_provisional_transliterations (main_identifier, input) values (?, ?) on duplicate key update input = ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('sss', $this->mainIdentifier->identifier, $transliteration, $transliteration)
     );
   }
@@ -149,23 +135,43 @@ insert into tlh_dig_provisional_transliterations (main_identifier, input)
     );
   }
 
-  function selectInitialTransliteration(): ?string
+  function selectReleasedTransliteration(): ?string
   {
     return executeSingleSelectQuery(
-      "select input from tlh_dig_initial_transliterations where main_identifier = ?;",
+      "select main_identifier from tlh_dig_released_transliterations where main_identifier = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
-      fn(array $row): string => $row['input']
+      fn(array $row): string => $row['main_identifier']
     );
   }
 
-  function insertInitialTransliteration(string $input): bool
+  function transliterationIsReleased(): bool
+  {
+    return !is_null($this->selectReleasedTransliteration());
+  }
+
+  function insertReleasedTransliteration(): bool
   {
     return executeSingleChangeQuery(
-      "insert into tlh_dig_initial_transliterations (main_identifier, input) values (?, ?)",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $this->mainIdentifier->identifier, $input)
+      "insert into tlh_dig_released_transliterations (main_identifier) values (?);",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier)
     );
   }
 
+  /** @return string[] */
+  static function releasedTransliterationsWithoutAppointedReviewer(): array
+  {
+    return executeMultiSelectQuery(
+      "
+select rel.main_identifier
+    from tlh_dig_released_transliterations as rel
+    left outer join tlh_dig_transliteration_review_appointments app on app.main_identifier = rel.main_identifier
+    where app.username is null;",
+      null,
+      fn(array $stmt) => $stmt['main_identifier']
+    );
+  }
+
+  /*
   function selectAllTransliterations(): ?AllTransliterations
   {
     return executeSingleSelectQuery(
@@ -180,7 +186,7 @@ select pt.input             as p_input,
        at.approval_username as at_username
 from tlh_dig_manuscript_metadatas as m
        left outer join tlh_dig_provisional_transliterations as pt on pt.main_identifier = m.main_identifier
-       left outer join tlh_dig_initial_transliterations as it on it.input = pt.input
+       left outer join tlh_dig_released_transliterations as it on it.input = pt.input
        left outer join tlh_dig_first_reviews as fr on fr.main_identifier = it.main_identifier
        left outer join tlh_dig_second_reviews as sr on sr.main_identifier = fr.main_identifier
        left outer join tlh_dig_approved_transliterations as at on at.main_identifier = sr.main_identifier
@@ -201,6 +207,7 @@ where m.main_identifier = ?;",
       )
     );
   }
+  */
 }
 
 // GraphQL
@@ -220,7 +227,12 @@ Manuscript::$graphQLType = new ObjectType([
     'creatorUsername' => Type::nonNull(Type::string()),
     'palaeographicClassification' => Type::nonNull(AbstractManuscript::$palaeographicClassificationGraphQLEnumType),
     'palaeographicClassificationSure' => Type::nonNull(Type::boolean()),
-    'status' => $manuscriptStatusEnumType,
+    'status' => [
+      // TODO: remove!
+      'type' => $manuscriptStatusEnumType,
+      'deprecationReason' => 'will be removed!',
+      'resolve' => fn(Manuscript $manuscript): string => $manuscript->status
+    ],
     'otherIdentifiers' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptIdentifier::$graphQLType))),
       'resolve' => fn(Manuscript $manuscript): array => $manuscript->selectOtherIdentifiers()
@@ -234,12 +246,9 @@ Manuscript::$graphQLType = new ObjectType([
       'resolve' => fn(Manuscript $manuscript): ?string => $manuscript->selectProvisionalTransliteration()
     ],
     'transliterationReleased' => [
+      // FIXME: also resolve creator!
       'type' => Type::nonNull(Type::boolean()),
-      'resolve' => fn(Manuscript $manuscript) => !is_null($manuscript->selectInitialTransliteration())
-    ],
-    'allTransliterations' => [
-      'type' => AllTransliterations::$graphQLType,
-      'resolve' => fn(Manuscript $manuscript): ?AllTransliterations => $manuscript->selectAllTransliterations()
+      'resolve' => fn(Manuscript $manuscript): bool => $manuscript->transliterationIsReleased()
     ]
   ]
 ]);
@@ -253,12 +262,15 @@ Manuscript::$graphQLMutationsType = new ObjectType([
         'input' => Type::nonNull(Type::string())
       ],
       'resolve' => function (Manuscript $manuscript, array $args, ?User $user): bool {
+        if (is_null($user)) {
+          throw new MySafeGraphQLException('User is not logged in!');
+        }
         if ($manuscript->creatorUsername !== $user->username) {
-          // make sure manuscript is from user
           throw new MySafeGraphQLException("Can only change own transliterations!");
         }
-
-        // FIXME: make sure transliteration is released yet (-> initialTransliteration!)!
+        if ($manuscript->transliterationIsReleased()) {
+          throw new MySafeGraphQLException("Transliteration is already released!");
+        }
 
         return $manuscript->upsertProvisionalTransliteration($args['input']);
       }
@@ -266,16 +278,15 @@ Manuscript::$graphQLMutationsType = new ObjectType([
     'releaseTransliteration' => [
       'type' => Type::nonNull(Type::boolean()),
       'resolve' => function (Manuscript $manuscript, array $args, ?User $user): bool {
-        if ($manuscript->creatorUsername !== $user->username) {
-          throw new MySafeGraphQLException('Can only release own transliterations!');
+        if (is_null($user)) {
+          throw new MySafeGraphQLException('User is not logged in!');
         }
-
-        if (!is_null($manuscript->selectInitialTransliteration())) {
-          // check if transliteration is already released...
+        if ($manuscript->creatorUsername !== $user->username) {
+          throw new MySafeGraphQLException('Only the owner can release the transliteration!');
+        }
+        if ($manuscript->transliterationIsReleased()) {
           return true;
         }
-
-        // FIXME: check if there is a provisional transliteration!
 
         $provisionalTransliteration = $manuscript->selectProvisionalTransliteration();
 
@@ -283,7 +294,9 @@ Manuscript::$graphQLMutationsType = new ObjectType([
           throw new MySafeGraphQLException('Can\'t release a non-existing transliteration!');
         }
 
-        return $manuscript->insertInitialTransliteration($provisionalTransliteration);
+        // FIXME: send mail to executive editors!
+
+        return $manuscript->insertReleasedTransliteration();
       }
     ]
   ]

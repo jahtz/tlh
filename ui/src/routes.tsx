@@ -8,7 +8,7 @@ import {
   homeUrl,
   loginUrl,
   preferencesUrl,
-  registerUrl,
+  registerUrl, reviewTransliterationUrl,
   uploadPicturesUrl,
   userManagementUrl,
   xmlComparatorUrl
@@ -31,6 +31,7 @@ import {ManuscriptData} from './manuscript/ManuscriptData';
 import {UploadPicturesForm} from './manuscript/UploadPicturesForm';
 import {TransliterationInput} from './manuscript/TransliterationInput';
 import {UserManagement} from './UserManagement';
+import {ReviewTransliteration} from './manuscript/ReviewTransliteration';
 
 async function apolloLoader<T, V extends OperationVariables>(query: TypedDocumentNode<T, V>, variables: V): Promise<T | undefined> {
   return apolloClient
@@ -70,6 +71,7 @@ export const router = createBrowserRouter([
             {path: 'data', element: <ManuscriptData/>, loader: manuscriptDataLoader},
             {path: uploadPicturesUrl, element: <UploadPicturesForm/>, loader: manuscriptDataLoader},
             {path: createTransliterationUrl, element: <TransliterationInput/>, loader: manuscriptDataLoader},
+            {path: reviewTransliterationUrl, element: <ReviewTransliteration/>},
           ]
         },
 

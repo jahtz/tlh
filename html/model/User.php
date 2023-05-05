@@ -5,22 +5,18 @@ namespace model;
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/ManuscriptInput.php';
+require_once __DIR__ . '/Rights.php';
 
-use GraphQL\Type\Definition\{EnumType, InputObjectType, ObjectType, Type};
+use GraphQL\Type\Definition\{InputObjectType, ObjectType, Type};
 use MySafeGraphQLException;
 use mysqli_stmt;
 use function sql_helpers\{executeMultiSelectQuery, executeSingleChangeQuery, executeSingleSelectQuery};
 
-$rightsGraphQLType = new EnumType([
-  'name' => 'Rights',
-  'values' => ['Author', 'Reviewer', 'ExecutiveEditor']
-]);
-
 class User
 {
+  static InputObjectType $graphQLInputObjectType;
   static ObjectType $graphQLQueryType;
   static ObjectType $graphQLMutationsType;
-  static InputObjectType $graphQLInputObjectType;
 
   public string $username;
   public string $pwHash;
@@ -51,11 +47,7 @@ class User
 
   // GraphQL
 
-  /**
-   * @param array $input
-   * @return User
-   * @throws MySafeGraphQLException
-   */
+  /** @throws MySafeGraphQLException */
   static function fromGraphQLInput(array $input): User
   {
     if ($input['password'] === $input['passwordRepeat']) {
@@ -85,6 +77,7 @@ class User
     );
   }
 
+  /** @return User[] */
   static function selectUsersPaginated(int $page): array
   {
     $pageSize = 10;
@@ -97,19 +90,21 @@ class User
     );
   }
 
+  /** @return string[] */
+  static function selectAllReviewers(): array
+  {
+    return executeMultiSelectQuery(
+      "select username from tlh_dig_users where rights <> 'Author';",
+      null,
+      fn(array $row): string => $row['username']
+    );
+  }
+
   function insert(): bool
   {
     return executeSingleChangeQuery(
       "insert into tlh_dig_users (username, pw_hash, name, affiliation, email) values (?, ?, ?, ?, ?);",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $this->username, $this->pwHash, $this->name, $this->affiliation, $this->email)
-    );
-  }
-
-  static function updateRights(string $username, string $newRights): bool
-  {
-    return executeSingleChangeQuery(
-      "update tlh_dig_users set rights = ? where username = ?;",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $newRights, $username)
     );
   }
 }
@@ -121,7 +116,7 @@ User::$graphQLQueryType = new ObjectType([
     'name' => Type::nonNull(Type::string()),
     'affiliation' => Type::string(),
     'email' => Type::nonNull(Type::string()),
-    'rights' => Type::nonNull($rightsGraphQLType)
+    'rights' => Type::nonNull(Rights::$graphQLType)
   ]
 ]);
 
@@ -149,28 +144,7 @@ User::$graphQLMutationsType = new ObjectType([
         'mainIdentifier' => Type::nonNull(Type::string())
       ],
       'resolve' => fn(User $_user, array $args): ?Manuscript => Manuscript::selectManuscriptById($args['mainIdentifier'])
-    ],
-    'updateUserRights' => [
-      'type' => Type::nonNull($rightsGraphQLType),
-      'args' => [
-        'username' => Type::nonNull(Type::string()),
-        'newRights' => Type::nonNull($rightsGraphQLType),
-      ],
-      'resolve' => function (User $user, array $args): string {
-        if (!$user->isExecutiveEditor()) {
-          throw new MySafeGraphQLException('Only executive editors can change user rights!');
-        }
-
-        $username = $args['username'];
-        $newRights = $args['newRights'];
-
-        if (User::updateRights($username, $args['newRights'])) {
-          return $newRights;
-        } else {
-          throw new MySafeGraphQLException("Could not change rights for user $username to $newRights");
-        }
-      }
-    ],
+    ]
   ]
 ]);
 

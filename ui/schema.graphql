@@ -1,31 +1,30 @@
-type AllTransliterations {
-  approvalReview: Review
-  firstReview: Review
-  initialInput: String
-  provisionalInput: String
-  secondReview: Review
+# This file was generated. Do not edit manually.
+
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type ExecutiveEditor {
+  allReviewers: [String!]!
+  releasedTransliterationsWithoutAppointedReviewer: [String!]!
+  userCount: Int!
+  users(page: Int!): [User!]!
+}
+
+type ExecutiveEditorMutations {
+  appointReviewerForReleasedTransliteration(mainIdentifier: String!, reviewer: String!): String!
+  updateUserRights(newRights: Rights!, username: String!): Rights!
 }
 
 type LoggedInUserMutations {
   createManuscript(values: ManuscriptMetaDataInput): String!
   manuscript(mainIdentifier: String!): ManuscriptMutations
-  updateUserRights(newRights: Rights!, username: String!): Rights!
 }
 
 type ManuscriptIdentifier {
   identifier: String!
   identifierType: ManuscriptIdentifierType!
-}
-
-input ManuscriptIdentifierInput {
-  identifier: String!
-  identifierType: ManuscriptIdentifierType!
-}
-
-enum ManuscriptIdentifierType {
-  CollectionNumber
-  ExcavationNumber
-  PublicationShortReference
 }
 
 type ManuscriptLanguage {
@@ -34,7 +33,6 @@ type ManuscriptLanguage {
 }
 
 type ManuscriptMetaData {
-  allTransliterations: AllTransliterations
   bibliography: String
   creatorUsername: String!
   cthClassification: Int
@@ -45,23 +43,54 @@ type ManuscriptMetaData {
   pictureUrls: [String!]!
   provenance: String
   provisionalTransliteration: String
-  status: ManuscriptStatus
+  status: ManuscriptStatus @deprecated(reason: "will be removed!")
   transliterationReleased: Boolean!
-}
-
-input ManuscriptMetaDataInput {
-  bibliography: String
-  cthClassification: Int
-  mainIdentifier: ManuscriptIdentifierInput!
-  otherIdentifiers: [ManuscriptIdentifierInput!]!
-  palaeographicClassification: PalaeographicClassification!
-  palaeographicClassificationSure: Boolean!
-  provenance: String
 }
 
 type ManuscriptMutations {
   releaseTransliteration: Boolean!
   updateTransliteration(input: String!): Boolean!
+}
+
+type Mutation {
+  executiveEditor: ExecutiveEditorMutations
+  login(password: String!, username: String!): String
+  me: LoggedInUserMutations
+  register(userInput: UserInput!): String
+  reviewerMutations: ReviewerMutations
+}
+
+type Query {
+  allManuscripts(page: Int!): [ManuscriptMetaData!]!
+  executiveEditorQueries: ExecutiveEditor
+  manuscript(mainIdentifier: String!): ManuscriptMetaData
+  manuscriptCount: Int!
+  manuscriptLanguages: [ManuscriptLanguage!]!
+  myManuscripts: [String!]
+  reviewerQueries: Reviewer
+}
+
+type Reviewer {
+  reviewAppointments: [String!]!
+  transliterationReview(mainIdentifier: String!): String
+}
+
+type ReviewerMutations {
+  submitTransliterationReview(mainIdentifier: String!, review: String!): Boolean!
+}
+
+type User {
+  affiliation: String
+  email: String!
+  name: String!
+  rights: Rights!
+  username: String!
+}
+
+enum ManuscriptIdentifierType {
+  CollectionNumber
+  ExcavationNumber
+  PublicationShortReference
 }
 
 enum ManuscriptStatus {
@@ -72,12 +101,6 @@ enum ManuscriptStatus {
   InCreation
   ReviewMerged
   Reviewed
-}
-
-type Mutation {
-  login(password: String!, username: String!): String
-  me: LoggedInUserMutations
-  register(userInput: UserInput!): String
 }
 
 enum PalaeographicClassification {
@@ -92,34 +115,25 @@ enum PalaeographicClassification {
   Unclassified
 }
 
-type Query {
-  allManuscripts(page: Int!): [ManuscriptMetaData!]!
-  manuscript(mainIdentifier: String!): ManuscriptMetaData
-  manuscriptCount: Int!
-  manuscriptLanguages: [ManuscriptLanguage!]!
-  manuscriptsToReview: [String!]
-  myManuscripts: [String!]
-  userCount: Int!
-  users(page: Int!): [User!]!
-}
-
-type Review {
-  input: String!
-  reviewerUsername: String!
-}
-
 enum Rights {
   Author
   ExecutiveEditor
   Reviewer
 }
 
-type User {
-  affiliation: String
-  email: String!
-  name: String!
-  rights: Rights!
-  username: String!
+input ManuscriptIdentifierInput {
+  identifier: String!
+  identifierType: ManuscriptIdentifierType!
+}
+
+input ManuscriptMetaDataInput {
+  bibliography: String
+  cthClassification: Int
+  mainIdentifier: ManuscriptIdentifierInput!
+  otherIdentifiers: [ManuscriptIdentifierInput!]!
+  palaeographicClassification: PalaeographicClassification!
+  palaeographicClassificationSure: Boolean!
+  provenance: String
 }
 
 input UserInput {

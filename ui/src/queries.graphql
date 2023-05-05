@@ -31,6 +31,12 @@ mutation Login($username: String!, $password: String!) {
 
 # /
 
+mutation AppointReviewerForReleasedTransliteration($mainIdentifier: String!, $reviewer: String!) {
+  executiveEditor {
+    appointReviewerForReleasedTransliteration(mainIdentifier: $mainIdentifier, reviewer: $reviewer)
+  }
+}
+
 fragment ManuscriptBasicData on ManuscriptMetaData {
   mainIdentifier {
     ...ManuscriptIdentifier
@@ -45,7 +51,13 @@ query Index($page: Int! = 0) {
     ...ManuscriptBasicData
   }
   myManuscripts
-  manuscriptsToReview
+  reviewerQueries {
+    reviewAppointments
+  }
+  executiveEditorQueries {
+    releasedTransliterationsWithoutAppointedReviewer
+    allReviewers
+  }
 }
 
 # /createManuscript
@@ -106,7 +118,7 @@ query UploadPictures($mainIdentifier: String!) {
   }
 }
 
-# /manuscript/:id/transliterationInput
+# /manuscripts/:id/transliterationInput
 
 query TransliterationInput($mainIdentifier: String!) {
   manuscript(mainIdentifier: $mainIdentifier) {
@@ -124,6 +136,20 @@ mutation uploadTransliteration($mainIdentifier: String!, $input: String!) {
   }
 }
 
+# /manuscripts/:id/reviewTransliteration
+
+query ReviewTransliteration($mainIdentifier: String!) {
+  reviewerQueries {
+    transliterationReview(mainIdentifier: $mainIdentifier)
+  }
+}
+
+mutation SubmitTransliterationReview($mainIdentifier: String!, $review: String!) {
+  reviewerMutations {
+    submitTransliterationReview(mainIdentifier: $mainIdentifier, review: $review)
+  }
+}
+
 # /userManagement
 
 fragment User on User {
@@ -135,14 +161,16 @@ fragment User on User {
 }
 
 query UsersOverview($page: Int!) {
-  userCount
-  users(page: $page) {
-    ...User
+  executiveEditorQueries {
+    userCount
+    users(page: $page) {
+      ...User
+    }
   }
 }
 
 mutation UpdateUserRights($username: String!, $newRights: Rights!) {
-  me {
+  executiveEditor {
     updateUserRights(username: $username, newRights: $newRights)
   }
 }

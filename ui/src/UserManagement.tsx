@@ -15,7 +15,7 @@ interface IProps extends UsersOverviewQuery {
   queryPage: (number: number) => void;
 }
 
-function Inner({userCount, users, page, queryPage}: IProps): JSX.Element {
+function Inner({page, queryPage, executiveEditorQueries}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [updateUserRights] = useUpdateUserRightsMutation();
@@ -25,6 +25,12 @@ function Inner({userCount, users, page, queryPage}: IProps): JSX.Element {
       .then(() => window.location.reload())
       .catch((error) => console.error(error));
   }
+
+  if (!executiveEditorQueries) {
+    return <Navigate to={homeUrl}/>;
+  }
+
+  const {userCount, users} = executiveEditorQueries;
 
   const columnNames = [t('username'), t('name'), t('affilitation'), t('email'), t('rights')];
 

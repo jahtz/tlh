@@ -1,6 +1,5 @@
 <?php
 
-require_once __DIR__ . '/sql_queries.php';
 require_once __DIR__ . '/cors.php';
 require_once __DIR__ . '/jwt_helpers.php';
 require_once __DIR__ . '/MySafeGraphQLException.php';
@@ -11,47 +10,20 @@ require_once __DIR__ . '/model/Manuscript.php';
 require_once __DIR__ . '/model/ManuscriptLanguage.php';
 require_once __DIR__ . '/model/ManuscriptIdentifier.php';
 require_once __DIR__ . '/model/User.php';
+require_once __DIR__ . '/model/Reviewer.php';
+require_once __DIR__ . '/model/ExecutiveEditor.php';
 
 use GraphQL\Error\{DebugFlag, FormattedError};
 use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
-use model\{Manuscript, ManuscriptLanguage, User};
+use model\{ExecutiveEditor, Manuscript, ManuscriptLanguage, Reviewer, User};
 use function jwt_helpers\{createJsonWebToken, extractJsonWebToken};
 use function model\allManuscriptLanguages;
 
 $queryType = new ObjectType([
   'name' => 'Query',
   'fields' => [
-    'userCount' => [
-      'type' => Type::nonNull(Type::int()),
-      'resolve' => function (?int $_rootValue, array $_args, ?User $user): int {
-        if (is_null($user)) {
-          throw new MySafeGraphQLException('User is not logged in!');
-        }
-        if ($user->rights !== 'ExecutiveEditor') {
-          throw new MySafeGraphQLException('Only executive editors can view users!');
-        }
-
-        return User::selectCount();
-      }
-    ],
-    'users' => [
-      'type' => Type::nonNull(Type::listOf(Type::nonNull(User::$graphQLQueryType))),
-      'args' => [
-        'page' => Type::nonNull(Type::int())
-      ],
-      'resolve' => function (?int $_rootValue, array $args, ?User $user): array {
-        if (is_null($user)) {
-          throw new MySafeGraphQLException('User is not logged in!');
-        }
-        if ($user->rights !== 'ExecutiveEditor') {
-          throw new MySafeGraphQLException('Only executive editors can view users!');
-        }
-
-        return User::selectUsersPaginated($args['page']);
-      }
-    ],
     'manuscriptLanguages' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptLanguage::$graphQLType))),
       'resolve' => fn(): array => allManuscriptLanguages()
@@ -69,11 +41,9 @@ $queryType = new ObjectType([
     ],
     'myManuscripts' => [
       'type' => Type::listOf(Type::nonNull(Type::string())),
-      'resolve' => fn(?int $_rootValue, array $_args, ?User $user): ?array => $user !== null ? Manuscript::selectManuscriptIdentifiersForUser($user->username) : null,
-    ],
-    'manuscriptsToReview' => [
-      'type' => Type::listOf(Type::nonNull(Type::string())),
-      'resolve' => fn(?int $_rootValue, array $_args, ?User $user): ?array => $user !== null && $user->isReviewer() ? selectManuscriptsToReview($user->username) : null
+      'resolve' => fn(?int $_rootValue, array $_args, ?User $user): ?array => !is_null($user)
+        ? Manuscript::selectManuscriptIdentifiersForUser($user->username)
+        : null,
     ],
     'manuscript' => [
       'type' => Manuscript::$graphQLType,
@@ -81,13 +51,20 @@ $queryType = new ObjectType([
         'mainIdentifier' => Type::nonNull(Type::string())
       ],
       'resolve' => fn(?int $_rootValue, array $args): ?Manuscript => Manuscript::selectManuscriptById($args['mainIdentifier'])
+    ],
+    'reviewerQueries' => [
+      'type' => Reviewer::$queryType,
+      'resolve' => fn(?int $_rootValue, array $args, ?User $user): ?User => !is_null($user) && $user->isReviewer() ? $user : null
+    ],
+    'executiveEditorQueries' => [
+      # TODO: make userQueries with field execEditorQueries, reviewerQueries and myManuscripts?
+      'type' => ExecutiveEditor::$executiveEditorQueryType,
+      'resolve' => fn(?int $_rootValue, array $_args, ?User $user): ?User => !is_null($user) && $user->isExecutiveEditor() ? $user : null
     ]
   ]
 ]);
 
-/**
- * @throws MySafeGraphQLException
- */
+/** @throws MySafeGraphQLException */
 function resolveRegister(array $args): string
 {
   $user = User::fromGraphQLInput($args['userInput']);
@@ -103,14 +80,12 @@ function resolveLogin(string $username, string $password): ?string
 {
   $user = User::selectUserFromDatabase($username);
 
-  return $user !== null && password_verify($password, $user->pwHash)
+  return !is_null($user) && password_verify($password, $user->pwHash)
     ? createJsonWebToken($user)
     : null;
 }
 
-/**
- * @throws MySafeGraphQLException
- */
+/** @throws MySafeGraphQLException */
 function resolveUser(): ?User
 {
   $jwt = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
@@ -145,6 +120,14 @@ $mutationType = new ObjectType([
     'me' => [
       'type' => User::$graphQLMutationsType,
       'resolve' => fn(?int $_rootValue, array $_args, ?User $user): ?User => $user
+    ],
+    'reviewerMutations' => [
+      'type' => Reviewer::$mutationType,
+      'resolve' => fn(?int $_rootValue, array $_args, ?User $user): ?User => !is_null($user) && $user->isReviewer() ? $user : null
+    ],
+    'executiveEditor' => [
+      'type' => ExecutiveEditor::$mutationsType,
+      'resolve' => fn(?int $_rootValue, array $_args, ?User $user): ?User => !is_null($user) && $user->isExecutiveEditor() ? $user : null
     ]
   ]
 ]);
@@ -175,12 +158,12 @@ try {
       'errors' => [FormattedError::createFromException(new Exception('No input given!'))]
     ];
   }
-} catch (Throwable $e) {
-  error_log($e->getMessage());
+} catch (Throwable $exception) {
+  error_log($exception);
 
   $output = [
     'data' => null,
-    'errors' => [FormattedError::createFromException($e)]
+    'errors' => [FormattedError::createFromException($exception)]
   ];
 }
 

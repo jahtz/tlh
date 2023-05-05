@@ -29,6 +29,8 @@ export const uploadPicturesUrl = 'uploadPictures';
 
 export const createTransliterationUrl = 'createTransliteration';
 
+export const reviewTransliterationUrl = 'reviewTransliteration';
+
 // Foreign urls
 
 export const tlhAnalyzerUrl = '/TLHaly/jasonanalysis.php';

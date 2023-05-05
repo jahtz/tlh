@@ -47,6 +47,7 @@ function LineBreakEditor({node, updateAttribute, setKeyHandlingEnabled, addition
     <>
       <div className="mb-4">
         <label htmlFor="txtId" className="font-bold">{t('textId')}:</label>
+        {/* FIXME: bearbeitung! */}
         <input type="text" id="txtId" className={inputClasses} defaultValue={node.attributes.txtid} placeholder={t('textId') || 'textId'} readOnly/>
       </div>
 

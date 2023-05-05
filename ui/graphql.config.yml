@@ -1,0 +1,8 @@
+schema: ./schema.graphql
+extensions:
+  endpoints:
+    Default GraphQL Endpoint:
+      url: http://localhost:8066/graphql.php
+      headers:
+        user-agent: JS GraphQL
+      introspect: false

@@ -2,43 +2,45 @@ import {useTranslation} from 'react-i18next';
 import {IndexQuery, useIndexLazyQuery} from './graphql';
 import {Link} from 'react-router-dom';
 import {WithQuery} from './WithQuery';
-import {createManuscriptUrl} from './urls';
+import {createManuscriptUrl, reviewTransliterationUrl} from './urls';
 import {ManuscriptsOverview} from './ManuscriptsOverview';
 import {ManuscriptLinkButtons} from './ManuscriptLinkButtons';
 import {useState} from 'react';
+import {Box} from './Box';
+import {ReviewerAppointing} from './ReviewerAppointing';
 
 interface IProps extends IndexQuery {
   page: number;
   queryPage: (page: number) => void;
 }
 
-function Inner({manuscriptCount, allManuscripts, myManuscripts, manuscriptsToReview, page, queryPage}: IProps): JSX.Element {
+function Inner({manuscriptCount, allManuscripts, myManuscripts, page, queryPage, reviewerQueries, executiveEditorQueries: execEd}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
   return (
     <>
-      <div className="my-4 p-2 rounded border border-slate-500">
-        <h2 className="font-bold text-center text-xl">{t('newestManuscripts')}</h2>
-
+      <Box heading={t('newestManuscripts')}>
         <ManuscriptsOverview manuscriptCount={manuscriptCount} allManuscripts={allManuscripts} queryPage={queryPage} page={page}/>
-      </div>
+      </Box>
 
-      <div className="my-4 p-2 rounded border border-slate-500">
-        <h2 className="font-bold text-center text-xl">{t('myManuscripts')}</h2>
+      {myManuscripts && <Box heading={t('myManuscripts')}>
+        <ManuscriptLinkButtons manuscripts={myManuscripts} errorMsg={t('noOwnManuscriptsYet')}/>
+      </Box>}
 
-        {myManuscripts
-          ? <ManuscriptLinkButtons manuscripts={myManuscripts} errorMsg={t('noOwnManuscriptsYet')}/>
-          : <p className="italic text-cyan-500 text-center">{t('pleaseLogin')}</p>}
-      </div>
+      {reviewerQueries && <Box heading={t('myReviewAppointments')}>
+        <div className="p-2 grid grid-cols-6 gap-2">
+          {reviewerQueries.reviewAppointments.map((app) =>
+            <Link key={app} to={`/manuscripts/${encodeURIComponent(app)}/${reviewTransliterationUrl}`}
+                  className="p-2 rounded bg-amber-500 text-white text-center w-full">
+              {app}
+            </Link>)}
+        </div>
+      </Box>}
 
-      <div className="my-4 p-2 rounded border border-slate-500">
-        <h2 className="font-bold text-center text-xl">{t('manuscriptsToReview')}</h2>
-
-        {manuscriptsToReview
-          ? <ManuscriptLinkButtons manuscripts={manuscriptsToReview} errorMsg={t('noManuscriptToReviewYet')}/>
-          : <p className="italic text-cyan-500 text-center">{t('pleaseLogin')}</p>}
-      </div>
+      {execEd && <Box heading={t('releasedTransliterationsWithoutAppointedReviewer')}>
+        <ReviewerAppointing manuscripts={execEd.releasedTransliterationsWithoutAppointedReviewer} reviewers={execEd.allReviewers}/>
+      </Box>}
     </>
   );
 }

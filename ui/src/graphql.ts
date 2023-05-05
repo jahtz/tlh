@@ -15,20 +15,41 @@ export type Scalars = {
   Float: number;
 };
 
-export type AllTransliterations = {
-  __typename?: 'AllTransliterations';
-  approvalReview?: Maybe<Review>;
-  firstReview?: Maybe<Review>;
-  initialInput?: Maybe<Scalars['String']>;
-  provisionalInput?: Maybe<Scalars['String']>;
-  secondReview?: Maybe<Review>;
+export type ExecutiveEditor = {
+  __typename?: 'ExecutiveEditor';
+  allReviewers: Array<Scalars['String']>;
+  releasedTransliterationsWithoutAppointedReviewer: Array<Scalars['String']>;
+  userCount: Scalars['Int'];
+  users: Array<User>;
+};
+
+
+export type ExecutiveEditorUsersArgs = {
+  page: Scalars['Int'];
+};
+
+export type ExecutiveEditorMutations = {
+  __typename?: 'ExecutiveEditorMutations';
+  appointReviewerForReleasedTransliteration: Scalars['String'];
+  updateUserRights: Rights;
+};
+
+
+export type ExecutiveEditorMutationsAppointReviewerForReleasedTransliterationArgs = {
+  mainIdentifier: Scalars['String'];
+  reviewer: Scalars['String'];
+};
+
+
+export type ExecutiveEditorMutationsUpdateUserRightsArgs = {
+  newRights: Rights;
+  username: Scalars['String'];
 };
 
 export type LoggedInUserMutations = {
   __typename?: 'LoggedInUserMutations';
   createManuscript: Scalars['String'];
   manuscript?: Maybe<ManuscriptMutations>;
-  updateUserRights: Rights;
 };
 
 
@@ -39,12 +60,6 @@ export type LoggedInUserMutationsCreateManuscriptArgs = {
 
 export type LoggedInUserMutationsManuscriptArgs = {
   mainIdentifier: Scalars['String'];
-};
-
-
-export type LoggedInUserMutationsUpdateUserRightsArgs = {
-  newRights: Rights;
-  username: Scalars['String'];
 };
 
 export type ManuscriptIdentifier = {
@@ -72,7 +87,6 @@ export type ManuscriptLanguage = {
 
 export type ManuscriptMetaData = {
   __typename?: 'ManuscriptMetaData';
-  allTransliterations?: Maybe<AllTransliterations>;
   bibliography?: Maybe<Scalars['String']>;
   creatorUsername: Scalars['String'];
   cthClassification?: Maybe<Scalars['Int']>;
@@ -83,6 +97,7 @@ export type ManuscriptMetaData = {
   pictureUrls: Array<Scalars['String']>;
   provenance?: Maybe<Scalars['String']>;
   provisionalTransliteration?: Maybe<Scalars['String']>;
+  /** @deprecated will be removed! */
   status?: Maybe<ManuscriptStatus>;
   transliterationReleased: Scalars['Boolean'];
 };
@@ -120,9 +135,11 @@ export const enum ManuscriptStatus {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  executiveEditor?: Maybe<ExecutiveEditorMutations>;
   login?: Maybe<Scalars['String']>;
   me?: Maybe<LoggedInUserMutations>;
   register?: Maybe<Scalars['String']>;
+  reviewerMutations?: Maybe<ReviewerMutations>;
 };
 
 
@@ -151,13 +168,12 @@ export const enum PalaeographicClassification {
 export type Query = {
   __typename?: 'Query';
   allManuscripts: Array<ManuscriptMetaData>;
+  executiveEditorQueries?: Maybe<ExecutiveEditor>;
   manuscript?: Maybe<ManuscriptMetaData>;
   manuscriptCount: Scalars['Int'];
   manuscriptLanguages: Array<ManuscriptLanguage>;
-  manuscriptsToReview?: Maybe<Array<Scalars['String']>>;
   myManuscripts?: Maybe<Array<Scalars['String']>>;
-  userCount: Scalars['Int'];
-  users: Array<User>;
+  reviewerQueries?: Maybe<Reviewer>;
 };
 
 
@@ -170,15 +186,26 @@ export type QueryManuscriptArgs = {
   mainIdentifier: Scalars['String'];
 };
 
-
-export type QueryUsersArgs = {
-  page: Scalars['Int'];
+export type Reviewer = {
+  __typename?: 'Reviewer';
+  reviewAppointments: Array<Scalars['String']>;
+  transliterationReview?: Maybe<Scalars['String']>;
 };
 
-export type Review = {
-  __typename?: 'Review';
-  input: Scalars['String'];
-  reviewerUsername: Scalars['String'];
+
+export type ReviewerTransliterationReviewArgs = {
+  mainIdentifier: Scalars['String'];
+};
+
+export type ReviewerMutations = {
+  __typename?: 'ReviewerMutations';
+  submitTransliterationReview: Scalars['Boolean'];
+};
+
+
+export type ReviewerMutationsSubmitTransliterationReviewArgs = {
+  mainIdentifier: Scalars['String'];
+  review: Scalars['String'];
 };
 
 export const enum Rights {
@@ -229,6 +256,14 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = { __typename?: 'Mutation', login?: string | null };
 
+export type AppointReviewerForReleasedTransliterationMutationVariables = Exact<{
+  mainIdentifier: Scalars['String'];
+  reviewer: Scalars['String'];
+}>;
+
+
+export type AppointReviewerForReleasedTransliterationMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', appointReviewerForReleasedTransliteration: string } | null };
+
 export type ManuscriptBasicDataFragment = { __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
 export type IndexQueryVariables = Exact<{
@@ -236,7 +271,7 @@ export type IndexQueryVariables = Exact<{
 }>;
 
 
-export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, myManuscripts?: Array<string> | null, manuscriptsToReview?: Array<string> | null, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }> };
+export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, myManuscripts?: Array<string> | null, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }>, reviewerQueries?: { __typename?: 'Reviewer', reviewAppointments: Array<string> } | null, executiveEditorQueries?: { __typename?: 'ExecutiveEditor', releasedTransliterationsWithoutAppointedReviewer: Array<string>, allReviewers: Array<string> } | null };
 
 export type CreateManuscriptMutationVariables = Exact<{
   manuscriptMetaData?: InputMaybe<ManuscriptMetaDataInput>;
@@ -285,6 +320,21 @@ export type UploadTransliterationMutationVariables = Exact<{
 
 export type UploadTransliterationMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', manuscript?: { __typename?: 'ManuscriptMutations', updateTransliteration: boolean } | null } | null };
 
+export type ReviewTransliterationQueryVariables = Exact<{
+  mainIdentifier: Scalars['String'];
+}>;
+
+
+export type ReviewTransliterationQuery = { __typename?: 'Query', reviewerQueries?: { __typename?: 'Reviewer', transliterationReview?: string | null } | null };
+
+export type SubmitTransliterationReviewMutationVariables = Exact<{
+  mainIdentifier: Scalars['String'];
+  review: Scalars['String'];
+}>;
+
+
+export type SubmitTransliterationReviewMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitTransliterationReview: boolean } | null };
+
 export type UserFragment = { __typename?: 'User', username: string, name: string, affiliation?: string | null, email: string, rights: Rights };
 
 export type UsersOverviewQueryVariables = Exact<{
@@ -292,7 +342,7 @@ export type UsersOverviewQueryVariables = Exact<{
 }>;
 
 
-export type UsersOverviewQuery = { __typename?: 'Query', userCount: number, users: Array<{ __typename?: 'User', username: string, name: string, affiliation?: string | null, email: string, rights: Rights }> };
+export type UsersOverviewQuery = { __typename?: 'Query', executiveEditorQueries?: { __typename?: 'ExecutiveEditor', userCount: number, users: Array<{ __typename?: 'User', username: string, name: string, affiliation?: string | null, email: string, rights: Rights }> } | null };
 
 export type UpdateUserRightsMutationVariables = Exact<{
   username: Scalars['String'];
@@ -300,7 +350,7 @@ export type UpdateUserRightsMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserRightsMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', updateUserRights: Rights } | null };
+export type UpdateUserRightsMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', updateUserRights: Rights } | null };
 
 export const ManuscriptLanguageFragmentDoc = gql`
     fragment ManuscriptLanguage on ManuscriptLanguage {
@@ -457,6 +507,43 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const AppointReviewerForReleasedTransliterationDocument = gql`
+    mutation AppointReviewerForReleasedTransliteration($mainIdentifier: String!, $reviewer: String!) {
+  executiveEditor {
+    appointReviewerForReleasedTransliteration(
+      mainIdentifier: $mainIdentifier
+      reviewer: $reviewer
+    )
+  }
+}
+    `;
+export type AppointReviewerForReleasedTransliterationMutationFn = Apollo.MutationFunction<AppointReviewerForReleasedTransliterationMutation, AppointReviewerForReleasedTransliterationMutationVariables>;
+
+/**
+ * __useAppointReviewerForReleasedTransliterationMutation__
+ *
+ * To run a mutation, you first call `useAppointReviewerForReleasedTransliterationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAppointReviewerForReleasedTransliterationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [appointReviewerForReleasedTransliterationMutation, { data, loading, error }] = useAppointReviewerForReleasedTransliterationMutation({
+ *   variables: {
+ *      mainIdentifier: // value for 'mainIdentifier'
+ *      reviewer: // value for 'reviewer'
+ *   },
+ * });
+ */
+export function useAppointReviewerForReleasedTransliterationMutation(baseOptions?: Apollo.MutationHookOptions<AppointReviewerForReleasedTransliterationMutation, AppointReviewerForReleasedTransliterationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AppointReviewerForReleasedTransliterationMutation, AppointReviewerForReleasedTransliterationMutationVariables>(AppointReviewerForReleasedTransliterationDocument, options);
+      }
+export type AppointReviewerForReleasedTransliterationMutationHookResult = ReturnType<typeof useAppointReviewerForReleasedTransliterationMutation>;
+export type AppointReviewerForReleasedTransliterationMutationResult = Apollo.MutationResult<AppointReviewerForReleasedTransliterationMutation>;
+export type AppointReviewerForReleasedTransliterationMutationOptions = Apollo.BaseMutationOptions<AppointReviewerForReleasedTransliterationMutation, AppointReviewerForReleasedTransliterationMutationVariables>;
 export const IndexDocument = gql`
     query Index($page: Int! = 0) {
   manuscriptCount
@@ -464,7 +551,13 @@ export const IndexDocument = gql`
     ...ManuscriptBasicData
   }
   myManuscripts
-  manuscriptsToReview
+  reviewerQueries {
+    reviewAppointments
+  }
+  executiveEditorQueries {
+    releasedTransliterationsWithoutAppointedReviewer
+    allReviewers
+  }
 }
     ${ManuscriptBasicDataFragmentDoc}`;
 
@@ -706,11 +799,82 @@ export function useUploadTransliterationMutation(baseOptions?: Apollo.MutationHo
 export type UploadTransliterationMutationHookResult = ReturnType<typeof useUploadTransliterationMutation>;
 export type UploadTransliterationMutationResult = Apollo.MutationResult<UploadTransliterationMutation>;
 export type UploadTransliterationMutationOptions = Apollo.BaseMutationOptions<UploadTransliterationMutation, UploadTransliterationMutationVariables>;
+export const ReviewTransliterationDocument = gql`
+    query ReviewTransliteration($mainIdentifier: String!) {
+  reviewerQueries {
+    transliterationReview(mainIdentifier: $mainIdentifier)
+  }
+}
+    `;
+
+/**
+ * __useReviewTransliterationQuery__
+ *
+ * To run a query within a React component, call `useReviewTransliterationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useReviewTransliterationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useReviewTransliterationQuery({
+ *   variables: {
+ *      mainIdentifier: // value for 'mainIdentifier'
+ *   },
+ * });
+ */
+export function useReviewTransliterationQuery(baseOptions: Apollo.QueryHookOptions<ReviewTransliterationQuery, ReviewTransliterationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ReviewTransliterationQuery, ReviewTransliterationQueryVariables>(ReviewTransliterationDocument, options);
+      }
+export function useReviewTransliterationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ReviewTransliterationQuery, ReviewTransliterationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ReviewTransliterationQuery, ReviewTransliterationQueryVariables>(ReviewTransliterationDocument, options);
+        }
+export type ReviewTransliterationQueryHookResult = ReturnType<typeof useReviewTransliterationQuery>;
+export type ReviewTransliterationLazyQueryHookResult = ReturnType<typeof useReviewTransliterationLazyQuery>;
+export type ReviewTransliterationQueryResult = Apollo.QueryResult<ReviewTransliterationQuery, ReviewTransliterationQueryVariables>;
+export const SubmitTransliterationReviewDocument = gql`
+    mutation SubmitTransliterationReview($mainIdentifier: String!, $review: String!) {
+  reviewerMutations {
+    submitTransliterationReview(mainIdentifier: $mainIdentifier, review: $review)
+  }
+}
+    `;
+export type SubmitTransliterationReviewMutationFn = Apollo.MutationFunction<SubmitTransliterationReviewMutation, SubmitTransliterationReviewMutationVariables>;
+
+/**
+ * __useSubmitTransliterationReviewMutation__
+ *
+ * To run a mutation, you first call `useSubmitTransliterationReviewMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSubmitTransliterationReviewMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [submitTransliterationReviewMutation, { data, loading, error }] = useSubmitTransliterationReviewMutation({
+ *   variables: {
+ *      mainIdentifier: // value for 'mainIdentifier'
+ *      review: // value for 'review'
+ *   },
+ * });
+ */
+export function useSubmitTransliterationReviewMutation(baseOptions?: Apollo.MutationHookOptions<SubmitTransliterationReviewMutation, SubmitTransliterationReviewMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SubmitTransliterationReviewMutation, SubmitTransliterationReviewMutationVariables>(SubmitTransliterationReviewDocument, options);
+      }
+export type SubmitTransliterationReviewMutationHookResult = ReturnType<typeof useSubmitTransliterationReviewMutation>;
+export type SubmitTransliterationReviewMutationResult = Apollo.MutationResult<SubmitTransliterationReviewMutation>;
+export type SubmitTransliterationReviewMutationOptions = Apollo.BaseMutationOptions<SubmitTransliterationReviewMutation, SubmitTransliterationReviewMutationVariables>;
 export const UsersOverviewDocument = gql`
     query UsersOverview($page: Int!) {
-  userCount
-  users(page: $page) {
-    ...User
+  executiveEditorQueries {
+    userCount
+    users(page: $page) {
+      ...User
+    }
   }
 }
     ${UserFragmentDoc}`;
@@ -744,7 +908,7 @@ export type UsersOverviewLazyQueryHookResult = ReturnType<typeof useUsersOvervie
 export type UsersOverviewQueryResult = Apollo.QueryResult<UsersOverviewQuery, UsersOverviewQueryVariables>;
 export const UpdateUserRightsDocument = gql`
     mutation UpdateUserRights($username: String!, $newRights: Rights!) {
-  me {
+  executiveEditor {
     updateUserRights(username: $username, newRights: $newRights)
   }
 }
