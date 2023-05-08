@@ -63,6 +63,9 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     docID: {
       replace: () => displayReplace(<span/>)
     },
+    merged: {
+      replace: () => displayReplace(<span/>)
+    },
     'AO:Manuscripts': aoManuscriptsConfig,
     'AO:ParagrNr': {
       replace: (node) => displayReplace(<div className="mt-4 font-bold italic">{node.attributes.c}</div>)
