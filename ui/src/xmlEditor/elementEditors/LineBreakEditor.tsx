@@ -48,14 +48,15 @@ function LineBreakEditor({node, updateAttribute, setKeyHandlingEnabled, addition
     <>
       <div className="mb-4">
         <label htmlFor="txtId" className="font-bold">{t('textId')}:</label>
-        {/* FIXME: bearbeitung! */}
-        <input type="text" id="txtId" className={inputClasses} defaultValue={node.attributes.txtid} placeholder={t('textId') || 'textId'} readOnly/>
+        <input type="text" id="txtId" className={inputClasses} defaultValue={node.attributes.txtid} placeholder={t('textId') || 'textId'}
+               onFocus={() => setKeyHandlingEnabled(false)} onBlur={() => setKeyHandlingEnabled(true)}
+               onChange={(event) => updateAttribute('txtid', event.target.value)}/>
       </div>
 
       <div className="mb-4">
         <label htmlFor="lineNumber" className="font-bold">{t('lineNumber')}:</label>
         <input type="text" id="lineNumber" className={inputClasses} defaultValue={node.attributes.lnr?.trim()} onFocus={() => setKeyHandlingEnabled(false)}
-               onChange={(event) => updateAttribute('lnr', event.target.value)}/>
+               onBlur={() => setKeyHandlingEnabled(true)} onChange={(event) => updateAttribute('lnr', event.target.value)}/>
       </div>
 
       <div className="mb-4">
@@ -65,7 +66,7 @@ function LineBreakEditor({node, updateAttribute, setKeyHandlingEnabled, addition
       <div className="mb-4">
         <label htmlFor="cuneiform" className="font-bold">{t('cuneiform')}</label>
         <input type="text" id="cuneiform" className={inputClasses} defaultValue={node.attributes.cu} onFocus={() => setKeyHandlingEnabled(false)}
-               onChange={(event) => updateAttribute('cu', event.target.value)}/>
+               onBlur={() => setKeyHandlingEnabled(true)} onChange={(event) => updateAttribute('cu', event.target.value)}/>
         <button type="button" className="mt-2 p-2 rounded bg-amber-500 text-white w-full" onClick={updateCuneiform}>{t('updateCuneiform')}</button>
       </div>
 
