@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 
 interface IProps {

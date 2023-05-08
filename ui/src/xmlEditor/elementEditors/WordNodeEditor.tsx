@@ -1,6 +1,6 @@
 import {XmlEditableNodeIProps} from '../editorConfig';
 import {useTranslation} from 'react-i18next';
-import {useState} from 'react';
+import {JSX, useState} from 'react';
 import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue} from '../../model/morphologicalAnalysis';
 import {MorphAnalysisOptionContainer} from '../morphAnalysisOption/MorphAnalysisOptionContainer';
 import {isXmlElementNode, lastChildNode, xmlElementNode, XmlElementNode} from 'simple_xml';

@@ -6,7 +6,7 @@ require_once __DIR__ . '/../MySafeGraphQLException.php';
 require_once __DIR__ . '/Rights.php';
 require_once __DIR__ . '/User.php';
 require_once __DIR__ . '/Manuscript.php';
-
+require_once __DIR__ . '/DocumentInPipeline.php';
 
 use GraphQL\Type\Definition\{ObjectType, Type};
 use MySafeGraphQLException;
@@ -29,8 +29,11 @@ class ExecutiveEditor
   static function insertReviewerAppointmentForReleasedTransliteration(string $mainIdentifier, string $reviewer, string $appointedBy): string
   {
     return executeSingleChangeQuery(
-      "insert into tlh_dig_transliteration_review_appointments (main_identifier, username, appointed_by_username) values (?, ?, ?);",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $reviewer, $appointedBy)
+      "
+insert into tlh_dig_transliteration_review_appointments (main_identifier, username, appointed_by_username)
+values (?, ?, ?)
+on duplicate key update username = ?, appointed_by_username = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $mainIdentifier, $reviewer, $appointedBy, $reviewer, $appointedBy)
     );
   }
 }
@@ -52,6 +55,17 @@ ExecutiveEditor::$executiveEditorQueryType = new ObjectType([
     'allReviewers' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(Type::string()))),
       'resolve' => fn(): array => User::selectAllReviewers()
+    ],
+    'documentsInPipelineCount' => [
+      'type' => Type::nonNull(Type::int()),
+      'resolve' => fn() => DocumentInPipeline::selectCount()
+    ],
+    'documentsInPipeline' => [
+      'type' => Type::nonNull(Type::listOf(Type::nonNull(DocumentInPipeline::$queryType))),
+      'args' => [
+        'page' => Type::int()
+      ],
+      'resolve' => fn(User $user, array $args): array => DocumentInPipeline::selectDocumentsInPipeline($args['page'] ?? 0)
     ],
     'releasedTransliterationsWithoutAppointedReviewer' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(Type::string()))),

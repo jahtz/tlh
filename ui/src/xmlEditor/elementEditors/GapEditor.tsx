@@ -1,6 +1,7 @@
 import {displayReplace, inputClasses, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {useTranslation} from 'react-i18next';
+import {JSX} from 'react';
 import {XmlElementNode} from 'simple_xml';
 
 function isLineGapNode(node: XmlElementNode): boolean {

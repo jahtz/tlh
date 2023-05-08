@@ -5,7 +5,8 @@ SET @mainId = 'KBo 08/15',
 
 insert into tlh_dig_users (username, pw_hash, name, email, rights)
 values ('jack', @pwHash, 'Jack Bourne', 'jack.bourne@example.com', 'ExecutiveEditor'),
-       ('admin', @pwHash, 'Admin', 'admin@example.com', 'ExecutiveEditor');
+       ('admin1', @pwHash, 'Admin1', 'admin1@example.com', 'ExecutiveEditor'),
+       ('admin2', @pwHash, 'Admin2', 'admin2@example.com', 'ExecutiveEditor');
 
 insert into tlh_dig_manuscript_metadatas (main_identifier, creator_username)
 values (@mainId, 'jack');

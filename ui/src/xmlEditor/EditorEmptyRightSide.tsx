@@ -1,4 +1,5 @@
 import {XmlEditorConfig, XmlInsertableSingleEditableNodeConfig} from './editorConfig';
+import {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {InsertablePositions} from './insertablePositions';
 import {SelectableButton} from '../genericElements/Buttons';

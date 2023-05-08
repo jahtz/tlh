@@ -3,6 +3,7 @@ import {SelectableButton} from '../../genericElements/Buttons';
 import {selectedMultiMorphAnalysisWithEnclitics, stringifyMultiMorphAnalysisWithEnclitics} from '../../model/selectedMorphologicalAnalysis';
 import {EncliticsAnalysisDisplay} from './SingleMorphAnalysisOptionButton';
 import {MultiMorphologicalAnalysisWithMultiEnclitics} from '../../model/morphologicalAnalysis';
+import {JSX} from 'react';
 
 interface IProps {
   ma: MultiMorphologicalAnalysisWithMultiEnclitics;

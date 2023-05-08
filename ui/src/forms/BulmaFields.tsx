@@ -1,5 +1,4 @@
-import {ChangeEvent} from 'react';
-
+import {ChangeEvent, JSX} from 'react';
 
 export interface SelectOption<T> {
   value: T;

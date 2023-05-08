@@ -1,4 +1,5 @@
 import {MultiMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
+import {JSX} from 'react';
 import {EncliticsAnalysisDisplay} from './SingleMorphAnalysisOptionButton';
 import {MultiMorphAnalysisSelection} from './MultiMorphAnalysisSelection';
 import {MultiMorphMultiEncAnalysisSelection} from './MultiMorphMultiEncAnalysisSelection';

@@ -1,4 +1,4 @@
-import {ChangeEvent, createRef, useState} from 'react';
+import {ChangeEvent, createRef, JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {homeUrl} from '../urls';
 import {PicturesBlock} from './PicturesBlock';

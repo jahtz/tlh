@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {JSX, useState} from 'react';
 import {NodeDisplay, NodeDisplayIProps} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
 import {isLeft, parseNewXml, XmlElementNode} from 'simple_xml';

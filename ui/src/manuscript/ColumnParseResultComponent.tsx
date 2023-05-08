@@ -1,4 +1,5 @@
 import {useTranslation} from 'react-i18next';
+import {JSX} from 'react';
 import {BulmaTabs} from '../genericElements/BulmaTabs';
 import {LineParseResultDisplay} from './LineParseResultDisplay';
 import {writeNode} from 'simple_xml';

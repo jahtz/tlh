@@ -1,4 +1,5 @@
 import {displayReplace, inputClasses, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {LanguageInput} from '../LanguageInput';
 import classNames from 'classnames';

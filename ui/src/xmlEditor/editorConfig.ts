@@ -1,4 +1,5 @@
 import {XmlElementNode, XmlReadConfig, XmlWriteConfig} from 'simple_xml';
+import {JSX} from 'react';
 import {Argument as ClassNamesArgument} from 'classnames';
 import {InsertablePositions} from './insertablePositions';
 import {Spec} from 'immutability-helper';

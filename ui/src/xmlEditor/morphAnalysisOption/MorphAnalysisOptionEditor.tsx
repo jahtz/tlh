@@ -2,7 +2,7 @@ import {isMultiMorphologicalAnalysis, MorphologicalAnalysis, MultiMorphologicalA
 import {isMultiEncliticsAnalysis, MultiEncliticsAnalysis} from '../../model/encliticsAnalysis';
 import {LetteredAnalysisOption, SelectableLetteredAnalysisOption} from '../../model/analysisOptions';
 import {useTranslation} from 'react-i18next';
-import {useState} from 'react';
+import {JSX, useState} from 'react';
 import {convertSingleMorphAnalysisToMultiMorphAnalysis} from '../../model/morphologicalAnalysisConverter';
 import update from 'immutability-helper';
 

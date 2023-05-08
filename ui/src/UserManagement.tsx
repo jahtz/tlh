@@ -1,12 +1,10 @@
 import {useTranslation} from 'react-i18next';
-import {activeUserSelector} from './newStore';
-import {useSelector} from 'react-redux';
 import {Navigate} from 'react-router-dom';
 import {homeUrl} from './urls';
 import {Rights, UsersOverviewQuery, useUpdateUserRightsMutation, useUsersOverviewLazyQuery} from './graphql';
 import {WithQuery} from './WithQuery';
 import {PaginatedTable} from './PaginatedTable';
-import {useState} from 'react';
+import {JSX, useState} from 'react';
 
 const allRights = [Rights.ExecutiveEditor, Rights.Reviewer, Rights.Author];
 
@@ -55,7 +53,6 @@ function Inner({page, queryPage, executiveEditorQueries}: IProps): JSX.Element {
 export function UserManagement(): JSX.Element {
 
   const {t} = useTranslation('common');
-  const user = useSelector(activeUserSelector);
   const [page, setPage] = useState(0);
   const [executeUsersOverviewQuery, usersOverviewQuery] = useUsersOverviewLazyQuery();
 
@@ -64,14 +61,10 @@ export function UserManagement(): JSX.Element {
       .catch((error) => console.error(error));
   }
 
-  if (user === null || user.rights !== Rights.ExecutiveEditor) {
-    return <Navigate to={homeUrl}/>;
-  }
-
   const queryPage = (page: number): void => {
     executeUsersOverviewQuery({variables: {page}})
-      .then((res) => {
-        if (res.data) {
+      .then(({data}) => {
+        if (data) {
           setPage(page);
         }
       })

@@ -1,20 +1,19 @@
 import {useTranslation} from 'react-i18next';
+import {JSX, useState} from 'react';
 import {IndexQuery, useIndexLazyQuery} from './graphql';
 import {Link} from 'react-router-dom';
 import {WithQuery} from './WithQuery';
 import {createManuscriptUrl, reviewTransliterationUrl} from './urls';
 import {ManuscriptsOverview} from './ManuscriptsOverview';
 import {ManuscriptLinkButtons} from './ManuscriptLinkButtons';
-import {useState} from 'react';
 import {Box} from './Box';
-import {ReviewerAppointing} from './ReviewerAppointing';
 
 interface IProps extends IndexQuery {
   page: number;
   queryPage: (page: number) => void;
 }
 
-function Inner({manuscriptCount, allManuscripts, myManuscripts, page, queryPage, reviewerQueries, executiveEditorQueries: execEd}: IProps): JSX.Element {
+function Inner({manuscriptCount, allManuscripts, myManuscripts, page, queryPage, reviewerQueries}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -36,10 +35,6 @@ function Inner({manuscriptCount, allManuscripts, myManuscripts, page, queryPage,
               {app}
             </Link>)}
         </div>
-      </Box>}
-
-      {execEd && <Box heading={t('releasedTransliterationsWithoutAppointedReviewer')}>
-        <ReviewerAppointing manuscripts={execEd.releasedTransliterationsWithoutAppointedReviewer} reviewers={execEd.allReviewers}/>
       </Box>}
     </>
   );

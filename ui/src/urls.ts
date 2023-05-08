@@ -21,6 +21,8 @@ export const documentMergerUrl = '/documentMerger';
 
 export const userManagementUrl = '/userManagement';
 
+export const pipelineManagementUrl = '/pipelineManagement';
+
 // Fragments
 
 export const manuscriptsUrlFragment = 'manuscripts';

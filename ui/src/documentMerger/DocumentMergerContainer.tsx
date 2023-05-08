@@ -1,6 +1,6 @@
 import {useTranslation} from 'react-i18next';
 import {FileLoader} from '../forms/FileLoader';
-import {useState} from 'react';
+import {JSX, useState} from 'react';
 import update from 'immutability-helper';
 import {DocumentMerger} from './DocumentMerger';
 import {isLeft, loadNewXml, XmlElementNode} from 'simple_xml';
@@ -97,8 +97,10 @@ export function DocumentMergerContainer(): JSX.Element {
         || (state._type === 'FirstFileLoadedState' &&
           <FileLoader onLoad={loadSecondDocument} accept={'text/xml'} text={t('loadSecondFile') || 'loadSecondFile'}/>)
         || (state._type === 'SecondFileLoadedState' &&
-          <DocumentMerger firstDocument={state.firstFile.document} secondDocument={state.secondFile.document} MergedPublicationMapping={state.secondFile.document.MergedPublicationMapping} onMerge={onMerge}/>)
-        || (state._type === 'MergedState' && <MergedDocumentView lines={state.mergedLines} header={state.header} publicationMapping={state.publicationMapping}/>)}
+          <DocumentMerger firstDocument={state.firstFile.document} secondDocument={state.secondFile.document}
+                          MergedPublicationMapping={state.secondFile.document.MergedPublicationMapping} onMerge={onMerge}/>)
+        || (state._type === 'MergedState' &&
+          <MergedDocumentView lines={state.mergedLines} header={state.header} publicationMapping={state.publicationMapping}/>)}
 
     </div>
   );

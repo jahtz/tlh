@@ -15,12 +15,27 @@ export type Scalars = {
   Float: number;
 };
 
+export type DocumentInPipeline = {
+  __typename?: 'DocumentInPipeline';
+  appointedTransliterationReviewer?: Maybe<Scalars['String']>;
+  appointedXmlConverter?: Maybe<Scalars['String']>;
+  manuscriptIdentifier: Scalars['String'];
+  transliterationReviewDateString?: Maybe<Scalars['String']>;
+};
+
 export type ExecutiveEditor = {
   __typename?: 'ExecutiveEditor';
   allReviewers: Array<Scalars['String']>;
+  documentsInPipeline: Array<DocumentInPipeline>;
+  documentsInPipelineCount: Scalars['Int'];
   releasedTransliterationsWithoutAppointedReviewer: Array<Scalars['String']>;
   userCount: Scalars['Int'];
   users: Array<User>;
+};
+
+
+export type ExecutiveEditorDocumentsInPipelineArgs = {
+  page?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -271,7 +286,7 @@ export type IndexQueryVariables = Exact<{
 }>;
 
 
-export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, myManuscripts?: Array<string> | null, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }>, reviewerQueries?: { __typename?: 'Reviewer', reviewAppointments: Array<string> } | null, executiveEditorQueries?: { __typename?: 'ExecutiveEditor', releasedTransliterationsWithoutAppointedReviewer: Array<string>, allReviewers: Array<string> } | null };
+export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, myManuscripts?: Array<string> | null, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }>, reviewerQueries?: { __typename?: 'Reviewer', reviewAppointments: Array<string> } | null };
 
 export type CreateManuscriptMutationVariables = Exact<{
   manuscriptMetaData?: InputMaybe<ManuscriptMetaDataInput>;
@@ -334,6 +349,17 @@ export type SubmitTransliterationReviewMutationVariables = Exact<{
 
 
 export type SubmitTransliterationReviewMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitTransliterationReview: boolean } | null };
+
+export type DocumentInPipelineFragment = { __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null };
+
+export type PipelineOverviewFragment = { __typename?: 'ExecutiveEditor', allReviewers: Array<string>, documentsInPipeline: Array<{ __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null }> };
+
+export type PipelineOverviewQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']>;
+}>;
+
+
+export type PipelineOverviewQuery = { __typename?: 'Query', executiveEditorQueries?: { __typename?: 'ExecutiveEditor', allReviewers: Array<string>, documentsInPipeline: Array<{ __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null }> } | null };
 
 export type UserFragment = { __typename?: 'User', username: string, name: string, affiliation?: string | null, email: string, rights: Rights };
 
@@ -401,6 +427,22 @@ export const ManuscriptIdentWithCreatorFragmentDoc = gql`
   creatorUsername
 }
     ${ManuscriptIdentifierFragmentDoc}`;
+export const DocumentInPipelineFragmentDoc = gql`
+    fragment DocumentInPipeline on DocumentInPipeline {
+  manuscriptIdentifier
+  appointedTransliterationReviewer
+  transliterationReviewDateString
+  appointedXmlConverter
+}
+    `;
+export const PipelineOverviewFragmentDoc = gql`
+    fragment PipelineOverview on ExecutiveEditor {
+  allReviewers
+  documentsInPipeline(page: $page) {
+    ...DocumentInPipeline
+  }
+}
+    ${DocumentInPipelineFragmentDoc}`;
 export const UserFragmentDoc = gql`
     fragment User on User {
   username
@@ -553,10 +595,6 @@ export const IndexDocument = gql`
   myManuscripts
   reviewerQueries {
     reviewAppointments
-  }
-  executiveEditorQueries {
-    releasedTransliterationsWithoutAppointedReviewer
-    allReviewers
   }
 }
     ${ManuscriptBasicDataFragmentDoc}`;
@@ -868,6 +906,41 @@ export function useSubmitTransliterationReviewMutation(baseOptions?: Apollo.Muta
 export type SubmitTransliterationReviewMutationHookResult = ReturnType<typeof useSubmitTransliterationReviewMutation>;
 export type SubmitTransliterationReviewMutationResult = Apollo.MutationResult<SubmitTransliterationReviewMutation>;
 export type SubmitTransliterationReviewMutationOptions = Apollo.BaseMutationOptions<SubmitTransliterationReviewMutation, SubmitTransliterationReviewMutationVariables>;
+export const PipelineOverviewDocument = gql`
+    query PipelineOverview($page: Int) {
+  executiveEditorQueries {
+    ...PipelineOverview
+  }
+}
+    ${PipelineOverviewFragmentDoc}`;
+
+/**
+ * __usePipelineOverviewQuery__
+ *
+ * To run a query within a React component, call `usePipelineOverviewQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePipelineOverviewQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePipelineOverviewQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *   },
+ * });
+ */
+export function usePipelineOverviewQuery(baseOptions?: Apollo.QueryHookOptions<PipelineOverviewQuery, PipelineOverviewQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PipelineOverviewQuery, PipelineOverviewQueryVariables>(PipelineOverviewDocument, options);
+      }
+export function usePipelineOverviewLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PipelineOverviewQuery, PipelineOverviewQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PipelineOverviewQuery, PipelineOverviewQueryVariables>(PipelineOverviewDocument, options);
+        }
+export type PipelineOverviewQueryHookResult = ReturnType<typeof usePipelineOverviewQuery>;
+export type PipelineOverviewLazyQueryHookResult = ReturnType<typeof usePipelineOverviewLazyQuery>;
+export type PipelineOverviewQueryResult = Apollo.QueryResult<PipelineOverviewQuery, PipelineOverviewQueryVariables>;
 export const UsersOverviewDocument = gql`
     query UsersOverview($page: Int!) {
   executiveEditorQueries {

@@ -1,3 +1,5 @@
+import {JSX} from 'react';
+
 interface IProps {
   heading: string;
   children: JSX.Element;

@@ -1,4 +1,5 @@
 import {createBrowserRouter, LoaderFunctionArgs, useRouteError} from 'react-router-dom';
+import {JSX} from 'react';
 import {
   createManuscriptUrl,
   createTransliterationUrl,
@@ -7,8 +8,10 @@ import {
   editTransliterationDocumentUrl,
   homeUrl,
   loginUrl,
+  pipelineManagementUrl,
   preferencesUrl,
-  registerUrl, reviewTransliterationUrl,
+  registerUrl,
+  reviewTransliterationUrl,
   uploadPicturesUrl,
   userManagementUrl,
   xmlComparatorUrl
@@ -24,7 +27,7 @@ import {DocumentMergerContainer} from './documentMerger/DocumentMergerContainer'
 import {tlhXmlEditorConfig} from './xmlEditor/tlhXmlEditorConfig';
 import {Preferences} from './Preferences';
 import {XmlComparatorContainer} from './xmlComparator/XmlComparatorContainer';
-import {ManuscriptDocument, ManuscriptMetaDataFragment, ManuscriptQuery, ManuscriptQueryVariables} from './graphql';
+import {ManuscriptDocument, ManuscriptMetaDataFragment, ManuscriptQuery, ManuscriptQueryVariables, Rights} from './graphql';
 import {apolloClient} from './apolloClient';
 import {OperationVariables, TypedDocumentNode} from '@apollo/client';
 import {ManuscriptData} from './manuscript/ManuscriptData';
@@ -32,6 +35,7 @@ import {UploadPicturesForm} from './manuscript/UploadPicturesForm';
 import {TransliterationInput} from './manuscript/TransliterationInput';
 import {UserManagement} from './UserManagement';
 import {ReviewTransliteration} from './manuscript/ReviewTransliteration';
+import {PipelineOverview} from './pipeline/PipelineOverview';
 
 async function apolloLoader<T, V extends OperationVariables>(query: TypedDocumentNode<T, V>, variables: V): Promise<T | undefined> {
   return apolloClient
@@ -61,9 +65,11 @@ export const router = createBrowserRouter([
 
         {path: registerUrl, element: <RegisterForm/>},
         {path: loginUrl, element: <LoginForm/>},
-        {path: userManagementUrl, element: <UserManagement/>},
+        {path: userManagementUrl, element: <RequireAuth minRights={Rights.ExecutiveEditor}>{() => <UserManagement/>}</RequireAuth>},
 
         {path: createManuscriptUrl, element: <RequireAuth>{() => <CreateManuscriptForm/>}</RequireAuth>},
+
+        {path: pipelineManagementUrl, element: <RequireAuth minRights={Rights.ExecutiveEditor}>{() => <PipelineOverview/>}</RequireAuth>},
 
         {
           path: 'manuscripts/:mainIdentifier',

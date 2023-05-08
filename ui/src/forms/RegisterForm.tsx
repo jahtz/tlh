@@ -2,6 +2,7 @@ import {useRegisterMutation, UserInput} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
 import {object as yupObject, Schema, string as yupString} from 'yup';
+import {JSX} from 'react';
 import classNames from 'classnames';
 
 const initialValues: UserInput = {username: '', password: '', passwordRepeat: '', name: '', email: '', affiliation: ''};

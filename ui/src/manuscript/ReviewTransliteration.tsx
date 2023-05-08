@@ -4,7 +4,7 @@ import {Navigate, useParams} from 'react-router-dom';
 import {homeUrl} from '../urls';
 import {TransliterationTextArea} from './TransliterationTextArea';
 import {useTranslation} from 'react-i18next';
-import {useState} from 'react';
+import {JSX, useState} from 'react';
 
 interface IProps {
   mainIdentifier: string;

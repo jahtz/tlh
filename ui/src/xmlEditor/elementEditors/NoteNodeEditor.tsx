@@ -1,5 +1,6 @@
 import {displayReplace, inputClasses, XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from '../editorConfig';
 import {useTranslation} from 'react-i18next';
+import {JSX} from 'react';
 
 export const noteNodeConfig: XmlSingleEditableNodeConfig = {
   replace: (node) => displayReplace(<sup title={node.attributes.c} className="has-text-weight-bold">x</sup>),

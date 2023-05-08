@@ -1,4 +1,5 @@
 import {pictureBaseUrl} from '../urls';
+import {JSX} from 'react';
 
 interface IProps {
   mainIdentifier: string;

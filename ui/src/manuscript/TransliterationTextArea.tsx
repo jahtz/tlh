@@ -1,4 +1,5 @@
 import {useTranslation} from 'react-i18next';
+import {JSX} from 'react';
 import {TLHParser} from 'simtex';
 import {ColumnParseResultComponent} from './ColumnParseResultComponent';
 import {convertLine} from './LineParseResult';

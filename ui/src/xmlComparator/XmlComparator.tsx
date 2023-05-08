@@ -1,4 +1,5 @@
 import {leftColorClass, ReadFile, rightColorClass} from './XmlComparatorContainer';
+import {JSX} from 'react';
 import {defaultXmlComparatorConfig, makeReplacements, XmlComparatorConfig} from './xmlComparatorConfig';
 import {Change, diffLines} from 'diff';
 

@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import {useTranslation} from 'react-i18next';
+import {JSX} from 'react';
 
 interface BaseProps {
   onClick: () => void;

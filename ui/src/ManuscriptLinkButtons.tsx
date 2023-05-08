@@ -1,4 +1,5 @@
 import {Link} from 'react-router-dom';
+import {JSX} from 'react';
 
 interface IProps {
   manuscripts: string[];

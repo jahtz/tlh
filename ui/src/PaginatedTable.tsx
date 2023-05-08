@@ -1,4 +1,5 @@
 import {MyPagination} from './genericElements/MyPagination';
+import {JSX} from 'react';
 
 interface IProps<T> {
   count: number;

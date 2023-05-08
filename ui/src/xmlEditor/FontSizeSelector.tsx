@@ -1,4 +1,5 @@
 import {useTranslation} from 'react-i18next';
+import {JSX} from 'react';
 
 const FONT_STEP = 10;
 

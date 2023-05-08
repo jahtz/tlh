@@ -1,5 +1,6 @@
 import {MultiMorphologicalAnalysisWithMultiEnclitics} from '../../model/morphologicalAnalysis';
 import {LetteredAnalysisOption, SelectableLetteredAnalysisOption} from '../../model/analysisOptions';
+import {JSX} from 'react';
 
 interface IProps {
   ma: MultiMorphologicalAnalysisWithMultiEnclitics;

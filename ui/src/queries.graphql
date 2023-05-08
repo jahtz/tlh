@@ -54,10 +54,6 @@ query Index($page: Int! = 0) {
   reviewerQueries {
     reviewAppointments
   }
-  executiveEditorQueries {
-    releasedTransliterationsWithoutAppointedReviewer
-    allReviewers
-  }
 }
 
 # /createManuscript
@@ -147,6 +143,28 @@ query ReviewTransliteration($mainIdentifier: String!) {
 mutation SubmitTransliterationReview($mainIdentifier: String!, $review: String!) {
   reviewerMutations {
     submitTransliterationReview(mainIdentifier: $mainIdentifier, review: $review)
+  }
+}
+
+# /pipelineOverview
+
+fragment DocumentInPipeline on DocumentInPipeline {
+  manuscriptIdentifier
+  appointedTransliterationReviewer
+  transliterationReviewDateString
+  appointedXmlConverter
+}
+
+fragment PipelineOverview on ExecutiveEditor {
+  allReviewers
+  documentsInPipeline(page: $page) {
+    ...DocumentInPipeline
+  }
+}
+
+query PipelineOverview($page: Int) {
+  executiveEditorQueries {
+    ...PipelineOverview
   }
 }
 

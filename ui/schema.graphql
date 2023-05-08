@@ -1,12 +1,14 @@
-# This file was generated. Do not edit manually.
-
-schema {
-  query: Query
-  mutation: Mutation
+type DocumentInPipeline {
+  appointedTransliterationReviewer: String
+  appointedXmlConverter: String
+  manuscriptIdentifier: String!
+  transliterationReviewDateString: String
 }
 
 type ExecutiveEditor {
   allReviewers: [String!]!
+  documentsInPipeline(page: Int): [DocumentInPipeline!]!
+  documentsInPipelineCount: Int!
   releasedTransliterationsWithoutAppointedReviewer: [String!]!
   userCount: Int!
   users(page: Int!): [User!]!
@@ -25,6 +27,17 @@ type LoggedInUserMutations {
 type ManuscriptIdentifier {
   identifier: String!
   identifierType: ManuscriptIdentifierType!
+}
+
+input ManuscriptIdentifierInput {
+  identifier: String!
+  identifierType: ManuscriptIdentifierType!
+}
+
+enum ManuscriptIdentifierType {
+  CollectionNumber
+  ExcavationNumber
+  PublicationShortReference
 }
 
 type ManuscriptLanguage {
@@ -47,9 +60,29 @@ type ManuscriptMetaData {
   transliterationReleased: Boolean!
 }
 
+input ManuscriptMetaDataInput {
+  bibliography: String
+  cthClassification: Int
+  mainIdentifier: ManuscriptIdentifierInput!
+  otherIdentifiers: [ManuscriptIdentifierInput!]!
+  palaeographicClassification: PalaeographicClassification!
+  palaeographicClassificationSure: Boolean!
+  provenance: String
+}
+
 type ManuscriptMutations {
   releaseTransliteration: Boolean!
   updateTransliteration(input: String!): Boolean!
+}
+
+enum ManuscriptStatus {
+  Approved
+  Created
+  ExecutiveReviewMerged
+  ExecutiveReviewed
+  InCreation
+  ReviewMerged
+  Reviewed
 }
 
 type Mutation {
@@ -58,6 +91,18 @@ type Mutation {
   me: LoggedInUserMutations
   register(userInput: UserInput!): String
   reviewerMutations: ReviewerMutations
+}
+
+enum PalaeographicClassification {
+  AssyroMittanianScript
+  LateNewScript
+  MiddleAssyrianScript
+  MiddleBabylonianScript
+  MiddleScript
+  NewScript
+  OldAssyrianScript
+  OldScript
+  Unclassified
 }
 
 type Query {
@@ -79,61 +124,18 @@ type ReviewerMutations {
   submitTransliterationReview(mainIdentifier: String!, review: String!): Boolean!
 }
 
-type User {
-  affiliation: String
-  email: String!
-  name: String!
-  rights: Rights!
-  username: String!
-}
-
-enum ManuscriptIdentifierType {
-  CollectionNumber
-  ExcavationNumber
-  PublicationShortReference
-}
-
-enum ManuscriptStatus {
-  Approved
-  Created
-  ExecutiveReviewMerged
-  ExecutiveReviewed
-  InCreation
-  ReviewMerged
-  Reviewed
-}
-
-enum PalaeographicClassification {
-  AssyroMittanianScript
-  LateNewScript
-  MiddleAssyrianScript
-  MiddleBabylonianScript
-  MiddleScript
-  NewScript
-  OldAssyrianScript
-  OldScript
-  Unclassified
-}
-
 enum Rights {
   Author
   ExecutiveEditor
   Reviewer
 }
 
-input ManuscriptIdentifierInput {
-  identifier: String!
-  identifierType: ManuscriptIdentifierType!
-}
-
-input ManuscriptMetaDataInput {
-  bibliography: String
-  cthClassification: Int
-  mainIdentifier: ManuscriptIdentifierInput!
-  otherIdentifiers: [ManuscriptIdentifierInput!]!
-  palaeographicClassification: PalaeographicClassification!
-  palaeographicClassificationSure: Boolean!
-  provenance: String
+type User {
+  affiliation: String
+  email: String!
+  name: String!
+  rights: Rights!
+  username: String!
 }
 
 input UserInput {

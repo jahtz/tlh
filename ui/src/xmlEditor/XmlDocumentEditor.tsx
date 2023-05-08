@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {JSX, useEffect, useState} from 'react';
 import {findFirstXmlElementByTagName, isXmlElementNode, writeNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './editorConfig';
 import {useTranslation} from 'react-i18next';

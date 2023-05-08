@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {JSX, useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
 import {useTranslation} from 'react-i18next';
 import {allXmlComparatorConfig, emptyXmlComparatorConfig, XmlComparatorConfig} from './xmlComparatorConfig';

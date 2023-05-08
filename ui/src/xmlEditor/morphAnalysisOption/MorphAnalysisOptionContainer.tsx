@@ -1,5 +1,5 @@
 import {MorphologicalAnalysis} from '../../model/morphologicalAnalysis';
-import {useEffect, useState} from 'react';
+import {JSX, useEffect, useState} from 'react';
 import {MorphAnalysisOptionButtons} from './MorphAnalysisButtons';
 import {MorphAnalysisOptionEditor} from './MorphAnalysisOptionEditor';
 

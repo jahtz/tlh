@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {JSX, useState} from 'react';
 import classNames from 'classnames';
 
 export interface Tabs {

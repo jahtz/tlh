@@ -1,5 +1,6 @@
 import {SingleMorphologicalAnalysis} from '../../model/morphologicalAnalysis';
 import {SelectableButton} from '../../genericElements/Buttons';
+import {JSX} from 'react';
 
 interface IProps {
   morphAnalysis: SingleMorphologicalAnalysis;

@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {JSX, useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
 import {isLeft, loadNewXml, XmlNode} from 'simple_xml';
 import {XmlDocumentEditor} from './XmlDocumentEditor';

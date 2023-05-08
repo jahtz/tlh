@@ -2,7 +2,7 @@ import {Field, Form, Formik} from 'formik';
 import {useTranslation} from 'react-i18next';
 import {useDispatch, useSelector} from 'react-redux';
 import {editorKeyConfigSelector, updatePreferences} from './newStore';
-import {useState} from 'react';
+import {JSX, useState} from 'react';
 import {EditorKeyConfig} from './xmlEditor/editorKeyConfig';
 
 const splitKey = ',';

@@ -1,4 +1,5 @@
 import {NavLink, useNavigate} from 'react-router-dom';
+import {JSX} from 'react';
 import {
   createManuscriptUrl,
   documentMergerUrl,
@@ -6,6 +7,7 @@ import {
   editTransliterationDocumentUrl,
   homeUrl,
   loginUrl,
+  pipelineManagementUrl,
   preferencesUrl,
   registerUrl,
   userManagementUrl,
@@ -63,7 +65,10 @@ export function NavBar(): JSX.Element {
       {user
         ? (
           <>
-            {user.rights === Rights.ExecutiveEditor && <NavLink className={buttonClasses} to={userManagementUrl}>{t('userManagement')}</NavLink>}
+            {user.rights === Rights.ExecutiveEditor && <>
+              <NavLink className={buttonClasses} to={pipelineManagementUrl}>{t('pipelineManagement')}</NavLink>
+              <NavLink className={buttonClasses} to={userManagementUrl}>{t('userManagement')}</NavLink>
+            </>}
             <button className={buttonClasses} onClick={onLogout}>{t('logout')} {user.sub}</button>
           </>
         )

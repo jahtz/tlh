@@ -1,4 +1,5 @@
 import {NodeDisplay} from './NodeDisplay';
+import {JSX} from 'react';
 import {XmlElementNode} from 'simple_xml';
 import {DeleteButton, SelectableButton} from '../genericElements/Buttons';
 import {useTranslation} from 'react-i18next';
