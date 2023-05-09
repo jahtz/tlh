@@ -83,8 +83,8 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     sGr: {styling: () => ['sumerogramm']},
     d: {styling: () => ['determinativ']},
 
-    add_in: {replace: () => displayReplace(<span>〈</span>)},
-    add_fin: {replace: () => displayReplace(<span>〉</span>)},
+    add_in: {replace: () => displayReplace(<span>〈</span>)},
+    add_fin: {replace: () => displayReplace(<span>〉</span>)},
     del_in: {replace: () => displayReplace(<span>[</span>)},
     del_fin: {replace: () => displayReplace(<span>]</span>)},
     ras_in: {replace: () => displayReplace(<span>*</span>)},
@@ -94,6 +94,10 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
 
     materlect: {
       replace: (node) => displayReplace(<span className="materLectionis">{node.attributes.c}</span>)
+    },
+
+    surpl: {
+      replace: (node) => displayReplace(<span>〈〈{node.attributes.c}〉〉</span>)
     },
 
     gap: gapConfig,

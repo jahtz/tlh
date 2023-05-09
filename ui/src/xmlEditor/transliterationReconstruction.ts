@@ -26,9 +26,9 @@ function reconstructTransliterationFromNode(node: XmlNode): NewResult<string, st
 
   switch (node.tagName) {
     case 'add_in':
-      return newOk('〈');
+      return newOk('〈');
     case 'add_fin':
-      return newOk('〉');
+      return newOk('〉');
     case 'del_in':
       return newOk('[');
     case 'del_fin':
@@ -54,6 +54,8 @@ function reconstructTransliterationFromNode(node: XmlNode): NewResult<string, st
       return newOk(`{F: ${node.attributes.c}}`);
     case 'subscr':
       return newOk(`|${node.attributes.c}`);
+    case 'surpl':
+      return newOk(`〈〈${node.attributes.c}}〉〉`);
     case 'num':
       return convertChildren(node.children);
     case 'sGr':
