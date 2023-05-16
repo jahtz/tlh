@@ -1,3 +1,14 @@
+type Appointment {
+  manuscriptIdentifier: String!
+  type: AppointmentType!
+  waitingFor: AppointmentType
+}
+
+enum AppointmentType {
+  TransliterationReview
+  XmlConversion
+}
+
 type DocumentInPipeline {
   appointedTransliterationReviewer: String
   appointedXmlConverter: String
@@ -15,7 +26,8 @@ type ExecutiveEditor {
 }
 
 type ExecutiveEditorMutations {
-  appointReviewerForReleasedTransliteration(mainIdentifier: String!, reviewer: String!): String!
+  appointReviewerForReleasedTransliteration(manuscriptIdentifier: String!, reviewer: String!): String!
+  appointXmlConverter(converter: String!, manuscriptIdentifier: String!): String!
   updateUserRights(newRights: Rights!, username: String!): Rights!
 }
 
@@ -116,12 +128,16 @@ type Query {
 }
 
 type Reviewer {
-  reviewAppointments: [String!]!
+  appointments: [Appointment!]!
   transliterationReview(mainIdentifier: String!): String
+  transliterationReviewAppointments: [Appointment!]!
+  xmlConversion(mainIdentifier: String!): String
+  xmlConversionAppointments: [String!]!
 }
 
 type ReviewerMutations {
   submitTransliterationReview(mainIdentifier: String!, review: String!): Boolean!
+  submitXmlConversion(conversion: String!, mainIdentifier: String!): Boolean!
 }
 
 enum Rights {

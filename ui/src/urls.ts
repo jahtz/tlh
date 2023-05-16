@@ -31,7 +31,9 @@ export const uploadPicturesUrl = 'uploadPictures';
 
 export const createTransliterationUrl = 'createTransliteration';
 
-export const reviewTransliterationUrl = 'reviewTransliteration';
+export const transliterationReviewUrl = 'transliterationReview';
+
+export const xmlConversionUrl = 'xmlConversion';
 
 // Foreign urls
 

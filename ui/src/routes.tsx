@@ -11,10 +11,10 @@ import {
   pipelineManagementUrl,
   preferencesUrl,
   registerUrl,
-  reviewTransliterationUrl,
+  transliterationReviewUrl,
   uploadPicturesUrl,
   userManagementUrl,
-  xmlComparatorUrl
+  xmlComparatorUrl, xmlConversionUrl
 } from './urls';
 import {RegisterForm} from './forms/RegisterForm';
 import {Home} from './Home';
@@ -34,7 +34,8 @@ import {ManuscriptData} from './manuscript/ManuscriptData';
 import {UploadPicturesForm} from './manuscript/UploadPicturesForm';
 import {TransliterationInput} from './manuscript/TransliterationInput';
 import {UserManagement} from './UserManagement';
-import {ReviewTransliteration} from './manuscript/ReviewTransliteration';
+import {TransliterationReview} from './manuscript/TransliterationReview';
+import {XmlConversion} from './manuscript/XmlConversion';
 import {PipelineOverview} from './pipeline/PipelineOverview';
 
 async function apolloLoader<T, V extends OperationVariables>(query: TypedDocumentNode<T, V>, variables: V): Promise<T | undefined> {
@@ -77,7 +78,8 @@ export const router = createBrowserRouter([
             {path: 'data', element: <ManuscriptData/>, loader: manuscriptDataLoader},
             {path: uploadPicturesUrl, element: <UploadPicturesForm/>, loader: manuscriptDataLoader},
             {path: createTransliterationUrl, element: <TransliterationInput/>, loader: manuscriptDataLoader},
-            {path: reviewTransliterationUrl, element: <ReviewTransliteration/>},
+            {path: transliterationReviewUrl, element: <TransliterationReview/>},
+            {path: xmlConversionUrl, element: <XmlConversion/>},
           ]
         },
 

@@ -31,18 +31,20 @@ mutation Login($username: String!, $password: String!) {
 
 # /
 
-mutation AppointReviewerForReleasedTransliteration($mainIdentifier: String!, $reviewer: String!) {
-  executiveEditor {
-    appointReviewerForReleasedTransliteration(mainIdentifier: $mainIdentifier, reviewer: $reviewer)
-  }
-}
-
 fragment ManuscriptBasicData on ManuscriptMetaData {
   mainIdentifier {
     ...ManuscriptIdentifier
   }
   status
   creatorUsername
+}
+
+fragment ReviewerHomeData on Reviewer {
+  appointments {
+    type
+    manuscriptIdentifier
+    waitingFor
+  }
 }
 
 query Index($page: Int! = 0) {
@@ -52,7 +54,7 @@ query Index($page: Int! = 0) {
   }
   myManuscripts
   reviewerQueries {
-    reviewAppointments
+    ...ReviewerHomeData
   }
 }
 
@@ -146,6 +148,20 @@ mutation SubmitTransliterationReview($mainIdentifier: String!, $review: String!)
   }
 }
 
+# /manuscripts/:id/xmlConversion
+
+query XmlConversion($mainIdentifier: String!) {
+  reviewerQueries {
+    xmlConversion(mainIdentifier: $mainIdentifier)
+  }
+}
+
+mutation SubmitXmlConversion($mainIdentifier: String!, $conversion: String!) {
+  reviewerMutations {
+    submitXmlConversion(mainIdentifier: $mainIdentifier,conversion: $conversion)
+  }
+}
+
 # /pipelineOverview
 
 fragment DocumentInPipeline on DocumentInPipeline {
@@ -165,6 +181,18 @@ fragment PipelineOverview on ExecutiveEditor {
 query PipelineOverview($page: Int) {
   executiveEditorQueries {
     ...PipelineOverview
+  }
+}
+
+mutation AppointTransliterationReviewer($manuscriptIdentifier: String!, $reviewer: String!) {
+  executiveEditor {
+    appointReviewerForReleasedTransliteration(manuscriptIdentifier: $manuscriptIdentifier, reviewer: $reviewer)
+  }
+}
+
+mutation AppointXmlConverter($manuscriptIdentifier: String!, $converter: String!) {
+  executiveEditor {
+    appointXmlConverter(manuscriptIdentifier: $manuscriptIdentifier, converter: $converter)
   }
 }
 

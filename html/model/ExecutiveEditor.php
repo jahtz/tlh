@@ -32,8 +32,19 @@ class ExecutiveEditor
       "
 insert into tlh_dig_transliteration_review_appointments (main_identifier, username, appointed_by_username)
 values (?, ?, ?)
-on duplicate key update username = ?, appointed_by_username = ?;",
+on duplicate key update username = ?, appointed_by_username = ?, appointment_date = now();",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $mainIdentifier, $reviewer, $appointedBy, $reviewer, $appointedBy)
+    );
+  }
+
+  static function insertXmlConversionAppointment(string $mainIdentifier, string $converter, string $appointedBy): string
+  {
+    return executeSingleChangeQuery(
+      "
+insert into tlh_dig_xml_conversion_appointments (main_identifier, username, appointed_by_username)
+values (?, ?, ?)
+on duplicate key update username = ?, appointed_by_username = ?, appointment_date = now();",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $mainIdentifier, $converter, $appointedBy, $converter, $appointedBy)
     );
   }
 }
@@ -74,6 +85,22 @@ ExecutiveEditor::$executiveEditorQueryType = new ObjectType([
   ]
 ]);
 
+/** @throws MySafeGraphQLException */
+function resolveReviewer(string $username): User
+{
+  $user = User::selectUserFromDatabase($username);
+
+  if (is_null($user)) {
+    throw new MySafeGraphQLException("User $username doesn't exist!");
+  }
+
+  if (!$user->isReviewer()) {
+    throw new MySafeGraphQLException("User $user->username is no reviewer!");
+  }
+
+  return $user;
+}
+
 ExecutiveEditor::$mutationsType = new ObjectType([
   'name' => 'ExecutiveEditorMutations',
   'fields' => [
@@ -97,21 +124,14 @@ ExecutiveEditor::$mutationsType = new ObjectType([
     'appointReviewerForReleasedTransliteration' => [
       'type' => Type::nonNull(Type::string()),
       'args' => [
-        'mainIdentifier' => Type::nonNull(Type::string()),
+        'manuscriptIdentifier' => Type::nonNull(Type::string()),
         'reviewer' => Type::nonNull(Type::string()),
       ],
       'resolve' => function (User $user, array $args): string {
-        $mainIdentifier = $args['mainIdentifier'];
-        $reviewerUsername = $args['reviewer'];
+        $mainIdentifier = $args['manuscriptIdentifier'];
 
         //  make sure that reviewer exists and has review rights
-        $reviewer = User::selectUserFromDatabase($reviewerUsername);
-        if (is_null($reviewer)) {
-          throw new MySafeGraphQLException("Can't appoint non-existing user $reviewerUsername as reviewer!");
-        }
-        if (!$reviewer->isReviewer()) {
-          throw new MySafeGraphQLException("User $reviewer->username hasn't got reviewer rights!");
-        }
+        $reviewer = resolveReviewer($args['reviewer']);
 
         // check that reviewer is not owner of manuscript!
 
@@ -119,11 +139,25 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         if (is_null($manuscript)) {
           throw new MySafeGraphQLException("Can't appoint reviewer for non-existing manuscript $mainIdentifier!");
         }
-        if ($manuscript->creatorUsername === $reviewerUsername) {
-          throw new MySafeGraphQLException("User $reviewerUsername can't review own manuscript!");
+        if ($manuscript->creatorUsername === $reviewer->username) {
+          throw new MySafeGraphQLException("User $reviewer->username can't review own manuscript!");
         }
 
-        return ExecutiveEditor::insertReviewerAppointmentForReleasedTransliteration($mainIdentifier, $reviewer->username, $user->username);
+        return ExecutiveEditor::insertReviewerAppointmentForReleasedTransliteration($manuscript->mainIdentifier->identifier, $reviewer->username, $user->username);
+      }
+    ],
+    'appointXmlConverter' => [
+      'type' => Type::nonNull(Type::string()),
+      'args' => [
+        'manuscriptIdentifier' => Type::nonNull(Type::string()),
+        'converter' => Type::nonNull(Type::string())
+      ],
+      'resolve' => function (User $user, array $args): string {
+        $manuscriptIdentifier = $args['manuscriptIdentifier'];
+
+        $converter = resolveReviewer($args['converter']);
+
+        return ExecutiveEditor::insertXmlConversionAppointment($manuscriptIdentifier, $converter->username, $user->username);
       }
     ]
   ]

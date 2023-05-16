@@ -3,10 +3,11 @@ import {JSX, useState} from 'react';
 import {IndexQuery, useIndexLazyQuery} from './graphql';
 import {Link} from 'react-router-dom';
 import {WithQuery} from './WithQuery';
-import {createManuscriptUrl, reviewTransliterationUrl} from './urls';
+import {createManuscriptUrl} from './urls';
 import {ManuscriptsOverview} from './ManuscriptsOverview';
 import {ManuscriptLinkButtons} from './ManuscriptLinkButtons';
 import {Box} from './Box';
+import {ReviewerHomeBox} from './ReviewerHomeBox';
 
 interface IProps extends IndexQuery {
   page: number;
@@ -27,15 +28,7 @@ function Inner({manuscriptCount, allManuscripts, myManuscripts, page, queryPage,
         <ManuscriptLinkButtons manuscripts={myManuscripts} errorMsg={t('noOwnManuscriptsYet')}/>
       </Box>}
 
-      {reviewerQueries && <Box heading={t('myReviewAppointments')}>
-        <div className="p-2 grid grid-cols-6 gap-2">
-          {reviewerQueries.reviewAppointments.map((app) =>
-            <Link key={app} to={`/manuscripts/${encodeURIComponent(app)}/${reviewTransliterationUrl}`}
-                  className="p-2 rounded bg-amber-500 text-white text-center w-full">
-              {app}
-            </Link>)}
-        </div>
-      </Box>}
+      {reviewerQueries && <ReviewerHomeBox {...reviewerQueries}/>}
     </>
   );
 }

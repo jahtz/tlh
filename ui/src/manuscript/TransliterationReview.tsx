@@ -31,13 +31,14 @@ function Inner({mainIdentifier, initialInput}: IProps): JSX.Element {
 
       {error && <div className="my-2 p-2 rounded bg-red-500 text-white text-center w-full">{error.message}</div>}
 
-      <button type="button" onClick={onSubmit} disabled={loading}
-              className="my-2 p-2 rounded bg-blue-500 text-white w-full disabled:opacity-50">{t('submit')}</button>
+      <button type="button" onClick={onSubmit} disabled={loading} className="my-2 p-2 rounded bg-blue-500 text-white w-full disabled:opacity-50">
+        {t('submit')}
+      </button>
     </div>
   );
 }
 
-export function ReviewTransliteration(): JSX.Element {
+export function TransliterationReview(): JSX.Element {
 
   const mainIdentifier = useParams<'mainIdentifier'>().mainIdentifier;
 
@@ -50,7 +51,7 @@ export function ReviewTransliteration(): JSX.Element {
   return (
     <WithQuery query={reviewQuery}>
       {(data) =>
-        data.reviewerQueries && data.reviewerQueries.transliterationReview
+        data.reviewerQueries?.transliterationReview
           ? <Inner mainIdentifier={mainIdentifier} initialInput={data.reviewerQueries.transliterationReview}/>
           : <Navigate to={homeUrl}/>
       }

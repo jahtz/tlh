@@ -15,6 +15,18 @@ export type Scalars = {
   Float: number;
 };
 
+export type Appointment = {
+  __typename?: 'Appointment';
+  manuscriptIdentifier: Scalars['String'];
+  type: AppointmentType;
+  waitingFor?: Maybe<AppointmentType>;
+};
+
+export const enum AppointmentType {
+  TransliterationReview = 'TransliterationReview',
+  XmlConversion = 'XmlConversion'
+};
+
 export type DocumentInPipeline = {
   __typename?: 'DocumentInPipeline';
   appointedTransliterationReviewer?: Maybe<Scalars['String']>;
@@ -46,13 +58,20 @@ export type ExecutiveEditorUsersArgs = {
 export type ExecutiveEditorMutations = {
   __typename?: 'ExecutiveEditorMutations';
   appointReviewerForReleasedTransliteration: Scalars['String'];
+  appointXmlConverter: Scalars['String'];
   updateUserRights: Rights;
 };
 
 
 export type ExecutiveEditorMutationsAppointReviewerForReleasedTransliterationArgs = {
-  mainIdentifier: Scalars['String'];
+  manuscriptIdentifier: Scalars['String'];
   reviewer: Scalars['String'];
+};
+
+
+export type ExecutiveEditorMutationsAppointXmlConverterArgs = {
+  converter: Scalars['String'];
+  manuscriptIdentifier: Scalars['String'];
 };
 
 
@@ -203,8 +222,11 @@ export type QueryManuscriptArgs = {
 
 export type Reviewer = {
   __typename?: 'Reviewer';
-  reviewAppointments: Array<Scalars['String']>;
+  appointments: Array<Appointment>;
   transliterationReview?: Maybe<Scalars['String']>;
+  transliterationReviewAppointments: Array<Appointment>;
+  xmlConversion?: Maybe<Scalars['String']>;
+  xmlConversionAppointments: Array<Scalars['String']>;
 };
 
 
@@ -212,15 +234,27 @@ export type ReviewerTransliterationReviewArgs = {
   mainIdentifier: Scalars['String'];
 };
 
+
+export type ReviewerXmlConversionArgs = {
+  mainIdentifier: Scalars['String'];
+};
+
 export type ReviewerMutations = {
   __typename?: 'ReviewerMutations';
   submitTransliterationReview: Scalars['Boolean'];
+  submitXmlConversion: Scalars['Boolean'];
 };
 
 
 export type ReviewerMutationsSubmitTransliterationReviewArgs = {
   mainIdentifier: Scalars['String'];
   review: Scalars['String'];
+};
+
+
+export type ReviewerMutationsSubmitXmlConversionArgs = {
+  conversion: Scalars['String'];
+  mainIdentifier: Scalars['String'];
 };
 
 export const enum Rights {
@@ -271,22 +305,16 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = { __typename?: 'Mutation', login?: string | null };
 
-export type AppointReviewerForReleasedTransliterationMutationVariables = Exact<{
-  mainIdentifier: Scalars['String'];
-  reviewer: Scalars['String'];
-}>;
-
-
-export type AppointReviewerForReleasedTransliterationMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', appointReviewerForReleasedTransliteration: string } | null };
-
 export type ManuscriptBasicDataFragment = { __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
+
+export type ReviewerHomeDataFragment = { __typename?: 'Reviewer', appointments: Array<{ __typename?: 'Appointment', type: AppointmentType, manuscriptIdentifier: string, waitingFor?: AppointmentType | null }> };
 
 export type IndexQueryVariables = Exact<{
   page?: Scalars['Int'];
 }>;
 
 
-export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, myManuscripts?: Array<string> | null, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }>, reviewerQueries?: { __typename?: 'Reviewer', reviewAppointments: Array<string> } | null };
+export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, myManuscripts?: Array<string> | null, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }>, reviewerQueries?: { __typename?: 'Reviewer', appointments: Array<{ __typename?: 'Appointment', type: AppointmentType, manuscriptIdentifier: string, waitingFor?: AppointmentType | null }> } | null };
 
 export type CreateManuscriptMutationVariables = Exact<{
   manuscriptMetaData?: InputMaybe<ManuscriptMetaDataInput>;
@@ -350,6 +378,21 @@ export type SubmitTransliterationReviewMutationVariables = Exact<{
 
 export type SubmitTransliterationReviewMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitTransliterationReview: boolean } | null };
 
+export type XmlConversionQueryVariables = Exact<{
+  mainIdentifier: Scalars['String'];
+}>;
+
+
+export type XmlConversionQuery = { __typename?: 'Query', reviewerQueries?: { __typename?: 'Reviewer', xmlConversion?: string | null } | null };
+
+export type SubmitXmlConversionMutationVariables = Exact<{
+  mainIdentifier: Scalars['String'];
+  conversion: Scalars['String'];
+}>;
+
+
+export type SubmitXmlConversionMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitXmlConversion: boolean } | null };
+
 export type DocumentInPipelineFragment = { __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null };
 
 export type PipelineOverviewFragment = { __typename?: 'ExecutiveEditor', allReviewers: Array<string>, documentsInPipeline: Array<{ __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null }> };
@@ -360,6 +403,22 @@ export type PipelineOverviewQueryVariables = Exact<{
 
 
 export type PipelineOverviewQuery = { __typename?: 'Query', executiveEditorQueries?: { __typename?: 'ExecutiveEditor', allReviewers: Array<string>, documentsInPipeline: Array<{ __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null }> } | null };
+
+export type AppointTransliterationReviewerMutationVariables = Exact<{
+  manuscriptIdentifier: Scalars['String'];
+  reviewer: Scalars['String'];
+}>;
+
+
+export type AppointTransliterationReviewerMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', appointReviewerForReleasedTransliteration: string } | null };
+
+export type AppointXmlConverterMutationVariables = Exact<{
+  manuscriptIdentifier: Scalars['String'];
+  converter: Scalars['String'];
+}>;
+
+
+export type AppointXmlConverterMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', appointXmlConverter: string } | null };
 
 export type UserFragment = { __typename?: 'User', username: string, name: string, affiliation?: string | null, email: string, rights: Rights };
 
@@ -399,6 +458,15 @@ export const ManuscriptBasicDataFragmentDoc = gql`
   creatorUsername
 }
     ${ManuscriptIdentifierFragmentDoc}`;
+export const ReviewerHomeDataFragmentDoc = gql`
+    fragment ReviewerHomeData on Reviewer {
+  appointments {
+    type
+    manuscriptIdentifier
+    waitingFor
+  }
+}
+    `;
 export const ManuscriptMetaDataFragmentDoc = gql`
     fragment ManuscriptMetaData on ManuscriptMetaData {
   mainIdentifier {
@@ -549,43 +617,6 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
-export const AppointReviewerForReleasedTransliterationDocument = gql`
-    mutation AppointReviewerForReleasedTransliteration($mainIdentifier: String!, $reviewer: String!) {
-  executiveEditor {
-    appointReviewerForReleasedTransliteration(
-      mainIdentifier: $mainIdentifier
-      reviewer: $reviewer
-    )
-  }
-}
-    `;
-export type AppointReviewerForReleasedTransliterationMutationFn = Apollo.MutationFunction<AppointReviewerForReleasedTransliterationMutation, AppointReviewerForReleasedTransliterationMutationVariables>;
-
-/**
- * __useAppointReviewerForReleasedTransliterationMutation__
- *
- * To run a mutation, you first call `useAppointReviewerForReleasedTransliterationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useAppointReviewerForReleasedTransliterationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [appointReviewerForReleasedTransliterationMutation, { data, loading, error }] = useAppointReviewerForReleasedTransliterationMutation({
- *   variables: {
- *      mainIdentifier: // value for 'mainIdentifier'
- *      reviewer: // value for 'reviewer'
- *   },
- * });
- */
-export function useAppointReviewerForReleasedTransliterationMutation(baseOptions?: Apollo.MutationHookOptions<AppointReviewerForReleasedTransliterationMutation, AppointReviewerForReleasedTransliterationMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AppointReviewerForReleasedTransliterationMutation, AppointReviewerForReleasedTransliterationMutationVariables>(AppointReviewerForReleasedTransliterationDocument, options);
-      }
-export type AppointReviewerForReleasedTransliterationMutationHookResult = ReturnType<typeof useAppointReviewerForReleasedTransliterationMutation>;
-export type AppointReviewerForReleasedTransliterationMutationResult = Apollo.MutationResult<AppointReviewerForReleasedTransliterationMutation>;
-export type AppointReviewerForReleasedTransliterationMutationOptions = Apollo.BaseMutationOptions<AppointReviewerForReleasedTransliterationMutation, AppointReviewerForReleasedTransliterationMutationVariables>;
 export const IndexDocument = gql`
     query Index($page: Int! = 0) {
   manuscriptCount
@@ -594,10 +625,11 @@ export const IndexDocument = gql`
   }
   myManuscripts
   reviewerQueries {
-    reviewAppointments
+    ...ReviewerHomeData
   }
 }
-    ${ManuscriptBasicDataFragmentDoc}`;
+    ${ManuscriptBasicDataFragmentDoc}
+${ReviewerHomeDataFragmentDoc}`;
 
 /**
  * __useIndexQuery__
@@ -906,6 +938,75 @@ export function useSubmitTransliterationReviewMutation(baseOptions?: Apollo.Muta
 export type SubmitTransliterationReviewMutationHookResult = ReturnType<typeof useSubmitTransliterationReviewMutation>;
 export type SubmitTransliterationReviewMutationResult = Apollo.MutationResult<SubmitTransliterationReviewMutation>;
 export type SubmitTransliterationReviewMutationOptions = Apollo.BaseMutationOptions<SubmitTransliterationReviewMutation, SubmitTransliterationReviewMutationVariables>;
+export const XmlConversionDocument = gql`
+    query XmlConversion($mainIdentifier: String!) {
+  reviewerQueries {
+    xmlConversion(mainIdentifier: $mainIdentifier)
+  }
+}
+    `;
+
+/**
+ * __useXmlConversionQuery__
+ *
+ * To run a query within a React component, call `useXmlConversionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useXmlConversionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useXmlConversionQuery({
+ *   variables: {
+ *      mainIdentifier: // value for 'mainIdentifier'
+ *   },
+ * });
+ */
+export function useXmlConversionQuery(baseOptions: Apollo.QueryHookOptions<XmlConversionQuery, XmlConversionQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<XmlConversionQuery, XmlConversionQueryVariables>(XmlConversionDocument, options);
+      }
+export function useXmlConversionLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<XmlConversionQuery, XmlConversionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<XmlConversionQuery, XmlConversionQueryVariables>(XmlConversionDocument, options);
+        }
+export type XmlConversionQueryHookResult = ReturnType<typeof useXmlConversionQuery>;
+export type XmlConversionLazyQueryHookResult = ReturnType<typeof useXmlConversionLazyQuery>;
+export type XmlConversionQueryResult = Apollo.QueryResult<XmlConversionQuery, XmlConversionQueryVariables>;
+export const SubmitXmlConversionDocument = gql`
+    mutation SubmitXmlConversion($mainIdentifier: String!, $conversion: String!) {
+  reviewerMutations {
+    submitXmlConversion(mainIdentifier: $mainIdentifier, conversion: $conversion)
+  }
+}
+    `;
+export type SubmitXmlConversionMutationFn = Apollo.MutationFunction<SubmitXmlConversionMutation, SubmitXmlConversionMutationVariables>;
+
+/**
+ * __useSubmitXmlConversionMutation__
+ *
+ * To run a mutation, you first call `useSubmitXmlConversionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSubmitXmlConversionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [submitXmlConversionMutation, { data, loading, error }] = useSubmitXmlConversionMutation({
+ *   variables: {
+ *      mainIdentifier: // value for 'mainIdentifier'
+ *      conversion: // value for 'conversion'
+ *   },
+ * });
+ */
+export function useSubmitXmlConversionMutation(baseOptions?: Apollo.MutationHookOptions<SubmitXmlConversionMutation, SubmitXmlConversionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SubmitXmlConversionMutation, SubmitXmlConversionMutationVariables>(SubmitXmlConversionDocument, options);
+      }
+export type SubmitXmlConversionMutationHookResult = ReturnType<typeof useSubmitXmlConversionMutation>;
+export type SubmitXmlConversionMutationResult = Apollo.MutationResult<SubmitXmlConversionMutation>;
+export type SubmitXmlConversionMutationOptions = Apollo.BaseMutationOptions<SubmitXmlConversionMutation, SubmitXmlConversionMutationVariables>;
 export const PipelineOverviewDocument = gql`
     query PipelineOverview($page: Int) {
   executiveEditorQueries {
@@ -941,6 +1042,80 @@ export function usePipelineOverviewLazyQuery(baseOptions?: Apollo.LazyQueryHookO
 export type PipelineOverviewQueryHookResult = ReturnType<typeof usePipelineOverviewQuery>;
 export type PipelineOverviewLazyQueryHookResult = ReturnType<typeof usePipelineOverviewLazyQuery>;
 export type PipelineOverviewQueryResult = Apollo.QueryResult<PipelineOverviewQuery, PipelineOverviewQueryVariables>;
+export const AppointTransliterationReviewerDocument = gql`
+    mutation AppointTransliterationReviewer($manuscriptIdentifier: String!, $reviewer: String!) {
+  executiveEditor {
+    appointReviewerForReleasedTransliteration(
+      manuscriptIdentifier: $manuscriptIdentifier
+      reviewer: $reviewer
+    )
+  }
+}
+    `;
+export type AppointTransliterationReviewerMutationFn = Apollo.MutationFunction<AppointTransliterationReviewerMutation, AppointTransliterationReviewerMutationVariables>;
+
+/**
+ * __useAppointTransliterationReviewerMutation__
+ *
+ * To run a mutation, you first call `useAppointTransliterationReviewerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAppointTransliterationReviewerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [appointTransliterationReviewerMutation, { data, loading, error }] = useAppointTransliterationReviewerMutation({
+ *   variables: {
+ *      manuscriptIdentifier: // value for 'manuscriptIdentifier'
+ *      reviewer: // value for 'reviewer'
+ *   },
+ * });
+ */
+export function useAppointTransliterationReviewerMutation(baseOptions?: Apollo.MutationHookOptions<AppointTransliterationReviewerMutation, AppointTransliterationReviewerMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AppointTransliterationReviewerMutation, AppointTransliterationReviewerMutationVariables>(AppointTransliterationReviewerDocument, options);
+      }
+export type AppointTransliterationReviewerMutationHookResult = ReturnType<typeof useAppointTransliterationReviewerMutation>;
+export type AppointTransliterationReviewerMutationResult = Apollo.MutationResult<AppointTransliterationReviewerMutation>;
+export type AppointTransliterationReviewerMutationOptions = Apollo.BaseMutationOptions<AppointTransliterationReviewerMutation, AppointTransliterationReviewerMutationVariables>;
+export const AppointXmlConverterDocument = gql`
+    mutation AppointXmlConverter($manuscriptIdentifier: String!, $converter: String!) {
+  executiveEditor {
+    appointXmlConverter(
+      manuscriptIdentifier: $manuscriptIdentifier
+      converter: $converter
+    )
+  }
+}
+    `;
+export type AppointXmlConverterMutationFn = Apollo.MutationFunction<AppointXmlConverterMutation, AppointXmlConverterMutationVariables>;
+
+/**
+ * __useAppointXmlConverterMutation__
+ *
+ * To run a mutation, you first call `useAppointXmlConverterMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAppointXmlConverterMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [appointXmlConverterMutation, { data, loading, error }] = useAppointXmlConverterMutation({
+ *   variables: {
+ *      manuscriptIdentifier: // value for 'manuscriptIdentifier'
+ *      converter: // value for 'converter'
+ *   },
+ * });
+ */
+export function useAppointXmlConverterMutation(baseOptions?: Apollo.MutationHookOptions<AppointXmlConverterMutation, AppointXmlConverterMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AppointXmlConverterMutation, AppointXmlConverterMutationVariables>(AppointXmlConverterDocument, options);
+      }
+export type AppointXmlConverterMutationHookResult = ReturnType<typeof useAppointXmlConverterMutation>;
+export type AppointXmlConverterMutationResult = Apollo.MutationResult<AppointXmlConverterMutation>;
+export type AppointXmlConverterMutationOptions = Apollo.BaseMutationOptions<AppointXmlConverterMutation, AppointXmlConverterMutationVariables>;
 export const UsersOverviewDocument = gql`
     query UsersOverview($page: Int!) {
   executiveEditorQueries {

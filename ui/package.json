@@ -58,7 +58,7 @@
   },
   "scripts": {
     "prestart": "npm run codegen",
-    "start": "react-scripts start",
+    "start": "GENERATE_SOURCEMAP=false react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "testVerbose": "react-scripts test --verbose",
