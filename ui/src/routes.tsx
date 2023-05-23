@@ -35,7 +35,7 @@ import {UploadPicturesForm} from './manuscript/UploadPicturesForm';
 import {TransliterationInput} from './manuscript/TransliterationInput';
 import {UserManagement} from './UserManagement';
 import {TransliterationReview} from './manuscript/TransliterationReview';
-import {XmlConversion} from './manuscript/XmlConversion';
+import {XmlConversion} from './manuscript/xmlConversion/XmlConversion';
 import {PipelineOverview} from './pipeline/PipelineOverview';
 
 async function apolloLoader<T, V extends OperationVariables>(query: TypedDocumentNode<T, V>, variables: V): Promise<T | undefined> {

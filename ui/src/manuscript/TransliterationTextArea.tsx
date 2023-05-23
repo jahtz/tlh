@@ -9,6 +9,8 @@ interface IProps {
   onChange: (value: string) => void;
 }
 
+const textAreaClasses = 'mt-2 p-2 rounded border border-slate-500 w-full';
+
 export function TransliterationTextArea({input, onChange}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
@@ -16,27 +18,21 @@ export function TransliterationTextArea({input, onChange}: IProps): JSX.Element 
   const parsed = new TLHParser(input).getLines().map(convertLine);
 
   return (
-    <>
-      <div className="mt-2 p-2 rounded border border-slate-500 grid grid-cols-3 gap-2">
-        <section>
-          <label className="font-bold block text-center">{t('transliteration')}:</label>
-          <textarea rows={20} defaultValue={input} placeholder={t('transliteration') || 'transliteration'}
-                    onChange={(event) => onChange(event.target.value)}
-                    className="mt-2 p-2 rounded border border-slate-500 w-full"/>
-        </section>
+    <div className="mt-2 p-2 grid grid-cols-3 gap-2 rounded border border-slate-500">
+      <section>
+        <label className="my-2 font-bold block text-center">{t('transliteration')}:</label>
 
-        <section className="col-span-2">
-          <label className="font-bold block text-center">{t('parseResult')}:</label>
+        <textarea rows={20} defaultValue={input} placeholder={t('transliteration') || 'transliteration'} className={textAreaClasses}
+                  onChange={(event) => onChange(event.target.value)}/>
+      </section>
 
-          {parsed.length > 0
-            ? (
-              <div className="mt-2">
-                <ColumnParseResultComponent showStatusLevel={true} lines={parsed}/>
-              </div>
-            )
-            : <div className="p-2 italic text-cyan-500 text-center">{t('no_result_yet')}...</div>}
-        </section>
-      </div>
-    </>
+      <section className="col-span-2">
+        <label className="my-2 font-bold block text-center">{t('parseResult')}:</label>
+
+        {parsed.length > 0
+          ? <ColumnParseResultComponent showStatusLevel={true} lines={parsed}/>
+          : <div className="p-2 italic text-cyan-500 text-center">{t('no_result_yet')}...</div>}
+      </section>
+    </div>
   );
 }

@@ -8,6 +8,7 @@ require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/Appointment.php';
 
 use GraphQL\Type\Definition\{ObjectType, Type};
+use MySafeGraphQLException;
 use mysqli_stmt;
 use function sql_helpers\{executeMultiSelectQuery, executeSingleChangeQuery, executeSingleSelectQuery};
 
@@ -48,6 +49,15 @@ where appointment.main_identifier = ? and username = ?;",
     );
   }
 
+  static function selectTransliterationReviewPerformed(string $mainIdentifier): bool
+  {
+    return executeSingleSelectQuery(
+      "select count(*) as count from tlh_dig_transliteration_reviews where main_identifier = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
+      fn(array $row): bool => $row['count'] == 1
+    );
+  }
+
   static function insertTransliterationReview(string $mainIdentifier, string $reviewerUsername, string $input): bool
   {
     return executeSingleChangeQuery(
@@ -73,7 +83,33 @@ where username = ? and conversion.input is null;",
     );
   }
 
-  static function selectXmlConversionAppointment(string $mainIdentifier, string $username): ?string
+  static function selectUserIsAppointedForXmlConversion(string $mainIdentifier, string $username): bool
+  {
+    return executeSingleSelectQuery(
+      "select count(*) as count from tlh_dig_xml_conversion_appointments where main_identifier = ? and username = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $mainIdentifier, $username),
+      fn(array $row): bool => $row['count'] === 1
+    );
+  }
+
+  static function selectXmlConversionPerformed(string $mainIdentifier): bool
+  {
+    return executeSingleSelectQuery(
+      "select count(*) as count from tlh_dig_xml_conversions where main_identifier = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
+      fn(array $row): bool => $row['count'] === 1
+    );
+  }
+
+  static function insertXmlConversion(string $mainIdentifier, string $converterUsername, string $xml): bool
+  {
+    return executeSingleChangeQuery(
+      "insert into tlh_dig_xml_conversions (main_identifier, input, converter_username) values (?, ?, ?);",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $converterUsername)
+    );
+  }
+
+  static function selectTransliterationInputForXmlConversionAppointment(string $mainIdentifier, string $username): ?string
   {
     // TODO: check if blocked...
     return executeSingleSelectQuery(
@@ -119,7 +155,7 @@ Reviewer::$queryType = new ObjectType([
       'args' => [
         'mainIdentifier' => Type::nonNull(Type::string())
       ],
-      'resolve' => fn(User $user, array $args): ?string => Reviewer::selectXmlConversionAppointment($args['mainIdentifier'], $user->username)
+      'resolve' => fn(User $user, array $args): ?string => Reviewer::selectTransliterationInputForXmlConversionAppointment($args['mainIdentifier'], $user->username)
     ]
   ]
 ]);
@@ -146,8 +182,21 @@ Reviewer::$mutationType = new ObjectType([
         $mainIdentifier = $args['mainIdentifier'];
         $conversion = $args['conversion'];
 
-        // Reviewer::insertXmlConversion()
-        return false;
+        if (!Reviewer::selectTransliterationReviewPerformed($mainIdentifier)) {
+          throw new MySafeGraphQLException("Transliteration review of manuscript $mainIdentifier is not yet performed!");
+        }
+
+        if (!Reviewer::selectUserIsAppointedForXmlConversion($mainIdentifier, $user->username)) {
+          throw new MySafeGraphQLException("User $user->username is not appointed for xml conversion of manuscript $mainIdentifier!");
+        }
+
+        if (Reviewer::selectXmlConversionPerformed($mainIdentifier)) {
+          throw new MySafeGraphQLException("Xml conversion for manuscript $mainIdentifier is already performed!");
+        }
+
+        // TODO: check if $conversion is xml and fulfills schema?
+
+        return Reviewer::insertXmlConversion($mainIdentifier, $user->username, $conversion);
       }
     ]
   ]
