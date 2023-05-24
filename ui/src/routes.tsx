@@ -6,15 +6,18 @@ import {
   documentMergerUrl,
   editTranscriptionDocumentUrl,
   editTransliterationDocumentUrl,
+  firstXmlReviewUrl,
   homeUrl,
   loginUrl,
   pipelineManagementUrl,
   preferencesUrl,
   registerUrl,
+  secondXmlReviewUrl,
   transliterationReviewUrl,
   uploadPicturesUrl,
   userManagementUrl,
-  xmlComparatorUrl, xmlConversionUrl
+  xmlComparatorUrl,
+  xmlConversionUrl
 } from './urls';
 import {RegisterForm} from './forms/RegisterForm';
 import {Home} from './Home';
@@ -37,6 +40,8 @@ import {UserManagement} from './UserManagement';
 import {TransliterationReview} from './manuscript/TransliterationReview';
 import {XmlConversion} from './manuscript/xmlConversion/XmlConversion';
 import {PipelineOverview} from './pipeline/PipelineOverview';
+import {FirstXmlReview} from './manuscript/review/FirstXmlReview';
+import {SecondXmlReview} from './manuscript/review/SecondXmlReview';
 
 async function apolloLoader<T, V extends OperationVariables>(query: TypedDocumentNode<T, V>, variables: V): Promise<T | undefined> {
   return apolloClient
@@ -76,10 +81,13 @@ export const router = createBrowserRouter([
           path: 'manuscripts/:mainIdentifier',
           children: [
             {path: 'data', element: <ManuscriptData/>, loader: manuscriptDataLoader},
+            // FIXME: RequireAuth for all child routes from here!
             {path: uploadPicturesUrl, element: <UploadPicturesForm/>, loader: manuscriptDataLoader},
             {path: createTransliterationUrl, element: <TransliterationInput/>, loader: manuscriptDataLoader},
             {path: transliterationReviewUrl, element: <TransliterationReview/>},
             {path: xmlConversionUrl, element: <XmlConversion/>},
+            {path: firstXmlReviewUrl, element: <FirstXmlReview/>},
+            {path: secondXmlReviewUrl, element: <SecondXmlReview/>},
           ]
         },
 

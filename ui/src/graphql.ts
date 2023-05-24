@@ -23,16 +23,23 @@ export type Appointment = {
 };
 
 export const enum AppointmentType {
+  FirstXmlReview = 'FirstXmlReview',
+  SecondXmlReview = 'SecondXmlReview',
   TransliterationReview = 'TransliterationReview',
   XmlConversion = 'XmlConversion'
 };
 
 export type DocumentInPipeline = {
   __typename?: 'DocumentInPipeline';
+  appointedFirstXmlReviewer?: Maybe<Scalars['String']>;
+  appointedSecondXmlReviewer?: Maybe<Scalars['String']>;
   appointedTransliterationReviewer?: Maybe<Scalars['String']>;
   appointedXmlConverter?: Maybe<Scalars['String']>;
+  firstXmlReviewDateString?: Maybe<Scalars['String']>;
   manuscriptIdentifier: Scalars['String'];
+  secondXmlReviewDateString?: Maybe<Scalars['String']>;
   transliterationReviewDateString?: Maybe<Scalars['String']>;
+  xmlConversionDateString?: Maybe<Scalars['String']>;
 };
 
 export type ExecutiveEditor = {
@@ -57,13 +64,27 @@ export type ExecutiveEditorUsersArgs = {
 
 export type ExecutiveEditorMutations = {
   __typename?: 'ExecutiveEditorMutations';
-  appointReviewerForReleasedTransliteration: Scalars['String'];
+  appointFirstXmlReviewer: Scalars['String'];
+  appointSecondXmlReviewer: Scalars['String'];
+  appointTransliterationReviewer: Scalars['String'];
   appointXmlConverter: Scalars['String'];
   updateUserRights: Rights;
 };
 
 
-export type ExecutiveEditorMutationsAppointReviewerForReleasedTransliterationArgs = {
+export type ExecutiveEditorMutationsAppointFirstXmlReviewerArgs = {
+  manuscriptIdentifier: Scalars['String'];
+  reviewer: Scalars['String'];
+};
+
+
+export type ExecutiveEditorMutationsAppointSecondXmlReviewerArgs = {
+  manuscriptIdentifier: Scalars['String'];
+  reviewer: Scalars['String'];
+};
+
+
+export type ExecutiveEditorMutationsAppointTransliterationReviewerArgs = {
   manuscriptIdentifier: Scalars['String'];
   reviewer: Scalars['String'];
 };
@@ -223,10 +244,20 @@ export type QueryManuscriptArgs = {
 export type Reviewer = {
   __typename?: 'Reviewer';
   appointments: Array<Appointment>;
+  firstXmlReview?: Maybe<Scalars['String']>;
+  secondXmlReview?: Maybe<Scalars['String']>;
   transliterationReview?: Maybe<Scalars['String']>;
-  transliterationReviewAppointments: Array<Appointment>;
   xmlConversion?: Maybe<Scalars['String']>;
-  xmlConversionAppointments: Array<Scalars['String']>;
+};
+
+
+export type ReviewerFirstXmlReviewArgs = {
+  mainIdentifier: Scalars['String'];
+};
+
+
+export type ReviewerSecondXmlReviewArgs = {
+  mainIdentifier: Scalars['String'];
 };
 
 
@@ -241,8 +272,15 @@ export type ReviewerXmlConversionArgs = {
 
 export type ReviewerMutations = {
   __typename?: 'ReviewerMutations';
+  submitFirstXmlReview: Scalars['Boolean'];
   submitTransliterationReview: Scalars['Boolean'];
   submitXmlConversion: Scalars['Boolean'];
+};
+
+
+export type ReviewerMutationsSubmitFirstXmlReviewArgs = {
+  mainIdentifier: Scalars['String'];
+  review: Scalars['String'];
 };
 
 
@@ -393,16 +431,30 @@ export type SubmitXmlConversionMutationVariables = Exact<{
 
 export type SubmitXmlConversionMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitXmlConversion: boolean } | null };
 
-export type DocumentInPipelineFragment = { __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null };
+export type FirstXmlReviewQueryVariables = Exact<{
+  mainIdentifier: Scalars['String'];
+}>;
 
-export type PipelineOverviewFragment = { __typename?: 'ExecutiveEditor', allReviewers: Array<string>, documentsInPipeline: Array<{ __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null }> };
+
+export type FirstXmlReviewQuery = { __typename?: 'Query', reviewerQueries?: { __typename?: 'Reviewer', firstXmlReview?: string | null } | null };
+
+export type SecondXmlReviewQueryVariables = Exact<{
+  mainIdentifier: Scalars['String'];
+}>;
+
+
+export type SecondXmlReviewQuery = { __typename?: 'Query', reviewerQueries?: { __typename?: 'Reviewer', secondXmlReview?: string | null } | null };
+
+export type DocumentInPipelineFragment = { __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null, xmlConversionDateString?: string | null, appointedFirstXmlReviewer?: string | null, firstXmlReviewDateString?: string | null, appointedSecondXmlReviewer?: string | null, secondXmlReviewDateString?: string | null };
+
+export type PipelineOverviewFragment = { __typename?: 'ExecutiveEditor', allReviewers: Array<string>, documentsInPipeline: Array<{ __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null, xmlConversionDateString?: string | null, appointedFirstXmlReviewer?: string | null, firstXmlReviewDateString?: string | null, appointedSecondXmlReviewer?: string | null, secondXmlReviewDateString?: string | null }> };
 
 export type PipelineOverviewQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']>;
 }>;
 
 
-export type PipelineOverviewQuery = { __typename?: 'Query', executiveEditorQueries?: { __typename?: 'ExecutiveEditor', allReviewers: Array<string>, documentsInPipeline: Array<{ __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null }> } | null };
+export type PipelineOverviewQuery = { __typename?: 'Query', executiveEditorQueries?: { __typename?: 'ExecutiveEditor', allReviewers: Array<string>, documentsInPipeline: Array<{ __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null, xmlConversionDateString?: string | null, appointedFirstXmlReviewer?: string | null, firstXmlReviewDateString?: string | null, appointedSecondXmlReviewer?: string | null, secondXmlReviewDateString?: string | null }> } | null };
 
 export type AppointTransliterationReviewerMutationVariables = Exact<{
   manuscriptIdentifier: Scalars['String'];
@@ -410,7 +462,7 @@ export type AppointTransliterationReviewerMutationVariables = Exact<{
 }>;
 
 
-export type AppointTransliterationReviewerMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', appointReviewerForReleasedTransliteration: string } | null };
+export type AppointTransliterationReviewerMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', appointTransliterationReviewer: string } | null };
 
 export type AppointXmlConverterMutationVariables = Exact<{
   manuscriptIdentifier: Scalars['String'];
@@ -419,6 +471,22 @@ export type AppointXmlConverterMutationVariables = Exact<{
 
 
 export type AppointXmlConverterMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', appointXmlConverter: string } | null };
+
+export type AppointFirstXmlReviewerMutationVariables = Exact<{
+  manuscriptIdentifier: Scalars['String'];
+  reviewer: Scalars['String'];
+}>;
+
+
+export type AppointFirstXmlReviewerMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', appointFirstXmlReviewer: string } | null };
+
+export type AppointSecondXmlReviewerMutationVariables = Exact<{
+  manuscriptIdentifier: Scalars['String'];
+  reviewer: Scalars['String'];
+}>;
+
+
+export type AppointSecondXmlReviewerMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', appointSecondXmlReviewer: string } | null };
 
 export type UserFragment = { __typename?: 'User', username: string, name: string, affiliation?: string | null, email: string, rights: Rights };
 
@@ -501,6 +569,11 @@ export const DocumentInPipelineFragmentDoc = gql`
   appointedTransliterationReviewer
   transliterationReviewDateString
   appointedXmlConverter
+  xmlConversionDateString
+  appointedFirstXmlReviewer
+  firstXmlReviewDateString
+  appointedSecondXmlReviewer
+  secondXmlReviewDateString
 }
     `;
 export const PipelineOverviewFragmentDoc = gql`
@@ -1007,6 +1080,76 @@ export function useSubmitXmlConversionMutation(baseOptions?: Apollo.MutationHook
 export type SubmitXmlConversionMutationHookResult = ReturnType<typeof useSubmitXmlConversionMutation>;
 export type SubmitXmlConversionMutationResult = Apollo.MutationResult<SubmitXmlConversionMutation>;
 export type SubmitXmlConversionMutationOptions = Apollo.BaseMutationOptions<SubmitXmlConversionMutation, SubmitXmlConversionMutationVariables>;
+export const FirstXmlReviewDocument = gql`
+    query FirstXmlReview($mainIdentifier: String!) {
+  reviewerQueries {
+    firstXmlReview(mainIdentifier: $mainIdentifier)
+  }
+}
+    `;
+
+/**
+ * __useFirstXmlReviewQuery__
+ *
+ * To run a query within a React component, call `useFirstXmlReviewQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFirstXmlReviewQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFirstXmlReviewQuery({
+ *   variables: {
+ *      mainIdentifier: // value for 'mainIdentifier'
+ *   },
+ * });
+ */
+export function useFirstXmlReviewQuery(baseOptions: Apollo.QueryHookOptions<FirstXmlReviewQuery, FirstXmlReviewQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<FirstXmlReviewQuery, FirstXmlReviewQueryVariables>(FirstXmlReviewDocument, options);
+      }
+export function useFirstXmlReviewLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<FirstXmlReviewQuery, FirstXmlReviewQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<FirstXmlReviewQuery, FirstXmlReviewQueryVariables>(FirstXmlReviewDocument, options);
+        }
+export type FirstXmlReviewQueryHookResult = ReturnType<typeof useFirstXmlReviewQuery>;
+export type FirstXmlReviewLazyQueryHookResult = ReturnType<typeof useFirstXmlReviewLazyQuery>;
+export type FirstXmlReviewQueryResult = Apollo.QueryResult<FirstXmlReviewQuery, FirstXmlReviewQueryVariables>;
+export const SecondXmlReviewDocument = gql`
+    query SecondXmlReview($mainIdentifier: String!) {
+  reviewerQueries {
+    secondXmlReview(mainIdentifier: $mainIdentifier)
+  }
+}
+    `;
+
+/**
+ * __useSecondXmlReviewQuery__
+ *
+ * To run a query within a React component, call `useSecondXmlReviewQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSecondXmlReviewQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSecondXmlReviewQuery({
+ *   variables: {
+ *      mainIdentifier: // value for 'mainIdentifier'
+ *   },
+ * });
+ */
+export function useSecondXmlReviewQuery(baseOptions: Apollo.QueryHookOptions<SecondXmlReviewQuery, SecondXmlReviewQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SecondXmlReviewQuery, SecondXmlReviewQueryVariables>(SecondXmlReviewDocument, options);
+      }
+export function useSecondXmlReviewLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SecondXmlReviewQuery, SecondXmlReviewQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SecondXmlReviewQuery, SecondXmlReviewQueryVariables>(SecondXmlReviewDocument, options);
+        }
+export type SecondXmlReviewQueryHookResult = ReturnType<typeof useSecondXmlReviewQuery>;
+export type SecondXmlReviewLazyQueryHookResult = ReturnType<typeof useSecondXmlReviewLazyQuery>;
+export type SecondXmlReviewQueryResult = Apollo.QueryResult<SecondXmlReviewQuery, SecondXmlReviewQueryVariables>;
 export const PipelineOverviewDocument = gql`
     query PipelineOverview($page: Int) {
   executiveEditorQueries {
@@ -1045,7 +1188,7 @@ export type PipelineOverviewQueryResult = Apollo.QueryResult<PipelineOverviewQue
 export const AppointTransliterationReviewerDocument = gql`
     mutation AppointTransliterationReviewer($manuscriptIdentifier: String!, $reviewer: String!) {
   executiveEditor {
-    appointReviewerForReleasedTransliteration(
+    appointTransliterationReviewer(
       manuscriptIdentifier: $manuscriptIdentifier
       reviewer: $reviewer
     )
@@ -1116,6 +1259,80 @@ export function useAppointXmlConverterMutation(baseOptions?: Apollo.MutationHook
 export type AppointXmlConverterMutationHookResult = ReturnType<typeof useAppointXmlConverterMutation>;
 export type AppointXmlConverterMutationResult = Apollo.MutationResult<AppointXmlConverterMutation>;
 export type AppointXmlConverterMutationOptions = Apollo.BaseMutationOptions<AppointXmlConverterMutation, AppointXmlConverterMutationVariables>;
+export const AppointFirstXmlReviewerDocument = gql`
+    mutation AppointFirstXmlReviewer($manuscriptIdentifier: String!, $reviewer: String!) {
+  executiveEditor {
+    appointFirstXmlReviewer(
+      manuscriptIdentifier: $manuscriptIdentifier
+      reviewer: $reviewer
+    )
+  }
+}
+    `;
+export type AppointFirstXmlReviewerMutationFn = Apollo.MutationFunction<AppointFirstXmlReviewerMutation, AppointFirstXmlReviewerMutationVariables>;
+
+/**
+ * __useAppointFirstXmlReviewerMutation__
+ *
+ * To run a mutation, you first call `useAppointFirstXmlReviewerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAppointFirstXmlReviewerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [appointFirstXmlReviewerMutation, { data, loading, error }] = useAppointFirstXmlReviewerMutation({
+ *   variables: {
+ *      manuscriptIdentifier: // value for 'manuscriptIdentifier'
+ *      reviewer: // value for 'reviewer'
+ *   },
+ * });
+ */
+export function useAppointFirstXmlReviewerMutation(baseOptions?: Apollo.MutationHookOptions<AppointFirstXmlReviewerMutation, AppointFirstXmlReviewerMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AppointFirstXmlReviewerMutation, AppointFirstXmlReviewerMutationVariables>(AppointFirstXmlReviewerDocument, options);
+      }
+export type AppointFirstXmlReviewerMutationHookResult = ReturnType<typeof useAppointFirstXmlReviewerMutation>;
+export type AppointFirstXmlReviewerMutationResult = Apollo.MutationResult<AppointFirstXmlReviewerMutation>;
+export type AppointFirstXmlReviewerMutationOptions = Apollo.BaseMutationOptions<AppointFirstXmlReviewerMutation, AppointFirstXmlReviewerMutationVariables>;
+export const AppointSecondXmlReviewerDocument = gql`
+    mutation AppointSecondXmlReviewer($manuscriptIdentifier: String!, $reviewer: String!) {
+  executiveEditor {
+    appointSecondXmlReviewer(
+      manuscriptIdentifier: $manuscriptIdentifier
+      reviewer: $reviewer
+    )
+  }
+}
+    `;
+export type AppointSecondXmlReviewerMutationFn = Apollo.MutationFunction<AppointSecondXmlReviewerMutation, AppointSecondXmlReviewerMutationVariables>;
+
+/**
+ * __useAppointSecondXmlReviewerMutation__
+ *
+ * To run a mutation, you first call `useAppointSecondXmlReviewerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAppointSecondXmlReviewerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [appointSecondXmlReviewerMutation, { data, loading, error }] = useAppointSecondXmlReviewerMutation({
+ *   variables: {
+ *      manuscriptIdentifier: // value for 'manuscriptIdentifier'
+ *      reviewer: // value for 'reviewer'
+ *   },
+ * });
+ */
+export function useAppointSecondXmlReviewerMutation(baseOptions?: Apollo.MutationHookOptions<AppointSecondXmlReviewerMutation, AppointSecondXmlReviewerMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AppointSecondXmlReviewerMutation, AppointSecondXmlReviewerMutationVariables>(AppointSecondXmlReviewerDocument, options);
+      }
+export type AppointSecondXmlReviewerMutationHookResult = ReturnType<typeof useAppointSecondXmlReviewerMutation>;
+export type AppointSecondXmlReviewerMutationResult = Apollo.MutationResult<AppointSecondXmlReviewerMutation>;
+export type AppointSecondXmlReviewerMutationOptions = Apollo.BaseMutationOptions<AppointSecondXmlReviewerMutation, AppointSecondXmlReviewerMutationVariables>;
 export const UsersOverviewDocument = gql`
     query UsersOverview($page: Int!) {
   executiveEditorQueries {

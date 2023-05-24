@@ -162,6 +162,22 @@ mutation SubmitXmlConversion($mainIdentifier: String!, $conversion: String!) {
   }
 }
 
+# /manuscripts/:id/firstXmlReview
+
+query FirstXmlReview($mainIdentifier: String!) {
+  reviewerQueries {
+    firstXmlReview(mainIdentifier: $mainIdentifier)
+  }
+}
+
+# /manuscripts/:id/secondXmlReview
+
+query SecondXmlReview($mainIdentifier: String!) {
+  reviewerQueries {
+    secondXmlReview(mainIdentifier: $mainIdentifier)
+  }
+}
+
 # /pipelineOverview
 
 fragment DocumentInPipeline on DocumentInPipeline {
@@ -169,6 +185,11 @@ fragment DocumentInPipeline on DocumentInPipeline {
   appointedTransliterationReviewer
   transliterationReviewDateString
   appointedXmlConverter
+  xmlConversionDateString,
+  appointedFirstXmlReviewer
+  firstXmlReviewDateString
+  appointedSecondXmlReviewer
+  secondXmlReviewDateString
 }
 
 fragment PipelineOverview on ExecutiveEditor {
@@ -186,13 +207,25 @@ query PipelineOverview($page: Int) {
 
 mutation AppointTransliterationReviewer($manuscriptIdentifier: String!, $reviewer: String!) {
   executiveEditor {
-    appointReviewerForReleasedTransliteration(manuscriptIdentifier: $manuscriptIdentifier, reviewer: $reviewer)
+    appointTransliterationReviewer(manuscriptIdentifier: $manuscriptIdentifier, reviewer: $reviewer)
   }
 }
 
 mutation AppointXmlConverter($manuscriptIdentifier: String!, $converter: String!) {
   executiveEditor {
     appointXmlConverter(manuscriptIdentifier: $manuscriptIdentifier, converter: $converter)
+  }
+}
+
+mutation AppointFirstXmlReviewer($manuscriptIdentifier: String!, $reviewer: String!) {
+  executiveEditor {
+    appointFirstXmlReviewer(manuscriptIdentifier: $manuscriptIdentifier, reviewer: $reviewer)
+  }
+}
+
+mutation AppointSecondXmlReviewer($manuscriptIdentifier: String!, $reviewer: String!) {
+  executiveEditor {
+    appointSecondXmlReviewer(manuscriptIdentifier: $manuscriptIdentifier, reviewer: $reviewer)
   }
 }
 

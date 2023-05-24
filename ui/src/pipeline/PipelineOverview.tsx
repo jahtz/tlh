@@ -20,7 +20,12 @@ function Inner({page, queryPage, allReviewers, documentsInPipeline}: IProps): JS
     t('manuscriptIdentifier'),
     t('appointedTransliterationReviewer'),
     t('transliterationReviewPerformed'),
-    t('appointedXmlConverter')
+    t('appointedXmlConverter'),
+    t('xmlConversionPerformed'),
+    t('appointedFirstXmlReviewer'),
+    t('firstXmlReviewPerformed'),
+    t('appointedSecondXmlReviewer'),
+    t('secondXmlReviewPerformed')
   ];
 
   return (
@@ -53,7 +58,7 @@ export function PipelineOverview(): JSX.Element {
   };
 
   return (
-    <div className="container mx-auto">
+    <div className="p-2">
       <h2 className="font-bold text-xl text-center">{t('pipelineOverview')}</h2>
 
       <WithQuery query={pipelineOverviewQuery}>

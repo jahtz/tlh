@@ -3,14 +3,16 @@ import {Box} from './Box';
 import {useTranslation} from 'react-i18next';
 import {AppointmentType, ReviewerHomeDataFragment} from './graphql';
 import {Link} from 'react-router-dom';
-import {transliterationReviewUrl, xmlConversionUrl} from './urls';
+import {firstXmlReviewUrl, secondXmlReviewUrl, transliterationReviewUrl, xmlConversionUrl} from './urls';
 
 const buttonClasses = 'p-2 rounded bg-amber-500 text-white text-center w-full disabled:opacity-50';
 
 const url = (manuscriptIdentifier: string, appointmentType: AppointmentType): string => {
   const typeUrlFragment = {
     [AppointmentType.TransliterationReview]: transliterationReviewUrl,
-    [AppointmentType.XmlConversion]: xmlConversionUrl
+    [AppointmentType.XmlConversion]: xmlConversionUrl,
+    [AppointmentType.FirstXmlReview]: firstXmlReviewUrl,
+    [AppointmentType.SecondXmlReview]: secondXmlReviewUrl,
   }[appointmentType];
 
   return `/manuscripts/${encodeURIComponent(manuscriptIdentifier)}/${typeUrlFragment}`;

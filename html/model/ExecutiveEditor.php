@@ -26,7 +26,7 @@ class ExecutiveEditor
     );
   }
 
-  static function insertReviewerAppointmentForReleasedTransliteration(string $mainIdentifier, string $reviewer, string $appointedBy): string
+  static function upsertReviewerAppointmentForReleasedTransliteration(string $mainIdentifier, string $reviewer, string $appointedBy): string
   {
     return executeSingleChangeQuery(
       "
@@ -37,7 +37,7 @@ on duplicate key update username = ?, appointed_by_username = ?, appointment_dat
     );
   }
 
-  static function insertXmlConversionAppointment(string $mainIdentifier, string $converter, string $appointedBy): string
+  static function upsertXmlConversionAppointment(string $mainIdentifier, string $converter, string $appointedBy): string
   {
     return executeSingleChangeQuery(
       "
@@ -45,6 +45,28 @@ insert into tlh_dig_xml_conversion_appointments (main_identifier, username, appo
 values (?, ?, ?)
 on duplicate key update username = ?, appointed_by_username = ?, appointment_date = now();",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $mainIdentifier, $converter, $appointedBy, $converter, $appointedBy)
+    );
+  }
+
+  static function upsertFirstXmlReviewAppointment(string $mainIdentifier, string $reviewer, string $appointedBy): string
+  {
+    return executeSingleChangeQuery(
+      "
+insert into tlh_dig_first_xml_review_appointments (main_identifier, username, appointed_by_username)
+values (?, ?, ?)
+on duplicate key update username = ?, appointed_by_username = ?, appointment_date = now();",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $mainIdentifier, $reviewer, $appointedBy, $reviewer, $appointedBy)
+    );
+  }
+
+  static function upsertSecondXmlReviewAppointment(string $mainIdentifier, string $reviewer, string $appointedBy): string
+  {
+    return executeSingleChangeQuery(
+      "
+insert into tlh_dig_second_xml_review_appointments (main_identifier, username, appointed_by_username)
+values (?, ?, ?)
+on duplicate key update username = ?, appointed_by_username = ?, appointment_date = now();",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $mainIdentifier, $reviewer, $appointedBy, $reviewer, $appointedBy)
     );
   }
 }
@@ -121,7 +143,7 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         }
       }
     ],
-    'appointReviewerForReleasedTransliteration' => [
+    'appointTransliterationReviewer' => [
       'type' => Type::nonNull(Type::string()),
       'args' => [
         'manuscriptIdentifier' => Type::nonNull(Type::string()),
@@ -143,7 +165,7 @@ ExecutiveEditor::$mutationsType = new ObjectType([
           throw new MySafeGraphQLException("User $reviewer->username can't review own manuscript!");
         }
 
-        return ExecutiveEditor::insertReviewerAppointmentForReleasedTransliteration($manuscript->mainIdentifier->identifier, $reviewer->username, $user->username);
+        return ExecutiveEditor::upsertReviewerAppointmentForReleasedTransliteration($manuscript->mainIdentifier->identifier, $reviewer->username, $user->username);
       }
     ],
     'appointXmlConverter' => [
@@ -157,7 +179,51 @@ ExecutiveEditor::$mutationsType = new ObjectType([
 
         $converter = resolveReviewer($args['converter']);
 
-        return ExecutiveEditor::insertXmlConversionAppointment($manuscriptIdentifier, $converter->username, $user->username);
+        // TODO: check conditions -> transliteration released!
+
+        if (XmlConverter::selectXmlConversionPerformed($manuscriptIdentifier)) {
+          throw new MySafeGraphQLException("Xml conversion of manuscript $manuscriptIdentifier was already performed!");
+        }
+
+        return ExecutiveEditor::upsertXmlConversionAppointment($manuscriptIdentifier, $converter->username, $user->username);
+      }
+    ],
+    'appointFirstXmlReviewer' => [
+      'type' => Type::nonNull(Type::string()),
+      'args' => [
+        'manuscriptIdentifier' => Type::nonNull(Type::string()),
+        'reviewer' => Type::nonNull(Type::string())
+      ],
+      'resolve' => function (User $user, array $args): string {
+        $manuscriptIdentifier = $args['manuscriptIdentifier'];
+        $reviewer = resolveReviewer($args['reviewer']);
+
+        // TODO: check conditions -> transliteration released!
+
+        if (FirstXmlReviewer::selectFirstXmlReviewPerformed($manuscriptIdentifier)) {
+          throw new MySafeGraphQLException("First xml of manuscript $manuscriptIdentifier was already performed!");
+        }
+
+        return ExecutiveEditor::upsertFirstXmlReviewAppointment($manuscriptIdentifier, $reviewer->username, $user->username);
+      }
+    ],
+    'appointSecondXmlReviewer' => [
+      'type' => Type::nonNull(Type::string()),
+      'args' => [
+        'manuscriptIdentifier' => Type::nonNull(Type::string()),
+        'reviewer' => Type::nonNull(Type::string())
+      ],
+      'resolve' => function (User $user, array $args): string {
+        $manuscriptIdentifier = $args['manuscriptIdentifier'];
+        $reviewer = resolveReviewer($args['reviewer']);
+
+        // TODO: check conditions -> transliteration released!
+
+        if (SecondXmlReviewer::selectSecondXmlReviewPerformed($manuscriptIdentifier)) {
+          throw new MySafeGraphQLException("Second xml of manuscript $manuscriptIdentifier was already performed!");
+        }
+
+        return ExecutiveEditor::upsertSecondXmlReviewAppointment($manuscriptIdentifier, $reviewer->username, $user->username);
       }
     ]
   ]

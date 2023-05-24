@@ -35,6 +35,10 @@ export const transliterationReviewUrl = 'transliterationReview';
 
 export const xmlConversionUrl = 'xmlConversion';
 
+export const firstXmlReviewUrl = 'firstXmlReview';
+
+export const secondXmlReviewUrl = 'secondXmlReview';
+
 // Foreign urls
 
 export const tlhAnalyzerUrl = '/TLHaly/jasonanalysis.php';
