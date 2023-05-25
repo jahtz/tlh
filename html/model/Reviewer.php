@@ -8,6 +8,7 @@ require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/Appointment.php';
 require_once __DIR__ . '/TransliterationReviewer.php';
 require_once __DIR__ . '/XmlConverter.php';
+require_once __DIR__ . '/XmlReviewType.php';
 require_once __DIR__ . '/FirstXmlReviewer.php';
 require_once __DIR__ . '/SecondXmlReviewer.php';
 
@@ -49,22 +50,74 @@ Reviewer::$queryType = new ObjectType([
       ],
       'resolve' => fn(User $user, array $args): ?string => XmlConverter::selectTransliterationInputForXmlConversionAppointment($args['mainIdentifier'], $user->username)
     ],
-    'firstXmlReview' => [
+    'xmlReview' => [
       'type' => Type::string(),
       'args' => [
-        'mainIdentifier' => Type::nonNull(Type::string())
+        'mainIdentifier' => Type::nonNull(Type::string()),
+        'reviewType' => Type::nonNull(XmlReviewType::$graphQLType)
       ],
-      'resolve' => fn(User $user, array $args): ?string => FirstXmlReviewer::selectXmlForFirstXmlReviewAppointment($args['mainIdentifier'], $user->username)
-    ],
-    'secondXmlReview' => [
-      'type' => Type::string(),
-      'args' => [
-        'mainIdentifier' => Type::nonNull(Type::string())
-      ],
-      'resolve' => fn(User $user, array $args): ?string => SecondXmlReviewer::selectXmlForSecondReviewAppointment($args['mainIdentifier'], $user->username)
+      'resolve' => fn(User $user, array $args): ?string => $args['reviewType'] === XmlReviewType::firstXmlReview
+        ? FirstXmlReviewer::selectXmlForFirstXmlReviewAppointment($args['mainIdentifier'], $user->username)
+        : SecondXmlReviewer::selectXmlForSecondReviewAppointment($args['mainIdentifier'], $user->username)
     ]
   ]
 ]);
+
+/** @throws MySafeGraphQLException */
+function resolveSubmitXmlConversion(User $user, string $mainIdentifier, string $conversion): bool
+{
+  if (!TransliterationReviewer::selectTransliterationReviewPerformed($mainIdentifier)) {
+    throw new MySafeGraphQLException("Transliteration review of manuscript $mainIdentifier is not yet performed!");
+  }
+
+  if (!XmlConverter::selectUserIsAppointedForXmlConversion($mainIdentifier, $user->username)) {
+    throw new MySafeGraphQLException("User $user->username is not appointed for xml conversion of manuscript $mainIdentifier!");
+  }
+
+  if (XmlConverter::selectXmlConversionPerformed($mainIdentifier)) {
+    throw new MySafeGraphQLException("Xml conversion for manuscript $mainIdentifier has already been performed!");
+  }
+
+  // TODO: check if $conversion is xml and fulfills schema?
+
+  return XmlConverter::insertXmlConversion($mainIdentifier, $user->username, $conversion);
+}
+
+/** @throws MySafeGraphQLException */
+function resolveSubmitFirstXmlReview(User $user, string $mainIdentifier, string $review): bool
+{
+  if (!XmlConverter::selectXmlConversionPerformed($mainIdentifier)) {
+    throw new MySafeGraphQLException("Xml conversion for manuscript $mainIdentifier has not yet been performed!");
+  }
+
+  if (!FirstXmlReviewer::selectUserIsAppointedForFirstXmlReview($mainIdentifier, $user->username)) {
+    throw new MySafeGraphQLException("User $user->username is not appointed for first xml review of manuscript $mainIdentifier!");
+  }
+
+  if (FirstXmlReviewer::selectFirstXmlReviewPerformed($mainIdentifier)) {
+    throw new MySafeGraphQLException("First xml review of manuscript $mainIdentifier has already been performed!");
+  }
+
+  return FirstXmlReviewer::insertFirstXmlReview($mainIdentifier, $user->username, $review);
+}
+
+/** @throws MySafeGraphQLException */
+function resolveSubmitSecondXmlReview(User $user, string $mainIdentifier, string $review): bool
+{
+  if (!FirstXmlReviewer::selectFirstXmlReviewPerformed($mainIdentifier)) {
+    throw new MySafeGraphQLException("First xml review of manuscript $mainIdentifier has not yet been performed!");
+  }
+
+  if (!SecondXmlReviewer::selectUserIsAppointedForSecondXmlReview($mainIdentifier, $user->username)) {
+    throw new MySafeGraphQLException("User $user->username is not appointed for second xml review of manuscript $mainIdentifier!");
+  }
+
+  if (SecondXmlReviewer::selectSecondXmlReviewPerformed($mainIdentifier)) {
+    throw new MySafeGraphQLException("Second xml review of manuscript $mainIdentifier has already been performed!");
+  }
+
+  return SecondXmlReviewer::insertSecondXmlReview($mainIdentifier, $user->username, $review);
+}
 
 Reviewer::$mutationType = new ObjectType([
   'name' => 'ReviewerMutations',
@@ -84,56 +137,18 @@ Reviewer::$mutationType = new ObjectType([
         'mainIdentifier' => Type::nonNull(Type::string()),
         'conversion' => Type::nonNull(Type::string())
       ],
-      'resolve' => function (User $user, array $args): bool {
-        $mainIdentifier = $args['mainIdentifier'];
-        $conversion = $args['conversion'];
-
-        if (!TransliterationReviewer::selectTransliterationReviewPerformed($mainIdentifier)) {
-          throw new MySafeGraphQLException("Transliteration review of manuscript $mainIdentifier is not yet performed!");
-        }
-
-        if (!XmlConverter::selectUserIsAppointedForXmlConversion($mainIdentifier, $user->username)) {
-          throw new MySafeGraphQLException("User $user->username is not appointed for xml conversion of manuscript $mainIdentifier!");
-        }
-
-        if (XmlConverter::selectXmlConversionPerformed($mainIdentifier)) {
-          throw new MySafeGraphQLException("Xml conversion for manuscript $mainIdentifier is already performed!");
-        }
-
-        // TODO: check if $conversion is xml and fulfills schema?
-
-        return XmlConverter::insertXmlConversion($mainIdentifier, $user->username, $conversion);
-      }
+      'resolve' => fn(User $user, array $args): bool => resolveSubmitXmlConversion($user, $args['mainIdentifier'], $args['conversion'])
     ],
-    'submitFirstXmlReview' => [
+    'submitXmlReview' => [
       'type' => Type::nonNull(Type::boolean()),
       'args' => [
         'mainIdentifier' => Type::nonNull(Type::string()),
-        'review' => Type::nonNull(Type::string())
+        'review' => Type::nonNull(Type::string()),
+        'reviewType' => Type::nonNull(XmlReviewType::$graphQLType)
       ],
-      'resolve' => function (User $user, array $args): bool {
-        $mainIdentifier = $args['mainIdentifier'];
-        $review = $args['review'];
-
-        // TODO: check conditions!
-
-        return false;
-      }
-    ],
-    'submitSecondXmlReview' => [
-      'type' => Type::nonNull(Type::string()),
-      'args' => [
-        'mainIdentifier' => Type::nonNull(Type::string()),
-        'review' => Type::nonNull(Type::string())
-      ],
-      'resolve' => function (User $user, array $args): bool {
-        $mainIdentifier = $args['mainIdentifier'];
-        $review = $args['review'];
-
-        // TODO: check conditions!
-
-        return false;
-      }
+      'resolve' => fn(User $user, array $args): bool => $args['reviewType'] === XmlReviewType::firstXmlReview
+        ? resolveSubmitFirstXmlReview($user, $args['mainIdentifier'], $args['review'])
+        : resolveSubmitSecondXmlReview($user, $args['mainIdentifier'], $args['review'])
     ]
   ]
 ]);

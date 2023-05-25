@@ -138,17 +138,15 @@ type Query {
 
 type Reviewer {
   appointments: [Appointment!]!
-  firstXmlReview(mainIdentifier: String!): String
-  secondXmlReview(mainIdentifier: String!): String
   transliterationReview(mainIdentifier: String!): String
   xmlConversion(mainIdentifier: String!): String
+  xmlReview(mainIdentifier: String!, reviewType: XmlReviewType!): String
 }
 
 type ReviewerMutations {
-  submitFirstXmlReview(mainIdentifier: String!, review: String!): Boolean!
-  submitSecondXmlReview(mainIdentifier: String!, review: String!): String!
   submitTransliterationReview(mainIdentifier: String!, review: String!): Boolean!
   submitXmlConversion(conversion: String!, mainIdentifier: String!): Boolean!
+  submitXmlReview(mainIdentifier: String!, review: String!, reviewType: XmlReviewType!): Boolean!
 }
 
 enum Rights {
@@ -172,4 +170,9 @@ input UserInput {
   password: String!
   passwordRepeat: String!
   username: String!
+}
+
+enum XmlReviewType {
+  FirstXmlReview
+  SecondXmlReview
 }

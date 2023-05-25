@@ -15,12 +15,6 @@ interface IProps extends DocumentInPipelineFragment {
 const formatDate = (value: string): string => new Date(value)
   .toLocaleDateString(undefined, {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
 
-function DateCheckMark({date}: { date: string | undefined }): JSX.Element {
-  return date !== undefined
-    ? <span>&#x2714; ({date})</span>
-    : <span>&#x2718;</span>;
-}
-
 function getOrThrow<T>(value: T | null | undefined, message: string): T {
   if (value) {
     return value;
@@ -28,6 +22,8 @@ function getOrThrow<T>(value: T | null | undefined, message: string): T {
     throw new Error(message);
   }
 }
+
+const DateCheckMark = ({date, user}: { date: string; user: string; }): JSX.Element => <span><code>{user}</code>, {date}</span>;
 
 export function DocumentInPipelineTableRow({
   allReviewers,
@@ -78,42 +74,30 @@ export function DocumentInPipelineTableRow({
 
       <td className="p-2">
         {transliterationReviewDate !== undefined
-          ? <span>{appointedTransliterationReviewer}</span>
+          ? <DateCheckMark date={transliterationReviewDate} user={appointedTransliterationReviewer || 'ERROR!'}/>
           : <UserSelect currentSelected={appointedTransliterationReviewer || undefined} allUsers={allReviewers}
                         loading={executeAppointTransliterationReviewerLoading} onNewUser={onChangeAppointedTransliterationReviewer}/>}
-      </td>
-      <td className="p-2">
-        <DateCheckMark date={transliterationReviewDate}/>
       </td>
 
       <td className="p-2">
         {xmlConversionDate !== undefined
-          ? <span>{appointedXmlConverter}</span>
+          ? <DateCheckMark date={xmlConversionDate} user={appointedXmlConverter || 'ERROR!'}/>
           : <UserSelect currentSelected={appointedXmlConverter || undefined} allUsers={allReviewers} loading={executeAppointXmlConvertLoading}
                         onNewUser={onChangeAppointedXmlConverter}/>}
-      </td>
-      <td className="p-2">
-        <DateCheckMark date={xmlConversionDate}/>
       </td>
 
       <td className="p-2">
         {firstXmlReviewDate !== undefined
-          ? <span>{appointedFirstXmlReviewer}</span>
+          ? <DateCheckMark date={firstXmlReviewDate} user={appointedFirstXmlReviewer || 'ERROR!'}/>
           : <UserSelect currentSelected={appointedFirstXmlReviewer || undefined} allUsers={allReviewers} loading={executeAppointFirstXmlReviewerLoading}
                         onNewUser={onChangeAppointFirstXmlReviewer}/>}
-      </td>
-      <td className="p-2">
-        <DateCheckMark date={firstXmlReviewDate}/>
       </td>
 
       <td className="p-2">
         {secondXmlReviewDate !== undefined
-          ? <span>{appointedSecondXmlReviewer}</span>
+          ? <DateCheckMark date={secondXmlReviewDate} user={appointedSecondXmlReviewer || 'ERROR!'}/>
           : <UserSelect currentSelected={appointedSecondXmlReviewer || undefined} allUsers={allReviewers} loading={executeAppointSecondXmlReviewerLoading}
                         onNewUser={onChangeAppointSecondXmlReviewer}/>}
-      </td>
-      <td className="p-2">
-        <DateCheckMark date={secondXmlReviewDate}/>
       </td>
     </tr>
   );

@@ -1,7 +1,7 @@
 import {JSX, useState} from 'react';
 import {NodeDisplay, NodeDisplayIProps} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
-import {isLeft, parseNewXml, XmlElementNode} from 'simple_xml';
+import {parseNewXml, XmlElementNode} from 'simple_xml';
 import classNames from 'classnames';
 import {xml} from '@codemirror/lang-xml';
 import ReactCodeMirror from '@uiw/react-codemirror';
@@ -14,10 +14,11 @@ import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
 export interface EditorLeftSideProps extends NodeDisplayIProps {
   filename: string;
   onNodeSelect: (node: XmlElementNode, path: NodePath) => void;
-  closeFile: () => void;
-  exportXml: () => void;
   updateNode: (node: XmlElementNode) => void;
   setKeyHandlingEnabled: (value: boolean) => void;
+  closeFile: (() => void) | undefined;
+  exportTitle: string;
+  onExport: () => void;
 }
 
 interface IState {
@@ -31,11 +32,12 @@ export function EditorLeftSide({
   node,
   currentSelectedPath,
   onNodeSelect,
-  closeFile,
-  exportXml,
   insertStuff,
   updateNode,
-  setKeyHandlingEnabled
+  setKeyHandlingEnabled,
+  closeFile,
+  exportTitle,
+  onExport,
 }: EditorLeftSideProps): JSX.Element {
 
   const {t} = useTranslation('common');
@@ -51,41 +53,36 @@ export function EditorLeftSide({
     setXmlSource(undefined);
   }
 
-  function setXmlSource(value: string | undefined): void {
-    setState((state) => update(state, {xmlSource: {$set: value}}));
-  }
+  const setXmlSource = (value: string | undefined): void => setState((state) => update(state, {xmlSource: {$set: value}}));
 
-  function onXmlSourceUpdate(): void {
-    const parseResult = parseNewXml(state.xmlSource as string, tlhXmlEditorConfig.readConfig);
+  const onXmlSourceUpdate = (): void => parseNewXml(state.xmlSource as string, tlhXmlEditorConfig.readConfig)
+    .handle(
+      (rootNode) => {
+        updateNode(rootNode as XmlElementNode);
+        deactivateShowSource();
+      },
+      (value) => alert(value)
+    );
 
-    if (isLeft(parseResult)) {
-      alert(parseResult.value);
-    } else {
-      updateNode(parseResult.value as XmlElementNode);
-      deactivateShowSource();
-    }
-  }
 
-  function changeFontSize(delta: number): void {
-    setState((state) => update((state), {fontSize: {$apply: (value) => value + delta}}));
-  }
+  const changeFontSize = (delta: number): void => setState((state) => update((state), {fontSize: {$apply: (value) => value + delta}}));
 
   return (
     <div className="flex flex-col h-full min-h-full max-h-full">
       <div className="p-4 rounded-t border border-slate-300 shadow-md">
         <span className="font-bold">{filename}</span>
 
-        <div className="float-right">
+        <div className="float-right space-x-2">
           <FontSizeSelector currentFontSize={state.fontSize} updateFontSize={changeFontSize}/>
 
           {state.xmlSource
             ? (
               <>
-                <button className="mr-2 px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource}
+                <button className="px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource}
                         title={t('cancelEditXmlSource') || 'cancelEditXmlSource'}>
                   &#x270E;
                 </button>
-                <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={onXmlSourceUpdate}
+                <button className="px-2 rounded bg-blue-500 text-white font-bold" onClick={onXmlSourceUpdate}
                         title={t('applyXmlSourceChange') || 'applyXmlSourceChange'}>
                   &#x270E;
                 </button>
@@ -97,19 +94,19 @@ export function EditorLeftSide({
                         className="mr-2 px-2 border border-slate-500 rounded">
                   {state.useSerifFont ? t('useSerifLessFont') : t('useSerifFont')}
                 </button>
-                <button className="mr-2 px-2 rounded bg-blue-500 text-white font-bold" onClick={activateShowSource} title={t('editSource') || 'editSource'}>
+                <button className="px-2 rounded bg-blue-500 text-white font-bold" onClick={activateShowSource} title={t('editSource') || 'editSource'}>
                   &#x270E;
                 </button>
               </>
             )}
 
-          <button className="mr-2 px-2 rounded bg-green-400 text-white font-bold" onClick={exportXml} title={t('exportXml') || 'exportXml'}>
+          <button className="px-2 rounded bg-green-400 text-white font-bold" onClick={onExport} title={exportTitle}>
             &#x1F5AB;
           </button>
 
-          <button className="px-2 rounded bg-red-600 text-white font-bold" onClick={closeFile} title={t('closeFile') || 'closeFile'}>
+          {closeFile && <button className="px-2 rounded bg-red-600 text-white font-bold" onClick={closeFile} title={t('closeFile') || 'closeFile'}>
             &#10799;
-          </button>
+          </button>}
         </div>
       </div>
 

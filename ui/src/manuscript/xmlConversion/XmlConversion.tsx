@@ -16,21 +16,24 @@ function Inner({mainIdentifier, initialInput}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [xmlContent, setXmlContent] = useState<string>();
-  const [submitXmlConversion, {loading, error}] = useSubmitXmlConversionMutation();
+  const [submitXmlConversion, {data, loading, error}] = useSubmitXmlConversionMutation();
 
-  const onSubmit = (conversion: string): void => {
+  const onSubmit = (conversion: string): Promise<void | undefined> =>
     submitXmlConversion({variables: {mainIdentifier, conversion}})
-      .then(({data}) => console.info(data?.reviewerMutations?.submitXmlConversion))
+      .then(() => void 0)
       .catch((error) => console.error(error));
-  };
 
   return (
     <div className="container mx-auto">
       <h2 className="font-bold text-xl text-center">{t('xmlConversion')}</h2>
 
-      {xmlContent === undefined
-        ? <TransliterationCheck initialTransliteration={initialInput} onConvert={setXmlContent}/>
-        : <XmlCheck initialXml={xmlContent} loading={loading} onSubmit={onSubmit}/>}
+      {data?.reviewerMutations?.submitXmlConversion
+        ? <pre>{xmlContent}</pre> // TODO: xml conversion performed
+        : (
+          xmlContent === undefined
+            ? <TransliterationCheck initialTransliteration={initialInput} onConvert={setXmlContent}/>
+            : <XmlCheck initialXml={xmlContent} loading={loading} onSubmit={onSubmit}/>
+        )}
 
       {error && <div className="my-2 p-2 rounded bg-red-500 text-white text-center w-full">{error.message}</div>}
     </div>

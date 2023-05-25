@@ -15,19 +15,20 @@ function Inner({mainIdentifier, initialInput}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [input, setInput] = useState(initialInput);
-  const [submitReview, {loading, error}] = useSubmitTransliterationReviewMutation();
+  const [submitReview, {data, loading, error}] = useSubmitTransliterationReviewMutation();
 
-  const onSubmit = (): void => {
+  const onSubmit = (): Promise<void | undefined> =>
     submitReview({variables: {mainIdentifier, review: input}})
-      .then(({data}) => console.info(data))
+      .then(() => void 0)
       .catch((error) => console.error(error));
-  };
 
   return (
     <div className="container mx-auto">
       <h2 className="font-bold text-xl text-center">{t('reviewTransliteration')}</h2>
 
-      <TransliterationTextArea input={input} onChange={setInput}/>
+      {data?.reviewerMutations?.submitTransliterationReview
+        ? <div>TODO!</div> // TODO: review performed!
+        : <TransliterationTextArea input={input} onChange={setInput}/>}
 
       {error && <div className="my-2 p-2 rounded bg-red-500 text-white text-center w-full">{error.message}</div>}
 

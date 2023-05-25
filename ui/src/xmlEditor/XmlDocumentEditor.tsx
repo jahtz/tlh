@@ -26,9 +26,11 @@ interface IProps {
   node: XmlNode;
   editorConfig?: XmlEditorConfig;
   filename: string;
+  closeFile?: () => void;
+  autoSave?: (rootNode: XmlNode) => void;
+  exportName?: string;
+  exportDisabled?: boolean;
   onExport: (node: XmlElementNode) => void;
-  closeFile: () => void;
-  autoSave: (rootNode: XmlNode) => void;
 }
 
 interface IState {
@@ -78,8 +80,16 @@ function findElement(node: XmlElementNode, path: number[]): XmlElementNode {
   return path.reduce<XmlElementNode>((nodeToUpdate, pathContent) => nodeToUpdate.children[pathContent] as XmlElementNode, node);
 }
 
-
-export function XmlDocumentEditor({node: initialNode, editorConfig = tlhXmlEditorConfig, onExport, filename, closeFile, autoSave}: IProps): JSX.Element {
+export function XmlDocumentEditor({
+  node: initialNode,
+  editorConfig = tlhXmlEditorConfig,
+  onExport,
+  filename,
+  closeFile,
+  autoSave,
+  exportName,
+  exportDisabled
+}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);
@@ -92,7 +102,7 @@ export function XmlDocumentEditor({node: initialNode, editorConfig = tlhXmlEdito
   });
 
   useEffect(() => {
-    state.changed && autoSave(state.rootNode);
+    state.changed && autoSave && autoSave(state.rootNode);
   }, [state]);
 
   useEffect(() => {
@@ -257,14 +267,12 @@ export function XmlDocumentEditor({node: initialNode, editorConfig = tlhXmlEdito
     ? state.editorState.tagName
     : undefined;
 
-  const leftSideProps: EditorLeftSideProps = {
-    filename,
-    node: state.rootNode,
+  const exportTitle = exportName ? exportName : t('exportXml') || 'exportXml';
+
+  const leftSideProps: Omit<EditorLeftSideProps, 'exportTitle' | 'filename' | 'node' | 'onNodeSelect' | 'onExport'> = {
     currentSelectedPath: state.editorState && 'path' in state.editorState
       ? state.editorState.path
       : undefined,
-    onNodeSelect,
-    exportXml,
     insertStuff: state.editorState && 'tagName' in state.editorState
       ? {
         insertablePaths: Array.from(new Set(calculateInsertablePositions(state.editorState.insertablePositions, state.rootNode))),
@@ -272,11 +280,13 @@ export function XmlDocumentEditor({node: initialNode, editorConfig = tlhXmlEdito
         initiateInsert
       }
       : undefined,
-    closeFile: () => {
-      if (!state.changed || confirm(t('closeFileOnUnfinishedChangesMessage') || 'closeFileOnUnfinishedChangesMessage')) {
-        closeFile();
+    closeFile: closeFile
+      ? () => {
+        if (!state.changed || confirm(t('closeFileOnUnfinishedChangesMessage') || 'closeFileOnUnfinishedChangesMessage')) {
+          closeFile();
+        }
       }
-    },
+      : undefined,
     updateNode: (node) => setState((state) => update(state, {rootNode: {$set: node}})),
     setKeyHandlingEnabled: (value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}})),
     isLeftSide: true
@@ -292,7 +302,8 @@ export function XmlDocumentEditor({node: initialNode, editorConfig = tlhXmlEdito
     )
     : (
       <div className="px-2 grid grid-cols-2 gap-4 h-full max-h-full">
-        <EditorLeftSide {...leftSideProps}/>
+        <EditorLeftSide {...leftSideProps} filename={filename} node={state.rootNode} onNodeSelect={onNodeSelect} onExport={exportXml}
+                        exportTitle={exportTitle}/>
 
         {state.editorState._type === 'EditNodeRightState'
           ? (
@@ -301,7 +312,8 @@ export function XmlDocumentEditor({node: initialNode, editorConfig = tlhXmlEdito
             </div>
           )
           : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}
-                                  toggleCompareChanges={toggleCompareChanges} onExport={exportXml}/>}
+                                  toggleCompareChanges={toggleCompareChanges} onExport={exportXml} exportTitle={exportTitle}
+                                  exportDisabled={exportDisabled || false}/>}
       </div>
     );
 }

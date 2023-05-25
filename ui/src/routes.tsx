@@ -30,7 +30,7 @@ import {DocumentMergerContainer} from './documentMerger/DocumentMergerContainer'
 import {tlhXmlEditorConfig} from './xmlEditor/tlhXmlEditorConfig';
 import {Preferences} from './Preferences';
 import {XmlComparatorContainer} from './xmlComparator/XmlComparatorContainer';
-import {ManuscriptDocument, ManuscriptMetaDataFragment, ManuscriptQuery, ManuscriptQueryVariables, Rights} from './graphql';
+import {ManuscriptDocument, ManuscriptMetaDataFragment, ManuscriptQuery, ManuscriptQueryVariables, Rights, XmlReviewType} from './graphql';
 import {apolloClient} from './apolloClient';
 import {OperationVariables, TypedDocumentNode} from '@apollo/client';
 import {ManuscriptData} from './manuscript/ManuscriptData';
@@ -40,8 +40,7 @@ import {UserManagement} from './UserManagement';
 import {TransliterationReview} from './manuscript/TransliterationReview';
 import {XmlConversion} from './manuscript/xmlConversion/XmlConversion';
 import {PipelineOverview} from './pipeline/PipelineOverview';
-import {FirstXmlReview} from './manuscript/review/FirstXmlReview';
-import {SecondXmlReview} from './manuscript/review/SecondXmlReview';
+import {XmlReview} from './manuscript/review/XmlReview';
 
 async function apolloLoader<T, V extends OperationVariables>(query: TypedDocumentNode<T, V>, variables: V): Promise<T | undefined> {
   return apolloClient
@@ -86,8 +85,8 @@ export const router = createBrowserRouter([
             {path: createTransliterationUrl, element: <TransliterationInput/>, loader: manuscriptDataLoader},
             {path: transliterationReviewUrl, element: <TransliterationReview/>},
             {path: xmlConversionUrl, element: <XmlConversion/>},
-            {path: firstXmlReviewUrl, element: <FirstXmlReview/>},
-            {path: secondXmlReviewUrl, element: <SecondXmlReview/>},
+            {path: firstXmlReviewUrl, element: <XmlReview reviewType={XmlReviewType.FirstXmlReview}/>},
+            {path: secondXmlReviewUrl, element: <XmlReview reviewType={XmlReviewType.SecondXmlReview}/>},
           ]
         },
 

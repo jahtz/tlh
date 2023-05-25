@@ -37,6 +37,15 @@ where username = ? and review.input is null;",
     );
   }
 
+  static function selectUserIsAppointedForFirstXmlReview(string $mainIdentifier, string $username): bool
+  {
+    return executeSingleSelectQuery(
+      "select count(*) as count from tlh_dig_first_xml_review_appointments where main_identifier = ? and username = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $mainIdentifier, $username),
+      fn(array $row): bool => $row['count'] === 1
+    );
+  }
+
   static function insertFirstXmlReview(string $mainIdentifier, string $reviewerUsername, string $xml): bool
   {
     return executeSingleChangeQuery(

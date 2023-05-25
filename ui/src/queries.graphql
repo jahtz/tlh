@@ -162,31 +162,17 @@ mutation SubmitXmlConversion($mainIdentifier: String!, $conversion: String!) {
   }
 }
 
-# /manuscripts/:id/firstXmlReview
+# /manuscripts/:id/firstXmlReview, /manuscripts/:id/secondXmlReview
 
-query FirstXmlReview($mainIdentifier: String!) {
+query XmlReview($mainIdentifier: String!, $reviewType: XmlReviewType!) {
   reviewerQueries {
-    firstXmlReview(mainIdentifier: $mainIdentifier)
+    xmlReview(mainIdentifier: $mainIdentifier, reviewType: $reviewType)
   }
 }
 
-mutation SubmitFirstXmlReview($mainIdentifier: String!, $review: String!) {
+mutation SubmitXmlReview($mainIdentifier: String!, $review: String!, $reviewType: XmlReviewType!) {
   reviewerMutations {
-    submitFirstXmlReview(mainIdentifier: $mainIdentifier, review: $review)
-  }
-}
-
-# /manuscripts/:id/secondXmlReview
-
-query SecondXmlReview($mainIdentifier: String!) {
-  reviewerQueries {
-    secondXmlReview(mainIdentifier: $mainIdentifier)
-  }
-}
-
-mutation SubmitSecondXmlReview($mainIdentifier: String!, $review: String!) {
-  reviewerMutations {
-    submitSecondXmlReview(mainIdentifier: $mainIdentifier, review: $review)
+    submitXmlReview(mainIdentifier: $mainIdentifier, review: $review, reviewType: $reviewType)
   }
 }
 

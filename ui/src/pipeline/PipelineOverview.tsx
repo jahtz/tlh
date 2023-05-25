@@ -19,18 +19,14 @@ function Inner({page, queryPage, allReviewers, documentsInPipeline}: IProps): JS
   const columnNames = [
     t('manuscriptIdentifier'),
     t('appointedTransliterationReviewer'),
-    t('transliterationReviewPerformed'),
     t('appointedXmlConverter'),
-    t('xmlConversionPerformed'),
     t('appointedFirstXmlReviewer'),
-    t('firstXmlReviewPerformed'),
     t('appointedSecondXmlReviewer'),
-    t('secondXmlReviewPerformed')
   ];
 
   return (
     <PaginatedTable count={-1} data={documentsInPipeline} columnNames={columnNames} emptyMessage={t('noDocumentsInPipelineYet')} page={page}
-                    queryPage={queryPage}>
+                    queryPage={queryPage} isFixed={true}>
       {(documentInPipeline) => <DocumentInPipelineTableRow key={documentInPipeline.manuscriptIdentifier} {...documentInPipeline} allReviewers={allReviewers}/>}
     </PaginatedTable>
   );
@@ -58,7 +54,7 @@ export function PipelineOverview(): JSX.Element {
   };
 
   return (
-    <div className="p-2">
+    <div className="container mx-auto">
       <h2 className="font-bold text-xl text-center">{t('pipelineOverview')}</h2>
 
       <WithQuery query={pipelineOverviewQuery}>

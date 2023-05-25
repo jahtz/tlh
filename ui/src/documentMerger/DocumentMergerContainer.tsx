@@ -3,7 +3,7 @@ import {FileLoader} from '../forms/FileLoader';
 import {JSX, useState} from 'react';
 import update from 'immutability-helper';
 import {DocumentMerger} from './DocumentMerger';
-import {isLeft, loadNewXml, XmlElementNode} from 'simple_xml';
+import {loadNewXml, XmlElementNode} from 'simple_xml';
 import {MergeDocument, mergeHeader, MergeLine, readMergeDocument} from './mergeDocument';
 import {MergedDocumentView} from './MergedDocumentView';
 
@@ -42,34 +42,27 @@ export function DocumentMergerContainer(): JSX.Element {
   const {t} = useTranslation('common');
   const [state, setState] = useState<IState>({_type: 'EmptyState'});
 
-  async function loadFirstDocument(file: File): Promise<void> {
-    const parseResult = await loadNewXml(file);
+  const loadFirstDocument = async (file: File): Promise<void> => loadNewXml(file)
+    .then((parseResult) =>
+      parseResult.handle(
+        (rootNode) => setState((state) => update(state, {
+          _type: {$set: 'FirstFileLoadedState'},
+          firstFile: {$set: {filename: file.name, document: readMergeDocument(rootNode as XmlElementNode)}}
+        })),
+        (value) => alert(value)
+      )
+    );
 
-    if (isLeft(parseResult)) {
-      alert(parseResult.value);
-    } else {
-      const document: MergeDocument = readMergeDocument(parseResult.value as XmlElementNode);
-      setState((state) => update(state, {
-        _type: {$set: 'FirstFileLoadedState'},
-        firstFile: {$set: {filename: file.name, document}}
-      }));
-    }
-  }
-
-  async function loadSecondDocument(file: File): Promise<void> {
-    const parseResult = await loadNewXml(file);
-
-    if (isLeft(parseResult)) {
-      alert(parseResult.value);
-    } else {
-      const document: MergeDocument = readMergeDocument(parseResult.value as XmlElementNode);
-      setState((state) => update(state, {
-        _type: {$set: 'SecondFileLoadedState'},
-        secondFile: {$set: {filename: file.name, document}}
-      }));
-
-    }
-  }
+  const loadSecondDocument = async (file: File): Promise<void> => loadNewXml(file).then((parseResult) =>
+    parseResult.handle(
+      (rootNode) =>
+        setState((state) => update(state, {
+          _type: {$set: 'SecondFileLoadedState'},
+          secondFile: {$set: {filename: file.name, document: readMergeDocument(rootNode as XmlElementNode)}}
+        })),
+      (value) => alert(value)
+    )
+  );
 
   function onMerge(mergedLines: MergeLine[], publicationMapping: Map<string, string[]>): void {
     let header: XmlElementNode;

@@ -1,6 +1,6 @@
 import {JSX, useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
-import {findFirstXmlElementByTagName, isLeft, loadNewXml, writeNode, xmlElementNode, XmlElementNode, XmlNode} from 'simple_xml';
+import {findFirstXmlElementByTagName, loadNewXml, writeNode, xmlElementNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {XmlDocumentEditor} from './XmlDocumentEditor';
 import {XmlEditorConfig} from './editorConfig';
 import {useTranslation} from 'react-i18next';
@@ -20,11 +20,6 @@ export function handleSaveToPC(data: string, filename: string): void {
 interface LoadedDocument {
   filename: string;
   rootNode: XmlNode;
-}
-
-interface IState {
-  document: LoadedDocument | undefined;
-  author: string | undefined;
 }
 
 function initialState(documentType: DocumentType): LoadedDocument | undefined {
@@ -66,15 +61,13 @@ export function StandAloneOXTED({editorConfig, documentType}: IProps): JSX.Eleme
   const [state, setState] = useState<LoadedDocument | undefined>(initialState(documentType));
   const [authorState, setAuthorState] = useState<string>();
 
-  async function readFile(file: File): Promise<void> {
-    const parseResult = await loadNewXml(file, editorConfig.readConfig);
-
-    if (isLeft(parseResult)) {
-      alert(parseResult.value);
-    } else {
-      setState({rootNode: parseResult.value, filename: file.name});
-    }
-  }
+  const readFile = (file: File): Promise<void> => loadNewXml(file, editorConfig.readConfig)
+    .then((parseResult) =>
+      parseResult.handle(
+        (rootNode) => setState({rootNode, filename: file.name}),
+        (value) => alert(value)
+      )
+    );
 
   function download(rootNode: XmlElementNode): void {
     if (state === undefined) {

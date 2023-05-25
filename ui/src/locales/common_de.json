@@ -145,5 +145,8 @@
   "noExportWithoutAuthor": "Kein Export ohne Autorenangabe",
   "deleteThisElement": "Dieses Element löschen",
   "closeFileOnUnfinishedChangesMessage": "Datei wirklich ohne Export und Sicherung schließen??",
-  "password_repeat": "Passwort wiederholen"
+  "password_repeat": "Passwort wiederholen",
+  "appointedTransliterationReviewer": "Reviewer für Transliteration",
+  "appointedFirstXmlReviewer": "Erster Reviewer für XML",
+  "appointedSecondXmlReviewer": "Zweiter Reviewer für XML"
 }
