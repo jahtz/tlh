@@ -99,11 +99,10 @@ type ManuscriptMutations {
 enum ManuscriptStatus {
   Approved
   Created
-  ExecutiveReviewMerged
-  ExecutiveReviewed
-  InCreation
-  ReviewMerged
-  Reviewed
+  FirstXmlReviewed
+  SecondXmlReviewed
+  TransliterationReleased
+  TransliterationReviewed
 }
 
 type Mutation {

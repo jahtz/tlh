@@ -183,11 +183,10 @@ export type ManuscriptMutationsUpdateTransliterationArgs = {
 export const enum ManuscriptStatus {
   Approved = 'Approved',
   Created = 'Created',
-  ExecutiveReviewMerged = 'ExecutiveReviewMerged',
-  ExecutiveReviewed = 'ExecutiveReviewed',
-  InCreation = 'InCreation',
-  ReviewMerged = 'ReviewMerged',
-  Reviewed = 'Reviewed'
+  FirstXmlReviewed = 'FirstXmlReviewed',
+  SecondXmlReviewed = 'SecondXmlReviewed',
+  TransliterationReleased = 'TransliterationReleased',
+  TransliterationReviewed = 'TransliterationReviewed'
 };
 
 export type Mutation = {

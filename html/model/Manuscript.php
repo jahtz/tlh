@@ -5,9 +5,10 @@ namespace model;
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/ManuscriptIdentifier.php';
+require_once __DIR__ . '/ManuscriptStatus.php';
 require_once __DIR__ . '/AbstractManuscript.php';
 
-use GraphQL\Type\Definition\{EnumType, ObjectType, Type};
+use GraphQL\Type\Definition\{ObjectType, Type};
 use MySafeGraphQLException;
 use mysqli_stmt;
 use function sql_helpers\{executeMultiSelectQuery, executeSingleChangeQuery, executeSingleSelectQuery};
@@ -46,6 +47,22 @@ class Manuscript extends AbstractManuscript
 
   static function fromDbAssocArray(array $row): Manuscript
   {
+    $status = $row['second_xml_rev_performed']
+      ? ManuscriptStatus::secondXmlReviewed
+      : ($row['first_xml_rev_performed']
+        ? ManuscriptStatus::firstXmlReviewPerformed
+        : ($row['xml_conv_performed']
+          ? ManuscriptStatus::xmlConversionPerformed
+          : ($row['transliteration_reviewed']
+            ? ManuscriptStatus::transliterationReviewed
+            : ($row['transliteration_released']
+              ? ManuscriptStatus::transliterationReleased
+              : ManuscriptStatus::created
+            )
+          )
+        )
+      );
+
     return new Manuscript(
       new ManuscriptIdentifier($row['main_identifier_type'], $row['main_identifier']),
       $row['palaeo_classification'],
@@ -53,7 +70,7 @@ class Manuscript extends AbstractManuscript
       $row['provenance'],
       $row['cth_classification'],
       $row['bibliography'],
-      /* $row['status'] */ 'InCreation',
+      $status,
       $row['creator_username']
     );
   }
@@ -75,10 +92,32 @@ class Manuscript extends AbstractManuscript
 
     return executeMultiSelectQuery(
       "
-select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, creator_username
-    from tlh_dig_manuscript_metadatas
-    order by creation_date desc
-    limit ?, ?;",
+select data.main_identifier,
+       main_identifier_type,
+       palaeo_classification,
+       palaeo_classification_sure,
+       provenance,
+       cth_classification,
+       bibliography,
+       creator_username,
+       rel_trans.release_date is not null     as transliteration_released,
+       translit_rev.review_date is not null   as transliteration_reviewed,
+       xml_conv.conversion_date is not null   as xml_conv_performed,
+       first_xml_rev.review_date is not null  as first_xml_rev_performed,
+       second_xml_rev.review_date is not null as second_xml_rev_performed
+from tlh_dig_manuscript_metadatas as data
+         left outer join tlh_dig_released_transliterations as rel_trans
+                         on rel_trans.main_identifier = data.main_identifier
+         left outer join tlh_dig_transliteration_reviews as translit_rev
+                         on translit_rev.main_identifier = data.main_identifier
+         left outer join tlh_dig_xml_conversions as xml_conv
+                         on xml_conv.main_identifier = data.main_identifier
+         left outer join tlh_dig_first_xml_reviews as first_xml_rev
+                         on first_xml_rev.main_identifier = data.main_identifier
+         left outer join tlh_dig_second_xml_reviews as second_xml_rev
+                         on second_xml_rev.main_identifier = data.main_identifier
+order by creation_date desc
+limit ?, ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('ii', $first, $pageSize),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
     );
@@ -98,9 +137,31 @@ select main_identifier, main_identifier_type, palaeo_classification, palaeo_clas
   {
     return executeSingleSelectQuery(
       "
-select main_identifier, main_identifier_type, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, creator_username
-    from tlh_dig_manuscript_metadatas
-    where main_identifier = ?;",
+select data.main_identifier,
+       main_identifier_type,
+       palaeo_classification,
+       palaeo_classification_sure,
+       provenance,
+       cth_classification,
+       bibliography,
+       creator_username,
+       rel_trans.release_date is not null     as transliteration_released,
+       translit_rev.review_date is not null   as transliteration_reviewed,
+       xml_conv.conversion_date is not null   as xml_conv_performed,
+       first_xml_rev.review_date is not null  as first_xml_rev_performed,
+       second_xml_rev.review_date is not null as second_xml_rev_performed
+from tlh_dig_manuscript_metadatas as data
+         left outer join tlh_dig_released_transliterations as rel_trans
+                         on rel_trans.main_identifier = data.main_identifier
+         left outer join tlh_dig_transliteration_reviews as translit_rev
+                         on translit_rev.main_identifier = data.main_identifier
+         left outer join tlh_dig_xml_conversions as xml_conv
+                         on xml_conv.main_identifier = data.main_identifier
+         left outer join tlh_dig_first_xml_reviews as first_xml_rev
+                         on first_xml_rev.main_identifier = data.main_identifier
+         left outer join tlh_dig_second_xml_reviews as second_xml_rev
+                         on second_xml_rev.main_identifier = data.main_identifier
+where data.main_identifier = ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
     );
@@ -170,52 +231,9 @@ select rel.main_identifier
       fn(array $stmt) => $stmt['main_identifier']
     );
   }
-
-  /*
-  function selectAllTransliterations(): ?AllTransliterations
-  {
-    return executeSingleSelectQuery(
-      "
-select pt.input             as p_input,
-       it.input             as i_input,
-       fr.input             as fr_input,
-       fr.reviewer_username as fr_username,
-       sr.input             as sr_input,
-       sr.reviewer_username as sr_username,
-       at.input             as at_input,
-       at.approval_username as at_username
-from tlh_dig_manuscript_metadatas as m
-       left outer join tlh_dig_provisional_transliterations as pt on pt.main_identifier = m.main_identifier
-       left outer join tlh_dig_released_transliterations as it on it.input = pt.input
-       left outer join tlh_dig_first_reviews as fr on fr.main_identifier = it.main_identifier
-       left outer join tlh_dig_second_reviews as sr on sr.main_identifier = fr.main_identifier
-       left outer join tlh_dig_approved_transliterations as at on at.main_identifier = sr.main_identifier
-where m.main_identifier = ?;",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
-      fn(array $row): AllTransliterations => new AllTransliterations(
-        $row['p_input'],
-        $row['i_input'],
-        isset($row['fr_input']) && isset($row['fr_username'])
-          ? new Review($row['fr_input'], $row['fr_username'])
-          : null,
-        isset($row['sr_input']) && isset($row['sr_username'])
-          ? new Review($row['sr_input'], $row['sr_username'])
-          : null,
-        isset($row['at_input']) && isset($row['at_username'])
-          ? new Review($row['at_input'], $row['at_username'])
-          : null
-      )
-    );
-  }
-  */
 }
 
 // GraphQL
-
-$manuscriptStatusEnumType = new EnumType([
-  'name' => 'ManuscriptStatus',
-  'values' => ['InCreation', 'Created', 'Reviewed', 'ReviewMerged', 'ExecutiveReviewed', 'ExecutiveReviewMerged', 'Approved']
-]);
 
 Manuscript::$graphQLType = new ObjectType([
   'name' => 'ManuscriptMetaData',
@@ -229,7 +247,7 @@ Manuscript::$graphQLType = new ObjectType([
     'palaeographicClassificationSure' => Type::nonNull(Type::boolean()),
     'status' => [
       // TODO: remove!
-      'type' => $manuscriptStatusEnumType,
+      'type' => ManuscriptStatus::$graphQLType,
       'deprecationReason' => 'will be removed!',
       'resolve' => fn(Manuscript $manuscript): string => $manuscript->status
     ],
