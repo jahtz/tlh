@@ -58,10 +58,10 @@ Reviewer::$queryType = new ObjectType([
     ],
     'secondXmlReview' => [
       'type' => Type::string(),
-      'args' =>[
+      'args' => [
         'mainIdentifier' => Type::nonNull(Type::string())
       ],
-      'resolve' => fn(User $user, array $args) : ?string => SecondXmlReviewer::selectXmlForSecondReviewAppointment($args['mainIdentifier'], $user->username)
+      'resolve' => fn(User $user, array $args): ?string => SecondXmlReviewer::selectXmlForSecondReviewAppointment($args['mainIdentifier'], $user->username)
     ]
   ]
 ]);
@@ -107,6 +107,21 @@ Reviewer::$mutationType = new ObjectType([
     ],
     'submitFirstXmlReview' => [
       'type' => Type::nonNull(Type::boolean()),
+      'args' => [
+        'mainIdentifier' => Type::nonNull(Type::string()),
+        'review' => Type::nonNull(Type::string())
+      ],
+      'resolve' => function (User $user, array $args): bool {
+        $mainIdentifier = $args['mainIdentifier'];
+        $review = $args['review'];
+
+        // TODO: check conditions!
+
+        return false;
+      }
+    ],
+    'submitSecondXmlReview' => [
+      'type' => Type::nonNull(Type::string()),
       'args' => [
         'mainIdentifier' => Type::nonNull(Type::string()),
         'review' => Type::nonNull(Type::string())

@@ -25,7 +25,7 @@ import {App} from './App';
 import {LoginForm} from './forms/LoginForm';
 import {RequireAuth} from './RequireAuth';
 import {CreateManuscriptForm} from './forms/CreateManuscriptForm';
-import {XmlDocumentEditorContainer} from './xmlEditor/XmlDocumentEditorContainer';
+import {StandAloneOXTED} from './xmlEditor/StandAloneOXTED';
 import {DocumentMergerContainer} from './documentMerger/DocumentMergerContainer';
 import {tlhXmlEditorConfig} from './xmlEditor/tlhXmlEditorConfig';
 import {Preferences} from './Preferences';
@@ -91,9 +91,8 @@ export const router = createBrowserRouter([
           ]
         },
 
-        {path: editTransliterationDocumentUrl, element: <XmlDocumentEditorContainer editorConfig={tlhXmlEditorConfig}/>},
-
-        {path: editTranscriptionDocumentUrl, element: <XmlDocumentEditorContainer editorConfig={tlhXmlEditorConfig}/>},
+        {path: editTransliterationDocumentUrl, element: <StandAloneOXTED editorConfig={tlhXmlEditorConfig} documentType={'transliteration'}/>},
+        {path: editTranscriptionDocumentUrl, element: <StandAloneOXTED editorConfig={tlhXmlEditorConfig} documentType={'transcription'}/>},
 
         {path: xmlComparatorUrl, element: <XmlComparatorContainer/>},
 

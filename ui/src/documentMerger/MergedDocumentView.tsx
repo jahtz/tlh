@@ -3,8 +3,7 @@ import {JSX} from 'react';
 import {MergeDocumentLine} from './DocumentMerger';
 import {useTranslation} from 'react-i18next';
 import {findFirstXmlElementByTagName, isXmlElementNode, isXmlTextNode, writeNode, XmlElementNode, xmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
-import {handleSaveToPC} from '../xmlEditor/XmlDocumentEditorContainer';
-import {writeXml} from '../xmlEditor/XmlDocumentEditor';
+import {handleSaveToPC, writeXml} from '../xmlEditor/StandAloneOXTED';
 import xmlFormat from 'xml-formatter';
 
 interface IProps {

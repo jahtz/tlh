@@ -5,7 +5,7 @@ import {isLeft, parseNewXml, XmlElementNode} from 'simple_xml';
 import classNames from 'classnames';
 import {xml} from '@codemirror/lang-xml';
 import ReactCodeMirror from '@uiw/react-codemirror';
-import {writeXml} from './XmlDocumentEditor';
+import {writeXml} from './StandAloneOXTED';
 import update from 'immutability-helper';
 import {FontSizeSelector} from './FontSizeSelector';
 import {NodePath} from './insertablePositions';

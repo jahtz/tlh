@@ -9,9 +9,10 @@ interface IProps {
   currentInsertedElement?: string;
   toggleElementInsert: (tagName: string, ip: InsertablePositions) => void;
   toggleCompareChanges: () => void;
+  onExport: () => void;
 }
 
-export function EditorEmptyRightSide({editorConfig, currentInsertedElement, toggleElementInsert, toggleCompareChanges}: IProps): JSX.Element {
+export function EditorEmptyRightSide({editorConfig, currentInsertedElement, toggleElementInsert, toggleCompareChanges, onExport}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -32,8 +33,9 @@ export function EditorEmptyRightSide({editorConfig, currentInsertedElement, togg
         )}
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 grid grid-cols-2 gap-2">
         <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={toggleCompareChanges}>{t('compareChanges')}</button>
+        <button type="button" className="p-2 rounded bg-green-500 text-white w-full" onClick={onExport}>{t('export')}</button>
       </div>
     </div>
   );

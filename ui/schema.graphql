@@ -146,6 +146,7 @@ type Reviewer {
 
 type ReviewerMutations {
   submitFirstXmlReview(mainIdentifier: String!, review: String!): Boolean!
+  submitSecondXmlReview(mainIdentifier: String!, review: String!): String!
   submitTransliterationReview(mainIdentifier: String!, review: String!): Boolean!
   submitXmlConversion(conversion: String!, mainIdentifier: String!): Boolean!
 }

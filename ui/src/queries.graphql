@@ -170,11 +170,23 @@ query FirstXmlReview($mainIdentifier: String!) {
   }
 }
 
+mutation SubmitFirstXmlReview($mainIdentifier: String!, $review: String!) {
+  reviewerMutations {
+    submitFirstXmlReview(mainIdentifier: $mainIdentifier, review: $review)
+  }
+}
+
 # /manuscripts/:id/secondXmlReview
 
 query SecondXmlReview($mainIdentifier: String!) {
   reviewerQueries {
     secondXmlReview(mainIdentifier: $mainIdentifier)
+  }
+}
+
+mutation SubmitSecondXmlReview($mainIdentifier: String!, $review: String!) {
+  reviewerMutations {
+    submitSecondXmlReview(mainIdentifier: $mainIdentifier, review: $review)
   }
 }
 

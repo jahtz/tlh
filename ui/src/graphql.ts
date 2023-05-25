@@ -273,12 +273,19 @@ export type ReviewerXmlConversionArgs = {
 export type ReviewerMutations = {
   __typename?: 'ReviewerMutations';
   submitFirstXmlReview: Scalars['Boolean'];
+  submitSecondXmlReview: Scalars['String'];
   submitTransliterationReview: Scalars['Boolean'];
   submitXmlConversion: Scalars['Boolean'];
 };
 
 
 export type ReviewerMutationsSubmitFirstXmlReviewArgs = {
+  mainIdentifier: Scalars['String'];
+  review: Scalars['String'];
+};
+
+
+export type ReviewerMutationsSubmitSecondXmlReviewArgs = {
   mainIdentifier: Scalars['String'];
   review: Scalars['String'];
 };
@@ -438,12 +445,28 @@ export type FirstXmlReviewQueryVariables = Exact<{
 
 export type FirstXmlReviewQuery = { __typename?: 'Query', reviewerQueries?: { __typename?: 'Reviewer', firstXmlReview?: string | null } | null };
 
+export type SubmitFirstXmlReviewMutationVariables = Exact<{
+  mainIdentifier: Scalars['String'];
+  review: Scalars['String'];
+}>;
+
+
+export type SubmitFirstXmlReviewMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitFirstXmlReview: boolean } | null };
+
 export type SecondXmlReviewQueryVariables = Exact<{
   mainIdentifier: Scalars['String'];
 }>;
 
 
 export type SecondXmlReviewQuery = { __typename?: 'Query', reviewerQueries?: { __typename?: 'Reviewer', secondXmlReview?: string | null } | null };
+
+export type SubmitSecondXmlReviewMutationVariables = Exact<{
+  mainIdentifier: Scalars['String'];
+  review: Scalars['String'];
+}>;
+
+
+export type SubmitSecondXmlReviewMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitSecondXmlReview: string } | null };
 
 export type DocumentInPipelineFragment = { __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null, xmlConversionDateString?: string | null, appointedFirstXmlReviewer?: string | null, firstXmlReviewDateString?: string | null, appointedSecondXmlReviewer?: string | null, secondXmlReviewDateString?: string | null };
 
@@ -1115,6 +1138,40 @@ export function useFirstXmlReviewLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type FirstXmlReviewQueryHookResult = ReturnType<typeof useFirstXmlReviewQuery>;
 export type FirstXmlReviewLazyQueryHookResult = ReturnType<typeof useFirstXmlReviewLazyQuery>;
 export type FirstXmlReviewQueryResult = Apollo.QueryResult<FirstXmlReviewQuery, FirstXmlReviewQueryVariables>;
+export const SubmitFirstXmlReviewDocument = gql`
+    mutation SubmitFirstXmlReview($mainIdentifier: String!, $review: String!) {
+  reviewerMutations {
+    submitFirstXmlReview(mainIdentifier: $mainIdentifier, review: $review)
+  }
+}
+    `;
+export type SubmitFirstXmlReviewMutationFn = Apollo.MutationFunction<SubmitFirstXmlReviewMutation, SubmitFirstXmlReviewMutationVariables>;
+
+/**
+ * __useSubmitFirstXmlReviewMutation__
+ *
+ * To run a mutation, you first call `useSubmitFirstXmlReviewMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSubmitFirstXmlReviewMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [submitFirstXmlReviewMutation, { data, loading, error }] = useSubmitFirstXmlReviewMutation({
+ *   variables: {
+ *      mainIdentifier: // value for 'mainIdentifier'
+ *      review: // value for 'review'
+ *   },
+ * });
+ */
+export function useSubmitFirstXmlReviewMutation(baseOptions?: Apollo.MutationHookOptions<SubmitFirstXmlReviewMutation, SubmitFirstXmlReviewMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SubmitFirstXmlReviewMutation, SubmitFirstXmlReviewMutationVariables>(SubmitFirstXmlReviewDocument, options);
+      }
+export type SubmitFirstXmlReviewMutationHookResult = ReturnType<typeof useSubmitFirstXmlReviewMutation>;
+export type SubmitFirstXmlReviewMutationResult = Apollo.MutationResult<SubmitFirstXmlReviewMutation>;
+export type SubmitFirstXmlReviewMutationOptions = Apollo.BaseMutationOptions<SubmitFirstXmlReviewMutation, SubmitFirstXmlReviewMutationVariables>;
 export const SecondXmlReviewDocument = gql`
     query SecondXmlReview($mainIdentifier: String!) {
   reviewerQueries {
@@ -1150,6 +1207,40 @@ export function useSecondXmlReviewLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
 export type SecondXmlReviewQueryHookResult = ReturnType<typeof useSecondXmlReviewQuery>;
 export type SecondXmlReviewLazyQueryHookResult = ReturnType<typeof useSecondXmlReviewLazyQuery>;
 export type SecondXmlReviewQueryResult = Apollo.QueryResult<SecondXmlReviewQuery, SecondXmlReviewQueryVariables>;
+export const SubmitSecondXmlReviewDocument = gql`
+    mutation SubmitSecondXmlReview($mainIdentifier: String!, $review: String!) {
+  reviewerMutations {
+    submitSecondXmlReview(mainIdentifier: $mainIdentifier, review: $review)
+  }
+}
+    `;
+export type SubmitSecondXmlReviewMutationFn = Apollo.MutationFunction<SubmitSecondXmlReviewMutation, SubmitSecondXmlReviewMutationVariables>;
+
+/**
+ * __useSubmitSecondXmlReviewMutation__
+ *
+ * To run a mutation, you first call `useSubmitSecondXmlReviewMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSubmitSecondXmlReviewMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [submitSecondXmlReviewMutation, { data, loading, error }] = useSubmitSecondXmlReviewMutation({
+ *   variables: {
+ *      mainIdentifier: // value for 'mainIdentifier'
+ *      review: // value for 'review'
+ *   },
+ * });
+ */
+export function useSubmitSecondXmlReviewMutation(baseOptions?: Apollo.MutationHookOptions<SubmitSecondXmlReviewMutation, SubmitSecondXmlReviewMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SubmitSecondXmlReviewMutation, SubmitSecondXmlReviewMutationVariables>(SubmitSecondXmlReviewDocument, options);
+      }
+export type SubmitSecondXmlReviewMutationHookResult = ReturnType<typeof useSubmitSecondXmlReviewMutation>;
+export type SubmitSecondXmlReviewMutationResult = Apollo.MutationResult<SubmitSecondXmlReviewMutation>;
+export type SubmitSecondXmlReviewMutationOptions = Apollo.BaseMutationOptions<SubmitSecondXmlReviewMutation, SubmitSecondXmlReviewMutationVariables>;
 export const PipelineOverviewDocument = gql`
     query PipelineOverview($page: Int) {
   executiveEditorQueries {
