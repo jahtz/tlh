@@ -5,19 +5,21 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string;
-  String: string;
-  Boolean: boolean;
-  Int: number;
-  Float: number;
+  ID: { input: string | number; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
 };
 
 export type Appointment = {
   __typename?: 'Appointment';
-  manuscriptIdentifier: Scalars['String'];
+  manuscriptIdentifier: Scalars['String']['output'];
   type: AppointmentType;
   waitingFor?: Maybe<AppointmentType>;
 };
@@ -31,79 +33,79 @@ export const enum AppointmentType {
 
 export type DocumentInPipeline = {
   __typename?: 'DocumentInPipeline';
-  appointedFirstXmlReviewer?: Maybe<Scalars['String']>;
-  appointedSecondXmlReviewer?: Maybe<Scalars['String']>;
-  appointedTransliterationReviewer?: Maybe<Scalars['String']>;
-  appointedXmlConverter?: Maybe<Scalars['String']>;
-  firstXmlReviewDateString?: Maybe<Scalars['String']>;
-  manuscriptIdentifier: Scalars['String'];
-  secondXmlReviewDateString?: Maybe<Scalars['String']>;
-  transliterationReviewDateString?: Maybe<Scalars['String']>;
-  xmlConversionDateString?: Maybe<Scalars['String']>;
+  appointedFirstXmlReviewer?: Maybe<Scalars['String']['output']>;
+  appointedSecondXmlReviewer?: Maybe<Scalars['String']['output']>;
+  appointedTransliterationReviewer?: Maybe<Scalars['String']['output']>;
+  appointedXmlConverter?: Maybe<Scalars['String']['output']>;
+  firstXmlReviewDateString?: Maybe<Scalars['String']['output']>;
+  manuscriptIdentifier: Scalars['String']['output'];
+  secondXmlReviewDateString?: Maybe<Scalars['String']['output']>;
+  transliterationReviewDateString?: Maybe<Scalars['String']['output']>;
+  xmlConversionDateString?: Maybe<Scalars['String']['output']>;
 };
 
 export type ExecutiveEditor = {
   __typename?: 'ExecutiveEditor';
-  allReviewers: Array<Scalars['String']>;
+  allReviewers: Array<Scalars['String']['output']>;
   documentsInPipeline: Array<DocumentInPipeline>;
-  documentsInPipelineCount: Scalars['Int'];
-  releasedTransliterationsWithoutAppointedReviewer: Array<Scalars['String']>;
-  userCount: Scalars['Int'];
+  documentsInPipelineCount: Scalars['Int']['output'];
+  releasedTransliterationsWithoutAppointedReviewer: Array<Scalars['String']['output']>;
+  userCount: Scalars['Int']['output'];
   users: Array<User>;
 };
 
 
 export type ExecutiveEditorDocumentsInPipelineArgs = {
-  page?: InputMaybe<Scalars['Int']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
 export type ExecutiveEditorUsersArgs = {
-  page: Scalars['Int'];
+  page: Scalars['Int']['input'];
 };
 
 export type ExecutiveEditorMutations = {
   __typename?: 'ExecutiveEditorMutations';
-  appointFirstXmlReviewer: Scalars['String'];
-  appointSecondXmlReviewer: Scalars['String'];
-  appointTransliterationReviewer: Scalars['String'];
-  appointXmlConverter: Scalars['String'];
+  appointFirstXmlReviewer: Scalars['String']['output'];
+  appointSecondXmlReviewer: Scalars['String']['output'];
+  appointTransliterationReviewer: Scalars['String']['output'];
+  appointXmlConverter: Scalars['String']['output'];
   updateUserRights: Rights;
 };
 
 
 export type ExecutiveEditorMutationsAppointFirstXmlReviewerArgs = {
-  manuscriptIdentifier: Scalars['String'];
-  reviewer: Scalars['String'];
+  manuscriptIdentifier: Scalars['String']['input'];
+  reviewer: Scalars['String']['input'];
 };
 
 
 export type ExecutiveEditorMutationsAppointSecondXmlReviewerArgs = {
-  manuscriptIdentifier: Scalars['String'];
-  reviewer: Scalars['String'];
+  manuscriptIdentifier: Scalars['String']['input'];
+  reviewer: Scalars['String']['input'];
 };
 
 
 export type ExecutiveEditorMutationsAppointTransliterationReviewerArgs = {
-  manuscriptIdentifier: Scalars['String'];
-  reviewer: Scalars['String'];
+  manuscriptIdentifier: Scalars['String']['input'];
+  reviewer: Scalars['String']['input'];
 };
 
 
 export type ExecutiveEditorMutationsAppointXmlConverterArgs = {
-  converter: Scalars['String'];
-  manuscriptIdentifier: Scalars['String'];
+  converter: Scalars['String']['input'];
+  manuscriptIdentifier: Scalars['String']['input'];
 };
 
 
 export type ExecutiveEditorMutationsUpdateUserRightsArgs = {
   newRights: Rights;
-  username: Scalars['String'];
+  username: Scalars['String']['input'];
 };
 
 export type LoggedInUserMutations = {
   __typename?: 'LoggedInUserMutations';
-  createManuscript: Scalars['String'];
+  createManuscript: Scalars['String']['output'];
   manuscript?: Maybe<ManuscriptMutations>;
 };
 
@@ -114,17 +116,17 @@ export type LoggedInUserMutationsCreateManuscriptArgs = {
 
 
 export type LoggedInUserMutationsManuscriptArgs = {
-  mainIdentifier: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
 };
 
 export type ManuscriptIdentifier = {
   __typename?: 'ManuscriptIdentifier';
-  identifier: Scalars['String'];
+  identifier: Scalars['String']['output'];
   identifierType: ManuscriptIdentifierType;
 };
 
 export type ManuscriptIdentifierInput = {
-  identifier: Scalars['String'];
+  identifier: Scalars['String']['input'];
   identifierType: ManuscriptIdentifierType;
 };
 
@@ -136,46 +138,46 @@ export const enum ManuscriptIdentifierType {
 
 export type ManuscriptLanguage = {
   __typename?: 'ManuscriptLanguage';
-  abbreviation: Scalars['String'];
-  name: Scalars['String'];
+  abbreviation: Scalars['String']['output'];
+  name: Scalars['String']['output'];
 };
 
 export type ManuscriptMetaData = {
   __typename?: 'ManuscriptMetaData';
-  bibliography?: Maybe<Scalars['String']>;
-  creatorUsername: Scalars['String'];
-  cthClassification?: Maybe<Scalars['Int']>;
+  bibliography?: Maybe<Scalars['String']['output']>;
+  creatorUsername: Scalars['String']['output'];
+  cthClassification?: Maybe<Scalars['Int']['output']>;
   mainIdentifier: ManuscriptIdentifier;
   otherIdentifiers: Array<ManuscriptIdentifier>;
   palaeographicClassification: PalaeographicClassification;
-  palaeographicClassificationSure: Scalars['Boolean'];
-  pictureUrls: Array<Scalars['String']>;
-  provenance?: Maybe<Scalars['String']>;
-  provisionalTransliteration?: Maybe<Scalars['String']>;
+  palaeographicClassificationSure: Scalars['Boolean']['output'];
+  pictureUrls: Array<Scalars['String']['output']>;
+  provenance?: Maybe<Scalars['String']['output']>;
+  provisionalTransliteration?: Maybe<Scalars['String']['output']>;
   /** @deprecated will be removed! */
   status?: Maybe<ManuscriptStatus>;
-  transliterationReleased: Scalars['Boolean'];
+  transliterationReleased: Scalars['Boolean']['output'];
 };
 
 export type ManuscriptMetaDataInput = {
-  bibliography?: InputMaybe<Scalars['String']>;
-  cthClassification?: InputMaybe<Scalars['Int']>;
+  bibliography?: InputMaybe<Scalars['String']['input']>;
+  cthClassification?: InputMaybe<Scalars['Int']['input']>;
   mainIdentifier: ManuscriptIdentifierInput;
   otherIdentifiers: Array<ManuscriptIdentifierInput>;
   palaeographicClassification: PalaeographicClassification;
-  palaeographicClassificationSure: Scalars['Boolean'];
-  provenance?: InputMaybe<Scalars['String']>;
+  palaeographicClassificationSure: Scalars['Boolean']['input'];
+  provenance?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ManuscriptMutations = {
   __typename?: 'ManuscriptMutations';
-  releaseTransliteration: Scalars['Boolean'];
-  updateTransliteration: Scalars['Boolean'];
+  releaseTransliteration: Scalars['Boolean']['output'];
+  updateTransliteration: Scalars['Boolean']['output'];
 };
 
 
 export type ManuscriptMutationsUpdateTransliterationArgs = {
-  input: Scalars['String'];
+  input: Scalars['String']['input'];
 };
 
 export const enum ManuscriptStatus {
@@ -191,16 +193,16 @@ export const enum ManuscriptStatus {
 export type Mutation = {
   __typename?: 'Mutation';
   executiveEditor?: Maybe<ExecutiveEditorMutations>;
-  login?: Maybe<Scalars['String']>;
+  login?: Maybe<Scalars['String']['output']>;
   me?: Maybe<LoggedInUserMutations>;
-  register?: Maybe<Scalars['String']>;
+  register?: Maybe<Scalars['String']['output']>;
   reviewerMutations?: Maybe<ReviewerMutations>;
 };
 
 
 export type MutationLoginArgs = {
-  password: Scalars['String'];
-  username: Scalars['String'];
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 
@@ -225,81 +227,81 @@ export type Query = {
   allManuscripts: Array<ManuscriptMetaData>;
   executiveEditorQueries?: Maybe<ExecutiveEditor>;
   manuscript?: Maybe<ManuscriptMetaData>;
-  manuscriptCount: Scalars['Int'];
+  manuscriptCount: Scalars['Int']['output'];
   manuscriptLanguages: Array<ManuscriptLanguage>;
-  myManuscripts?: Maybe<Array<Scalars['String']>>;
+  myManuscripts?: Maybe<Array<Scalars['String']['output']>>;
   reviewerQueries?: Maybe<Reviewer>;
 };
 
 
 export type QueryAllManuscriptsArgs = {
-  page: Scalars['Int'];
+  page: Scalars['Int']['input'];
 };
 
 
 export type QueryManuscriptArgs = {
-  mainIdentifier: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
 };
 
 export type Reviewer = {
   __typename?: 'Reviewer';
   appointments: Array<Appointment>;
-  firstXmlReview?: Maybe<Scalars['String']>;
-  secondXmlReview?: Maybe<Scalars['String']>;
-  transliterationReview?: Maybe<Scalars['String']>;
-  xmlConversion?: Maybe<Scalars['String']>;
+  firstXmlReview?: Maybe<Scalars['String']['output']>;
+  secondXmlReview?: Maybe<Scalars['String']['output']>;
+  transliterationReview?: Maybe<Scalars['String']['output']>;
+  xmlConversion?: Maybe<Scalars['String']['output']>;
 };
 
 
 export type ReviewerFirstXmlReviewArgs = {
-  mainIdentifier: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
 };
 
 
 export type ReviewerSecondXmlReviewArgs = {
-  mainIdentifier: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
 };
 
 
 export type ReviewerTransliterationReviewArgs = {
-  mainIdentifier: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
 };
 
 
 export type ReviewerXmlConversionArgs = {
-  mainIdentifier: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
 };
 
 export type ReviewerMutations = {
   __typename?: 'ReviewerMutations';
-  submitFirstXmlReview: Scalars['Boolean'];
-  submitSecondXmlReview: Scalars['String'];
-  submitTransliterationReview: Scalars['Boolean'];
-  submitXmlConversion: Scalars['Boolean'];
+  submitFirstXmlReview: Scalars['Boolean']['output'];
+  submitSecondXmlReview: Scalars['String']['output'];
+  submitTransliterationReview: Scalars['Boolean']['output'];
+  submitXmlConversion: Scalars['Boolean']['output'];
 };
 
 
 export type ReviewerMutationsSubmitFirstXmlReviewArgs = {
-  mainIdentifier: Scalars['String'];
-  review: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
+  review: Scalars['String']['input'];
 };
 
 
 export type ReviewerMutationsSubmitSecondXmlReviewArgs = {
-  mainIdentifier: Scalars['String'];
-  review: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
+  review: Scalars['String']['input'];
 };
 
 
 export type ReviewerMutationsSubmitTransliterationReviewArgs = {
-  mainIdentifier: Scalars['String'];
-  review: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
+  review: Scalars['String']['input'];
 };
 
 
 export type ReviewerMutationsSubmitXmlConversionArgs = {
-  conversion: Scalars['String'];
-  mainIdentifier: Scalars['String'];
+  conversion: Scalars['String']['input'];
+  mainIdentifier: Scalars['String']['input'];
 };
 
 export const enum Rights {
@@ -310,20 +312,20 @@ export const enum Rights {
 
 export type User = {
   __typename?: 'User';
-  affiliation?: Maybe<Scalars['String']>;
-  email: Scalars['String'];
-  name: Scalars['String'];
+  affiliation?: Maybe<Scalars['String']['output']>;
+  email: Scalars['String']['output'];
+  name: Scalars['String']['output'];
   rights: Rights;
-  username: Scalars['String'];
+  username: Scalars['String']['output'];
 };
 
 export type UserInput = {
-  affiliation?: InputMaybe<Scalars['String']>;
-  email: Scalars['String'];
-  name: Scalars['String'];
-  password: Scalars['String'];
-  passwordRepeat: Scalars['String'];
-  username: Scalars['String'];
+  affiliation?: InputMaybe<Scalars['String']['input']>;
+  email: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  passwordRepeat: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 export type ManuscriptIdentifierFragment = { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string };
@@ -343,8 +345,8 @@ export type RegisterMutationVariables = Exact<{
 export type RegisterMutation = { __typename?: 'Mutation', register?: string | null };
 
 export type LoginMutationVariables = Exact<{
-  username: Scalars['String'];
-  password: Scalars['String'];
+  username: Scalars['String']['input'];
+  password: Scalars['String']['input'];
 }>;
 
 
@@ -355,7 +357,7 @@ export type ManuscriptBasicDataFragment = { __typename?: 'ManuscriptMetaData', s
 export type ReviewerHomeDataFragment = { __typename?: 'Reviewer', appointments: Array<{ __typename?: 'Appointment', type: AppointmentType, manuscriptIdentifier: string, waitingFor?: AppointmentType | null }> };
 
 export type IndexQueryVariables = Exact<{
-  page?: Scalars['Int'];
+  page?: Scalars['Int']['input'];
 }>;
 
 
@@ -371,14 +373,14 @@ export type CreateManuscriptMutation = { __typename?: 'Mutation', me?: { __typen
 export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, provisionalTransliteration?: string | null, transliterationReleased: boolean, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }> };
 
 export type ManuscriptQueryVariables = Exact<{
-  mainIdentifier: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
 }>;
 
 
 export type ManuscriptQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, provisionalTransliteration?: string | null, transliterationReleased: boolean, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }> } | null };
 
 export type ReleaseTransliterationMutationVariables = Exact<{
-  mainIdentifier: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
 }>;
 
 
@@ -387,82 +389,82 @@ export type ReleaseTransliterationMutation = { __typename?: 'Mutation', me?: { _
 export type ManuscriptIdentWithCreatorFragment = { __typename?: 'ManuscriptMetaData', pictureUrls: Array<string>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
 export type UploadPicturesQueryVariables = Exact<{
-  mainIdentifier: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
 }>;
 
 
 export type UploadPicturesQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', pictureUrls: Array<string>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } } | null };
 
 export type TransliterationInputQueryVariables = Exact<{
-  mainIdentifier: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
 }>;
 
 
 export type TransliterationInputQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } } | null };
 
 export type UploadTransliterationMutationVariables = Exact<{
-  mainIdentifier: Scalars['String'];
-  input: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
+  input: Scalars['String']['input'];
 }>;
 
 
 export type UploadTransliterationMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', manuscript?: { __typename?: 'ManuscriptMutations', updateTransliteration: boolean } | null } | null };
 
 export type ReviewTransliterationQueryVariables = Exact<{
-  mainIdentifier: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
 }>;
 
 
 export type ReviewTransliterationQuery = { __typename?: 'Query', reviewerQueries?: { __typename?: 'Reviewer', transliterationReview?: string | null } | null };
 
 export type SubmitTransliterationReviewMutationVariables = Exact<{
-  mainIdentifier: Scalars['String'];
-  review: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
+  review: Scalars['String']['input'];
 }>;
 
 
 export type SubmitTransliterationReviewMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitTransliterationReview: boolean } | null };
 
 export type XmlConversionQueryVariables = Exact<{
-  mainIdentifier: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
 }>;
 
 
 export type XmlConversionQuery = { __typename?: 'Query', reviewerQueries?: { __typename?: 'Reviewer', xmlConversion?: string | null } | null };
 
 export type SubmitXmlConversionMutationVariables = Exact<{
-  mainIdentifier: Scalars['String'];
-  conversion: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
+  conversion: Scalars['String']['input'];
 }>;
 
 
 export type SubmitXmlConversionMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitXmlConversion: boolean } | null };
 
 export type FirstXmlReviewQueryVariables = Exact<{
-  mainIdentifier: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
 }>;
 
 
 export type FirstXmlReviewQuery = { __typename?: 'Query', reviewerQueries?: { __typename?: 'Reviewer', firstXmlReview?: string | null } | null };
 
 export type SubmitFirstXmlReviewMutationVariables = Exact<{
-  mainIdentifier: Scalars['String'];
-  review: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
+  review: Scalars['String']['input'];
 }>;
 
 
 export type SubmitFirstXmlReviewMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitFirstXmlReview: boolean } | null };
 
 export type SecondXmlReviewQueryVariables = Exact<{
-  mainIdentifier: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
 }>;
 
 
 export type SecondXmlReviewQuery = { __typename?: 'Query', reviewerQueries?: { __typename?: 'Reviewer', secondXmlReview?: string | null } | null };
 
 export type SubmitSecondXmlReviewMutationVariables = Exact<{
-  mainIdentifier: Scalars['String'];
-  review: Scalars['String'];
+  mainIdentifier: Scalars['String']['input'];
+  review: Scalars['String']['input'];
 }>;
 
 
@@ -473,39 +475,39 @@ export type DocumentInPipelineFragment = { __typename?: 'DocumentInPipeline', ma
 export type PipelineOverviewFragment = { __typename?: 'ExecutiveEditor', allReviewers: Array<string>, documentsInPipeline: Array<{ __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null, xmlConversionDateString?: string | null, appointedFirstXmlReviewer?: string | null, firstXmlReviewDateString?: string | null, appointedSecondXmlReviewer?: string | null, secondXmlReviewDateString?: string | null }> };
 
 export type PipelineOverviewQueryVariables = Exact<{
-  page?: InputMaybe<Scalars['Int']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
 export type PipelineOverviewQuery = { __typename?: 'Query', executiveEditorQueries?: { __typename?: 'ExecutiveEditor', allReviewers: Array<string>, documentsInPipeline: Array<{ __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null, xmlConversionDateString?: string | null, appointedFirstXmlReviewer?: string | null, firstXmlReviewDateString?: string | null, appointedSecondXmlReviewer?: string | null, secondXmlReviewDateString?: string | null }> } | null };
 
 export type AppointTransliterationReviewerMutationVariables = Exact<{
-  manuscriptIdentifier: Scalars['String'];
-  reviewer: Scalars['String'];
+  manuscriptIdentifier: Scalars['String']['input'];
+  reviewer: Scalars['String']['input'];
 }>;
 
 
 export type AppointTransliterationReviewerMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', appointTransliterationReviewer: string } | null };
 
 export type AppointXmlConverterMutationVariables = Exact<{
-  manuscriptIdentifier: Scalars['String'];
-  converter: Scalars['String'];
+  manuscriptIdentifier: Scalars['String']['input'];
+  converter: Scalars['String']['input'];
 }>;
 
 
 export type AppointXmlConverterMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', appointXmlConverter: string } | null };
 
 export type AppointFirstXmlReviewerMutationVariables = Exact<{
-  manuscriptIdentifier: Scalars['String'];
-  reviewer: Scalars['String'];
+  manuscriptIdentifier: Scalars['String']['input'];
+  reviewer: Scalars['String']['input'];
 }>;
 
 
 export type AppointFirstXmlReviewerMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', appointFirstXmlReviewer: string } | null };
 
 export type AppointSecondXmlReviewerMutationVariables = Exact<{
-  manuscriptIdentifier: Scalars['String'];
-  reviewer: Scalars['String'];
+  manuscriptIdentifier: Scalars['String']['input'];
+  reviewer: Scalars['String']['input'];
 }>;
 
 
@@ -514,14 +516,14 @@ export type AppointSecondXmlReviewerMutation = { __typename?: 'Mutation', execut
 export type UserFragment = { __typename?: 'User', username: string, name: string, affiliation?: string | null, email: string, rights: Rights };
 
 export type UsersOverviewQueryVariables = Exact<{
-  page: Scalars['Int'];
+  page: Scalars['Int']['input'];
 }>;
 
 
 export type UsersOverviewQuery = { __typename?: 'Query', executiveEditorQueries?: { __typename?: 'ExecutiveEditor', userCount: number, users: Array<{ __typename?: 'User', username: string, name: string, affiliation?: string | null, email: string, rights: Rights }> } | null };
 
 export type UpdateUserRightsMutationVariables = Exact<{
-  username: Scalars['String'];
+  username: Scalars['String']['input'];
   newRights: Rights;
 }>;
 
