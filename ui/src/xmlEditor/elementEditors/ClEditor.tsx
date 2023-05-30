@@ -6,8 +6,8 @@ import {buildActionSpec} from '../XmlDocumentEditor';
 
 export const clEditorConfig: XmlInsertableSingleEditableNodeConfig = {
   replace: (node, renderedChildren, isSelected, isLeftSide) => displayReplace(
-    <><span className="px-1 cl">{node.attributes.id || ' '}</span>&nbsp;</>,
-    isLeftSide ? <>{renderedChildren}<br/></> : undefined
+    <><br/><span className="px-1 cl">{node.attributes.id || ' '}</span>&nbsp;</>,
+    isLeftSide ? <>{renderedChildren}</> : undefined
   ),
   dontRenderChildrenInline: true,
   edit: (props) => <ClEditor {...props}/>,
