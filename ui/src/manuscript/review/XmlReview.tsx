@@ -17,7 +17,7 @@ interface IProps {
 function Inner({mainIdentifier, initialXml, reviewType}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
-  const [submitXmlReview, {data, loading, error}] = useSubmitXmlReviewMutation();
+  const [submitXmlReview, {data, loading/*, error*/}] = useSubmitXmlReviewMutation();
 
   const rootNodeParseResult = parseNewXml(initialXml);
 
@@ -25,13 +25,10 @@ function Inner({mainIdentifier, initialXml, reviewType}: IProps): JSX.Element {
     throw new Error('TODO!');
   }
 
-  const onExport = (rootNode: XmlElementNode): void => {
-    const review = writeXml(rootNode);
-
-    submitXmlReview({variables: {mainIdentifier, review, reviewType}})
-      .then(({data}) => console.info(data?.reviewerMutations?.submitXmlReview))
+  const onExport = (rootNode: XmlElementNode): Promise<void | undefined> =>
+    submitXmlReview({variables: {mainIdentifier, review: writeXml(rootNode), reviewType}})
+      .then(() => void 0)
       .catch((error) => console.error(error));
-  };
 
   return data?.reviewerMutations?.submitXmlReview
     ? <div>TODO!</div>
@@ -41,7 +38,7 @@ function Inner({mainIdentifier, initialXml, reviewType}: IProps): JSX.Element {
 
 export function XmlReview({reviewType}: { reviewType: XmlReviewType }): JSX.Element {
 
-  const mainIdentifier = useParams<'mainIdentifier'>().mainIdentifier;
+  const {mainIdentifier} = useParams<'mainIdentifier'>();
 
   if (!mainIdentifier) {
     return <Navigate to={homeUrl}/>;

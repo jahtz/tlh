@@ -47,6 +47,10 @@ fragment ReviewerHomeData on Reviewer {
   }
 }
 
+fragment ExecutiveEditorHomeData on ExecutiveEditor {
+  documentsAwaitingApproval
+}
+
 query Index($page: Int! = 0) {
   manuscriptCount
   allManuscripts(page: $page) {
@@ -55,6 +59,9 @@ query Index($page: Int! = 0) {
   myManuscripts
   reviewerQueries {
     ...ReviewerHomeData
+  }
+  executiveEditorQueries {
+    ...ExecutiveEditorHomeData
   }
 }
 
@@ -173,6 +180,21 @@ query XmlReview($mainIdentifier: String!, $reviewType: XmlReviewType!) {
 mutation SubmitXmlReview($mainIdentifier: String!, $review: String!, $reviewType: XmlReviewType!) {
   reviewerMutations {
     submitXmlReview(mainIdentifier: $mainIdentifier, review: $review, reviewType: $reviewType)
+  }
+}
+
+# /manuscripts/:id/approveDocument
+
+query Approval($mainIdentifier: String!) {
+  executiveEditorQueries {
+    __typename
+    documentAwaitingApproval(mainIdentifier: $mainIdentifier)
+  }
+}
+
+mutation SubmitApproval($mainIdentifier: String!, $input: String!) {
+  executiveEditor {
+    submitApproval(manuscriptIdentifier: $mainIdentifier, input: $input)
   }
 }
 

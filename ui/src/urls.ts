@@ -39,6 +39,8 @@ export const firstXmlReviewUrl = 'firstXmlReview';
 
 export const secondXmlReviewUrl = 'secondXmlReview';
 
+export const approveDocumentUrl = 'approveDocument';
+
 // Foreign urls
 
 export const tlhAnalyzerUrl = '/TLHaly/jasonanalysis.php';

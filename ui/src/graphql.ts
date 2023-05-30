@@ -37,6 +37,7 @@ export type DocumentInPipeline = {
   appointedSecondXmlReviewer?: Maybe<Scalars['String']['output']>;
   appointedTransliterationReviewer?: Maybe<Scalars['String']['output']>;
   appointedXmlConverter?: Maybe<Scalars['String']['output']>;
+  approvalDateString?: Maybe<Scalars['String']['output']>;
   firstXmlReviewDateString?: Maybe<Scalars['String']['output']>;
   manuscriptIdentifier: Scalars['String']['output'];
   secondXmlReviewDateString?: Maybe<Scalars['String']['output']>;
@@ -47,11 +48,17 @@ export type DocumentInPipeline = {
 export type ExecutiveEditor = {
   __typename?: 'ExecutiveEditor';
   allReviewers: Array<Scalars['String']['output']>;
+  documentAwaitingApproval?: Maybe<Scalars['String']['output']>;
+  documentsAwaitingApproval: Array<Scalars['String']['output']>;
   documentsInPipeline: Array<DocumentInPipeline>;
   documentsInPipelineCount: Scalars['Int']['output'];
-  releasedTransliterationsWithoutAppointedReviewer: Array<Scalars['String']['output']>;
   userCount: Scalars['Int']['output'];
   users: Array<User>;
+};
+
+
+export type ExecutiveEditorDocumentAwaitingApprovalArgs = {
+  mainIdentifier: Scalars['String']['input'];
 };
 
 
@@ -70,6 +77,7 @@ export type ExecutiveEditorMutations = {
   appointSecondXmlReviewer: Scalars['String']['output'];
   appointTransliterationReviewer: Scalars['String']['output'];
   appointXmlConverter: Scalars['String']['output'];
+  submitApproval: Scalars['Boolean']['output'];
   updateUserRights: Rights;
 };
 
@@ -94,6 +102,12 @@ export type ExecutiveEditorMutationsAppointTransliterationReviewerArgs = {
 
 export type ExecutiveEditorMutationsAppointXmlConverterArgs = {
   converter: Scalars['String']['input'];
+  manuscriptIdentifier: Scalars['String']['input'];
+};
+
+
+export type ExecutiveEditorMutationsSubmitApprovalArgs = {
+  input: Scalars['String']['input'];
   manuscriptIdentifier: Scalars['String']['input'];
 };
 
@@ -183,10 +197,11 @@ export type ManuscriptMutationsUpdateTransliterationArgs = {
 export const enum ManuscriptStatus {
   Approved = 'Approved',
   Created = 'Created',
-  FirstXmlReviewed = 'FirstXmlReviewed',
-  SecondXmlReviewed = 'SecondXmlReviewed',
+  FirstXmlReviewPerformed = 'FirstXmlReviewPerformed',
+  SecondXmlReviewPerformed = 'SecondXmlReviewPerformed',
   TransliterationReleased = 'TransliterationReleased',
-  TransliterationReviewed = 'TransliterationReviewed'
+  TransliterationReviewPerformed = 'TransliterationReviewPerformed',
+  XmlConversionPerformed = 'XmlConversionPerformed'
 };
 
 export type Mutation = {
@@ -349,12 +364,14 @@ export type ManuscriptBasicDataFragment = { __typename?: 'ManuscriptMetaData', s
 
 export type ReviewerHomeDataFragment = { __typename?: 'Reviewer', appointments: Array<{ __typename?: 'Appointment', type: AppointmentType, manuscriptIdentifier: string, waitingFor?: AppointmentType | null }> };
 
+export type ExecutiveEditorHomeDataFragment = { __typename?: 'ExecutiveEditor', documentsAwaitingApproval: Array<string> };
+
 export type IndexQueryVariables = Exact<{
   page?: Scalars['Int']['input'];
 }>;
 
 
-export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, myManuscripts?: Array<string> | null, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }>, reviewerQueries?: { __typename?: 'Reviewer', appointments: Array<{ __typename?: 'Appointment', type: AppointmentType, manuscriptIdentifier: string, waitingFor?: AppointmentType | null }> } | null };
+export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, myManuscripts?: Array<string> | null, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }>, reviewerQueries?: { __typename?: 'Reviewer', appointments: Array<{ __typename?: 'Appointment', type: AppointmentType, manuscriptIdentifier: string, waitingFor?: AppointmentType | null }> } | null, executiveEditorQueries?: { __typename?: 'ExecutiveEditor', documentsAwaitingApproval: Array<string> } | null };
 
 export type CreateManuscriptMutationVariables = Exact<{
   manuscriptMetaData?: InputMaybe<ManuscriptMetaDataInput>;
@@ -450,6 +467,21 @@ export type SubmitXmlReviewMutationVariables = Exact<{
 
 export type SubmitXmlReviewMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitXmlReview: boolean } | null };
 
+export type ApprovalQueryVariables = Exact<{
+  mainIdentifier: Scalars['String']['input'];
+}>;
+
+
+export type ApprovalQuery = { __typename?: 'Query', executiveEditorQueries?: { __typename: 'ExecutiveEditor', documentAwaitingApproval?: string | null } | null };
+
+export type SubmitApprovalMutationVariables = Exact<{
+  mainIdentifier: Scalars['String']['input'];
+  input: Scalars['String']['input'];
+}>;
+
+
+export type SubmitApprovalMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', submitApproval: boolean } | null };
+
 export type DocumentInPipelineFragment = { __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null, xmlConversionDateString?: string | null, appointedFirstXmlReviewer?: string | null, firstXmlReviewDateString?: string | null, appointedSecondXmlReviewer?: string | null, secondXmlReviewDateString?: string | null };
 
 export type PipelineOverviewFragment = { __typename?: 'ExecutiveEditor', allReviewers: Array<string>, documentsInPipeline: Array<{ __typename?: 'DocumentInPipeline', manuscriptIdentifier: string, appointedTransliterationReviewer?: string | null, transliterationReviewDateString?: string | null, appointedXmlConverter?: string | null, xmlConversionDateString?: string | null, appointedFirstXmlReviewer?: string | null, firstXmlReviewDateString?: string | null, appointedSecondXmlReviewer?: string | null, secondXmlReviewDateString?: string | null }> };
@@ -538,6 +570,11 @@ export const ReviewerHomeDataFragmentDoc = gql`
     manuscriptIdentifier
     waitingFor
   }
+}
+    `;
+export const ExecutiveEditorHomeDataFragmentDoc = gql`
+    fragment ExecutiveEditorHomeData on ExecutiveEditor {
+  documentsAwaitingApproval
 }
     `;
 export const ManuscriptMetaDataFragmentDoc = gql`
@@ -705,9 +742,13 @@ export const IndexDocument = gql`
   reviewerQueries {
     ...ReviewerHomeData
   }
+  executiveEditorQueries {
+    ...ExecutiveEditorHomeData
+  }
 }
     ${ManuscriptBasicDataFragmentDoc}
-${ReviewerHomeDataFragmentDoc}`;
+${ReviewerHomeDataFragmentDoc}
+${ExecutiveEditorHomeDataFragmentDoc}`;
 
 /**
  * __useIndexQuery__
@@ -1160,6 +1201,76 @@ export function useSubmitXmlReviewMutation(baseOptions?: Apollo.MutationHookOpti
 export type SubmitXmlReviewMutationHookResult = ReturnType<typeof useSubmitXmlReviewMutation>;
 export type SubmitXmlReviewMutationResult = Apollo.MutationResult<SubmitXmlReviewMutation>;
 export type SubmitXmlReviewMutationOptions = Apollo.BaseMutationOptions<SubmitXmlReviewMutation, SubmitXmlReviewMutationVariables>;
+export const ApprovalDocument = gql`
+    query Approval($mainIdentifier: String!) {
+  executiveEditorQueries {
+    __typename
+    documentAwaitingApproval(mainIdentifier: $mainIdentifier)
+  }
+}
+    `;
+
+/**
+ * __useApprovalQuery__
+ *
+ * To run a query within a React component, call `useApprovalQuery` and pass it any options that fit your needs.
+ * When your component renders, `useApprovalQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useApprovalQuery({
+ *   variables: {
+ *      mainIdentifier: // value for 'mainIdentifier'
+ *   },
+ * });
+ */
+export function useApprovalQuery(baseOptions: Apollo.QueryHookOptions<ApprovalQuery, ApprovalQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ApprovalQuery, ApprovalQueryVariables>(ApprovalDocument, options);
+      }
+export function useApprovalLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ApprovalQuery, ApprovalQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ApprovalQuery, ApprovalQueryVariables>(ApprovalDocument, options);
+        }
+export type ApprovalQueryHookResult = ReturnType<typeof useApprovalQuery>;
+export type ApprovalLazyQueryHookResult = ReturnType<typeof useApprovalLazyQuery>;
+export type ApprovalQueryResult = Apollo.QueryResult<ApprovalQuery, ApprovalQueryVariables>;
+export const SubmitApprovalDocument = gql`
+    mutation SubmitApproval($mainIdentifier: String!, $input: String!) {
+  executiveEditor {
+    submitApproval(manuscriptIdentifier: $mainIdentifier, input: $input)
+  }
+}
+    `;
+export type SubmitApprovalMutationFn = Apollo.MutationFunction<SubmitApprovalMutation, SubmitApprovalMutationVariables>;
+
+/**
+ * __useSubmitApprovalMutation__
+ *
+ * To run a mutation, you first call `useSubmitApprovalMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSubmitApprovalMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [submitApprovalMutation, { data, loading, error }] = useSubmitApprovalMutation({
+ *   variables: {
+ *      mainIdentifier: // value for 'mainIdentifier'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSubmitApprovalMutation(baseOptions?: Apollo.MutationHookOptions<SubmitApprovalMutation, SubmitApprovalMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SubmitApprovalMutation, SubmitApprovalMutationVariables>(SubmitApprovalDocument, options);
+      }
+export type SubmitApprovalMutationHookResult = ReturnType<typeof useSubmitApprovalMutation>;
+export type SubmitApprovalMutationResult = Apollo.MutationResult<SubmitApprovalMutation>;
+export type SubmitApprovalMutationOptions = Apollo.BaseMutationOptions<SubmitApprovalMutation, SubmitApprovalMutationVariables>;
 export const PipelineOverviewDocument = gql`
     query PipelineOverview($page: Int) {
   executiveEditorQueries {

@@ -12,10 +12,12 @@ abstract class XmlReviewType
 
   const firstXmlReview = 'FirstXmlReview';
   const secondXmlReview = 'SecondXmlReview';
-  // const afterApproval = 'AfterApproval';
 }
 
 XmlReviewType::$graphQLType = new EnumType([
   'name' => 'XmlReviewType',
-  'values' => [XmlReviewType::firstXmlReview, XmlReviewType::secondXmlReview/*, XmlReviewType::afterApproval*/]
+  'values' => [
+    XmlReviewType::firstXmlReview,
+    XmlReviewType::secondXmlReview,
+  ]
 ]);

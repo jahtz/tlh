@@ -47,17 +47,20 @@ class Manuscript extends AbstractManuscript
 
   static function fromDbAssocArray(array $row): Manuscript
   {
-    $status = $row['second_xml_rev_performed']
-      ? ManuscriptStatus::secondXmlReviewed
-      : ($row['first_xml_rev_performed']
-        ? ManuscriptStatus::firstXmlReviewPerformed
-        : ($row['xml_conv_performed']
-          ? ManuscriptStatus::xmlConversionPerformed
-          : ($row['transliteration_reviewed']
-            ? ManuscriptStatus::transliterationReviewed
-            : ($row['transliteration_released']
-              ? ManuscriptStatus::transliterationReleased
-              : ManuscriptStatus::created
+    $status = $row['approval_performed']
+      ? ManuscriptStatus::approved
+      : ($row['second_xml_rev_performed']
+        ? ManuscriptStatus::secondXmlReviewed
+        : ($row['first_xml_rev_performed']
+          ? ManuscriptStatus::firstXmlReviewPerformed
+          : ($row['xml_conv_performed']
+            ? ManuscriptStatus::xmlConversionPerformed
+            : ($row['transliteration_reviewed']
+              ? ManuscriptStatus::transliterationReviewed
+              : ($row['transliteration_released']
+                ? ManuscriptStatus::transliterationReleased
+                : ManuscriptStatus::created
+              )
             )
           )
         )
@@ -100,11 +103,12 @@ select data.main_identifier,
        cth_classification,
        bibliography,
        creator_username,
-       rel_trans.release_date is not null     as transliteration_released,
-       translit_rev.review_date is not null   as transliteration_reviewed,
-       xml_conv.conversion_date is not null   as xml_conv_performed,
-       first_xml_rev.review_date is not null  as first_xml_rev_performed,
-       second_xml_rev.review_date is not null as second_xml_rev_performed
+       rel_trans.release_date is not null       as transliteration_released,
+       translit_rev.review_date is not null     as transliteration_reviewed,
+       xml_conv.conversion_date is not null     as xml_conv_performed,
+       first_xml_rev.review_date is not null    as first_xml_rev_performed,
+       second_xml_rev.review_date is not null   as second_xml_rev_performed,
+       approved_trans.approval_date is not null as approval_performed
 from tlh_dig_manuscript_metadatas as data
          left outer join tlh_dig_released_transliterations as rel_trans
                          on rel_trans.main_identifier = data.main_identifier
@@ -116,6 +120,8 @@ from tlh_dig_manuscript_metadatas as data
                          on first_xml_rev.main_identifier = data.main_identifier
          left outer join tlh_dig_second_xml_reviews as second_xml_rev
                          on second_xml_rev.main_identifier = data.main_identifier
+         left outer join tlh_dig_approved_transliterations as approved_trans
+                         on approved_trans.main_identifier = data.main_identifier
 order by creation_date desc
 limit ?, ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('ii', $first, $pageSize),
@@ -145,11 +151,12 @@ select data.main_identifier,
        cth_classification,
        bibliography,
        creator_username,
-       rel_trans.release_date is not null     as transliteration_released,
-       translit_rev.review_date is not null   as transliteration_reviewed,
-       xml_conv.conversion_date is not null   as xml_conv_performed,
-       first_xml_rev.review_date is not null  as first_xml_rev_performed,
-       second_xml_rev.review_date is not null as second_xml_rev_performed
+       rel_trans.release_date is not null       as transliteration_released,
+       translit_rev.review_date is not null     as transliteration_reviewed,
+       xml_conv.conversion_date is not null     as xml_conv_performed,
+       first_xml_rev.review_date is not null    as first_xml_rev_performed,
+       second_xml_rev.review_date is not null   as second_xml_rev_performed,
+       approved_trans.approval_date is not null as approval_performed
 from tlh_dig_manuscript_metadatas as data
          left outer join tlh_dig_released_transliterations as rel_trans
                          on rel_trans.main_identifier = data.main_identifier
@@ -161,6 +168,8 @@ from tlh_dig_manuscript_metadatas as data
                          on first_xml_rev.main_identifier = data.main_identifier
          left outer join tlh_dig_second_xml_reviews as second_xml_rev
                          on second_xml_rev.main_identifier = data.main_identifier
+         left outer join tlh_dig_approved_transliterations as approved_trans
+                         on approved_trans.main_identifier = data.main_identifier
 where data.main_identifier = ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
@@ -215,20 +224,6 @@ where data.main_identifier = ?;",
     return executeSingleChangeQuery(
       "insert into tlh_dig_released_transliterations (main_identifier) values (?);",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier)
-    );
-  }
-
-  /** @return string[] */
-  static function releasedTransliterationsWithoutAppointedReviewer(): array
-  {
-    return executeMultiSelectQuery(
-      "
-select rel.main_identifier
-    from tlh_dig_released_transliterations as rel
-    left outer join tlh_dig_transliteration_review_appointments app on app.main_identifier = rel.main_identifier
-    where app.username is null;",
-      null,
-      fn(array $stmt) => $stmt['main_identifier']
     );
   }
 }

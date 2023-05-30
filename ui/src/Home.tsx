@@ -8,13 +8,14 @@ import {ManuscriptsOverview} from './ManuscriptsOverview';
 import {ManuscriptLinkButtons} from './ManuscriptLinkButtons';
 import {Box} from './Box';
 import {ReviewerHomeBox} from './ReviewerHomeBox';
+import {ExecutiveEditorHomeBox} from './ExecutiveEditorHomeBox';
 
 interface IProps extends IndexQuery {
   page: number;
   queryPage: (page: number) => void;
 }
 
-function Inner({manuscriptCount, allManuscripts, myManuscripts, page, queryPage, reviewerQueries}: IProps): JSX.Element {
+function Inner({manuscriptCount, allManuscripts, myManuscripts, page, queryPage, reviewerQueries, executiveEditorQueries}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -29,6 +30,8 @@ function Inner({manuscriptCount, allManuscripts, myManuscripts, page, queryPage,
       </Box>}
 
       {reviewerQueries && <ReviewerHomeBox {...reviewerQueries}/>}
+
+      {executiveEditorQueries && <ExecutiveEditorHomeBox {...executiveEditorQueries}/>}
     </>
   );
 }

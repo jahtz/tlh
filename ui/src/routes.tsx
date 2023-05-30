@@ -1,6 +1,7 @@
 import {createBrowserRouter, LoaderFunctionArgs, useRouteError} from 'react-router-dom';
 import {JSX} from 'react';
 import {
+  approveDocumentUrl,
   createManuscriptUrl,
   createTransliterationUrl,
   documentMergerUrl,
@@ -41,6 +42,7 @@ import {TransliterationReview} from './manuscript/TransliterationReview';
 import {XmlConversion} from './manuscript/xmlConversion/XmlConversion';
 import {PipelineOverview} from './pipeline/PipelineOverview';
 import {XmlReview} from './manuscript/review/XmlReview';
+import {DocumentApproval} from './manuscript/DocumentApproval';
 
 async function apolloLoader<T, V extends OperationVariables>(query: TypedDocumentNode<T, V>, variables: V): Promise<T | undefined> {
   return apolloClient
@@ -87,6 +89,7 @@ export const router = createBrowserRouter([
             {path: xmlConversionUrl, element: <XmlConversion/>},
             {path: firstXmlReviewUrl, element: <XmlReview reviewType={XmlReviewType.FirstXmlReview}/>},
             {path: secondXmlReviewUrl, element: <XmlReview reviewType={XmlReviewType.SecondXmlReview}/>},
+            {path: approveDocumentUrl, element: <DocumentApproval/>}
           ]
         },
 

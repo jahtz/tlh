@@ -58,7 +58,7 @@ $queryType = new ObjectType([
     ],
     'executiveEditorQueries' => [
       # TODO: make userQueries with field execEditorQueries, reviewerQueries and myManuscripts?
-      'type' => ExecutiveEditor::$executiveEditorQueryType,
+      'type' => ExecutiveEditor::$queryType,
       'resolve' => fn(?int $_rootValue, array $_args, ?User $user): ?User => !is_null($user) && $user->isExecutiveEditor() ? $user : null
     ]
   ]

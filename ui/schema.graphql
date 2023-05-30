@@ -16,6 +16,7 @@ type DocumentInPipeline {
   appointedSecondXmlReviewer: String
   appointedTransliterationReviewer: String
   appointedXmlConverter: String
+  approvalDateString: String
   firstXmlReviewDateString: String
   manuscriptIdentifier: String!
   secondXmlReviewDateString: String
@@ -25,9 +26,10 @@ type DocumentInPipeline {
 
 type ExecutiveEditor {
   allReviewers: [String!]!
+  documentAwaitingApproval(mainIdentifier: String!): String
+  documentsAwaitingApproval: [String!]!
   documentsInPipeline(page: Int): [DocumentInPipeline!]!
   documentsInPipelineCount: Int!
-  releasedTransliterationsWithoutAppointedReviewer: [String!]!
   userCount: Int!
   users(page: Int!): [User!]!
 }
@@ -37,6 +39,7 @@ type ExecutiveEditorMutations {
   appointSecondXmlReviewer(manuscriptIdentifier: String!, reviewer: String!): String!
   appointTransliterationReviewer(manuscriptIdentifier: String!, reviewer: String!): String!
   appointXmlConverter(converter: String!, manuscriptIdentifier: String!): String!
+  submitApproval(input: String!, manuscriptIdentifier: String!): Boolean!
   updateUserRights(newRights: Rights!, username: String!): Rights!
 }
 
@@ -99,10 +102,11 @@ type ManuscriptMutations {
 enum ManuscriptStatus {
   Approved
   Created
-  FirstXmlReviewed
-  SecondXmlReviewed
+  FirstXmlReviewPerformed
+  SecondXmlReviewPerformed
   TransliterationReleased
-  TransliterationReviewed
+  TransliterationReviewPerformed
+  XmlConversionPerformed
 }
 
 type Mutation {

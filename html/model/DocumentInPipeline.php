@@ -21,6 +21,7 @@ class DocumentInPipeline
   public ?string $firstXmlReviewDateString;
   public ?string $appointedSecondXmlReviewer;
   public ?string $secondXmlReviewDateString;
+  public ?string $approvalDateString;
 
   function __construct(
     string  $manuscriptIdentifier,
@@ -31,7 +32,8 @@ class DocumentInPipeline
     ?string $appointedFirstXmlReviewer,
     ?string $firstXmlReviewDateString,
     ?string $appointedSecondXmlReviewer,
-    ?string $secondXmlReviewDateString
+    ?string $secondXmlReviewDateString,
+    ?string $approvalDateString
   )
   {
     $this->manuscriptIdentifier = $manuscriptIdentifier;
@@ -43,6 +45,7 @@ class DocumentInPipeline
     $this->firstXmlReviewDateString = $firstXmlReviewDateString;
     $this->appointedSecondXmlReviewer = $appointedSecondXmlReviewer;
     $this->secondXmlReviewDateString = $secondXmlReviewDateString;
+    $this->approvalDateString = $approvalDateString;
   }
 
   static function selectCount(): int
@@ -66,7 +69,8 @@ select translits.main_identifier,
        first_xml_rev_app.username as first_xml_reviewer,
        first_xml_rev.review_date as first_xml_rev_date,
        second_xml_rev_app.username as second_xml_reviewer,
-       second_xml_rev.review_date as second_xml_rev_date
+       second_xml_rev.review_date as second_xml_rev_date,
+       approved_trans.approval_date as approval_date
 from tlh_dig_released_transliterations as translits
     -- join for appointed transliteration reviewer
     left outer join tlh_dig_transliteration_review_appointments as trans_rev_app
@@ -92,6 +96,9 @@ from tlh_dig_released_transliterations as translits
     -- join for second xml review date
     left outer join tlh_dig_second_xml_reviews as second_xml_rev
         on second_xml_rev.main_identifier = translits.main_identifier
+    -- join for approval
+    left outer join tlh_dig_approved_transliterations as approved_trans
+        on approved_trans.main_identifier = translits.main_identifier
 limit ?, ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ii', $firstIndex, $pageSize),
       fn(array $row): DocumentInPipeline => new DocumentInPipeline(
@@ -103,7 +110,8 @@ limit ?, ?;",
         $row['first_xml_reviewer'],
         $row['first_xml_rev_date'],
         $row['second_xml_reviewer'],
-        $row['second_xml_rev_date']
+        $row['second_xml_rev_date'],
+        $row['approval_date']
       )
     );
   }
@@ -120,6 +128,7 @@ DocumentInPipeline::$queryType = new ObjectType([
     'appointedFirstXmlReviewer' => Type::string(),
     'firstXmlReviewDateString' => Type::string(),
     'appointedSecondXmlReviewer' => Type::string(),
-    'secondXmlReviewDateString' => Type::string()
+    'secondXmlReviewDateString' => Type::string(),
+    'approvalDateString' => Type::string()
   ]
 ]);
