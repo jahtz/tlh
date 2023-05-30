@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 CLIENT_TARGET_DIR=html/public
 
 # ensure jq installed
