@@ -180,7 +180,7 @@ export function mergeHeader(firstDocumentHeader: XmlElementNode, secondDocumentH
     children: [xmlElementNode('docID',{}, [xmlTextNode(newDocID)]),
       xmlElementNode('meta', {}, [
         xmlElementNode('merge', {'date': new Date().toISOString(), 'editor':'DocumentMerger'}, []),
-        xmlElementNode('annotation', {}, [xmlElementNode('annot', {'editor':'auto', 'date':new Date().toISOString()})]),
+        xmlElementNode('annotation', {}, []),
         merged
       ]) ]
   };
