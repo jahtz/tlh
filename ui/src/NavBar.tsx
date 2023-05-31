@@ -1,4 +1,5 @@
 import {NavLink, useNavigate} from 'react-router-dom';
+import {JSX} from 'react';
 import {
   createManuscriptUrl,
   documentMergerUrl,
@@ -6,6 +7,7 @@ import {
   editTransliterationDocumentUrl,
   homeUrl,
   loginUrl,
+  pipelineManagementUrl,
   preferencesUrl,
   registerUrl,
   userManagementUrl,
@@ -20,7 +22,7 @@ import {Rights} from './graphql';
 
 const languages: string[] = ['de', 'en'];
 
-const buttonClasses = 'p-4 ml-4 hover:bg-slate-700';
+const buttonClasses = 'py-4 px-2 ml-2 hover:bg-slate-700';
 
 export function NavBar(): JSX.Element {
 
@@ -54,7 +56,7 @@ export function NavBar(): JSX.Element {
 
       <NavLink className={buttonClasses} to={preferencesUrl}>{t('preferences')}</NavLink>
 
-      <div className="p-4">{t('language')}:</div>
+      <div className="py-4 px-2">{t('language')}:</div>
       {languages.map((lang) =>
         <button type="button" onClick={() => changeLang(lang)} className={classNames('py-4 pr-2', {'font-bold': i18next.language === lang})} key={lang}>
           {lang}
@@ -63,7 +65,10 @@ export function NavBar(): JSX.Element {
       {user
         ? (
           <>
-            {user.rights === Rights.ExecutiveEditor && <NavLink className={buttonClasses} to={userManagementUrl}>{t('userManagement')}</NavLink>}
+            {user.rights === Rights.ExecutiveEditor && <>
+              <NavLink className={buttonClasses} to={pipelineManagementUrl}>{t('pipelineManagement')}</NavLink>
+              <NavLink className={buttonClasses} to={userManagementUrl}>{t('userManagement')}</NavLink>
+            </>}
             <button className={buttonClasses} onClick={onLogout}>{t('logout')} {user.sub}</button>
           </>
         )

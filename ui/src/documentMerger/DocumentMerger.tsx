@@ -1,5 +1,5 @@
 import {MergeDocument, MergeLine, mergeLines, replaceLNR, resetPublicationMap} from './mergeDocument';
-import React, {useState} from 'react';
+import {JSX, useReducer, useState} from 'react';
 import {zipWithOffset} from './zipWithOffset';
 import {useTranslation} from 'react-i18next';
 import {IoAddCircleOutline, IoChevronDown, IoChevronUp, IoRemoveCircleOutline} from 'react-icons/io5';
@@ -26,7 +26,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
 
   const {t} = useTranslation('common');
   const [offset, setOffset] = useState(0);
-  const forceUpdate = React.useReducer(() => ({}), {})[1] as () => void;
+  const forceUpdate = useReducer(() => ({}), {})[1] as () => void;
 
   let firstLines = firstDocument.lines;
   const firstPublMap = firstDocument.publMap;
@@ -181,7 +181,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
       if (mapIntersect) {
         rightMap = updateLNR(mapIntersect[1], parseInt(newIndex.toString()), rightMap, false, true);
       }
-     }
+    }
     return new Map([...Array.from(leftMap.entries()), ...Array.from(rightMap.entries())]);
   }
 

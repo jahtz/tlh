@@ -1,4 +1,5 @@
 import {Field} from 'formik';
+import {JSX} from 'react';
 import {allKnownProvenances} from '../provenances';
 import {useTranslation} from 'react-i18next';
 import classNames from 'classnames';

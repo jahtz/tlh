@@ -3,6 +3,7 @@ import {ErrorMessage, Field} from 'formik';
 import {getNameForPalaeoClassification} from '../model/manuscriptProperties/palaeoClassification';
 import {useTranslation} from 'react-i18next';
 import {PalaeographicClassification} from '../graphql';
+import {JSX} from 'react';
 
 interface IProps {
   palaeographicClassificationSure: boolean;

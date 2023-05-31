@@ -39,13 +39,30 @@ fragment ManuscriptBasicData on ManuscriptMetaData {
   creatorUsername
 }
 
+fragment ReviewerHomeData on Reviewer {
+  appointments {
+    type
+    manuscriptIdentifier
+    waitingFor
+  }
+}
+
+fragment ExecutiveEditorHomeData on ExecutiveEditor {
+  documentsAwaitingApproval
+}
+
 query Index($page: Int! = 0) {
   manuscriptCount
   allManuscripts(page: $page) {
     ...ManuscriptBasicData
   }
   myManuscripts
-  manuscriptsToReview
+  reviewerQueries {
+    ...ReviewerHomeData
+  }
+  executiveEditorQueries {
+    ...ExecutiveEditorHomeData
+  }
 }
 
 # /createManuscript
@@ -106,7 +123,7 @@ query UploadPictures($mainIdentifier: String!) {
   }
 }
 
-# /manuscript/:id/transliterationInput
+# /manuscripts/:id/transliterationInput
 
 query TransliterationInput($mainIdentifier: String!) {
   manuscript(mainIdentifier: $mainIdentifier) {
@@ -124,6 +141,114 @@ mutation uploadTransliteration($mainIdentifier: String!, $input: String!) {
   }
 }
 
+# /manuscripts/:id/reviewTransliteration
+
+query ReviewTransliteration($mainIdentifier: String!) {
+  reviewerQueries {
+    transliterationReview(mainIdentifier: $mainIdentifier)
+  }
+}
+
+mutation SubmitTransliterationReview($mainIdentifier: String!, $review: String!) {
+  reviewerMutations {
+    submitTransliterationReview(mainIdentifier: $mainIdentifier, review: $review)
+  }
+}
+
+# /manuscripts/:id/xmlConversion
+
+query XmlConversion($mainIdentifier: String!) {
+  reviewerQueries {
+    xmlConversion(mainIdentifier: $mainIdentifier)
+  }
+}
+
+mutation SubmitXmlConversion($mainIdentifier: String!, $conversion: String!) {
+  reviewerMutations {
+    submitXmlConversion(mainIdentifier: $mainIdentifier,conversion: $conversion)
+  }
+}
+
+# /manuscripts/:id/firstXmlReview, /manuscripts/:id/secondXmlReview
+
+query XmlReview($mainIdentifier: String!, $reviewType: XmlReviewType!) {
+  reviewerQueries {
+    xmlReview(mainIdentifier: $mainIdentifier, reviewType: $reviewType)
+  }
+}
+
+mutation SubmitXmlReview($mainIdentifier: String!, $review: String!, $reviewType: XmlReviewType!) {
+  reviewerMutations {
+    submitXmlReview(mainIdentifier: $mainIdentifier, review: $review, reviewType: $reviewType)
+  }
+}
+
+# /manuscripts/:id/approveDocument
+
+query Approval($mainIdentifier: String!) {
+  executiveEditorQueries {
+    __typename
+    documentAwaitingApproval(mainIdentifier: $mainIdentifier)
+  }
+}
+
+mutation SubmitApproval($mainIdentifier: String!, $input: String!) {
+  executiveEditor {
+    submitApproval(manuscriptIdentifier: $mainIdentifier, input: $input)
+  }
+}
+
+# /pipelineOverview
+
+fragment DocumentInPipeline on DocumentInPipeline {
+  manuscriptIdentifier
+  appointedTransliterationReviewer
+  transliterationReviewDateString
+  appointedXmlConverter
+  xmlConversionDateString,
+  appointedFirstXmlReviewer
+  firstXmlReviewDateString
+  appointedSecondXmlReviewer
+  secondXmlReviewDateString
+}
+
+fragment PipelineOverview on ExecutiveEditor {
+  allReviewers
+  documentsInPipeline(page: $page) {
+    ...DocumentInPipeline
+  }
+}
+
+query PipelineOverview($page: Int) {
+  executiveEditorQueries {
+    ...PipelineOverview
+  }
+}
+
+mutation AppointTransliterationReviewer($manuscriptIdentifier: String!, $reviewer: String!) {
+  executiveEditor {
+    appointTransliterationReviewer(manuscriptIdentifier: $manuscriptIdentifier, reviewer: $reviewer)
+  }
+}
+
+mutation AppointXmlConverter($manuscriptIdentifier: String!, $converter: String!) {
+  executiveEditor {
+    appointXmlConverter(manuscriptIdentifier: $manuscriptIdentifier, converter: $converter)
+  }
+}
+
+mutation AppointFirstXmlReviewer($manuscriptIdentifier: String!, $reviewer: String!) {
+  executiveEditor {
+    appointFirstXmlReviewer(manuscriptIdentifier: $manuscriptIdentifier, reviewer: $reviewer)
+  }
+}
+
+mutation AppointSecondXmlReviewer($manuscriptIdentifier: String!, $reviewer: String!) {
+  executiveEditor {
+    appointSecondXmlReviewer(manuscriptIdentifier: $manuscriptIdentifier, reviewer: $reviewer)
+  }
+}
+
 # /userManagement
 
 fragment User on User {
@@ -135,14 +260,16 @@ fragment User on User {
 }
 
 query UsersOverview($page: Int!) {
-  userCount
-  users(page: $page) {
-    ...User
+  executiveEditorQueries {
+    userCount
+    users(page: $page) {
+      ...User
+    }
   }
 }
 
 mutation UpdateUserRights($username: String!, $newRights: Rights!) {
-  me {
+  executiveEditor {
     updateUserRights(username: $username, newRights: $newRights)
   }
 }

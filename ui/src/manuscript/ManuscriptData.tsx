@@ -1,4 +1,5 @@
 import {useTranslation} from 'react-i18next';
+import {JSX} from 'react';
 import {Link, Navigate, useLoaderData} from 'react-router-dom';
 import {ManuscriptMetaDataFragment, useReleaseTransliterationMutation} from '../graphql';
 import {useSelector} from 'react-redux';

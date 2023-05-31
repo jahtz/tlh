@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react';
-import {findFirstXmlElementByTagName, isXmlElementNode, writeNode, XmlElementNode, XmlNode} from 'simple_xml';
+import {JSX, useEffect, useState} from 'react';
+import {isXmlElementNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './editorConfig';
 import {useTranslation} from 'react-i18next';
 import {useSelector} from 'react-redux';
@@ -10,10 +10,10 @@ import {EditorEmptyRightSide} from './EditorEmptyRightSide';
 import {calculateInsertablePositions, InsertablePositions, NodePath} from './insertablePositions';
 import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
 import {addNodeEditorState, compareChangesEditorState, defaultRightSideState, editNodeEditorState, EditorState, IEditNodeEditorState} from './editorState';
-import {ReadFile} from '../xmlComparator/XmlComparatorContainer';
 import {XmlComparator} from '../xmlComparator/XmlComparator';
 import {NodeEditorRightSide} from './NodeEditorRightSide';
 import {FontSizeSelectorProps} from './FontSizeSelector';
+import {writeXml} from './StandAloneOXTED';
 
 export function buildActionSpec(innerAction: Spec<XmlNode>, path: number[]): Spec<XmlNode> {
   return path.reduceRight(
@@ -24,11 +24,13 @@ export function buildActionSpec(innerAction: Spec<XmlNode>, path: number[]): Spe
 
 interface IProps {
   node: XmlNode;
-  editorConfig: XmlEditorConfig;
+  editorConfig?: XmlEditorConfig;
   filename: string;
-  download: (content: string) => void;
-  closeFile: () => void;
-  autoSave: (rootNode: XmlNode) => void;
+  closeFile?: () => void;
+  autoSave?: (rootNode: XmlNode) => void;
+  exportName?: string;
+  exportDisabled?: boolean;
+  onExport: (node: XmlElementNode) => void;
 }
 
 interface IState {
@@ -40,15 +42,9 @@ interface IState {
   rightSideFontSize: number;
 }
 
-function searchEditableNode(
-  tagName: string,
-  rootNode: XmlElementNode,
-  currentPath: number[],
-  forward: boolean,
-): number[] | undefined {
+function searchEditableNode(tagName: string, rootNode: XmlElementNode, currentPath: number[], forward: boolean): number[] | undefined {
 
   const go = (node: XmlElementNode, currentPath: number[]): number[] | undefined => {
-
     if (node.tagName === tagName) {
       return [];
     }
@@ -84,36 +80,16 @@ function findElement(node: XmlElementNode, path: number[]): XmlElementNode {
   return path.reduce<XmlElementNode>((nodeToUpdate, pathContent) => nodeToUpdate.children[pathContent] as XmlElementNode, node);
 }
 
-function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode {
-
-  const annotationNode = findFirstXmlElementByTagName(rootNode, 'annotation');
-
-  if (!annotationNode) {
-    throw new Error('No annotation node found!');
-  }
-
-  annotationNode.children.push({
-    tagName: 'annot',
-    attributes: {
-      editor, date: (new Date()).toISOString()
-    },
-    children: []
-  });
-
-  return rootNode;
-}
-
-export function writeXml(node: XmlElementNode): string {
-  const editorConfig = tlhXmlEditorConfig;
-
-  const nodeToExport = editorConfig.beforeExport(node);
-
-  const exported = writeNode(nodeToExport, editorConfig.writeConfig);
-
-  return editorConfig.afterExport(exported.join('\n'));
-}
-
-export function XmlDocumentEditor({node: initialNode, editorConfig, download, filename, closeFile, autoSave}: IProps): JSX.Element {
+export function XmlDocumentEditor({
+  node: initialNode,
+  editorConfig = tlhXmlEditorConfig,
+  onExport,
+  filename,
+  closeFile,
+  autoSave,
+  exportName,
+  exportDisabled
+}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);
@@ -126,7 +102,7 @@ export function XmlDocumentEditor({node: initialNode, editorConfig, download, fi
   });
 
   useEffect(() => {
-    state.changed && autoSave(state.rootNode);
+    state.changed && autoSave && autoSave(state.rootNode);
   }, [state]);
 
   useEffect(() => {
@@ -135,35 +111,15 @@ export function XmlDocumentEditor({node: initialNode, editorConfig, download, fi
   });
 
   function exportXml(): void {
-    let author: string | null | undefined = state.author;
-
-    if (!author) {
-      author = prompt(t('authorAbbreviation?') || 'authorAbbreviation?');
-
-      if (!author) {
-        alert(t('noExportWithoutAuthor'));
-        return;
-      }
-
-      setState((state) => update(state, {author: {$set: author as string}}));
-    }
-
-    const toExport = addAuthorNode(state.rootNode as XmlElementNode, author);
-
     setState((state) => update(state, {changed: {$set: false}}));
-
-    download(
-      writeXml(toExport)
-    );
+    onExport(state.rootNode as XmlElementNode);
   }
 
-  function onNodeSelect(node: XmlElementNode, path: number[]): void {
-    setState((state) => update(state, {
-      editorState: (currentEditorState) => currentEditorState._type === 'EditNodeRightState' && currentEditorState.path.join('.') === path.join('.')
-        ? defaultRightSideState
-        : editNodeEditorState(node, editorConfig, path)
-    }));
-  }
+  const onNodeSelect = (node: XmlElementNode, path: number[]): void => setState((state) => update(state, {
+    editorState: (currentEditorState) => currentEditorState._type === 'EditNodeRightState' && currentEditorState.path.join('.') === path.join('.')
+      ? defaultRightSideState
+      : editNodeEditorState(node, editorConfig, path)
+  }));
 
   function applyUpdates(nextEditablePath?: number[]): void {
     let newEditorState: IEditNodeEditorState | undefined = undefined;
@@ -191,13 +147,11 @@ export function XmlDocumentEditor({node: initialNode, editorConfig, download, fi
     );
   }
 
-  function updateEditedNode(updateSpec: Spec<XmlElementNode>): void {
-    setState((state) => update(state, {
-      editorState: (editorState) => editorState._type === 'EditNodeRightState'
-        ? update(editorState, {node: updateSpec, changed: {$set: true}})
-        : editorState
-    }));
-  }
+  const updateEditedNode = (updateSpec: Spec<XmlElementNode>): void => setState((state) => update(state, {
+    editorState: (editorState) => editorState._type === 'EditNodeRightState'
+      ? update(editorState, {node: updateSpec, changed: {$set: true}})
+      : editorState
+  }));
 
   const updateAttribute = (key: string, value: string | undefined): void => updateEditedNode({attributes: {[key]: {$set: value}}});
 
@@ -265,41 +219,30 @@ export function XmlDocumentEditor({node: initialNode, editorConfig, download, fi
       : undefined;
 
     return (
-      <NodeEditorRightSide key={path.join('.')} originalNode={node} changed={changed}
-                           deleteNode={() => deleteNode(path)}
-                           applyUpdates={() => applyUpdates()}
+      <NodeEditorRightSide key={path.join('.')} originalNode={node} changed={changed} deleteNode={() => deleteNode(path)} applyUpdates={() => applyUpdates()}
                            cancelSelection={() => setState((state) => update(state, {editorState: {$set: defaultRightSideState}}))}
-                           jumpElement={(forward) => jumpEditableNodes(node.tagName, forward)}
-                           fontSizeSelectorProps={fontSizeSelectorProps}>
+                           jumpElement={(forward) => jumpEditableNodes(node.tagName, forward)} fontSizeSelectorProps={fontSizeSelectorProps}>
         {config.edit({node, path, updateEditedNode, updateAttribute, setKeyHandlingEnabled, additionalInfo})}
       </NodeEditorRightSide>
     );
   }
 
-  function toggleElementInsert(tagName: string, insertablePositions: InsertablePositions): void {
-    const targetState = addNodeEditorState(tagName, insertablePositions);
-
-    setState((state) => {
-        switch (state.editorState._type) {
-          case 'DefaultEditorState':
-            return update(state, {editorState: {$set: targetState}});
-          case 'AddNodeRightState':
-            return update(state, {editorState: {$set: state.editorState.tagName !== tagName ? targetState : defaultRightSideState}});
-          case 'EditNodeRightState':
-          case 'CompareChangesEditorState':
-            return state;
-        }
+  const toggleElementInsert = (tagName: string, insertablePositions: InsertablePositions): void => setState((state) => {
+      switch (state.editorState._type) {
+        case 'DefaultEditorState':
+          return update(state, {editorState: {$set: addNodeEditorState(tagName, insertablePositions)}});
+        case 'AddNodeRightState':
+          return update(state, {editorState: {$set: state.editorState.tagName !== tagName ? addNodeEditorState(tagName, insertablePositions) : defaultRightSideState}});
+        case 'EditNodeRightState':
+        case 'CompareChangesEditorState':
+          return state;
       }
-    );
-  }
+    }
+  );
 
-  function toggleCompareChanges(): void {
-    setState((state) => update(state, {editorState: {$set: compareChangesEditorState}}));
-  }
+  const toggleCompareChanges = (): void => setState((state) => update(state, {editorState: {$set: compareChangesEditorState}}));
 
-  function toggleDefaultMode(): void {
-    setState((state) => update(state, {editorState: {$set: defaultRightSideState}}));
-  }
+  const toggleDefaultMode = (): void => setState((state) => update(state, {editorState: {$set: defaultRightSideState}}));
 
   function initiateInsert(path: NodePath): void {
     if (state.editorState && 'tagName' in state.editorState) {
@@ -324,14 +267,12 @@ export function XmlDocumentEditor({node: initialNode, editorConfig, download, fi
     ? state.editorState.tagName
     : undefined;
 
-  const leftSideProps: EditorLeftSideProps = {
-    filename,
-    node: state.rootNode,
+  const exportTitle = exportName ? exportName : t('exportXml') || 'exportXml';
+
+  const leftSideProps: Omit<EditorLeftSideProps, 'exportTitle' | 'filename' | 'node' | 'onNodeSelect' | 'onExport'> = {
     currentSelectedPath: state.editorState && 'path' in state.editorState
       ? state.editorState.path
       : undefined,
-    onNodeSelect,
-    exportXml,
     insertStuff: state.editorState && 'tagName' in state.editorState
       ? {
         insertablePaths: Array.from(new Set(calculateInsertablePositions(state.editorState.insertablePositions, state.rootNode))),
@@ -339,32 +280,30 @@ export function XmlDocumentEditor({node: initialNode, editorConfig, download, fi
         initiateInsert
       }
       : undefined,
-    closeFile: () => {
-      if (!state.changed || confirm(t('closeFileOnUnfinishedChangesMessage') || 'closeFileOnUnfinishedChangesMessage')) {
-        closeFile();
+    closeFile: closeFile
+      ? () => {
+        if (!state.changed || confirm(t('closeFileOnUnfinishedChangesMessage') || 'closeFileOnUnfinishedChangesMessage')) {
+          closeFile();
+        }
       }
-    },
+      : undefined,
     updateNode: (node) => setState((state) => update(state, {rootNode: {$set: node}})),
     setKeyHandlingEnabled: (value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}})),
     isLeftSide: true
   };
 
-  if (state.editorState._type === 'CompareChangesEditorState') {
-
-    const leftSide: ReadFile = {name: '', baseContent: writeXml(initialNode as XmlElementNode)};
-    const right: ReadFile = {name: '', baseContent: writeXml(state.rootNode as XmlElementNode)};
-
-    return (
+  return state.editorState._type === 'CompareChangesEditorState'
+    ? (
       <div className="container mx-auto">
         <button type="button" onClick={toggleDefaultMode} className="my-4 p-2 rounded bg-blue-500 text-white w-full">{t('close')}</button>
-        <XmlComparator leftFile={leftSide} rightFile={right}/>
+        <XmlComparator leftFile={{name: t('startState'), baseContent: writeXml(initialNode as XmlElementNode)}}
+                       rightFile={{name: t('currentState'), baseContent: writeXml(state.rootNode as XmlElementNode)}}/>
       </div>
-    );
-  } else {
-
-    return (
+    )
+    : (
       <div className="px-2 grid grid-cols-2 gap-4 h-full max-h-full">
-        <EditorLeftSide {...leftSideProps}/>
+        <EditorLeftSide {...leftSideProps} filename={filename} node={state.rootNode} onNodeSelect={onNodeSelect} onExport={exportXml}
+                        exportTitle={exportTitle}/>
 
         {state.editorState._type === 'EditNodeRightState'
           ? (
@@ -373,8 +312,8 @@ export function XmlDocumentEditor({node: initialNode, editorConfig, download, fi
             </div>
           )
           : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}
-                                  toggleCompareChanges={toggleCompareChanges}/>}
+                                  toggleCompareChanges={toggleCompareChanges} onExport={exportXml} exportTitle={exportTitle}
+                                  exportDisabled={exportDisabled || false}/>}
       </div>
     );
-  }
 }

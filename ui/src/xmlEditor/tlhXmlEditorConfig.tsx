@@ -63,6 +63,9 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     docID: {
       replace: () => displayReplace(<span/>)
     },
+    merged: {
+      replace: () => displayReplace(<span/>)
+    },
     'AO:Manuscripts': aoManuscriptsConfig,
     'AO:ParagrNr': {
       replace: (node) => displayReplace(<div className="mt-4 font-bold italic">{node.attributes.c}</div>)
@@ -80,8 +83,8 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     sGr: {styling: () => ['sumerogramm']},
     d: {styling: () => ['determinativ']},
 
-    add_in: {replace: () => displayReplace(<span>〈</span>)},
-    add_fin: {replace: () => displayReplace(<span>〉</span>)},
+    add_in: {replace: () => displayReplace(<span>〈</span>)},
+    add_fin: {replace: () => displayReplace(<span>〉</span>)},
     del_in: {replace: () => displayReplace(<span>[</span>)},
     del_fin: {replace: () => displayReplace(<span>]</span>)},
     ras_in: {replace: () => displayReplace(<span>*</span>)},
@@ -91,6 +94,10 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
 
     materlect: {
       replace: (node) => displayReplace(<span className="materLectionis">{node.attributes.c}</span>)
+    },
+
+    surpl: {
+      replace: (node) => displayReplace(<span>〈〈{node.attributes.c}〉〉</span>)
     },
 
     gap: gapConfig,
@@ -129,5 +136,6 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     .replace(/<w/g, '\n <w')
     .replace(/<lb/g, '\n\n<lb')
     .replace(/ mrp/g, '\n\tmrp')
+    // FIXME: only without spaces in front or behind!
     .replace(/@/g, ' @ ')
 };

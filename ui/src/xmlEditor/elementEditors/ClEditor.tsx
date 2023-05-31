@@ -1,12 +1,13 @@
 import {displayReplace, inputClasses, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {getElementByPath, XmlElementNode} from 'simple_xml';
 import {buildActionSpec} from '../XmlDocumentEditor';
 
 export const clEditorConfig: XmlInsertableSingleEditableNodeConfig = {
   replace: (node, renderedChildren, isSelected, isLeftSide) => displayReplace(
-    <><span className="px-1 cl">{node.attributes.id || ' '}</span>&nbsp;</>,
-    isLeftSide ? <>{renderedChildren}<br/></> : undefined
+    <><br/><span className="px-1 cl">{node.attributes.id || ' '}</span>&nbsp;</>,
+    isLeftSide ? <>{renderedChildren}</> : undefined
   ),
   dontRenderChildrenInline: true,
   edit: (props) => <ClEditor {...props}/>,

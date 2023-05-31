@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Result} from 'parsimmon';
 import {writeNode, XmlElementNode} from 'simple_xml';

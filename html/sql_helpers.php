@@ -127,7 +127,7 @@ function executeSingleSelectQuery(string $sql, ?callable $bindParams, callable $
       }
     );
   } catch (Exception $exception) {
-    error_log($exception->getMessage());
+    error_log($exception);
     return null;
   }
 }
@@ -151,7 +151,7 @@ function executeMultiSelectQuery(string $sql, ?callable $bindParams, callable $f
       )
     );
   } catch (Exception $exception) {
-    error_log($exception->getMessage());
+    error_log($exception);
     return [];
   }
 }
@@ -161,7 +161,7 @@ function executeSingleChangeQuery(string $sql, callable $bindParams): bool
   try {
     return executeQuery($sql, $bindParams, fn() => true);
   } catch (Exception $exception) {
-    error_log($exception->getMessage());
+    error_log($exception);
     return false;
   }
 }

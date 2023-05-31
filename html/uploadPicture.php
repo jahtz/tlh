@@ -1,6 +1,5 @@
 <?php
 
-require_once __DIR__ . '/sql_queries.php';
 require_once __DIR__ . '/cors.php';
 require_once __DIR__ . '/model/Manuscript.php';
 
@@ -72,6 +71,6 @@ try {
   $targetFileName = doUpload($manuscriptId);
 
   echo(json_encode(["fileName" => $targetFileName]));
-} catch (Exception $e) {
-  echo(json_encode(["error" => $e->getMessage()]));
+} catch (Exception $exception) {
+  echo(json_encode(["error" => $exception->getMessage()]));
 }

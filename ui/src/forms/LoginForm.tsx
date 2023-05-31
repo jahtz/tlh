@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {JSX, useState} from 'react';
 import {LoginMutationVariables, useLoginMutation} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
@@ -7,8 +7,13 @@ import {Navigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {activeUserSelector, login} from '../newStore';
 import {object as yupObject, Schema, string as yupString} from 'yup';
-import {borderColors} from './colors';
 import classNames from 'classnames';
+
+export const borderColors = {
+  error: 'border-red-500',
+  success: 'border-green-500',
+  default: 'border-slate-500'
+};
 
 const initialValues: LoginMutationVariables = {username: '', password: ''};
 

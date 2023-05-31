@@ -1,44 +1,37 @@
 import {useTranslation} from 'react-i18next';
+import {JSX, useState} from 'react';
 import {IndexQuery, useIndexLazyQuery} from './graphql';
 import {Link} from 'react-router-dom';
 import {WithQuery} from './WithQuery';
 import {createManuscriptUrl} from './urls';
 import {ManuscriptsOverview} from './ManuscriptsOverview';
 import {ManuscriptLinkButtons} from './ManuscriptLinkButtons';
-import {useState} from 'react';
+import {Box} from './Box';
+import {ReviewerHomeBox} from './ReviewerHomeBox';
+import {ExecutiveEditorHomeBox} from './ExecutiveEditorHomeBox';
 
 interface IProps extends IndexQuery {
   page: number;
   queryPage: (page: number) => void;
 }
 
-function Inner({manuscriptCount, allManuscripts, myManuscripts, manuscriptsToReview, page, queryPage}: IProps): JSX.Element {
+function Inner({manuscriptCount, allManuscripts, myManuscripts, page, queryPage, reviewerQueries, executiveEditorQueries}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
   return (
     <>
-      <div className="my-4 p-2 rounded border border-slate-500">
-        <h2 className="font-bold text-center text-xl">{t('newestManuscripts')}</h2>
-
+      <Box heading={t('newestManuscripts')}>
         <ManuscriptsOverview manuscriptCount={manuscriptCount} allManuscripts={allManuscripts} queryPage={queryPage} page={page}/>
-      </div>
+      </Box>
 
-      <div className="my-4 p-2 rounded border border-slate-500">
-        <h2 className="font-bold text-center text-xl">{t('myManuscripts')}</h2>
+      {myManuscripts && <Box heading={t('myManuscripts')}>
+        <ManuscriptLinkButtons manuscripts={myManuscripts} errorMsg={t('noOwnManuscriptsYet')}/>
+      </Box>}
 
-        {myManuscripts
-          ? <ManuscriptLinkButtons manuscripts={myManuscripts} errorMsg={t('noOwnManuscriptsYet')}/>
-          : <p className="italic text-cyan-500 text-center">{t('pleaseLogin')}</p>}
-      </div>
+      {reviewerQueries && <ReviewerHomeBox {...reviewerQueries}/>}
 
-      <div className="my-4 p-2 rounded border border-slate-500">
-        <h2 className="font-bold text-center text-xl">{t('manuscriptsToReview')}</h2>
-
-        {manuscriptsToReview
-          ? <ManuscriptLinkButtons manuscripts={manuscriptsToReview} errorMsg={t('noManuscriptToReviewYet')}/>
-          : <p className="italic text-cyan-500 text-center">{t('pleaseLogin')}</p>}
-      </div>
+      {executiveEditorQueries && <ExecutiveEditorHomeBox {...executiveEditorQueries}/>}
     </>
   );
 }

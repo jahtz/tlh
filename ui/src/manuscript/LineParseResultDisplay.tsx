@@ -1,4 +1,5 @@
 import {NodeDisplay} from '../xmlEditor/NodeDisplay';
+import {JSX} from 'react';
 import {LineParseResult} from './LineParseResult';
 
 interface IProps {

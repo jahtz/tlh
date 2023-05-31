@@ -1,4 +1,5 @@
 import {XmlEditorConfig, XmlInsertableSingleEditableNodeConfig} from './editorConfig';
+import {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {InsertablePositions} from './insertablePositions';
 import {SelectableButton} from '../genericElements/Buttons';
@@ -8,9 +9,20 @@ interface IProps {
   currentInsertedElement?: string;
   toggleElementInsert: (tagName: string, ip: InsertablePositions) => void;
   toggleCompareChanges: () => void;
+  onExport: () => void;
+  exportTitle: string;
+  exportDisabled: boolean;
 }
 
-export function EditorEmptyRightSide({editorConfig, currentInsertedElement, toggleElementInsert, toggleCompareChanges}: IProps): JSX.Element {
+export function EditorEmptyRightSide({
+  editorConfig,
+  currentInsertedElement,
+  toggleElementInsert,
+  toggleCompareChanges,
+  onExport,
+  exportTitle,
+  exportDisabled
+}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -31,8 +43,9 @@ export function EditorEmptyRightSide({editorConfig, currentInsertedElement, togg
         )}
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 grid grid-cols-2 gap-2">
         <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={toggleCompareChanges}>{t('compareChanges')}</button>
+        <button type="button" className="p-2 rounded bg-green-500 text-white w-full" onClick={onExport} disabled={exportDisabled}>{exportTitle}</button>
       </div>
     </div>
   );

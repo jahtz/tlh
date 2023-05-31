@@ -3,6 +3,7 @@ import {DeleteButton} from '../../genericElements/Buttons';
 import {isXmlElementNode, isXmlTextNode, XmlElementNode, xmlElementNode, XmlNode, XmlTextNode, xmlTextNode} from 'simple_xml';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 import {Spec} from 'immutability-helper';
+import {JSX} from 'react';
 
 type SourceType = 'AO:TxtPubl' | 'AO:InvNr';
 const sourceTypes: SourceType[] = ['AO:TxtPubl', 'AO:InvNr'];

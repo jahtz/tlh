@@ -3,10 +3,8 @@
 namespace model;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../sql_queries.php';
 require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/ManuscriptIdentifier.php';
-require_once __DIR__ . '/AllTransliterations.php';
 require_once __DIR__ . '/AbstractManuscript.php';
 
 

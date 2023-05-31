@@ -1,4 +1,5 @@
 import {ErrorMessage, Field, FormikErrors, FormikTouched} from 'formik';
+import {JSX} from 'react';
 import {ManuscriptIdentifierInput, ManuscriptIdentifierType} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import classnames from 'classnames';

@@ -1,4 +1,5 @@
 import {isXmlCommentNode, isXmlTextNode, XmlElementNode, XmlNode} from 'simple_xml';
+import {JSX} from 'react';
 import {isXmlEditableNodeConfig, XmlEditorNodeConfig} from './editorConfig';
 import classNames from 'classnames';
 import {NodePath} from './insertablePositions';

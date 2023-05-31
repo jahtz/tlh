@@ -1,5 +1,6 @@
 import {MultiMorphologicalAnalysisWithoutEnclitics, MultiMorphologicalAnalysisWithSingleEnclitics} from '../../model/morphologicalAnalysis';
 import {SingleEncliticsAnalysis} from '../../model/encliticsAnalysis';
+import {JSX} from 'react';
 
 interface IProps {
   ma: MultiMorphologicalAnalysisWithoutEnclitics | MultiMorphologicalAnalysisWithSingleEnclitics;

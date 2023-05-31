@@ -21,6 +21,8 @@ export const documentMergerUrl = '/documentMerger';
 
 export const userManagementUrl = '/userManagement';
 
+export const pipelineManagementUrl = '/pipelineManagement';
+
 // Fragments
 
 export const manuscriptsUrlFragment = 'manuscripts';
@@ -28,6 +30,16 @@ export const manuscriptsUrlFragment = 'manuscripts';
 export const uploadPicturesUrl = 'uploadPictures';
 
 export const createTransliterationUrl = 'createTransliteration';
+
+export const transliterationReviewUrl = 'transliterationReview';
+
+export const xmlConversionUrl = 'xmlConversion';
+
+export const firstXmlReviewUrl = 'firstXmlReview';
+
+export const secondXmlReviewUrl = 'secondXmlReview';
+
+export const approveDocumentUrl = 'approveDocument';
 
 // Foreign urls
 

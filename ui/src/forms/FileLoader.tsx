@@ -1,4 +1,4 @@
-import {ChangeEvent, useRef, useState} from 'react';
+import {ChangeEvent, JSX, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 
 interface IProps {

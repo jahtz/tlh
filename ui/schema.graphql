@@ -1,15 +1,51 @@
-type AllTransliterations {
-  approvalReview: Review
-  firstReview: Review
-  initialInput: String
-  provisionalInput: String
-  secondReview: Review
+type Appointment {
+  manuscriptIdentifier: String!
+  type: AppointmentType!
+  waitingFor: AppointmentType
+}
+
+enum AppointmentType {
+  FirstXmlReview
+  SecondXmlReview
+  TransliterationReview
+  XmlConversion
+}
+
+type DocumentInPipeline {
+  appointedFirstXmlReviewer: String
+  appointedSecondXmlReviewer: String
+  appointedTransliterationReviewer: String
+  appointedXmlConverter: String
+  approvalDateString: String
+  firstXmlReviewDateString: String
+  manuscriptIdentifier: String!
+  secondXmlReviewDateString: String
+  transliterationReviewDateString: String
+  xmlConversionDateString: String
+}
+
+type ExecutiveEditor {
+  allReviewers: [String!]!
+  documentAwaitingApproval(mainIdentifier: String!): String
+  documentsAwaitingApproval: [String!]!
+  documentsInPipeline(page: Int): [DocumentInPipeline!]!
+  documentsInPipelineCount: Int!
+  userCount: Int!
+  users(page: Int!): [User!]!
+}
+
+type ExecutiveEditorMutations {
+  appointFirstXmlReviewer(manuscriptIdentifier: String!, reviewer: String!): String!
+  appointSecondXmlReviewer(manuscriptIdentifier: String!, reviewer: String!): String!
+  appointTransliterationReviewer(manuscriptIdentifier: String!, reviewer: String!): String!
+  appointXmlConverter(converter: String!, manuscriptIdentifier: String!): String!
+  submitApproval(input: String!, manuscriptIdentifier: String!): Boolean!
+  updateUserRights(newRights: Rights!, username: String!): Rights!
 }
 
 type LoggedInUserMutations {
   createManuscript(values: ManuscriptMetaDataInput): String!
   manuscript(mainIdentifier: String!): ManuscriptMutations
-  updateUserRights(newRights: Rights!, username: String!): Rights!
 }
 
 type ManuscriptIdentifier {
@@ -34,7 +70,6 @@ type ManuscriptLanguage {
 }
 
 type ManuscriptMetaData {
-  allTransliterations: AllTransliterations
   bibliography: String
   creatorUsername: String!
   cthClassification: Int
@@ -45,7 +80,7 @@ type ManuscriptMetaData {
   pictureUrls: [String!]!
   provenance: String
   provisionalTransliteration: String
-  status: ManuscriptStatus
+  status: ManuscriptStatus @deprecated(reason: "will be removed!")
   transliterationReleased: Boolean!
 }
 
@@ -67,17 +102,19 @@ type ManuscriptMutations {
 enum ManuscriptStatus {
   Approved
   Created
-  ExecutiveReviewMerged
-  ExecutiveReviewed
-  InCreation
-  ReviewMerged
-  Reviewed
+  FirstXmlReviewPerformed
+  SecondXmlReviewPerformed
+  TransliterationReleased
+  TransliterationReviewPerformed
+  XmlConversionPerformed
 }
 
 type Mutation {
+  executiveEditor: ExecutiveEditorMutations
   login(password: String!, username: String!): String
   me: LoggedInUserMutations
   register(userInput: UserInput!): String
+  reviewerMutations: ReviewerMutations
 }
 
 enum PalaeographicClassification {
@@ -94,18 +131,25 @@ enum PalaeographicClassification {
 
 type Query {
   allManuscripts(page: Int!): [ManuscriptMetaData!]!
+  executiveEditorQueries: ExecutiveEditor
   manuscript(mainIdentifier: String!): ManuscriptMetaData
   manuscriptCount: Int!
   manuscriptLanguages: [ManuscriptLanguage!]!
-  manuscriptsToReview: [String!]
   myManuscripts: [String!]
-  userCount: Int!
-  users(page: Int!): [User!]!
+  reviewerQueries: Reviewer
 }
 
-type Review {
-  input: String!
-  reviewerUsername: String!
+type Reviewer {
+  appointments: [Appointment!]!
+  transliterationReview(mainIdentifier: String!): String
+  xmlConversion(mainIdentifier: String!): String
+  xmlReview(mainIdentifier: String!, reviewType: XmlReviewType!): String
+}
+
+type ReviewerMutations {
+  submitTransliterationReview(mainIdentifier: String!, review: String!): Boolean!
+  submitXmlConversion(conversion: String!, mainIdentifier: String!): Boolean!
+  submitXmlReview(mainIdentifier: String!, review: String!, reviewType: XmlReviewType!): Boolean!
 }
 
 enum Rights {
@@ -129,4 +173,9 @@ input UserInput {
   password: String!
   passwordRepeat: String!
   username: String!
+}
+
+enum XmlReviewType {
+  FirstXmlReview
+  SecondXmlReview
 }

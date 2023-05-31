@@ -2,6 +2,7 @@ import {ManuscriptBasicDataFragment} from './graphql';
 import {useTranslation} from 'react-i18next';
 import {PaginatedTable} from './PaginatedTable';
 import {Link} from 'react-router-dom';
+import {JSX} from 'react';
 
 interface IProps {
   manuscriptCount: number;

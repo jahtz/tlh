@@ -1,4 +1,5 @@
 import {displayReplace, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {JSX} from 'react';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 
 const separatorTypes: ('parsep' | 'parsep_dbl')[] = ['parsep', 'parsep_dbl'];

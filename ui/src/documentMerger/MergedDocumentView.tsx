@@ -1,10 +1,9 @@
 import {MergeLine} from './mergeDocument';
+import {JSX} from 'react';
 import {MergeDocumentLine} from './DocumentMerger';
 import {useTranslation} from 'react-i18next';
-
-import {writeNode, XmlNode, findFirstXmlElementByTagName, isXmlTextNode, xmlElementNode, xmlTextNode, XmlElementNode, isXmlElementNode} from 'simple_xml';
-import {handleSaveToPC} from '../xmlEditor/XmlDocumentEditorContainer';
-import {writeXml} from '../xmlEditor/XmlDocumentEditor';
+import {findFirstXmlElementByTagName, isXmlElementNode, isXmlTextNode, writeNode, XmlElementNode, xmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
+import {handleSaveToPC} from '../xmlEditor/StandAloneOXTED';
 import xmlFormat from 'xml-formatter';
 
 interface IProps {
@@ -18,6 +17,7 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
   const {t} = useTranslation('common');
 
   let mergerName = 'DocumentMerger';
+
   function onExport(): void {
     const lineNodes = lines
       .map<XmlNode[]>(({lineNumberNode, rest}) => [lineNumberNode, ...rest])
@@ -28,7 +28,7 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
     const newBody: XmlElementNode = {
       tagName: 'body',
       attributes: {},
-      children: [xmlElementNode('div1', {'type':'transliteration'}, [xmlElementNode('text', {'xml:lang':'XXXlang'}, childNodes)])]
+      children: [xmlElementNode('div1', {'type': 'transliteration'}, [xmlElementNode('text', {'xml:lang': 'XXXlang'}, childNodes)])]
     };
 
     header.children.forEach((node) => {
@@ -45,17 +45,17 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
     });
 
 
-
     const AOxml: XmlElementNode = {
       tagName: 'AOxml',
-      attributes: {'xmlns:hpm':'http://hethiter.net/ns/hpm/1.0',
-                   'xmlns:AO': 'http://hethiter.net/ns/AO/1.0',
-                   'xmlns:dc': 'http://purl.org/dc/elements/1.1/',
-                   'xmlns:meta': 'urn:oasis:names:tc:opendocument:xmlns:meta:1.0',
-                   'xmlns:text': 'urn:oasis:names:tc:opendocument:xmlns:text:1.0',
-                   'xmlns:table': 'urn:oasis:names:tc:opendocument:xmlns:table:1.0',
-                   'xmlns:draw': 'urn:oasis:names:tc:opendocument:xmlns:drawing:1.0',
-                   'xmlns:xlink': 'http://www.w3.org/1999/xlink'
+      attributes: {
+        'xmlns:hpm': 'http://hethiter.net/ns/hpm/1.0',
+        'xmlns:AO': 'http://hethiter.net/ns/AO/1.0',
+        'xmlns:dc': 'http://purl.org/dc/elements/1.1/',
+        'xmlns:meta': 'urn:oasis:names:tc:opendocument:xmlns:meta:1.0',
+        'xmlns:text': 'urn:oasis:names:tc:opendocument:xmlns:text:1.0',
+        'xmlns:table': 'urn:oasis:names:tc:opendocument:xmlns:table:1.0',
+        'xmlns:draw': 'urn:oasis:names:tc:opendocument:xmlns:drawing:1.0',
+        'xmlns:xlink': 'http://www.w3.org/1999/xlink'
       },
       children: [header, newBody]
     };
@@ -80,7 +80,9 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
     console.log(publicationMapping);
     let i = 0;
     for (const publ of Array.from(publicationMapping.values())) {
-      if (i > 0) { publications.push(xmlTextNode('+')); }
+      if (i > 0) {
+        publications.push(xmlTextNode('+'));
+      }
       console.log(publ[1] + '{€' + publ[0] + '}');
       publications.push(xmlElementNode('AO:TxtPubl',
         {},
@@ -94,6 +96,7 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
 
     return [xmlElementNode('AO:Manuscripts', {}, publications)];
   }
+
 
   function getPublicationMappingString(publMapping: XmlNode[]): string [] {
     const output: string[] = [];
@@ -114,13 +117,16 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
     return output;
   }
 
-  function setMergerReg(input: string) { mergerName = input; }
+  function setMergerReg(input: string) {
+    mergerName = input;
+  }
 
   return (
     <>
       <div className="mb-4">
         <label htmlFor="mergerName" className="font-bold">{t('editorName')}:</label>
-        <input name="mergerName" id="mergerName" placeholder="DocumentMerger" className="mt-2 p-2 rounded border w-full" onChange={e => setMergerReg(e.target.value)}></input>
+        <input name="mergerName" id="mergerName" placeholder="DocumentMerger" className="mt-2 p-2 rounded border w-full"
+               onChange={e => setMergerReg(e.target.value)}></input>
       </div>
       <button type="button" className="mb-2 p-2 rounded bg-blue-500 text-white w-full" onClick={onExport}>{t('export')}</button>
       <pre><code>{xmlFormat(writeNode(header).join('\n'), {
