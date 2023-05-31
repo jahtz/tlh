@@ -220,7 +220,7 @@ export function replaceLNR(node: XmlElementNode, publicationMap: Map<string, str
 
   } else if( publicationMap.values()) {
     // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-    textLine = '{€' + Array.from(publicationMap.values()).pop()![0] + '}' + textLine;
+    textLine = '{€' + Array.from(publicationMap.values()).pop()![0] + '} ' + textLine;
   }
   return textLine;
 }
