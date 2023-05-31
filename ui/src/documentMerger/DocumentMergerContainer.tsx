@@ -6,6 +6,7 @@ import {DocumentMerger} from './DocumentMerger';
 import {loadNewXml, XmlElementNode} from 'simple_xml';
 import {MergeDocument, mergeHeader, MergeLine, readMergeDocument} from './mergeDocument';
 import {MergedDocumentView} from './MergedDocumentView';
+import {tlhXmlEditorConfig} from "../xmlEditor/tlhXmlEditorConfig";
 
 interface MergeFile {
   filename: string;
@@ -42,7 +43,7 @@ export function DocumentMergerContainer(): JSX.Element {
   const {t} = useTranslation('common');
   const [state, setState] = useState<IState>({_type: 'EmptyState'});
 
-  const loadFirstDocument = async (file: File): Promise<void> => loadNewXml(file)
+  const loadFirstDocument = async (file: File): Promise<void> => loadNewXml(file, tlhXmlEditorConfig.readConfig)
     .then((parseResult) =>
       parseResult.handle(
         (rootNode) => setState((state) => update(state, {
@@ -53,7 +54,7 @@ export function DocumentMergerContainer(): JSX.Element {
       )
     );
 
-  const loadSecondDocument = async (file: File): Promise<void> => loadNewXml(file).then((parseResult) =>
+  const loadSecondDocument = async (file: File): Promise<void> => loadNewXml(file, tlhXmlEditorConfig.readConfig).then((parseResult) =>
     parseResult.handle(
       (rootNode) =>
         setState((state) => update(state, {

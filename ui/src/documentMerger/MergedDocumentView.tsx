@@ -5,6 +5,7 @@ import {useTranslation} from 'react-i18next';
 import {findFirstXmlElementByTagName, isXmlElementNode, isXmlTextNode, writeNode, XmlElementNode, xmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
 import {handleSaveToPC} from '../xmlEditor/StandAloneOXTED';
 import xmlFormat from 'xml-formatter';
+import {tlhXmlEditorConfig} from "../xmlEditor/tlhXmlEditorConfig";
 
 interface IProps {
   lines: MergeLine[];
@@ -61,11 +62,7 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
     };
 
 
-    const exported: string = xmlFormat(writeNode(AOxml).join('\n'), {
-      indentation: '  ',
-      collapseContent: true,
-      lineSeparator: '\n'
-    });
+    const exported: string = writeNode(AOxml, tlhXmlEditorConfig.writeConfig).join('\n');
     console.log(exported);
     let filename = 'merged';
     const docIDnode = findFirstXmlElementByTagName(header, 'docID');
