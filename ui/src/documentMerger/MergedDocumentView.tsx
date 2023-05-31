@@ -57,8 +57,13 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
       children: [header, newBody]
     };
 
-    const exported = writeXml(AOxml);
 
+    const exported: string = xmlFormat(writeNode(AOxml).join('\n'), {
+      indentation: '  ',
+      collapseContent: true,
+      lineSeparator: '\n'
+    });
+    console.log(exported);
     let filename = 'merged';
     const docIDnode = findFirstXmlElementByTagName(header, 'docID');
     if (docIDnode && isXmlTextNode(docIDnode.children[0])) {
@@ -77,9 +82,9 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
       publications.push(xmlElementNode('AO:TxtPubl',
         {},
         [xmlTextNode(
-          (publ[1] + '{€' + publ[0] + '}')
-            .replace('\n','')
-            .replace('\t', '')
+          (publ[1] + ' {€' + publ[0] + '}')
+            .replaceAll('\n','')
+            .replaceAll('\t', '')
         )]));
       i++;
     }
