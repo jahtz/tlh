@@ -5,7 +5,7 @@ import {useTranslation} from 'react-i18next';
 import {findFirstXmlElementByTagName, isXmlElementNode, isXmlTextNode, writeNode, XmlElementNode, xmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
 import {handleSaveToPC} from '../xmlEditor/StandAloneOXTED';
 import xmlFormat from 'xml-formatter';
-import {tlhXmlEditorConfig} from "../xmlEditor/tlhXmlEditorConfig";
+import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
 
 interface IProps {
   lines: MergeLine[];

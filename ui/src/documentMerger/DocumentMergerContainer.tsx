@@ -6,7 +6,7 @@ import {DocumentMerger} from './DocumentMerger';
 import {loadNewXml, XmlElementNode} from 'simple_xml';
 import {MergeDocument, mergeHeader, MergeLine, readMergeDocument} from './mergeDocument';
 import {MergedDocumentView} from './MergedDocumentView';
-import {tlhXmlEditorConfig} from "../xmlEditor/tlhXmlEditorConfig";
+import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
 
 interface MergeFile {
   filename: string;
