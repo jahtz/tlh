@@ -22,7 +22,9 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
     const lineNodes = lines
       .map<XmlNode[]>(({lineNumberNode, rest}) => [lineNumberNode, ...rest])
       .flat();
-    const childNodes = writePublMapping().concat(lineNodes);
+    const publMapping = writePublMapping();
+    const publicationMappingString: string[] = getPublicationMappingString(publMapping);
+    const childNodes = publMapping.concat(lineNodes);
     const newBody: XmlElementNode = {
       tagName: 'body',
       attributes: {},
@@ -34,6 +36,7 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
         node.children.forEach((cnode) => {
             if (isXmlElementNode(cnode) && cnode.tagName === 'merge') {
               cnode.attributes['editor'] = mergerName;
+              cnode.attributes['docs'] = publicationMappingString.join(' ');
               console.log(cnode.attributes['editor']);
             }
           }
@@ -90,6 +93,25 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
     }
 
     return [xmlElementNode('AO:Manuscripts', {}, publications)];
+  }
+
+  function getPublicationMappingString(publMapping: XmlNode[]): string [] {
+    const output: string[] = [];
+
+    for (const publication of publMapping) {
+      if (isXmlElementNode(publication)) {
+        for (const childPub of publication.children) {
+          if (isXmlElementNode(childPub) && isXmlTextNode(childPub.children[0])) {
+            output.push(childPub.children[0].textContent);
+          }
+          else if (isXmlTextNode(childPub)) {
+            output.push(childPub.textContent);
+          }
+        }
+      }
+    }
+
+    return output;
   }
 
   function setMergerReg(input: string) { mergerName = input; }
