@@ -18,6 +18,8 @@ export interface MergeDocument {
   MergedPublicationMapping: Map<string, string[]> | undefined;
 }
 
+let leftTxtId = '';
+
 export function readMergeDocument(rootNode: XmlElementNode): MergeDocument {
   const element: XmlElementNode | undefined = findFirstXmlElementByTagName(rootNode, 'text');
   const aoManuscript: XmlElementNode | undefined = findFirstXmlElementByTagName(rootNode, 'AO:Manuscripts');
@@ -63,9 +65,9 @@ export function mergeLines(mls: ZipWithOffsetResult<MergeLine>): MergeLine[] {
     if (left && right) {
       return mergeLine(left, right);
     } else if (left && right == null) {
-      return left;
+      return iterateTxtId(left);
     } else if (right && left == null) {
-      return right;
+      return iterateTxtId(right);
     } else {
       throw new Error('TODO');
     }
@@ -103,12 +105,24 @@ function mergeLine(
   const lineNumber = computeNewLineNumber(lnr, rnr) || (lnr + rnr);
 
   const language = leftLineNumberNode.attributes.lg || '';
-  const txtid = (leftLineNumberNode.attributes.txtid + '+').replace('++', '+') || '';
+  const txtid = (leftLineNumberNode.attributes.txtid + '+').replace('++','+') || '';
+  leftTxtId = txtid;
   const lineNumberNode: XmlElementNode = {
     tagName: 'lb', children: [], attributes: {'txtid': txtid, 'lnr': lineNumber, 'lg': language}
   };
 
   return {lineNumberNode, rest: [...leftRest, mergeSeparatorElement, ...rightRest]};
+}
+
+function iterateTxtId({lineNumberNode: leftLineNumberNode, rest: leftRest}: MergeLine): MergeLine {
+
+  const lineNumber = leftLineNumberNode.attributes.lnr || '';
+  const language = leftLineNumberNode.attributes.lg || '';
+  const lineNumberNode: XmlElementNode = {
+    tagName: 'lb', children: [], attributes: {'txtid': leftTxtId, 'lnr': lineNumber, 'lg': language}
+  };
+
+  return {lineNumberNode, rest: [...leftRest]};
 }
 
 function parsePublicationMapping(txtPublication: string, publMap: Map<string, string[]>) {
@@ -168,8 +182,8 @@ export function mergeHeader(firstDocumentHeader: XmlElementNode, secondDocumentH
     attributes: {},
     children: [xmlElementNode('docID', {}, [xmlTextNode(newDocID)]),
       xmlElementNode('meta', {}, [
-        xmlElementNode('merge', {'date': new Date().toISOString(), 'editor': 'DocumentMerger'}, []),
-        xmlElementNode('annotation', {}, [xmlElementNode('annot', {'editor': 'auto', 'date': new Date().toISOString()})]),
+        xmlElementNode('merge', {'date': new Date().toISOString(), 'editor':'DocumentMerger'}, []),
+        xmlElementNode('annotation', {}, []),
         merged
       ])]
   };
@@ -207,7 +221,7 @@ export function replaceLNR(node: XmlElementNode, publicationMap: Map<string, str
 
   } else if (publicationMap.values()) {
     // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
-    textLine = '{€' + Array.from(publicationMap.values()).pop()![0] + '}' + textLine;
+    textLine = '{€' + Array.from(publicationMap.values()).pop()![0] + '} ' + textLine;
   }
   return textLine;
 }

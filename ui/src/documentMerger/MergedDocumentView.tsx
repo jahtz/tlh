@@ -3,8 +3,9 @@ import {JSX} from 'react';
 import {MergeDocumentLine} from './DocumentMerger';
 import {useTranslation} from 'react-i18next';
 import {findFirstXmlElementByTagName, isXmlElementNode, isXmlTextNode, writeNode, XmlElementNode, xmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
-import {handleSaveToPC, writeXml} from '../xmlEditor/StandAloneOXTED';
+import {handleSaveToPC} from '../xmlEditor/StandAloneOXTED';
 import xmlFormat from 'xml-formatter';
+import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
 
 interface IProps {
   lines: MergeLine[];
@@ -22,7 +23,9 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
     const lineNodes = lines
       .map<XmlNode[]>(({lineNumberNode, rest}) => [lineNumberNode, ...rest])
       .flat();
-    const childNodes = writePublMapping().concat(lineNodes);
+    const publMapping = writePublMapping();
+    const publicationMappingString: string[] = getPublicationMappingString(publMapping);
+    const childNodes = publMapping.concat(lineNodes);
     const newBody: XmlElementNode = {
       tagName: 'body',
       attributes: {},
@@ -34,6 +37,7 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
         node.children.forEach((cnode) => {
             if (isXmlElementNode(cnode) && cnode.tagName === 'merge') {
               cnode.attributes['editor'] = mergerName;
+              cnode.attributes['docs'] = publicationMappingString.join(' ');
               console.log(cnode.attributes['editor']);
             }
           }
@@ -57,8 +61,9 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
       children: [header, newBody]
     };
 
-    const exported = writeXml(AOxml);
 
+    const exported: string = writeNode(AOxml, tlhXmlEditorConfig.writeConfig).join('\n');
+    console.log(exported);
     let filename = 'merged';
     const docIDnode = findFirstXmlElementByTagName(header, 'docID');
     if (docIDnode && isXmlTextNode(docIDnode.children[0])) {
@@ -79,14 +84,34 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
       publications.push(xmlElementNode('AO:TxtPubl',
         {},
         [xmlTextNode(
-          (publ[1] + '{€' + publ[0] + '}')
-            .replace('\n', '')
-            .replace('\t', '')
+          (publ[1] + ' {€' + publ[0] + '}')
+            .replaceAll('\n','')
+            .replaceAll('\t', '')
         )]));
       i++;
     }
 
     return [xmlElementNode('AO:Manuscripts', {}, publications)];
+  }
+
+
+  function getPublicationMappingString(publMapping: XmlNode[]): string [] {
+    const output: string[] = [];
+
+    for (const publication of publMapping) {
+      if (isXmlElementNode(publication)) {
+        for (const childPub of publication.children) {
+          if (isXmlElementNode(childPub) && isXmlTextNode(childPub.children[0])) {
+            output.push(childPub.children[0].textContent);
+          }
+          else if (isXmlTextNode(childPub)) {
+            output.push(childPub.textContent);
+          }
+        }
+      }
+    }
+
+    return output;
   }
 
   function setMergerReg(input: string) {
