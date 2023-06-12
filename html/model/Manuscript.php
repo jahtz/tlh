@@ -47,25 +47,6 @@ class Manuscript extends AbstractManuscript
 
   static function fromDbAssocArray(array $row): Manuscript
   {
-    $status = $row['approval_performed']
-      ? ManuscriptStatus::approved
-      : ($row['second_xml_rev_performed']
-        ? ManuscriptStatus::secondXmlReviewed
-        : ($row['first_xml_rev_performed']
-          ? ManuscriptStatus::firstXmlReviewPerformed
-          : ($row['xml_conv_performed']
-            ? ManuscriptStatus::xmlConversionPerformed
-            : ($row['transliteration_reviewed']
-              ? ManuscriptStatus::transliterationReviewed
-              : ($row['transliteration_released']
-                ? ManuscriptStatus::transliterationReleased
-                : ManuscriptStatus::created
-              )
-            )
-          )
-        )
-      );
-
     return new Manuscript(
       new ManuscriptIdentifier($row['main_identifier_type'], $row['main_identifier']),
       $row['palaeo_classification'],
@@ -73,7 +54,7 @@ class Manuscript extends AbstractManuscript
       $row['provenance'],
       $row['cth_classification'],
       $row['bibliography'],
-      $status,
+      $row['status'],
       $row['creator_username']
     );
   }
@@ -94,36 +75,7 @@ class Manuscript extends AbstractManuscript
     $first = $page * $pageSize;
 
     return executeMultiSelectQuery(
-      "
-select manuscript.main_identifier,
-       main_identifier_type,
-       palaeo_classification,
-       palaeo_classification_sure,
-       provenance,
-       cth_classification,
-       bibliography,
-       creator_username,
-       rel_trans.release_date is not null       as transliteration_released,
-       translit_rev.review_date is not null     as transliteration_reviewed,
-       xml_conv.conversion_date is not null     as xml_conv_performed,
-       first_xml_rev.review_date is not null    as first_xml_rev_performed,
-       second_xml_rev.review_date is not null   as second_xml_rev_performed,
-       approved_trans.approval_date is not null as approval_performed
-from tlh_dig_manuscripts as manuscript
-         left outer join tlh_dig_released_transliterations as rel_trans
-                         on rel_trans.main_identifier = manuscript.main_identifier
-         left outer join tlh_dig_transliteration_reviews as translit_rev
-                         on translit_rev.main_identifier = manuscript.main_identifier
-         left outer join tlh_dig_xml_conversions as xml_conv
-                         on xml_conv.main_identifier = manuscript.main_identifier
-         left outer join tlh_dig_first_xml_reviews as first_xml_rev
-                         on first_xml_rev.main_identifier = manuscript.main_identifier
-         left outer join tlh_dig_second_xml_reviews as second_xml_rev
-                         on second_xml_rev.main_identifier = manuscript.main_identifier
-         left outer join tlh_dig_approved_transliterations as approved_trans
-                         on approved_trans.main_identifier = manuscript.main_identifier
-order by creation_date desc
-limit ?, ?;",
+      "select * from tlh_dig_manuscripts order by creation_date desc limit ?, ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('ii', $first, $pageSize),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
     );
@@ -142,35 +94,7 @@ limit ?, ?;",
   static function selectManuscriptById(string $mainIdentifier): ?Manuscript
   {
     return executeSingleSelectQuery(
-      "
-select manuscript.main_identifier,
-       main_identifier_type,
-       palaeo_classification,
-       palaeo_classification_sure,
-       provenance,
-       cth_classification,
-       bibliography,
-       creator_username,
-       rel_trans.release_date is not null       as transliteration_released,
-       translit_rev.review_date is not null     as transliteration_reviewed,
-       xml_conv.conversion_date is not null     as xml_conv_performed,
-       first_xml_rev.review_date is not null    as first_xml_rev_performed,
-       second_xml_rev.review_date is not null   as second_xml_rev_performed,
-       approved_trans.approval_date is not null as approval_performed
-from tlh_dig_manuscripts as manuscript
-         left outer join tlh_dig_released_transliterations as rel_trans
-                         on rel_trans.main_identifier = manuscript.main_identifier
-         left outer join tlh_dig_transliteration_reviews as translit_rev
-                         on translit_rev.main_identifier = manuscript.main_identifier
-         left outer join tlh_dig_xml_conversions as xml_conv
-                         on xml_conv.main_identifier = manuscript.main_identifier
-         left outer join tlh_dig_first_xml_reviews as first_xml_rev
-                         on first_xml_rev.main_identifier = manuscript.main_identifier
-         left outer join tlh_dig_second_xml_reviews as second_xml_rev
-                         on second_xml_rev.main_identifier = manuscript.main_identifier
-         left outer join tlh_dig_approved_transliterations as approved_trans
-                         on approved_trans.main_identifier = manuscript.main_identifier
-where manuscript.main_identifier = ?;",
+      "select * from tlh_dig_manuscripts where main_identifier = ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
     );
