@@ -1,9 +1,9 @@
-import {displayReplace, inputClasses, XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from '../editorConfig';
+import {inputClasses, XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from '../editorConfig';
 import {useTranslation} from 'react-i18next';
 import {JSX} from 'react';
 
 export const noteNodeConfig: XmlSingleEditableNodeConfig = {
-  replace: (node) => displayReplace(<sup title={node.attributes.c} className="has-text-weight-bold">x</sup>),
+  replace: (node) => <sup title={node.attributes.c} className="has-text-weight-bold">x</sup>,
   edit: (props) => <NoteNodeEditor {...props}/>
 };
 

@@ -1,4 +1,4 @@
-import {displayReplace, XmlEditorConfig} from './editorConfig';
+import {XmlEditorConfig} from './editorConfig';
 import {isXmlCommentNode, isXmlTextNode, LetterCorrection, xmlElementNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {noteNodeConfig} from './elementEditors/NoteNodeEditor';
 import {aoManuscriptsConfig} from './elementEditors/AoManuscriptsEditor';
@@ -8,6 +8,7 @@ import {wordNodeConfig} from './elementEditors/wordNodeData';
 import {gapConfig} from './elementEditors/GapEditor';
 import {paragraphSeparatorConfig} from './elementEditors/ParagraphSeparatorEditor';
 import {clEditorConfig} from './elementEditors/ClEditor';
+import {textElementConfig} from './textElementConfig';
 
 export const selectedNodeClass = 'bg-teal-400';
 
@@ -60,16 +61,11 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     }
   },
   nodeConfigs: {
-    docID: {
-      replace: () => displayReplace(<span/>)
-    },
-    merged: {
-      replace: () => displayReplace(<span/>)
-    },
+    docID: {replace: () => <span/>},
+    merged: {replace: () => <span/>},
     'AO:Manuscripts': aoManuscriptsConfig,
-    'AO:ParagrNr': {
-      replace: (node) => displayReplace(<div className="mt-4 font-bold italic">{node.attributes.c}</div>)
-    },
+    'AO:ParagrNr': {replace: (node) => <div className="mt-4 font-bold italic">{node.attributes.c}</div>},
+
     lb: lineBreakNodeConfig,
 
     clb: clbNodeConfig,
@@ -83,30 +79,24 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     sGr: {styling: () => ['sumerogramm']},
     d: {styling: () => ['determinativ']},
 
-    add_in: {replace: () => displayReplace(<span>〈</span>)},
-    add_fin: {replace: () => displayReplace(<span>〉</span>)},
-    del_in: {replace: () => displayReplace(<span>[</span>)},
-    del_fin: {replace: () => displayReplace(<span>]</span>)},
-    ras_in: {replace: () => displayReplace(<span>*</span>)},
-    ras_fin: {replace: () => displayReplace(<span>*</span>)},
-    laes_in: {replace: () => displayReplace(<span>⸢</span>)},
-    laes_fin: {replace: () => displayReplace(<span>⸣</span>)},
+    add_in: {replace: () => <span>〈</span>},
+    add_fin: {replace: () => <span>〉</span>},
+    del_in: {replace: () => <span>[</span>},
+    del_fin: {replace: () => <span>]</span>},
+    ras_in: {replace: () => <span>*</span>},
+    ras_fin: {replace: () => <span>*</span>},
+    laes_in: {replace: () => <span>⸢</span>},
+    laes_fin: {replace: () => <span>⸣</span>},
 
-    materlect: {
-      replace: (node) => displayReplace(<span className="materLectionis">{node.attributes.c}</span>)
-    },
+    materlect: {replace: (node) => <span className="materLectionis">{node.attributes.c}</span>},
 
-    surpl: {
-      replace: (node) => displayReplace(<span>〈〈{node.attributes.c}〉〉</span>)
-    },
+    surpl: {replace: (node) => <span>〈〈{node.attributes.c}〉〉</span>},
 
     gap: gapConfig,
-    subscr: {replace: (node) => displayReplace(<sub>{node.attributes.c}</sub>)},
+    subscr: {replace: (node) => <sub>{node.attributes.c}</sub>},
 
     space: {
-      replace: (node) => displayReplace(
-        <>{Array.from({length: parseInt(node.attributes.c || '0') || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}</>
-      ),
+      replace: (node) => <>{Array.from({length: parseInt(node.attributes.c || '0') || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}</>,
       insertablePositions: {
         beforeElement: ['w'],
         afterElement: ['lb', 'w'],
@@ -115,12 +105,14 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
       }
     },
 
+    text: textElementConfig,
+
     parsep: paragraphSeparatorConfig,
     parsep_dbl: paragraphSeparatorConfig,
 
     corr: {
       styling: () => ['corr'],
-      replace: (node) => displayReplace(<span>{node.attributes.c}</span>)
+      replace: (node) => <span>{node.attributes.c}</span>
     },
     note: noteNodeConfig
   },

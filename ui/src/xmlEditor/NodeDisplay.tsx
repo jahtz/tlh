@@ -1,5 +1,5 @@
 import {isXmlCommentNode, isXmlTextNode, XmlElementNode, XmlNode} from 'simple_xml';
-import {JSX} from 'react';
+import {isValidElement, ReactElement} from 'react';
 import {isXmlEditableNodeConfig, XmlEditorNodeConfig} from './editorConfig';
 import classNames from 'classnames';
 import {NodePath} from './insertablePositions';
@@ -20,13 +20,13 @@ export interface NodeDisplayIProps {
   isLeftSide: boolean;
 }
 
-function InsertButton({initiate}: { initiate: () => void }): JSX.Element {
+function InsertButton({initiate}: { initiate: () => void }): ReactElement {
   return (
     <button type="button" onClick={initiate} className="mx-2 px-2 rounded bg-teal-100">+</button>
   );
 }
 
-export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIProps): JSX.Element {
+export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIProps): ReactElement {
   if (isXmlCommentNode(node)) {
     return <></>;
   } else if (isXmlTextNode(node)) {
@@ -37,15 +37,17 @@ export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIPr
 
   const currentConfig: XmlEditorNodeConfig | undefined = tlhXmlEditorConfig.nodeConfigs[node.tagName];
 
-  const renderedChildren = (
-    <>{node.children.map((c, i) => <NodeDisplay key={i} node={c} path={[...path, i]} {...inheritedProps}/>)}</>
-  );
+  const renderChildren = () => <>{node.children.map((c, i) => <NodeDisplay key={i} node={c} path={[...path, i]} {...inheritedProps}/>)}</>;
 
   const isSelected = !!currentSelectedPath && path.join('.') === currentSelectedPath.join('.');
 
-  const {clickable, notClickable} = currentConfig?.replace
-    ? currentConfig.replace(node, renderedChildren, isSelected, isLeftSide)
-    : {clickable: renderedChildren, notClickable: undefined};
+  const replacement = currentConfig?.replace
+    ? currentConfig.replace(node, renderChildren, isSelected, isLeftSide)
+    : {clickable: renderChildren(), notClickable: undefined};
+
+  const {clickable, notClickable} = isValidElement(replacement)
+    ? {clickable: replacement, notClickable: undefined}
+    : replacement;
 
   const classes = currentConfig?.styling
     ? currentConfig.styling(node, isSelected, isLeftSide)
@@ -59,7 +61,7 @@ export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIPr
     <>
       {insertStuff && insertStuff.insertablePaths.includes(path.join('.')) && <InsertButton initiate={() => insertStuff.initiateInsert(path)}/>}
       <span className={classNames(classes)} onClick={onClick}>{clickable}</span>
-      {notClickable && <span className={classNames(classes)}>{notClickable}</span>}
+      {isLeftSide && notClickable && <span className={classNames(classes)}>{notClickable}</span>}
       {insertStuff && insertStuff.insertAsLastChildOf.includes(node.tagName) &&
         <InsertButton initiate={() => insertStuff.initiateInsert([...path, node.children.length])}/>}
     </>

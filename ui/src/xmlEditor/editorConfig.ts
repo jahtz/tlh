@@ -1,8 +1,9 @@
 import {XmlElementNode, XmlReadConfig, XmlWriteConfig} from 'simple_xml';
-import {JSX} from 'react';
+import {JSX, ReactElement} from 'react';
 import {Argument as ClassNamesArgument} from 'classnames';
 import {InsertablePositions} from './insertablePositions';
 import {Spec} from 'immutability-helper';
+import {DisplayReplacement} from './editorConfig/displayReplacement';
 
 export const inputClasses = 'mt-2 p-2 rounded border border-slate-500 w-full';
 
@@ -15,17 +16,8 @@ export interface XmlEditableNodeIProps<T = void> {
   additionalInfo: T;
 }
 
-export interface DisplayReplacement {
-  clickable: JSX.Element;
-  notClickable?: JSX.Element;
-}
-
-export function displayReplace(clickable: JSX.Element, notClickable?: JSX.Element): DisplayReplacement {
-  return {clickable, notClickable};
-}
-
 export interface XmlSingleNodeConfig {
-  replace?: (node: XmlElementNode, renderedChildren: JSX.Element, isSelected: boolean, isLeftSide: boolean) => DisplayReplacement;
+  replace?: (node: XmlElementNode, renderChildren: () => JSX.Element, isSelected: boolean, isLeftSide: boolean) => ReactElement | DisplayReplacement;
   styling?: (node: XmlElementNode, isSelected: boolean, isLeftSide: boolean) => ClassNamesArgument;
   dontRenderChildrenInline?: boolean;
 }

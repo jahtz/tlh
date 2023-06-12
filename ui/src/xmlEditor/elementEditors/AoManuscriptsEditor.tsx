@@ -1,4 +1,4 @@
-import {displayReplace, XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from '../editorConfig';
+import {XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from '../editorConfig';
 import {DeleteButton} from '../../genericElements/Buttons';
 import {isXmlElementNode, isXmlTextNode, XmlElementNode, xmlElementNode, XmlNode, XmlTextNode, xmlTextNode} from 'simple_xml';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
@@ -45,9 +45,7 @@ const newEntry: XmlNode[] = [
 ];
 
 export const aoManuscriptsConfig: XmlSingleEditableNodeConfig = {
-  replace: (node, renderedChildren, isSelected) => displayReplace(
-    <span className={isSelected ? selectedNodeClass : ''}>{renderedChildren}</span>
-  ),
+  replace: (node, renderChildren, isSelected) => <span className={isSelected ? selectedNodeClass : ''}>{renderChildren()}</span>,
   edit: (props) => <AoManuscriptsEditor {...props}/>
 };
 

@@ -1,4 +1,4 @@
-import {displayReplace, inputClasses, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {inputClasses, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import classNames from 'classnames';
@@ -6,9 +6,7 @@ import {selectedNodeClass} from '../tlhXmlEditorConfig';
 import {xmlElementNode} from 'simple_xml';
 
 export const clbNodeConfig: XmlInsertableSingleEditableNodeConfig = {
-  replace: (node, _element, isSelected) => displayReplace(
-    <span className={classNames(isSelected ? selectedNodeClass : 'bg-amber-500')}>{node.attributes.id}&nbsp;</span>
-  ),
+  replace: (node, _element, isSelected) => <span className={classNames(isSelected ? selectedNodeClass : 'bg-amber-500')}>{node.attributes.id}&nbsp;</span>,
   edit: (props) => <ClbEditor {...props}/>,
   insertablePositions: {
     beforeElement: ['w', 'parsep', 'parsep_dbl'],

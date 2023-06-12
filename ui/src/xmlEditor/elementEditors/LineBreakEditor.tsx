@@ -1,4 +1,4 @@
-import {displayReplace, inputClasses, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {inputClasses, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {LanguageInput} from '../LanguageInput';
@@ -13,13 +13,12 @@ interface GetCuneiformResponse {
 }
 
 export const lineBreakNodeConfig: XmlInsertableSingleEditableNodeConfig<XmlNode[]> = {
-  replace: (node, _renderedChildren, isSelected, isLeftSide) => displayReplace(
+  replace: (node, _renderedChildren, isSelected, isLeftSide) =>
     <>
       {isLeftSide && <br/>}
       <span className={classNames(isSelected ? [selectedNodeClass, 'text-black'] : ['text-gray-500'])}>{node.attributes.lnr}:</span>
       &nbsp;&nbsp;
-    </>
-  ),
+    </>,
   insertablePositions: {
     beforeElement: ['lb', 'w', 'gap'],
     asLastChildOf: ['div1']

@@ -1,10 +1,10 @@
 import {isXmlElementNode, XmlElementNode} from 'simple_xml';
-import {displayReplace, DisplayReplacement, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {WordNodeEditor} from './WordNodeEditor';
 import {SpacesEditor} from './SpacesEditor';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
-import {JSX} from 'react';
+import {JSX, ReactElement} from 'react';
 
 /** @deprecated */
 const foreignLanguageColors: { [key: string]: string } = {
@@ -38,7 +38,7 @@ function backgroundColor(node: XmlElementNode, isSelected: boolean, selectedMorp
   return undefined;
 }
 
-export const replaceWordDisplay = (node: XmlElementNode, renderedChildren: JSX.Element, isSelected: boolean): DisplayReplacement => {
+export const replaceWordDisplay = (node: XmlElementNode, renderChildren: () => JSX.Element, isSelected: boolean): ReactElement => {
 
   const selectedMorph = node.attributes.mrp0sel?.trim();
 
@@ -61,11 +61,11 @@ export const replaceWordDisplay = (node: XmlElementNode, renderedChildren: JSX.E
       ]
   );
 
-  return displayReplace(
+  return (
     <>
       &nbsp;
       <span className={classes} title={hasEditingQuestion ? node.attributes.q : undefined}>
-          {node.children.length === 0 ? <span>&#x2715;</span> : renderedChildren}
+          {node.children.length === 0 ? <span>&#x2715;</span> : renderChildren()}
         </span>
       &nbsp;
     </>

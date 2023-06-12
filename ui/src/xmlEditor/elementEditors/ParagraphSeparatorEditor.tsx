@@ -1,15 +1,13 @@
-import {displayReplace, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import {JSX} from 'react';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 
 const separatorTypes: ('parsep' | 'parsep_dbl')[] = ['parsep', 'parsep_dbl'];
 
 export const paragraphSeparatorConfig: XmlInsertableSingleEditableNodeConfig = {
-  replace: (node, _renderedChildren, isSelected) => displayReplace(
-    <span className={isSelected ? selectedNodeClass : ''}>
+  replace: (node, _renderedChildren, isSelected) => <span className={isSelected ? selectedNodeClass : ''}>
       {node.tagName === 'parsep' ? '¬¬¬' : '==='}
-    </span>
-  ),
+    </span>,
   insertablePositions: {
     beforeElement: ['w'],
     afterElement: ['lb', 'w'],
