@@ -81,7 +81,7 @@ class Manuscript extends AbstractManuscript
   static function selectManuscriptsCount(): int
   {
     return executeSingleSelectQuery(
-      "select count(*) as manuscript_count from tlh_dig_manuscript_metadatas;",
+      "select count(*) as manuscript_count from tlh_dig_manuscripts;",
       null,
       fn(array $row): int => (int)$row['manuscript_count']
     ) ?? -1;
@@ -95,7 +95,7 @@ class Manuscript extends AbstractManuscript
 
     return executeMultiSelectQuery(
       "
-select data.main_identifier,
+select manuscript.main_identifier,
        main_identifier_type,
        palaeo_classification,
        palaeo_classification_sure,
@@ -109,19 +109,19 @@ select data.main_identifier,
        first_xml_rev.review_date is not null    as first_xml_rev_performed,
        second_xml_rev.review_date is not null   as second_xml_rev_performed,
        approved_trans.approval_date is not null as approval_performed
-from tlh_dig_manuscript_metadatas as data
+from tlh_dig_manuscripts as manuscript
          left outer join tlh_dig_released_transliterations as rel_trans
-                         on rel_trans.main_identifier = data.main_identifier
+                         on rel_trans.main_identifier = manuscript.main_identifier
          left outer join tlh_dig_transliteration_reviews as translit_rev
-                         on translit_rev.main_identifier = data.main_identifier
+                         on translit_rev.main_identifier = manuscript.main_identifier
          left outer join tlh_dig_xml_conversions as xml_conv
-                         on xml_conv.main_identifier = data.main_identifier
+                         on xml_conv.main_identifier = manuscript.main_identifier
          left outer join tlh_dig_first_xml_reviews as first_xml_rev
-                         on first_xml_rev.main_identifier = data.main_identifier
+                         on first_xml_rev.main_identifier = manuscript.main_identifier
          left outer join tlh_dig_second_xml_reviews as second_xml_rev
-                         on second_xml_rev.main_identifier = data.main_identifier
+                         on second_xml_rev.main_identifier = manuscript.main_identifier
          left outer join tlh_dig_approved_transliterations as approved_trans
-                         on approved_trans.main_identifier = data.main_identifier
+                         on approved_trans.main_identifier = manuscript.main_identifier
 order by creation_date desc
 limit ?, ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('ii', $first, $pageSize),
@@ -133,7 +133,7 @@ limit ?, ?;",
   static function selectManuscriptIdentifiersForUser(string $username): array
   {
     return executeMultiSelectQuery(
-      "select main_identifier from tlh_dig_manuscript_metadatas where creator_username = ?;",
+      "select main_identifier from tlh_dig_manuscripts where creator_username = ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $username),
       fn(array $row): string => (string)$row['main_identifier'],
     );
@@ -143,7 +143,7 @@ limit ?, ?;",
   {
     return executeSingleSelectQuery(
       "
-select data.main_identifier,
+select manuscript.main_identifier,
        main_identifier_type,
        palaeo_classification,
        palaeo_classification_sure,
@@ -157,20 +157,20 @@ select data.main_identifier,
        first_xml_rev.review_date is not null    as first_xml_rev_performed,
        second_xml_rev.review_date is not null   as second_xml_rev_performed,
        approved_trans.approval_date is not null as approval_performed
-from tlh_dig_manuscript_metadatas as data
+from tlh_dig_manuscripts as manuscript
          left outer join tlh_dig_released_transliterations as rel_trans
-                         on rel_trans.main_identifier = data.main_identifier
+                         on rel_trans.main_identifier = manuscript.main_identifier
          left outer join tlh_dig_transliteration_reviews as translit_rev
-                         on translit_rev.main_identifier = data.main_identifier
+                         on translit_rev.main_identifier = manuscript.main_identifier
          left outer join tlh_dig_xml_conversions as xml_conv
-                         on xml_conv.main_identifier = data.main_identifier
+                         on xml_conv.main_identifier = manuscript.main_identifier
          left outer join tlh_dig_first_xml_reviews as first_xml_rev
-                         on first_xml_rev.main_identifier = data.main_identifier
+                         on first_xml_rev.main_identifier = manuscript.main_identifier
          left outer join tlh_dig_second_xml_reviews as second_xml_rev
-                         on second_xml_rev.main_identifier = data.main_identifier
+                         on second_xml_rev.main_identifier = manuscript.main_identifier
          left outer join tlh_dig_approved_transliterations as approved_trans
-                         on approved_trans.main_identifier = data.main_identifier
-where data.main_identifier = ?;",
+                         on approved_trans.main_identifier = manuscript.main_identifier
+where manuscript.main_identifier = ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
     );

@@ -13,7 +13,7 @@ drop table if exists
   tlh_dig_released_transliterations,
   tlh_dig_provisional_transliterations,
   tlh_dig_manuscript_other_identifiers,
-  tlh_dig_manuscript_metadatas,
+  tlh_dig_manuscripts,
   tlh_dig_users;
 
 -- users
@@ -29,7 +29,7 @@ create table if not exists tlh_dig_users (
 
 -- manuscripts
 
-create table if not exists tlh_dig_manuscript_metadatas (
+create table if not exists tlh_dig_manuscripts (
   main_identifier            varchar(20) primary key                       not null,
   main_identifier_type       enum ('ExcavationNumber', 'CollectionNumber') not null default 'ExcavationNumber',
   palaeo_classification      varchar(100)                                  not null default 'OldScript',
@@ -42,7 +42,7 @@ create table if not exists tlh_dig_manuscript_metadatas (
 );
 
 create table if not exists tlh_dig_manuscript_other_identifiers (
-  main_identifier varchar(20)                                                                not null references tlh_dig_manuscript_metadatas (main_identifier) on update cascade on delete cascade,
+  main_identifier varchar(20)                                                                not null references tlh_dig_manuscripts (main_identifier) on update cascade on delete cascade,
 
   identifier      varchar(20)                                                                not null unique,
   identifier_type enum ('ExcavationNumber', 'CollectionNumber', 'PublicationShortReference') not null default 'ExcavationNumber',
@@ -53,13 +53,13 @@ create table if not exists tlh_dig_manuscript_other_identifiers (
 -- transliterations
 
 create table if not exists tlh_dig_provisional_transliterations (
-  main_identifier varchar(20) not null primary key references tlh_dig_manuscript_metadatas (main_identifier) on update cascade on delete cascade,
+  main_identifier varchar(20) not null primary key references tlh_dig_manuscripts (main_identifier) on update cascade on delete cascade,
   input           text        not null,
   creation_date   date        not null default now()
 );
 
 create table if not exists tlh_dig_released_transliterations (
-  main_identifier varchar(20) not null primary key references tlh_dig_manuscript_metadatas (main_identifier) on update cascade on delete cascade,
+  main_identifier varchar(20) not null primary key references tlh_dig_manuscripts (main_identifier) on update cascade on delete cascade,
   release_date    date        not null default now()
 );
 
