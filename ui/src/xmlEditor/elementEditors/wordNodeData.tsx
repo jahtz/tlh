@@ -1,10 +1,12 @@
 import {isXmlElementNode, XmlElementNode} from 'simple_xml';
-import {displayReplace, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {displayReplace, DisplayReplacement, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {WordNodeEditor} from './WordNodeEditor';
 import {SpacesEditor} from './SpacesEditor';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
+import {JSX} from 'react';
 
+/** @deprecated */
 const foreignLanguageColors: { [key: string]: string } = {
   // FIXME: other colors!
   HURR: 'Hur',
@@ -36,40 +38,42 @@ function backgroundColor(node: XmlElementNode, isSelected: boolean, selectedMorp
   return undefined;
 }
 
-export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig = {
-  replace: (node, renderedChildren, isSelected) => {
+export const replaceWordDisplay = (node: XmlElementNode, renderedChildren: JSX.Element, isSelected: boolean): DisplayReplacement => {
 
-    const selectedMorph = node.attributes.mrp0sel?.trim();
+  const selectedMorph = node.attributes.mrp0sel?.trim();
 
-    const isForeignLanguage = selectedMorph !== undefined
-      ? Object.keys(foreignLanguageColors).includes(selectedMorph)
-      : false;
+  const isForeignLanguage = selectedMorph !== undefined
+    ? Object.keys(foreignLanguageColors).includes(selectedMorph)
+    : false;
 
-    const hasEditingQuestion = node.attributes.editingQuestion !== undefined;
+  const hasEditingQuestion = node.attributes.editingQuestion !== undefined;
 
-    const classes = classNames(node.attributes.lg || '',
-      isOnlySpaces(node)
-        ? [isSelected ? selectedNodeClass : 'bg-gray-200']
-        : [
-          backgroundColor(node, isSelected, selectedMorph),
-          {
-            'text-red-600': node.children.length === 0,
-            'font-bold': isForeignLanguage,
-            [foreignLanguageColors[node.attributes.mrp0sel || '']]: isForeignLanguage,
-          }
-        ]
-    );
+  const classes = classNames(node.attributes.lg || '',
+    isOnlySpaces(node)
+      ? [isSelected ? selectedNodeClass : 'bg-gray-200']
+      : [
+        backgroundColor(node, isSelected, selectedMorph),
+        {
+          'text-red-600': node.children.length === 0,
+          'font-bold': isForeignLanguage,
+          [foreignLanguageColors[node.attributes.mrp0sel || '']]: isForeignLanguage,
+        }
+      ]
+  );
 
-    return displayReplace(
-      <>
-        &nbsp;
-        <span className={classes} title={hasEditingQuestion ? node.attributes.q : undefined}>
+  return displayReplace(
+    <>
+      &nbsp;
+      <span className={classes} title={hasEditingQuestion ? node.attributes.q : undefined}>
           {node.children.length === 0 ? <span>&#x2715;</span> : renderedChildren}
         </span>
-        &nbsp;
-      </>
-    );
-  },
+      &nbsp;
+    </>
+  );
+};
+
+export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig = {
+  replace: replaceWordDisplay,
   edit: (props) => isOnlySpaces(props.node)
     ? <SpacesEditor {...props}/>
     : <WordNodeEditor {...props}/>,
