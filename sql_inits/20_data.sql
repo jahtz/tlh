@@ -8,7 +8,7 @@ values ('jack', @pwHash, 'Jack Bourne', 'jack.bourne@example.com', 'ExecutiveEdi
        ('admin1', @pwHash, 'Admin1', 'admin1@example.com', 'ExecutiveEditor'),
        ('admin2', @pwHash, 'Admin2', 'admin2@example.com', 'ExecutiveEditor');
 
-insert into tlh_dig_manuscript_metadatas (main_identifier, creator_username)
+insert into tlh_dig_manuscripts (main_identifier, creator_username)
 values (@mainId, 'jack');
 
 insert into tlh_dig_provisional_transliterations (main_identifier, input)
