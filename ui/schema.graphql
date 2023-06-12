@@ -69,10 +69,21 @@ type ManuscriptLanguage {
   name: String!
 }
 
+enum ManuscriptLanguageAbbreviations {
+  Akk
+  Hat
+  Hit
+  Hur
+  Luw
+  Pal
+  Sum
+}
+
 type ManuscriptMetaData {
   bibliography: String
   creatorUsername: String!
   cthClassification: Int
+  defaultLanguage: ManuscriptLanguageAbbreviations!
   mainIdentifier: ManuscriptIdentifier!
   otherIdentifiers: [ManuscriptIdentifier!]!
   palaeographicClassification: PalaeographicClassification!
@@ -80,13 +91,14 @@ type ManuscriptMetaData {
   pictureUrls: [String!]!
   provenance: String
   provisionalTransliteration: String
-  status: ManuscriptStatus @deprecated(reason: "will be removed!")
+  status: ManuscriptStatus
   transliterationReleased: Boolean!
 }
 
 input ManuscriptMetaDataInput {
   bibliography: String
   cthClassification: Int
+  defaultLanguage: ManuscriptLanguageAbbreviations!
   mainIdentifier: ManuscriptIdentifierInput!
   otherIdentifiers: [ManuscriptIdentifierInput!]!
   palaeographicClassification: PalaeographicClassification!
@@ -134,7 +146,7 @@ type Query {
   executiveEditorQueries: ExecutiveEditor
   manuscript(mainIdentifier: String!): ManuscriptMetaData
   manuscriptCount: Int!
-  manuscriptLanguages: [ManuscriptLanguage!]!
+  manuscriptLanguages: [ManuscriptLanguage!]! @deprecated(reason: "Will be removed!")
   myManuscripts: [String!]
   reviewerQueries: Reviewer
 }

@@ -1,0 +1,36 @@
+# /register
+
+mutation Register($userInput: UserInput!) {
+  register(userInput: $userInput)
+}
+
+# /login
+
+mutation Login($username: String!, $password: String!) {
+  login(username: $username, password: $password)
+}
+
+# /userManagement
+
+fragment User on User {
+  username
+  name
+  affiliation
+  email
+  rights
+}
+
+query UsersOverview($page: Int!) {
+  executiveEditorQueries {
+    userCount
+    users(page: $page) {
+      ...User
+    }
+  }
+}
+
+mutation UpdateUserRights($username: String!, $newRights: Rights!) {
+  executiveEditor {
+    updateUserRights(username: $username, newRights: $newRights)
+  }
+}

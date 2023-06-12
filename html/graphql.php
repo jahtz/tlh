@@ -26,6 +26,7 @@ $queryType = new ObjectType([
   'fields' => [
     'manuscriptLanguages' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptLanguage::$graphQLType))),
+      'deprecationReason' => 'Will be removed!',
       'resolve' => fn(): array => allManuscriptLanguages()
     ],
     'manuscriptCount' => [

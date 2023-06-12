@@ -1,7 +1,6 @@
 import {useTranslation} from 'react-i18next';
-import {useSelector} from 'react-redux';
 import {JSX} from 'react';
-import {allManuscriptLanguagesSelector} from '../newStore';
+import {getNameForManuscriptLanguageAbbreviation, manuscriptLanguageAbbreviations} from '../forms/manuscriptLanguageAbbreviations';
 
 interface IProps {
   initialValue: string | undefined;
@@ -13,7 +12,6 @@ interface IProps {
 export function LanguageInput({initialValue, onChange, onFocus, onBlur}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
-  const allManuscriptLanguages = useSelector(allManuscriptLanguagesSelector);
 
   return (
     <div className="flex">
@@ -23,7 +21,9 @@ export function LanguageInput({initialValue, onChange, onFocus, onBlur}: IProps)
              list="languages" onChange={(event) => onChange(event.target.value)} onFocus={onFocus} onBlur={onBlur}/>
 
       <datalist id="languages">
-        {allManuscriptLanguages.map(({abbreviation}) => <option key={abbreviation}>{abbreviation}</option>)}
+        {manuscriptLanguageAbbreviations.map((abbreviation) => <option key={abbreviation} value={abbreviation}>
+          {getNameForManuscriptLanguageAbbreviation(abbreviation, t)}
+        </option>)}
       </datalist>
     </div>
   );

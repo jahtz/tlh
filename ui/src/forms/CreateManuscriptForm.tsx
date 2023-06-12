@@ -3,6 +3,7 @@ import {JSX} from 'react';
 import {
   ManuscriptIdentifierInput,
   ManuscriptIdentifierType,
+  ManuscriptLanguageAbbreviations,
   ManuscriptMetaDataInput,
   PalaeographicClassification,
   useCreateManuscriptMutation
@@ -15,6 +16,7 @@ import {Navigate} from 'react-router-dom';
 import {PalaeographicClassificationField} from './PalaeographicField';
 import {manuscriptsUrlFragment} from '../urls';
 import {ProvenanceField} from './ProvenanceField';
+import {getNameForManuscriptLanguageAbbreviation, manuscriptLanguageAbbreviations} from './manuscriptLanguageAbbreviations';
 
 function newManuscriptIdentifier(): ManuscriptIdentifierInput {
   return {
@@ -28,8 +30,9 @@ const initialValues: ManuscriptMetaDataInput = {
   otherIdentifiers: [],
   palaeographicClassification: PalaeographicClassification.Unclassified,
   palaeographicClassificationSure: false,
-  bibliography: '',
-  provenance: '',
+  defaultLanguage: ManuscriptLanguageAbbreviations.Hit,
+  bibliography: undefined,
+  provenance: undefined,
   cthClassification: undefined
 };
 
@@ -38,15 +41,16 @@ export function CreateManuscriptForm(): JSX.Element {
   const {t} = useTranslation('common');
   const [createManuscript, {data, loading, error}] = useCreateManuscriptMutation();
 
-  const createdManuscript: string | null | undefined = data?.me?.createManuscript;
+  const newIdentifier = data?.me?.identifier;
 
-  if (createdManuscript) {
-    return <Navigate to={`/${manuscriptsUrlFragment}/${encodeURIComponent(createdManuscript)}/data`}/>;
+  if (newIdentifier) {
+    return <Navigate to={`/${manuscriptsUrlFragment}/${encodeURIComponent(newIdentifier)}/data`}/>;
   }
 
-  function handleSubmit(manuscriptMetaData: ManuscriptMetaDataInput): void {
-    createManuscript({variables: {manuscriptMetaData}}).catch((e) => console.error(e));
-  }
+  const handleSubmit = (manuscriptMetaData: ManuscriptMetaDataInput): Promise<void> =>
+    createManuscript({variables: {manuscriptMetaData}})
+      .then(() => void 0)
+      .catch((e) => console.error(e));
 
   return (
     <div className="container mx-auto">
@@ -87,6 +91,16 @@ export function CreateManuscriptForm(): JSX.Element {
 
           <ProvenanceField/>
 
+          <div className="my-2">
+            <label htmlFor="defaultLanguage" className="font-bold">{t('defaultLanguage')}</label>
+
+            <Field as="select" name="defaultLanguage" id="defaultLangauge" placeholder={t('defaultLanguage')}
+                   className="my-2 p-2 rounded border border-slate-500 bg-white w-full">
+              {manuscriptLanguageAbbreviations.map((abbreviation) =>
+                <option key={abbreviation} value={abbreviation}>{getNameForManuscriptLanguageAbbreviation(abbreviation, t)}</option>)}
+            </Field>
+          </div>
+
           <div className="mt-2">
             <label htmlFor="cthClassification" className="font-bold">{t('(proposed)CthClassification')}:</label>
 
@@ -104,7 +118,7 @@ export function CreateManuscriptForm(): JSX.Element {
 
           {error && <div className="my-2 p-2 rounded bg-red-600 text-white text-center">{error.message}</div>}
 
-          <button type="submit" disabled={loading || !!createdManuscript}
+          <button type="submit" disabled={loading || !!newIdentifier}
                   className={classNames('mt-2', 'p-2', 'rounded', 'bg-blue-600', 'text-white', 'w-full', {'is-loading': loading})}>
             {t('createManuscript')}
           </button>

@@ -18,17 +18,6 @@ query AllManuscriptLanguages {
   }
 }
 
-# /register
-mutation Register($userInput: UserInput!) {
-  register(userInput: $userInput)
-}
-
-# /login
-
-mutation Login($username: String!, $password: String!) {
-  login(username: $username, password: $password)
-}
-
 # /
 
 fragment ManuscriptBasicData on ManuscriptMetaData {
@@ -69,7 +58,7 @@ query Index($page: Int! = 0) {
 
 mutation CreateManuscript($manuscriptMetaData : ManuscriptMetaDataInput) {
   me {
-    createManuscript(values: $manuscriptMetaData)
+    identifier: createManuscript(values: $manuscriptMetaData)
   }
 }
 
@@ -82,6 +71,7 @@ fragment ManuscriptMetaData on ManuscriptMetaData {
   otherIdentifiers {
     ...ManuscriptIdentifier
   }
+  defaultLanguage
   bibliography
   cthClassification
   palaeographicClassification
@@ -246,30 +236,5 @@ mutation AppointFirstXmlReviewer($manuscriptIdentifier: String!, $reviewer: Stri
 mutation AppointSecondXmlReviewer($manuscriptIdentifier: String!, $reviewer: String!) {
   executiveEditor {
     appointSecondXmlReviewer(manuscriptIdentifier: $manuscriptIdentifier, reviewer: $reviewer)
-  }
-}
-
-# /userManagement
-
-fragment User on User {
-  username
-  name
-  affiliation
-  email
-  rights
-}
-
-query UsersOverview($page: Int!) {
-  executiveEditorQueries {
-    userCount
-    users(page: $page) {
-      ...User
-    }
-  }
-}
-
-mutation UpdateUserRights($username: String!, $newRights: Rights!) {
-  executiveEditor {
-    updateUserRights(username: $username, newRights: $newRights)
   }
 }

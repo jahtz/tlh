@@ -24,6 +24,7 @@ export function UploadPicturesForm(): JSX.Element {
   const [state, setState] = useState<IState>({allPictures: [...manuscript.pictureUrls]});
   const fileUploadRef = createRef<HTMLInputElement>();
 
+  // FIXME: url needs version...
   const uploadUrl = `${process.env.REACT_APP_SERVER_URL}/uploadPicture.php?id=${encodeURIComponent(manuscript.mainIdentifier.identifier)}`;
 
   function selectFile(event: ChangeEvent<HTMLInputElement>): void {

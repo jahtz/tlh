@@ -156,11 +156,22 @@ export type ManuscriptLanguage = {
   name: Scalars['String']['output'];
 };
 
+export const enum ManuscriptLanguageAbbreviations {
+  Akk = 'Akk',
+  Hat = 'Hat',
+  Hit = 'Hit',
+  Hur = 'Hur',
+  Luw = 'Luw',
+  Pal = 'Pal',
+  Sum = 'Sum'
+};
+
 export type ManuscriptMetaData = {
   __typename?: 'ManuscriptMetaData';
   bibliography?: Maybe<Scalars['String']['output']>;
   creatorUsername: Scalars['String']['output'];
   cthClassification?: Maybe<Scalars['Int']['output']>;
+  defaultLanguage: ManuscriptLanguageAbbreviations;
   mainIdentifier: ManuscriptIdentifier;
   otherIdentifiers: Array<ManuscriptIdentifier>;
   palaeographicClassification: PalaeographicClassification;
@@ -168,7 +179,6 @@ export type ManuscriptMetaData = {
   pictureUrls: Array<Scalars['String']['output']>;
   provenance?: Maybe<Scalars['String']['output']>;
   provisionalTransliteration?: Maybe<Scalars['String']['output']>;
-  /** @deprecated will be removed! */
   status?: Maybe<ManuscriptStatus>;
   transliterationReleased: Scalars['Boolean']['output'];
 };
@@ -176,6 +186,7 @@ export type ManuscriptMetaData = {
 export type ManuscriptMetaDataInput = {
   bibliography?: InputMaybe<Scalars['String']['input']>;
   cthClassification?: InputMaybe<Scalars['Int']['input']>;
+  defaultLanguage: ManuscriptLanguageAbbreviations;
   mainIdentifier: ManuscriptIdentifierInput;
   otherIdentifiers: Array<ManuscriptIdentifierInput>;
   palaeographicClassification: PalaeographicClassification;
@@ -242,6 +253,7 @@ export type Query = {
   executiveEditorQueries?: Maybe<ExecutiveEditor>;
   manuscript?: Maybe<ManuscriptMetaData>;
   manuscriptCount: Scalars['Int']['output'];
+  /** @deprecated Will be removed! */
   manuscriptLanguages: Array<ManuscriptLanguage>;
   myManuscripts?: Maybe<Array<Scalars['String']['output']>>;
   reviewerQueries?: Maybe<Reviewer>;
@@ -345,21 +357,6 @@ export type AllManuscriptLanguagesQueryVariables = Exact<{ [key: string]: never;
 
 export type AllManuscriptLanguagesQuery = { __typename?: 'Query', manuscriptLanguages: Array<{ __typename?: 'ManuscriptLanguage', name: string, abbreviation: string }> };
 
-export type RegisterMutationVariables = Exact<{
-  userInput: UserInput;
-}>;
-
-
-export type RegisterMutation = { __typename?: 'Mutation', register?: string | null };
-
-export type LoginMutationVariables = Exact<{
-  username: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-}>;
-
-
-export type LoginMutation = { __typename?: 'Mutation', login?: string | null };
-
 export type ManuscriptBasicDataFragment = { __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
 export type ReviewerHomeDataFragment = { __typename?: 'Reviewer', appointments: Array<{ __typename?: 'Appointment', type: AppointmentType, manuscriptIdentifier: string, waitingFor?: AppointmentType | null }> };
@@ -378,16 +375,16 @@ export type CreateManuscriptMutationVariables = Exact<{
 }>;
 
 
-export type CreateManuscriptMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', createManuscript: string } | null };
+export type CreateManuscriptMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', identifier: string } | null };
 
-export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, provisionalTransliteration?: string | null, transliterationReleased: boolean, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }> };
+export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', defaultLanguage: ManuscriptLanguageAbbreviations, bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, provisionalTransliteration?: string | null, transliterationReleased: boolean, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }> };
 
 export type ManuscriptQueryVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
 }>;
 
 
-export type ManuscriptQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, provisionalTransliteration?: string | null, transliterationReleased: boolean, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }> } | null };
+export type ManuscriptQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', defaultLanguage: ManuscriptLanguageAbbreviations, bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, pictureUrls: Array<string>, provisionalTransliteration?: string | null, transliterationReleased: boolean, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }> } | null };
 
 export type ReleaseTransliterationMutationVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
@@ -525,6 +522,21 @@ export type AppointSecondXmlReviewerMutationVariables = Exact<{
 
 export type AppointSecondXmlReviewerMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', appointSecondXmlReviewer: string } | null };
 
+export type RegisterMutationVariables = Exact<{
+  userInput: UserInput;
+}>;
+
+
+export type RegisterMutation = { __typename?: 'Mutation', register?: string | null };
+
+export type LoginMutationVariables = Exact<{
+  username: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+}>;
+
+
+export type LoginMutation = { __typename?: 'Mutation', login?: string | null };
+
 export type UserFragment = { __typename?: 'User', username: string, name: string, affiliation?: string | null, email: string, rights: Rights };
 
 export type UsersOverviewQueryVariables = Exact<{
@@ -585,6 +597,7 @@ export const ManuscriptMetaDataFragmentDoc = gql`
   otherIdentifiers {
     ...ManuscriptIdentifier
   }
+  defaultLanguage
   bibliography
   cthClassification
   palaeographicClassification
@@ -669,69 +682,6 @@ export function useAllManuscriptLanguagesLazyQuery(baseOptions?: Apollo.LazyQuer
 export type AllManuscriptLanguagesQueryHookResult = ReturnType<typeof useAllManuscriptLanguagesQuery>;
 export type AllManuscriptLanguagesLazyQueryHookResult = ReturnType<typeof useAllManuscriptLanguagesLazyQuery>;
 export type AllManuscriptLanguagesQueryResult = Apollo.QueryResult<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>;
-export const RegisterDocument = gql`
-    mutation Register($userInput: UserInput!) {
-  register(userInput: $userInput)
-}
-    `;
-export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
-
-/**
- * __useRegisterMutation__
- *
- * To run a mutation, you first call `useRegisterMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRegisterMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [registerMutation, { data, loading, error }] = useRegisterMutation({
- *   variables: {
- *      userInput: // value for 'userInput'
- *   },
- * });
- */
-export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<RegisterMutation, RegisterMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument, options);
-      }
-export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
-export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
-export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
-export const LoginDocument = gql`
-    mutation Login($username: String!, $password: String!) {
-  login(username: $username, password: $password)
-}
-    `;
-export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
-
-/**
- * __useLoginMutation__
- *
- * To run a mutation, you first call `useLoginMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useLoginMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [loginMutation, { data, loading, error }] = useLoginMutation({
- *   variables: {
- *      username: // value for 'username'
- *      password: // value for 'password'
- *   },
- * });
- */
-export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
-      }
-export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
-export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const IndexDocument = gql`
     query Index($page: Int! = 0) {
   manuscriptCount
@@ -780,7 +730,7 @@ export type IndexQueryResult = Apollo.QueryResult<IndexQuery, IndexQueryVariable
 export const CreateManuscriptDocument = gql`
     mutation CreateManuscript($manuscriptMetaData: ManuscriptMetaDataInput) {
   me {
-    createManuscript(values: $manuscriptMetaData)
+    identifier: createManuscript(values: $manuscriptMetaData)
   }
 }
     `;
@@ -1454,6 +1404,69 @@ export function useAppointSecondXmlReviewerMutation(baseOptions?: Apollo.Mutatio
 export type AppointSecondXmlReviewerMutationHookResult = ReturnType<typeof useAppointSecondXmlReviewerMutation>;
 export type AppointSecondXmlReviewerMutationResult = Apollo.MutationResult<AppointSecondXmlReviewerMutation>;
 export type AppointSecondXmlReviewerMutationOptions = Apollo.BaseMutationOptions<AppointSecondXmlReviewerMutation, AppointSecondXmlReviewerMutationVariables>;
+export const RegisterDocument = gql`
+    mutation Register($userInput: UserInput!) {
+  register(userInput: $userInput)
+}
+    `;
+export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
+
+/**
+ * __useRegisterMutation__
+ *
+ * To run a mutation, you first call `useRegisterMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRegisterMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [registerMutation, { data, loading, error }] = useRegisterMutation({
+ *   variables: {
+ *      userInput: // value for 'userInput'
+ *   },
+ * });
+ */
+export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<RegisterMutation, RegisterMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument, options);
+      }
+export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
+export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
+export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const LoginDocument = gql`
+    mutation Login($username: String!, $password: String!) {
+  login(username: $username, password: $password)
+}
+    `;
+export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
+
+/**
+ * __useLoginMutation__
+ *
+ * To run a mutation, you first call `useLoginMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLoginMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [loginMutation, { data, loading, error }] = useLoginMutation({
+ *   variables: {
+ *      username: // value for 'username'
+ *      password: // value for 'password'
+ *   },
+ * });
+ */
+export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
+      }
+export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
+export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
 export const UsersOverviewDocument = gql`
     query UsersOverview($page: Int!) {
   executiveEditorQueries {

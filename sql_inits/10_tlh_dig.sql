@@ -19,45 +19,46 @@ drop table if exists
 -- users
 
 create table if not exists tlh_dig_users (
-  username    varchar(100) primary key                       not null,
-  pw_hash     varchar(255)                                   not null,
-  name        varchar(255)                                   not null,
+  username    varchar(100) primary key not null,
+  pw_hash     varchar(255)             not null,
+  name        varchar(255)             not null,
   affiliation varchar(255),
-  email       varchar(255) unique                            not null,
-  rights      enum ('Author', 'Reviewer', 'ExecutiveEditor') not null default 'Author'
+  email       varchar(255) unique      not null,
+  rights      enum (
+    'Author', 'Reviewer', 'ExecutiveEditor'
+    )                                  not null default 'Author'
 );
 
 -- manuscripts
 
 create table if not exists tlh_dig_manuscripts (
-  main_identifier            varchar(20) primary key not null,
+  main_identifier            varchar(20)  not null primary key,
   main_identifier_type       enum (
-    'ExcavationNumber',
-    'CollectionNumber'
-    )                                                not null default 'ExcavationNumber',
-  palaeo_classification      varchar(100)            not null default 'OldScript',
-  palaeo_classification_sure boolean                 not null default false,
+    'ExcavationNumber', 'CollectionNumber'
+    )                                     not null default 'ExcavationNumber',
+  palaeo_classification      varchar(100) not null default 'OldScript',
+  palaeo_classification_sure boolean      not null default false,
+  default_language           enum (
+    'Hit', 'Luw', 'Pal', 'Hat', 'Hur', 'Akk', 'Sum'
+    )                                     not null default 'Hit',
   provenance                 varchar(255),
   cth_classification         integer,
   bibliography               text,
-  creator_username           varchar(100)            not null references tlh_dig_users (username) on update cascade on delete cascade,
-  creation_date              date                    not null default now(),
+  creator_username           varchar(100) not null references tlh_dig_users (username) on update cascade on delete cascade,
+  creation_date              date         not null default now(),
   status                     enum (
-    'Created',
-    'TransliterationReleased',
-    'TransliterationReviewPerformed',
-    'XmlConversionPerformed',
-    'FirstXmlReviewPerformed',
-    'SecondXmlReviewPerformed',
-    'Approved'
-    )                                                not null default 'Created'
+    'Created', 'TransliterationReleased', 'TransliterationReviewPerformed', 'XmlConversionPerformed',
+    'FirstXmlReviewPerformed', 'SecondXmlReviewPerformed', 'Approved'
+    )                                     not null default 'Created'
 );
 
 create table if not exists tlh_dig_manuscript_other_identifiers (
-  main_identifier varchar(20)                                                                not null references tlh_dig_manuscripts (main_identifier) on update cascade on delete cascade,
+  main_identifier varchar(20) not null references tlh_dig_manuscripts (main_identifier) on update cascade on delete cascade,
 
-  identifier      varchar(20)                                                                not null unique,
-  identifier_type enum ('ExcavationNumber', 'CollectionNumber', 'PublicationShortReference') not null default 'ExcavationNumber',
+  identifier      varchar(20) not null unique,
+  identifier_type enum (
+    'ExcavationNumber', 'CollectionNumber', 'PublicationShortReference'
+    )                         not null default 'ExcavationNumber',
 
   primary key (main_identifier, identifier, identifier_type)
 );

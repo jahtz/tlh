@@ -10,6 +10,7 @@ import {createTransliterationUrl, homeUrl, uploadPicturesUrl} from '../urls';
 import {TLHParser} from 'simtex';
 import {convertLine} from './LineParseResult';
 import {TransliterationParseResultDisplay} from './ColumnParseResultComponent';
+import {getNameForManuscriptLanguageAbbreviation} from '../forms/manuscriptLanguageAbbreviations';
 
 export function ManuscriptData(): JSX.Element {
 
@@ -61,6 +62,10 @@ export function ManuscriptData(): JSX.Element {
                     </div>
                   )}
               </td>
+            </tr>
+            <tr>
+              <th className="text-right px-4 px-2">{t('defaultLanguage')}</th>
+              <td className="px-4 py-2">{getNameForManuscriptLanguageAbbreviation(manuscript.defaultLanguage, t)}</td>
             </tr>
             <tr>
               <th className="text-right px-4 py-2">{t('palaeographicClassification')}</th>

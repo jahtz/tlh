@@ -1,11 +1,10 @@
 import {AnyAction, configureStore, createSlice, EnhancedStore, PayloadAction} from '@reduxjs/toolkit';
-import {ManuscriptLanguage, ManuscriptLanguageFragment, Rights} from './graphql';
+import {Rights} from './graphql';
 import {defaultEditorKeyConfig, EditorKeyConfig} from './xmlEditor/editorKeyConfig';
 import {ThunkMiddlewareFor} from '@reduxjs/toolkit/dist/getDefaultMiddleware';
 
-export function loadFromLocalStorage<T>(key: string, defaultValue: T): T {
+function loadFromLocalStorage<T>(key: string, defaultValue: T): T {
   const foundString = localStorage.getItem(key);
-
   return foundString ? JSON.parse(foundString) : defaultValue;
 }
 
@@ -74,37 +73,17 @@ export const {updatePreferences} = editorKeyConfigSlice.actions;
 
 export const editorKeyConfigSelector: (store: StoreState) => EditorKeyConfig = ({editorKeyConfig}) => editorKeyConfig.editorKeyConfig;
 
-// Languages
-
-const languagesKey = 'languages';
-
-const languages = createSlice({
-  name: 'languages',
-  initialState: () => ({languages: loadFromLocalStorage<ManuscriptLanguage[]>(languagesKey, [])}),
-  reducers: {
-    newLanguages(state, {payload}: PayloadAction<ManuscriptLanguage[]>) {
-      state.languages = payload;
-    }
-  }
-});
-
-export const {newLanguages} = languages.actions;
-
-export const allManuscriptLanguagesSelector: (store: StoreState) => ManuscriptLanguageFragment[] = ({languages}) => languages.languages;
-
 // Store
 
 interface StoreState {
   user: { user: User | null };
   editorKeyConfig: { editorKeyConfig: EditorKeyConfig };
-  languages: { languages: ManuscriptLanguage[] };
 }
 
 export const newStore: EnhancedStore<StoreState, AnyAction, [ThunkMiddlewareFor<StoreState>]> = configureStore({
   reducer: {
     user: userSlice.reducer,
     editorKeyConfig: editorKeyConfigSlice.reducer,
-    languages: languages.reducer
   }
 });
 

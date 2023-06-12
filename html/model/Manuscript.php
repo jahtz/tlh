@@ -6,6 +6,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/ManuscriptIdentifier.php';
 require_once __DIR__ . '/ManuscriptStatus.php';
+require_once __DIR__ . '/ManuscriptLanguage.php';
 require_once __DIR__ . '/AbstractManuscript.php';
 
 use GraphQL\Type\Definition\{ObjectType, Type};
@@ -34,6 +35,7 @@ class Manuscript extends AbstractManuscript
     ManuscriptIdentifier $mainIdentifier,
     string               $palaeographicClassification,
     bool                 $palaeographicClassificationSure,
+    string               $defaultLanguage,
     ?string              $provenance,
     ?int                 $cthClassification,
     ?string              $bibliography,
@@ -41,7 +43,7 @@ class Manuscript extends AbstractManuscript
     string               $creatorUsername
   )
   {
-    parent::__construct($mainIdentifier, $palaeographicClassification, $palaeographicClassificationSure, $provenance, $cthClassification, $bibliography, $creatorUsername);
+    parent::__construct($mainIdentifier, $palaeographicClassification, $palaeographicClassificationSure, $defaultLanguage, $provenance, $cthClassification, $bibliography, $creatorUsername);
     $this->status = $status;
   }
 
@@ -51,6 +53,7 @@ class Manuscript extends AbstractManuscript
       new ManuscriptIdentifier($row['main_identifier_type'], $row['main_identifier']),
       $row['palaeo_classification'],
       $row['palaeo_classification_sure'],
+      $row['default_language'],
       $row['provenance'],
       $row['cth_classification'],
       $row['bibliography'],
@@ -164,10 +167,9 @@ Manuscript::$graphQLType = new ObjectType([
     'creatorUsername' => Type::nonNull(Type::string()),
     'palaeographicClassification' => Type::nonNull(AbstractManuscript::$palaeographicClassificationGraphQLEnumType),
     'palaeographicClassificationSure' => Type::nonNull(Type::boolean()),
+    'defaultLanguage' => Type::nonNull(ManuscriptLanguage::$enumType),
     'status' => [
-      // TODO: remove!
       'type' => ManuscriptStatus::$graphQLType,
-      'deprecationReason' => 'will be removed!',
       'resolve' => fn(Manuscript $manuscript): string => $manuscript->status
     ],
     'otherIdentifiers' => [

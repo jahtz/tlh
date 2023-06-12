@@ -6,9 +6,8 @@ import {ApolloProvider} from '@apollo/client';
 import {Provider as StoreProvider} from 'react-redux';
 import i18n from 'i18next';
 import {I18nextProvider, initReactI18next} from 'react-i18next';
-import {AllManuscriptLanguagesDocument, AllManuscriptLanguagesQuery} from './graphql';
 import {createRoot} from 'react-dom/client';
-import {newLanguages, newStore} from './newStore';
+import {newStore} from './newStore';
 import common_de from './locales/common_de.json';
 import common_en from './locales/common_en.json';
 import {router} from './routes';
@@ -24,10 +23,6 @@ i18n
       en: {common: common_en}
     },
   });
-
-apolloClient.query<AllManuscriptLanguagesQuery>({query: AllManuscriptLanguagesDocument})
-  .then(({data}) => newStore.dispatch(newLanguages(data.manuscriptLanguages)))
-  .catch(() => void 0);
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
 

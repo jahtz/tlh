@@ -4,15 +4,28 @@ namespace model;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use GraphQL\Type\Definition\{ObjectType, Type};
+use GraphQL\Type\Definition\{EnumType, ObjectType, Type};
 
 class ManuscriptLanguage
 {
+  /** @deprecated */
   static ObjectType $graphQLType;
+  static EnumType $enumType;
 
+  const hit = 'Hit';
+  const luw = 'Luw';
+  const pal = 'Pal';
+  const hat = 'Hat';
+  const hur = 'Hur';
+  const akk = 'Akk';
+  const sum = 'Sum';
+
+  /** @deprecated */
   public string $name;
+  /** @deprecated */
   public string $abbreviation;
 
+  /** @deprecated */
   function __construct(string $name, string $abbreviation)
   {
     $this->name = $name;
@@ -20,6 +33,7 @@ class ManuscriptLanguage
   }
 }
 
+/** @deprecated */
 ManuscriptLanguage::$graphQLType = new ObjectType([
   'name' => 'ManuscriptLanguage',
   'fields' => [
@@ -28,6 +42,15 @@ ManuscriptLanguage::$graphQLType = new ObjectType([
   ]
 ]);
 
+ManuscriptLanguage::$enumType = new EnumType([
+  'name' => 'ManuscriptLanguageAbbreviations',
+  'values' => [
+    ManuscriptLanguage::hit, ManuscriptLanguage::luw, ManuscriptLanguage::pal, ManuscriptLanguage::hat,
+    ManuscriptLanguage::hur, ManuscriptLanguage::akk, ManuscriptLanguage::sum
+  ]
+]);
+
+/** @deprecated */
 function allManuscriptLanguages(): array
 {
   return [

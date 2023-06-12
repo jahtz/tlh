@@ -11,6 +11,7 @@ abstract class AbstractManuscript
   public ManuscriptIdentifier $mainIdentifier;
   public string $palaeographicClassification;
   public bool $palaeographicClassificationSure;
+  public string $defaultLanguage;
   public ?string $provenance;
   public ?int $cthClassification;
   public ?string $bibliography;
@@ -20,6 +21,7 @@ abstract class AbstractManuscript
     ManuscriptIdentifier $mainIdentifier,
     string               $palaeographicClassification,
     bool                 $palaeographicClassificationSure,
+    string               $defaultLanguage,
     ?string              $provenance,
     ?int                 $cthClassification,
     ?string              $bibliography,
@@ -29,6 +31,7 @@ abstract class AbstractManuscript
     $this->mainIdentifier = $mainIdentifier;
     $this->palaeographicClassification = $palaeographicClassification;
     $this->palaeographicClassificationSure = $palaeographicClassificationSure;
+    $this->defaultLanguage = $defaultLanguage;
     $this->provenance = $provenance;
     $this->cthClassification = $cthClassification;
     $this->bibliography = $bibliography;
