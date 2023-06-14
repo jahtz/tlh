@@ -1,6 +1,6 @@
 import {isXmlCommentNode, isXmlTextNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {isValidElement, ReactElement} from 'react';
-import {isXmlEditableNodeConfig, XmlEditorNodeConfig} from './editorConfig';
+import {isXmlEditableNodeConfig, XmlEditorSingleNodeConfig} from './editorConfig';
 import classNames from 'classnames';
 import {NodePath} from './insertablePositions';
 import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
@@ -35,7 +35,7 @@ export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIPr
 
   const {currentSelectedPath, onSelect, insertStuff, isLeftSide} = inheritedProps;
 
-  const currentConfig: XmlEditorNodeConfig | undefined = tlhXmlEditorConfig.nodeConfigs[node.tagName];
+  const currentConfig: XmlEditorSingleNodeConfig | undefined = tlhXmlEditorConfig.nodeConfigs[node.tagName];
 
   const renderChildren = () => <>{node.children.map((c, i) => <NodeDisplay key={i} node={c} path={[...path, i]} {...inheritedProps}/>)}</>;
 

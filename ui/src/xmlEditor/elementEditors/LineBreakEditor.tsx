@@ -13,7 +13,9 @@ interface GetCuneiformResponse {
   cuneiform: string;
 }
 
-export const lineBreakNodeConfig: XmlSingleInsertableEditableNodeConfig = {
+type LineBreakAttributes = 'lnr' | 'cu' | 'txtid' | 'lg';
+
+export const lineBreakNodeConfig: XmlSingleInsertableEditableNodeConfig<'lb', LineBreakAttributes> = {
   replace: (node, _renderedChildren, isSelected, isLeftSide) =>
     <>
       {isLeftSide && <br/>}
@@ -27,7 +29,7 @@ export const lineBreakNodeConfig: XmlSingleInsertableEditableNodeConfig = {
   edit: (props) => <LineBreakEditor {...props}/>
 };
 
-function LineBreakEditor({node, path, updateAttribute, setKeyHandlingEnabled, rootNode}: XmlEditableNodeIProps): JSX.Element {
+function LineBreakEditor({node, path, updateAttribute, setKeyHandlingEnabled, rootNode}: XmlEditableNodeIProps<'lb', LineBreakAttributes>): JSX.Element {
 
   const {t} = useTranslation('common');
 

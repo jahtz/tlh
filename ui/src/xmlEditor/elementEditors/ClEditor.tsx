@@ -5,7 +5,9 @@ import {getElementByPath, XmlElementNode} from 'simple_xml';
 import {buildActionSpec} from '../XmlDocumentEditor';
 import {displayReplace} from '../editorConfig/displayReplacement';
 
-export const clEditorConfig: XmlSingleInsertableEditableNodeConfig = {
+type clAttrs = 'id';
+
+export const clEditorConfig: XmlSingleInsertableEditableNodeConfig<'cl', clAttrs> = {
   replace: (node, renderChildren) => displayReplace(
     <><br/><span className="px-1 cl">{node.attributes.id || ' '}</span>&nbsp;</>,
     renderChildren()
@@ -34,7 +36,7 @@ export const clEditorConfig: XmlSingleInsertableEditableNodeConfig = {
   }
 };
 
-function ClEditor({node, updateAttribute, setKeyHandlingEnabled}: XmlEditableNodeIProps): JSX.Element {
+function ClEditor({node, updateAttribute, setKeyHandlingEnabled}: XmlEditableNodeIProps<'cl', clAttrs>): JSX.Element {
 
   const {t} = useTranslation('common');
 

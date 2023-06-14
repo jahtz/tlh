@@ -5,7 +5,9 @@ import classNames from 'classnames';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 import {xmlElementNode} from 'simple_xml';
 
-export const clbNodeConfig: XmlSingleInsertableEditableNodeConfig = {
+type clbAttrs = 'id';
+
+export const clbNodeConfig: XmlSingleInsertableEditableNodeConfig<'clb', clbAttrs> = {
   replace: (node, _element, isSelected) => <span className={classNames(isSelected ? selectedNodeClass : 'bg-amber-500')}>{node.attributes.id}&nbsp;</span>,
   edit: (props) => <ClbEditor {...props}/>,
   insertablePositions: {
@@ -15,7 +17,7 @@ export const clbNodeConfig: XmlSingleInsertableEditableNodeConfig = {
   }
 };
 
-function ClbEditor({node, updateAttribute, setKeyHandlingEnabled}: XmlEditableNodeIProps): JSX.Element {
+function ClbEditor({node, updateAttribute, setKeyHandlingEnabled}: XmlEditableNodeIProps<'clb', clbAttrs>): JSX.Element {
 
   const {t} = useTranslation('common');
 

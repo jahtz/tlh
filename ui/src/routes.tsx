@@ -79,8 +79,7 @@ export const router = createBrowserRouter([
         {path: pipelineManagementUrl, element: <RequireAuth minRights={Rights.ExecutiveEditor}>{() => <PipelineOverview/>}</RequireAuth>},
 
         {
-          path: 'manuscripts/:mainIdentifier',
-          children: [
+          path: 'manuscripts/:mainIdentifier', children: [
             {path: 'data', element: <ManuscriptData/>, loader: manuscriptDataLoader},
             // FIXME: RequireAuth for all child routes from here!
             {path: uploadPicturesUrl, element: <UploadPicturesForm/>, loader: manuscriptDataLoader},

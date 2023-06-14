@@ -1,4 +1,4 @@
-import {XmlEditorConfig} from './editorConfig';
+import {XmlEditorConfig, XmlEditorSingleNodeConfig} from './editorConfig';
 import {isXmlCommentNode, isXmlTextNode, LetterCorrection, xmlElementNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {noteNodeConfig} from './elementEditors/NoteNodeEditor';
 import {aoManuscriptsConfig} from './elementEditors/AoManuscriptsEditor';
@@ -66,10 +66,10 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     'AO:Manuscripts': aoManuscriptsConfig,
     'AO:ParagrNr': {replace: (node) => <div className="mt-4 font-bold italic">{node.attributes.c}</div>},
 
-    lb: lineBreakNodeConfig,
+    lb: lineBreakNodeConfig as XmlEditorSingleNodeConfig,
 
-    clb: clbNodeConfig,
-    cl: clEditorConfig,
+    clb: clbNodeConfig as XmlEditorSingleNodeConfig,
+    cl: clEditorConfig as XmlEditorSingleNodeConfig,
 
     // Words
     w: wordNodeConfig,
@@ -105,7 +105,7 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
       }
     },
 
-    text: textElementConfig,
+    text: textElementConfig as XmlEditorSingleNodeConfig,
 
     parsep: paragraphSeparatorConfig,
     parsep_dbl: paragraphSeparatorConfig,
@@ -114,7 +114,7 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
       styling: () => ['corr'],
       replace: (node) => <span>{node.attributes.c}</span>
     },
-    note: noteNodeConfig
+    note: noteNodeConfig as XmlEditorSingleNodeConfig
   },
   beforeExport: (rootNode: XmlElementNode) => {
     reCountNodeNumbers(rootNode, 'node', 'n');

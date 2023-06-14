@@ -2,12 +2,14 @@ import {inputClasses, XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from '
 import {useTranslation} from 'react-i18next';
 import {JSX} from 'react';
 
-export const noteNodeConfig: XmlSingleEditableNodeConfig = {
+type noteAttrs = 'n' | 'c';
+
+export const noteNodeConfig: XmlSingleEditableNodeConfig<'note', noteAttrs> = {
   replace: (node) => <sup title={node.attributes.c} className="has-text-weight-bold">x</sup>,
   edit: (props) => <NoteNodeEditor {...props}/>
 };
 
-function NoteNodeEditor({node, updateAttribute, setKeyHandlingEnabled}: XmlEditableNodeIProps): JSX.Element {
+function NoteNodeEditor({node, updateAttribute, setKeyHandlingEnabled}: XmlEditableNodeIProps<'note', noteAttrs>): JSX.Element {
 
   const {t} = useTranslation('common');
 
