@@ -31,6 +31,7 @@
     "yup": "^1.0.0"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@graphql-codegen/cli": "^4.0.0",
     "@graphql-codegen/schema-ast": "^4.0.0",
     "@graphql-codegen/typescript-operations": "^4.0.0",
