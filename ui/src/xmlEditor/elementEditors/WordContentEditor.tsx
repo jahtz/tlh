@@ -12,6 +12,7 @@ import {tlhXmlEditorConfig} from '../tlhXmlEditorConfig';
 
 interface IProps {
   oldNode: XmlElementNode;
+  language: string;
   cancelEdit: () => void;
   updateNode: (node: XmlElementNode) => void;
 }
@@ -23,7 +24,7 @@ function readTransliteration(transliteration: string): Result<XmlElementNode> {
   return {status: true, value: word.exportXml()};
 }
 
-export function WordContentEditor({oldNode, cancelEdit, updateNode}: IProps): JSX.Element {
+export function WordContentEditor({oldNode, language, cancelEdit, updateNode}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -45,8 +46,7 @@ export function WordContentEditor({oldNode, cancelEdit, updateNode}: IProps): JS
       return;
     }
 
-    // FIXME: set language!
-    fetchMorphologicalAnalyses(writeNode(state.value, tlhXmlEditorConfig.writeConfig).join(''), 'Hit')
+    fetchMorphologicalAnalyses(writeNode(state.value, tlhXmlEditorConfig.writeConfig).join(''), language)
       .then((res) => {
         if (res) {
           setState((state) => update(state, {value: {attributes: {$set: res}}}));
@@ -68,14 +68,15 @@ export function WordContentEditor({oldNode, cancelEdit, updateNode}: IProps): JS
 
   return (
     <div>
-
       {!initialTransliteration.status && <div className="my-4 p-2 rounded bg-red-600 text-white text-center">
         <p className="font-bold">{t('errorWhileTransliterationReconstruction')}:</p>
         <pre>{initialTransliteration.error}</pre>
       </div>}
 
       <div className="flex">
-        <label htmlFor="newTransliteration" className="p-2 rounded-l border-l border-y border-slate-500 font-bold">{t('newTransliteration')}:</label>
+        <label htmlFor="newTransliteration" className="p-2 rounded-l border-l border-y border-slate-500 font-bold">
+          {t('newTransliteration')} ({t('language')}: {language}):
+        </label>
 
         <input defaultValue={initialTransliteration.status ? initialTransliteration.value : ''} className="flex-grow rounded-r border border-slate-500 p-2"
                id="newTransliteration"

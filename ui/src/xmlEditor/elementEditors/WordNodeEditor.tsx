@@ -135,13 +135,16 @@ export function WordNodeEditor({node, path, updateEditedNode, setKeyHandlingEnab
   const onCancel = () => setState('DefaultState');
 
   if (state === 'EditContent') {
-    return <WordContentEditor oldNode={node} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>;
+    const language = node.attributes.lg || lineBreakLanguage || textLanguage || 'Hit';
+
+    return <WordContentEditor oldNode={node} language={language} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>;
   }
 
   return (
     <>
       <div className="mt-2">
-        <LanguageInput initialValue={node.attributes.lg} parentLanguages={{text: textLanguage, lb: lineBreakLanguage}} onChange={(lg) => updateAttribute('lg', lg.trim() || '')} onFocus={onFocus} onBlur={onBlur}/>
+        <LanguageInput initialValue={node.attributes.lg} parentLanguages={{text: textLanguage, lb: lineBreakLanguage}}
+                       onChange={(lg) => updateAttribute('lg', lg.trim() || '')} onFocus={onFocus} onBlur={onBlur}/>
       </div>
 
       <div className="mt-2 grid grid-cols-3 gap-2">

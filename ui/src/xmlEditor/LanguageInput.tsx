@@ -13,7 +13,7 @@ interface IProps {
 export function LanguageInput({initialValue, parentLanguages, onChange, onFocus, onBlur}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
- 
+
   const parentLangs = parentLanguages !== undefined
     ? Object.entries(parentLanguages)
       .map(([key, language]) => `${key}: ${language}`)
