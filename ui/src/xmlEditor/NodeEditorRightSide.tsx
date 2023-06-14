@@ -30,8 +30,6 @@ export function NodeEditorRightSide({
   cancelSelection
 }: IProps): JSX.Element {
 
-  // TODO: import editing question here for all elements?
-
   const {t} = useTranslation('common');
 
   return (
@@ -66,7 +64,7 @@ export function NodeEditorRightSide({
         </div>
       </div>
 
-      <div className="p-2 border border slate-300" style={{fontSize: `${fontSizeSelectorProps.currentFontSize}%`}}>
+      <div className="p-2 border border-slate-300" style={{fontSize: `${fontSizeSelectorProps.currentFontSize}%`}}>
         {children}
       </div>
     </div>

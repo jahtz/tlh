@@ -7,7 +7,7 @@ import {fetchMorphologicalAnalyses} from '../../model/morphologicalAnalysis';
 import {NodeDisplay} from '../NodeDisplay';
 import update from 'immutability-helper';
 import {reconstructTransliterationForWordNode} from '../transliterationReconstruction';
-import {Word} from 'simtex';
+import {ParagraphLanguageType, Word} from 'simtex';
 import {tlhXmlEditorConfig} from '../tlhXmlEditorConfig';
 
 interface IProps {
@@ -17,9 +17,32 @@ interface IProps {
   updateNode: (node: XmlElementNode) => void;
 }
 
-function readTransliteration(transliteration: string): Result<XmlElementNode> {
-  // TODO: language!
-  const word: Word = Word.parseWord(null, transliteration);
+const convertLangauge = (language: string): ParagraphLanguageType | null => {
+  switch (language) {
+    case 'Akk' :
+      return ParagraphLanguageType.Akk;
+    case 'Sum' :
+      return ParagraphLanguageType.Sum;
+    case 'Luw':
+      return ParagraphLanguageType.Luw;
+    case 'Pal':
+      return ParagraphLanguageType.Pal;
+    case 'Hur':
+      return ParagraphLanguageType.Hur;
+    case 'Hat':
+      return ParagraphLanguageType.Hat;
+    case 'Hit' :
+      return ParagraphLanguageType.Hit;
+    default:
+      return null;
+  }
+};
+
+function readTransliteration(transliteration: string, language: string): Result<XmlElementNode> {
+  const word: Word = Word.parseWord(convertLangauge(language), transliteration);
+
+  // FIXME: use status!
+  const status = word.getStatus();
 
   return {status: true, value: word.exportXml()};
 }
@@ -32,7 +55,7 @@ export function WordContentEditor({oldNode, language, cancelEdit, updateNode}: I
 
   const [state, setState] = useState<Result<XmlElementNode>>(
     initialTransliteration.status
-      ? readTransliteration(initialTransliteration.value)
+      ? readTransliteration(initialTransliteration.value, language)
       : {status: false, index: {line: -1, column: -1, offset: -1}, expected: []}
   );
 
@@ -79,8 +102,8 @@ export function WordContentEditor({oldNode, language, cancelEdit, updateNode}: I
         </label>
 
         <input defaultValue={initialTransliteration.status ? initialTransliteration.value : ''} className="flex-grow rounded-r border border-slate-500 p-2"
-               id="newTransliteration"
-               placeholder={t('newTransliteration') || 'newTransliteration'} onChange={(event) => setState(readTransliteration(event.target.value))}/>
+               id="newTransliteration" placeholder={t('newTransliteration') || 'newTransliteration'}
+               onChange={(event) => setState(readTransliteration(event.target.value, language))}/>
       </div>
 
       <div className="mt-4 rounded-t">

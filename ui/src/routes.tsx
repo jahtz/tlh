@@ -81,14 +81,23 @@ export const router = createBrowserRouter([
         {
           path: 'manuscripts/:mainIdentifier', children: [
             {path: 'data', element: <ManuscriptData/>, loader: manuscriptDataLoader},
-            // FIXME: RequireAuth for all child routes from here!
-            {path: uploadPicturesUrl, element: <UploadPicturesForm/>, loader: manuscriptDataLoader},
-            {path: createTransliterationUrl, element: <TransliterationInput/>, loader: manuscriptDataLoader},
-            {path: transliterationReviewUrl, element: <TransliterationReview/>},
-            {path: xmlConversionUrl, element: <XmlConversion/>},
-            {path: firstXmlReviewUrl, element: <XmlReview reviewType={XmlReviewType.FirstXmlReview}/>},
-            {path: secondXmlReviewUrl, element: <XmlReview reviewType={XmlReviewType.SecondXmlReview}/>},
-            {path: approveDocumentUrl, element: <DocumentApproval/>}
+            {path: uploadPicturesUrl, element: <RequireAuth>{() => <UploadPicturesForm/>}</RequireAuth>, loader: manuscriptDataLoader},
+            {
+              path: createTransliterationUrl,
+              element: <RequireAuth minRights={Rights.Reviewer}>{() => <TransliterationInput/>}</RequireAuth>,
+              loader: manuscriptDataLoader
+            },
+            {path: transliterationReviewUrl, element: <RequireAuth minRights={Rights.Reviewer}>{() => <TransliterationReview/>}</RequireAuth>},
+            {path: xmlConversionUrl, element: <RequireAuth minRights={Rights.Reviewer}>{() => <XmlConversion/>}</RequireAuth>},
+            {
+              path: firstXmlReviewUrl,
+              element: <RequireAuth minRights={Rights.Reviewer}>{() => <XmlReview reviewType={XmlReviewType.FirstXmlReview}/>}</RequireAuth>
+            },
+            {
+              path: secondXmlReviewUrl,
+              element: <RequireAuth minRights={Rights.Reviewer}>{() => <XmlReview reviewType={XmlReviewType.SecondXmlReview}/>}</RequireAuth>
+            },
+            {path: approveDocumentUrl, element: <RequireAuth minRights={Rights.ExecutiveEditor}>{() => <DocumentApproval/>}</RequireAuth>}
           ]
         },
 

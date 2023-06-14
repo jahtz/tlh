@@ -1,4 +1,4 @@
-import {XmlElementNode, XmlReadConfig, XmlWriteConfig} from 'simple_xml';
+import {XmlElementNode, XmlNode, XmlReadConfig, XmlWriteConfig} from 'simple_xml';
 import {JSX, ReactElement} from 'react';
 import {Argument as ClassNamesArgument} from 'classnames';
 import {InsertablePositions} from './insertablePositions';
@@ -14,6 +14,7 @@ export interface XmlEditableNodeIProps<T extends string = string, A extends stri
   updateAttribute: (key: A, value: string | undefined) => void;
   setKeyHandlingEnabled: (enabled: boolean) => void;
   rootNode: XmlElementNode;
+  updateOtherNode: (path: number[], spec: Spec<XmlNode>) => void;
 }
 
 export interface XmlSingleNodeConfig<T extends string = string, A extends string = string> {

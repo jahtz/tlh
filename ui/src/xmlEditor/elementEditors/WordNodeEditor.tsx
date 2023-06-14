@@ -9,12 +9,12 @@ import {WordContentEditor} from './WordContentEditor';
 import {LanguageInput} from '../LanguageInput';
 import {readSelectedMorphology, SelectedMorphAnalysis} from '../../model/selectedMorphologicalAnalysis';
 import {WordStringChildEditor} from './WordStringChildEditor';
-import {getPriorSibling} from '../../nodeIterators';
+import {getPriorSibling, getPriorSiblingPath} from '../../nodeIterators';
 import {AOption} from '../../myOption';
 
 type States = 'DefaultState' | 'AddMorphology' | 'EditEditingQuestion' | 'EditFootNoteState' | 'EditContent';
 
-export function WordNodeEditor({node, path, updateEditedNode, setKeyHandlingEnabled, rootNode}: XmlEditableNodeIProps): JSX.Element {
+export function WordNodeEditor({node, path, updateEditedNode, setKeyHandlingEnabled, rootNode, updateOtherNode}: XmlEditableNodeIProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [state, setState] = useState<States>('DefaultState');
@@ -51,7 +51,6 @@ export function WordNodeEditor({node, path, updateEditedNode, setKeyHandlingEnab
     }
   }
 
-
   const toggleAnalysisSelection = (morphNumber: number, letter: string | undefined, encLetter: string | undefined, targetState: boolean | undefined): void => updateEditedNode({
     attributes: {mrp0sel: (value) => toggleMorphology(value || '', morphNumber, letter, encLetter, targetState)}
   });
@@ -62,7 +61,12 @@ export function WordNodeEditor({node, path, updateEditedNode, setKeyHandlingEnab
   }
 
   function handleEditUpdate(node: XmlElementNode): void {
-    // FIXME: set lb attr cu dirty!
+    const maybeLineBreakPath = getPriorSiblingPath(rootNode, path, 'lb');
+
+    if (maybeLineBreakPath !== undefined) {
+      updateOtherNode(maybeLineBreakPath, {attributes: {cuDirty: {$set: '1'}}});
+    }
+
     updateEditedNode({$set: node});
     cancelEdit();
   }

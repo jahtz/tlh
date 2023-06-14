@@ -10,7 +10,7 @@ cors();
 
 function fileTypeAllowed(string $fileType): bool
 {
-  return in_array($fileType, ['png', 'jpg', 'jpeg', 'gif']);
+  return in_array($fileType, ['png', 'jpg', 'jpeg', 'gif', 'tiff']);
 }
 
 /**
@@ -42,7 +42,7 @@ function doUpload(string $manuscriptId): string
 
   $targetFile = $targetDir . $targetFileName;
 
-// check
+  // check
   $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
   if (!fileTypeAllowed($imageFileType)) {
     throw new Exception("File type $imageFileType is not allowed!");

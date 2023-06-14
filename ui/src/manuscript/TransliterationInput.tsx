@@ -41,7 +41,6 @@ export function TransliterationInput(): JSX.Element {
     uploadTransliteration({variables: {mainIdentifier, input}})
       .then((res) => {
         if (res.data?.me?.manuscript?.updateTransliteration) {
-          console.info(JSON.stringify(res.data));
           setTransliteration((state) => update(state, {isSaved: {$set: true}}));
         }
       })

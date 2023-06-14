@@ -128,6 +128,5 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     .replace(/<w/g, '\n <w')
     .replace(/<lb/g, '\n\n<lb')
     .replace(/ mrp/g, '\n\tmrp')
-    // FIXME: only without spaces in front or behind!
     .replace(/@/g, ' @ ')
 };

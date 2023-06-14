@@ -1,5 +1,5 @@
 import {inputClasses, XmlEditableNodeIProps, XmlSingleInsertableEditableNodeConfig} from '../editorConfig';
-import {JSX} from 'react';
+import {ReactElement} from 'react';
 import {useTranslation} from 'react-i18next';
 import {LanguageInput} from '../LanguageInput';
 import classNames from 'classnames';
@@ -13,15 +13,16 @@ interface GetCuneiformResponse {
   cuneiform: string;
 }
 
-type LineBreakAttributes = 'lnr' | 'cu' | 'txtid' | 'lg';
+type LineBreakAttributes = 'lnr' | 'cu' | 'txtid' | 'lg' | 'cuDirty';
 
 export const lineBreakNodeConfig: XmlSingleInsertableEditableNodeConfig<'lb', LineBreakAttributes> = {
-  replace: (node, _renderedChildren, isSelected, isLeftSide) =>
-    <>
-      {isLeftSide && <br/>}
-      <span className={classNames(isSelected ? [selectedNodeClass, 'text-black'] : ['text-gray-500'])}>{node.attributes.lnr}:</span>
-      &nbsp;&nbsp;
-    </>,
+  replace: (node, _renderedChildren, isSelected, isLeftSide) => {
+    const classes = classNames(isSelected ? [selectedNodeClass, 'text-black'] : ['text-gray-500'], {'bg-amber-500': node.attributes.cuDirty});
+
+    return (
+      <>{isLeftSide && <br/>}<span className={classes}>{node.attributes.lnr}:</span>&nbsp;&nbsp;</>
+    );
+  },
   insertablePositions: {
     beforeElement: ['lb', 'w', 'gap'],
     asLastChildOf: ['div1']
@@ -29,7 +30,14 @@ export const lineBreakNodeConfig: XmlSingleInsertableEditableNodeConfig<'lb', Li
   edit: (props) => <LineBreakEditor {...props}/>
 };
 
-function LineBreakEditor({node, path, updateAttribute, setKeyHandlingEnabled, rootNode}: XmlEditableNodeIProps<'lb', LineBreakAttributes>): JSX.Element {
+const LineBreakEditor = ({
+  node,
+  path,
+  updateEditedNode,
+  updateAttribute,
+  setKeyHandlingEnabled,
+  rootNode
+}: XmlEditableNodeIProps<'lb', LineBreakAttributes>): ReactElement => {
 
   const {t} = useTranslation('common');
 
@@ -50,7 +58,7 @@ function LineBreakEditor({node, path, updateAttribute, setKeyHandlingEnabled, ro
     const {cuneiform} = await fetch('https://www.hethport3.uni-wuerzburg.de/TLHcuni/create_cuneiform_single.php', {method: 'POST', body})
       .then<GetCuneiformResponse>((response) => response.json());
 
-    updateAttribute('cu', cuneiform);
+    updateEditedNode({attributes: {'cu': {$set: cuneiform}, cuDirty: {$set: undefined}}});
   };
 
   return (
@@ -81,4 +89,4 @@ function LineBreakEditor({node, path, updateAttribute, setKeyHandlingEnabled, ro
 
     </>
   );
-}
+};

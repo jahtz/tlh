@@ -122,15 +122,10 @@ export function XmlDocumentEditor({
   }));
 
   function applyUpdates(nextEditablePath?: number[]): void {
-    let newEditorState: IEditNodeEditorState | undefined = undefined;
 
-    if (nextEditablePath !== undefined) {
-      const node = findElement(state.rootNode as XmlElementNode, nextEditablePath);
-
-      if (state.editorState && 'path' in state.editorState) {
-        newEditorState = editNodeEditorState(node, editorConfig, nextEditablePath);
-      }
-    }
+    const newEditorState = nextEditablePath !== undefined && state.editorState && 'path' in state.editorState
+      ? editNodeEditorState(findElement(state.rootNode as XmlElementNode, nextEditablePath), editorConfig, nextEditablePath)
+      : undefined;
 
     setState((state) => state.editorState._type === 'EditNodeRightState'
       ? update(state, {
@@ -214,11 +209,20 @@ export function XmlDocumentEditor({
 
     const config = editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig;
 
+    const updateOtherNode = (path: number[], spec: Spec<XmlNode>): void => {
+      setState((state) => update(state, {
+        rootNode: path.reduceRight<Spec<XmlNode>>(
+          (acc, index) => ({children: {[index]: acc}}),
+          spec
+        )
+      }));
+    };
+
     return (
       <NodeEditorRightSide key={path.join('.')} originalNode={node} changed={changed} deleteNode={() => deleteNode(path)} applyUpdates={() => applyUpdates()}
                            cancelSelection={() => setState((state) => update(state, {editorState: {$set: defaultRightSideState}}))}
                            jumpElement={(forward) => jumpEditableNodes(node.tagName, forward)} fontSizeSelectorProps={fontSizeSelectorProps}>
-        {config.edit({node, path, updateEditedNode, updateAttribute, setKeyHandlingEnabled, rootNode: state.rootNode as XmlElementNode})}
+        {config.edit({node, path, updateEditedNode, updateAttribute, setKeyHandlingEnabled, rootNode: state.rootNode as XmlElementNode, updateOtherNode})}
       </NodeEditorRightSide>
     );
   }

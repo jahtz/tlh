@@ -35,3 +35,18 @@ export function getPriorSibling(rootNode: XmlElementNode, path: number[], untilT
     .reverse()
     .find((xmlNode) => isXmlElementNode(xmlNode) && xmlNode.tagName === untilTagName) as XmlElementNode | undefined;
 }
+
+export function getPriorSiblingPath(rootNode: XmlElementNode, path: number[], untilTagName: string): number[] | undefined {
+  const pathStart = path.slice(0, -1);
+
+  const parent = getElementByPath(rootNode, pathStart);
+
+  for (let index = path[path.length - 1]; index >= 0; index--) {
+    const child = parent.children[index];
+    if (isXmlElementNode(child) && child.tagName === untilTagName) {
+      return [...pathStart, index];
+    }
+  }
+
+  return undefined;
+}
