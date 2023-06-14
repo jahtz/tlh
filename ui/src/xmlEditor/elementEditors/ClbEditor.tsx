@@ -25,7 +25,7 @@ function ClbEditor({node, updateAttribute, setKeyHandlingEnabled}: XmlEditableNo
     <>
       <label htmlFor="id" className="font-bold">{t('id')}:</label>
       <input type="text" id="id" className={inputClasses} defaultValue={node.attributes.id?.trim()} onFocus={() => setKeyHandlingEnabled(false)}
-             onChange={(event) => updateAttribute('id', event.target.value)}/>
+             onBlur={() => setKeyHandlingEnabled(true)} onChange={(event) => updateAttribute('id', event.target.value)}/>
     </>
   );
 }

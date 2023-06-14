@@ -1,10 +1,11 @@
 import {JSX} from 'react';
 
 export interface DisplayReplacement {
-  clickable: JSX.Element;
-  notClickable?: JSX.Element;
+  clickablePrior: JSX.Element;
+  notClickable: JSX.Element;
+  posterior?: JSX.Element;
 }
 
-export function displayReplace(clickable: JSX.Element, notClickable?: JSX.Element): DisplayReplacement {
-  return {clickable, notClickable};
+export function displayReplace(clickable: JSX.Element, notClickable: JSX.Element, posterior?: JSX.Element): DisplayReplacement {
+  return {clickablePrior: clickable, notClickable, posterior};
 }

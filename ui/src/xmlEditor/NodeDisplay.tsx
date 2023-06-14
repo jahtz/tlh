@@ -43,10 +43,10 @@ export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIPr
 
   const replacement = currentConfig?.replace
     ? currentConfig.replace(node, renderChildren, isSelected, isLeftSide)
-    : {clickable: renderChildren(), notClickable: undefined};
+    : {clickablePrior: renderChildren(), notClickable: undefined, posterior: undefined};
 
-  const {clickable, notClickable} = isValidElement(replacement)
-    ? {clickable: replacement, notClickable: undefined}
+  const {clickablePrior, notClickable, posterior} = isValidElement(replacement)
+    ? {clickablePrior: replacement, notClickable: undefined, posterior: undefined}
     : replacement;
 
   const classes = currentConfig?.styling
@@ -60,10 +60,11 @@ export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIPr
   return (
     <>
       {insertStuff && insertStuff.insertablePaths.includes(path.join('.')) && <InsertButton initiate={() => insertStuff.initiateInsert(path)}/>}
-      <span className={classNames(classes)} onClick={onClick}>{clickable}</span>
+      <span className={classNames(classes)} onClick={onClick}>{clickablePrior}</span>
       {isLeftSide && notClickable && <span className={classNames(classes)}>{notClickable}</span>}
       {insertStuff && insertStuff.insertAsLastChildOf.includes(node.tagName) &&
         <InsertButton initiate={() => insertStuff.initiateInsert([...path, node.children.length])}/>}
+      {posterior}
     </>
   );
 }

@@ -1,4 +1,4 @@
-import {XmlEditorConfig, XmlEditorSingleNodeConfig} from './editorConfig';
+import {XmlEditorConfig, XmlEditorSingleNodeConfig, XmlSingleEditableNodeConfig} from './editorConfig';
 import {isXmlCommentNode, isXmlTextNode, LetterCorrection, xmlElementNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {noteNodeConfig} from './elementEditors/NoteNodeEditor';
 import {aoManuscriptsConfig} from './elementEditors/AoManuscriptsEditor';
@@ -9,6 +9,7 @@ import {gapConfig} from './elementEditors/GapEditor';
 import {paragraphSeparatorConfig} from './elementEditors/ParagraphSeparatorEditor';
 import {clEditorConfig} from './elementEditors/ClEditor';
 import {textElementConfig} from './textElementConfig';
+import {deviConfig} from './deviConfig';
 
 export const selectedNodeClass = 'bg-teal-400';
 
@@ -70,6 +71,8 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
 
     clb: clbNodeConfig as XmlEditorSingleNodeConfig,
     cl: clEditorConfig as XmlEditorSingleNodeConfig,
+
+    devi: deviConfig as XmlSingleEditableNodeConfig,
 
     // Words
     w: wordNodeConfig,
