@@ -6,12 +6,7 @@ export abstract class AOption<T> {
 
   abstract map<U>(f: (t: T) => U): AOption<U>;
 
-  abstract getOrElse(def: T): T;
-
-  jsxMap<U>(f: (t: T) => U): AOption<U> {
-    // use in tsx to suppress missing key annotation
-    return this.map(f);
-  }
+  abstract get(): T | undefined;
 
 }
 
@@ -24,7 +19,7 @@ class Some<T> extends AOption<T> {
     return new Some(f(this.value));
   }
 
-  override getOrElse(): T {
+  override get(): T | undefined {
     return this.value;
   }
 }
@@ -34,8 +29,8 @@ class ANone extends AOption<never> {
     return None;
   }
 
-  override getOrElse<T>(value: T): T {
-    return value;
+  override get<T>(): T | undefined {
+    return undefined;
   }
 }
 

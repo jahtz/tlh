@@ -1,18 +1,19 @@
-import {inputClasses, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {inputClasses, XmlEditableNodeIProps, XmlSingleInsertableEditableNodeConfig} from '../editorConfig';
 import {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {LanguageInput} from '../LanguageInput';
 import classNames from 'classnames';
 import {selectedNodeClass, tlhXmlEditorConfig} from '../tlhXmlEditorConfig';
-import {writeNode, XmlNode} from 'simple_xml';
+import {findFirstXmlElementByTagName, writeNode} from 'simple_xml';
 import {getSiblingsUntil} from '../../nodeIterators';
+import {AOption} from '../../myOption';
 
 interface GetCuneiformResponse {
   number: number;
   cuneiform: string;
 }
 
-export const lineBreakNodeConfig: XmlInsertableSingleEditableNodeConfig<XmlNode[]> = {
+export const lineBreakNodeConfig: XmlSingleInsertableEditableNodeConfig = {
   replace: (node, _renderedChildren, isSelected, isLeftSide) =>
     <>
       {isLeftSide && <br/>}
@@ -23,24 +24,31 @@ export const lineBreakNodeConfig: XmlInsertableSingleEditableNodeConfig<XmlNode[
     beforeElement: ['lb', 'w', 'gap'],
     asLastChildOf: ['div1']
   },
-  edit: (props) => <LineBreakEditor {...props}/>,
-  getAdditionalInfo: (rootNode, path) => getSiblingsUntil(rootNode, path, 'lb')
+  edit: (props) => <LineBreakEditor {...props}/>
 };
 
-function LineBreakEditor({node, updateAttribute, setKeyHandlingEnabled, additionalInfo}: XmlEditableNodeIProps<XmlNode[]>): JSX.Element {
+function LineBreakEditor({node, path, updateAttribute, setKeyHandlingEnabled, rootNode}: XmlEditableNodeIProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
+  const textLanguage = AOption.of(findFirstXmlElementByTagName(rootNode, 'text'))
+    .map((textElement) => textElement.attributes['xml:lang'])
+    .get();
+
   const updateCuneiform = async (): Promise<void> => {
+
+    const lineContent = getSiblingsUntil(rootNode, path, 'lb');
+
     const body = JSON.stringify({
       number: 1,
-      content: additionalInfo.map((node) => writeNode(node, tlhXmlEditorConfig.writeConfig)).join(' ')
+      content: lineContent.map((node) => writeNode(node, tlhXmlEditorConfig.writeConfig)).join(' ')
     });
 
-    const response = await fetch('https://www.hethport3.uni-wuerzburg.de/TLHcuni/create_cuneiform_single.php', {method: 'POST', body})
+    // FIXME: change url!
+    const {cuneiform} = await fetch('https://www.hethport3.uni-wuerzburg.de/TLHcuni/create_cuneiform_single.php', {method: 'POST', body})
       .then<GetCuneiformResponse>((response) => response.json());
 
-    updateAttribute('cu', response.cuneiform);
+    updateAttribute('cu', cuneiform);
   };
 
   return (
@@ -59,7 +67,7 @@ function LineBreakEditor({node, updateAttribute, setKeyHandlingEnabled, addition
       </div>
 
       <div className="mb-4">
-        <LanguageInput initialValue={node.attributes.lg} onChange={(value) => updateAttribute('lg', value)}/>
+        <LanguageInput initialValue={node.attributes.lg} parentLanguages={{text: textLanguage}} onChange={(value) => updateAttribute('lg', value)}/>
       </div>
 
       <div className="mb-4">

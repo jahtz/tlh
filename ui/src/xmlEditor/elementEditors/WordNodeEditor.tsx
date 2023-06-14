@@ -1,21 +1,31 @@
 import {XmlEditableNodeIProps} from '../editorConfig';
 import {useTranslation} from 'react-i18next';
 import {JSX, useState} from 'react';
-import {MorphologicalAnalysis, readMorphologiesFromNode, writeMorphAnalysisValue} from '../../model/morphologicalAnalysis';
+import {MorphologicalAnalysis, multiMorphAnalysisWithoutEnclitics, readMorphologiesFromNode, writeMorphAnalysisValue} from '../../model/morphologicalAnalysis';
 import {MorphAnalysisOptionContainer} from '../morphAnalysisOption/MorphAnalysisOptionContainer';
-import {isXmlElementNode, lastChildNode, xmlElementNode, XmlElementNode} from 'simple_xml';
+import {findFirstXmlElementByTagName, isXmlElementNode, lastChildNode, xmlElementNode, XmlElementNode} from 'simple_xml';
 import {MorphAnalysisOptionEditor} from '../morphAnalysisOption/MorphAnalysisOptionEditor';
 import {WordContentEditor} from './WordContentEditor';
 import {LanguageInput} from '../LanguageInput';
 import {readSelectedMorphology, SelectedMorphAnalysis} from '../../model/selectedMorphologicalAnalysis';
 import {WordStringChildEditor} from './WordStringChildEditor';
+import {getPriorSibling} from '../../nodeIterators';
+import {AOption} from '../../myOption';
 
 type States = 'DefaultState' | 'AddMorphology' | 'EditEditingQuestion' | 'EditFootNoteState' | 'EditContent';
 
-export function WordNodeEditor({node, updateEditedNode, setKeyHandlingEnabled}: XmlEditableNodeIProps): JSX.Element {
+export function WordNodeEditor({node, path, updateEditedNode, setKeyHandlingEnabled, rootNode}: XmlEditableNodeIProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [state, setState] = useState<States>('DefaultState');
+
+  const textLanguage = AOption.of(findFirstXmlElementByTagName(rootNode, 'text'))
+    .map((textElement) => textElement.attributes['xml:lang'])
+    .get();
+
+  const lineBreakLanguage = AOption.of(getPriorSibling(rootNode, path, 'lb'))
+    .map((lineBreakElement) => lineBreakElement.attributes.lg)
+    .get();
 
   const selectedMorphologies: SelectedMorphAnalysis[] = node.attributes.mrp0sel !== undefined
     ? readSelectedMorphology(node.attributes.mrp0sel)
@@ -42,11 +52,9 @@ export function WordNodeEditor({node, updateEditedNode, setKeyHandlingEnabled}: 
   }
 
 
-  function toggleAnalysisSelection(morphNumber: number, letter: string | undefined, encLetter: string | undefined, targetState: boolean | undefined): void {
-    return updateEditedNode({
-      attributes: {mrp0sel: (value) => toggleMorphology(value || '', morphNumber, letter, encLetter, targetState)}
-    });
-  }
+  const toggleAnalysisSelection = (morphNumber: number, letter: string | undefined, encLetter: string | undefined, targetState: boolean | undefined): void => updateEditedNode({
+    attributes: {mrp0sel: (value) => toggleMorphology(value || '', morphNumber, letter, encLetter, targetState)}
+  });
 
   function enableEditWordState(): void {
     setKeyHandlingEnabled(false);
@@ -64,12 +72,7 @@ export function WordNodeEditor({node, updateEditedNode, setKeyHandlingEnabled}: 
   }
 
   function updateMorphology(number: number, newMa: MorphologicalAnalysis): void {
-    const key = `mrp${number}`;
-    const newValue = writeMorphAnalysisValue(newMa);
-
-    console.info(key + ' :: ' + newValue);
-
-    updateEditedNode({attributes: {[key]: {$set: newValue}}});
+    updateEditedNode({attributes: {[`mrp${number}`]: {$set: writeMorphAnalysisValue(newMa)}}});
     setState('DefaultState');
   }
 
@@ -78,20 +81,7 @@ export function WordNodeEditor({node, updateEditedNode, setKeyHandlingEnabled}: 
     setState(state === 'AddMorphology' ? 'DefaultState' : 'AddMorphology');
   }
 
-  function nextMorphAnalysis(): MorphologicalAnalysis {
-    const number = Math.max(0, ...morphologies.map(({number}) => number)) + 1;
-
-    return {
-      _type: 'MultiMorphAnalysisWithoutEnclitics',
-      number,
-      translation: '',
-      referenceWord: '',
-      analysisOptions: [],
-      encliticsAnalysis: undefined,
-      determinative: undefined,
-      paradigmClass: ''
-    };
-  }
+  const nextMorphAnalysis = (): MorphologicalAnalysis => multiMorphAnalysisWithoutEnclitics(Math.max(0, ...morphologies.map(({number}) => number)) + 1);
 
   const updateAttribute = (name: string, value: string | undefined): void => updateEditedNode({attributes: {[name]: {$set: value}}});
 
@@ -151,7 +141,7 @@ export function WordNodeEditor({node, updateEditedNode, setKeyHandlingEnabled}: 
   return (
     <>
       <div className="mt-2">
-        <LanguageInput initialValue={node.attributes.lg} onChange={(lg) => updateAttribute('lg', lg.trim() || '')} onFocus={onFocus} onBlur={onBlur}/>
+        <LanguageInput initialValue={node.attributes.lg} parentLanguages={{text: textLanguage, lb: lineBreakLanguage}} onChange={(lg) => updateAttribute('lg', lg.trim() || '')} onFocus={onFocus} onBlur={onBlur}/>
       </div>
 
       <div className="mt-2 grid grid-cols-3 gap-2">

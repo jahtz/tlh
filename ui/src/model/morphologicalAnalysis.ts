@@ -56,6 +56,19 @@ export interface MultiMorphologicalAnalysisWithoutEnclitics extends IMultiMorpho
   encliticsAnalysis: undefined;
 }
 
+export function multiMorphAnalysisWithoutEnclitics(number: number): MultiMorphologicalAnalysisWithoutEnclitics {
+  return {
+    _type: 'MultiMorphAnalysisWithoutEnclitics',
+    number,
+    translation: '',
+    referenceWord: '',
+    analysisOptions: [],
+    encliticsAnalysis: undefined,
+    determinative: undefined,
+    paradigmClass: ''
+  };
+}
+
 export interface MultiMorphologicalAnalysisWithSingleEnclitics extends IMultiMorphologicalAnalysis {
   _type: 'MultiMorphAnalysisWithSingleEnclitics';
   analysisOptions: SelectableLetteredAnalysisOption[];

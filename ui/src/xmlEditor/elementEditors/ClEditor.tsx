@@ -1,11 +1,11 @@
-import {inputClasses, XmlEditableNodeIProps, XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {inputClasses, XmlEditableNodeIProps, XmlSingleInsertableEditableNodeConfig} from '../editorConfig';
 import {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {getElementByPath, XmlElementNode} from 'simple_xml';
 import {buildActionSpec} from '../XmlDocumentEditor';
 import {displayReplace} from '../editorConfig/displayReplacement';
 
-export const clEditorConfig: XmlInsertableSingleEditableNodeConfig = {
+export const clEditorConfig: XmlSingleInsertableEditableNodeConfig = {
   replace: (node, renderChildren) => displayReplace(
     <><br/><span className="px-1 cl">{node.attributes.id || ' '}</span>&nbsp;</>,
     renderChildren()

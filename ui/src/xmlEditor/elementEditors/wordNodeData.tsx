@@ -1,5 +1,5 @@
 import {isXmlElementNode, XmlElementNode} from 'simple_xml';
-import {XmlInsertableSingleEditableNodeConfig} from '../editorConfig';
+import {XmlSingleInsertableEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {WordNodeEditor} from './WordNodeEditor';
 import {SpacesEditor} from './SpacesEditor';
@@ -72,7 +72,7 @@ export const replaceWordDisplay = (node: XmlElementNode, renderChildren: () => J
   );
 };
 
-export const wordNodeConfig: XmlInsertableSingleEditableNodeConfig = {
+export const wordNodeConfig: XmlSingleInsertableEditableNodeConfig = {
   replace: replaceWordDisplay,
   edit: (props) => isOnlySpaces(props.node)
     ? <SpacesEditor {...props}/>

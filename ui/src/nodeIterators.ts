@@ -15,16 +15,23 @@ function takeUntil<T>(values: T[], f: (t: T) => boolean): T[] {
 }
 
 export function getSiblingsUntil(rootNode: XmlElementNode, path: number[], untilTagName: string): XmlNode[] {
-  const parentPath = path.slice(0, -1);
-
-  const parent = getElementByPath(rootNode, parentPath);
+  const parent = getElementByPath(rootNode, path.slice(0, -1));
 
   const childrenAfter = parent.children.slice(path[path.length - 1] + 1);
 
   return Array.from(
     takeUntil(
       childrenAfter,
-      (n) => isXmlElementNode(n) && n.tagName === untilTagName)
+      (n) => isXmlElementNode(n) && n.tagName === untilTagName
+    )
   );
+}
 
+export function getPriorSibling(rootNode: XmlElementNode, path: number[], untilTagName: string): XmlElementNode | undefined {
+  const parent = getElementByPath(rootNode, path.slice(0, -1));
+
+  return parent.children
+    .slice(0, path[path.length - 1])
+    .reverse()
+    .find((xmlNode) => isXmlElementNode(xmlNode) && xmlNode.tagName === untilTagName) as XmlElementNode | undefined;
 }

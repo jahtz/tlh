@@ -214,15 +214,11 @@ export function XmlDocumentEditor({
 
     const config = editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig;
 
-    const additionalInfo = config.getAdditionalInfo !== undefined
-      ? config.getAdditionalInfo(state.rootNode as XmlElementNode, path)
-      : undefined;
-
     return (
       <NodeEditorRightSide key={path.join('.')} originalNode={node} changed={changed} deleteNode={() => deleteNode(path)} applyUpdates={() => applyUpdates()}
                            cancelSelection={() => setState((state) => update(state, {editorState: {$set: defaultRightSideState}}))}
                            jumpElement={(forward) => jumpEditableNodes(node.tagName, forward)} fontSizeSelectorProps={fontSizeSelectorProps}>
-        {config.edit({node, path, updateEditedNode, updateAttribute, setKeyHandlingEnabled, additionalInfo})}
+        {config.edit({node, path, updateEditedNode, updateAttribute, setKeyHandlingEnabled, rootNode: state.rootNode as XmlElementNode})}
       </NodeEditorRightSide>
     );
   }

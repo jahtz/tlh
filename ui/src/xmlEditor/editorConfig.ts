@@ -7,13 +7,13 @@ import {DisplayReplacement} from './editorConfig/displayReplacement';
 
 export const inputClasses = 'mt-2 p-2 rounded border border-slate-500 w-full';
 
-export interface XmlEditableNodeIProps<T = void> {
+export interface XmlEditableNodeIProps {
   node: XmlElementNode;
   path: number[];
   updateEditedNode: (spec: Spec<XmlElementNode>) => void;
   updateAttribute: (key: string, value: string | undefined) => void;
   setKeyHandlingEnabled: (enabled: boolean) => void;
-  additionalInfo: T;
+  rootNode: XmlElementNode;
 }
 
 export interface XmlSingleNodeConfig {
@@ -22,20 +22,19 @@ export interface XmlSingleNodeConfig {
   dontRenderChildrenInline?: boolean;
 }
 
-export interface XmlSingleEditableNodeConfig<T = void> extends XmlSingleNodeConfig {
-  edit: (props: XmlEditableNodeIProps<T>) => JSX.Element;
-  getAdditionalInfo?: (rootNode: XmlElementNode, path: number[]) => T;
+export interface XmlSingleEditableNodeConfig<Props extends XmlEditableNodeIProps = XmlEditableNodeIProps> extends XmlSingleNodeConfig {
+  edit: (props: Props) => JSX.Element;
 }
 
 export function isXmlEditableNodeConfig(c: XmlEditorNodeConfig): c is XmlSingleEditableNodeConfig {
   return 'edit' in c;
 }
 
-export interface XmlInsertableSingleEditableNodeConfig<T = void> extends XmlSingleEditableNodeConfig<T> {
+export interface XmlSingleInsertableEditableNodeConfig extends XmlSingleEditableNodeConfig {
   insertablePositions: InsertablePositions;
 }
 
-export type XmlEditorNodeConfig = XmlSingleNodeConfig | XmlSingleEditableNodeConfig | XmlInsertableSingleEditableNodeConfig;
+export type XmlEditorNodeConfig = XmlSingleNodeConfig | XmlSingleEditableNodeConfig | XmlSingleInsertableEditableNodeConfig;
 
 export interface XmlEditorConfig {
   readConfig: XmlReadConfig;

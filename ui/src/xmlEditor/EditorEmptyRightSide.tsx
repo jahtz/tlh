@@ -1,4 +1,4 @@
-import {XmlEditorConfig, XmlInsertableSingleEditableNodeConfig} from './editorConfig';
+import {XmlEditorConfig, XmlSingleInsertableEditableNodeConfig} from './editorConfig';
 import {JSX} from 'react';
 import {useTranslation} from 'react-i18next';
 import {InsertablePositions} from './insertablePositions';
@@ -27,7 +27,7 @@ export function EditorEmptyRightSide({
   const {t} = useTranslation('common');
 
   const insertableTags: [string, InsertablePositions][] = Object.entries(editorConfig.nodeConfigs)
-    .filter((c): c is [string, XmlInsertableSingleEditableNodeConfig] => 'insertablePositions' in c[1])
+    .filter((c): c is [string, XmlSingleInsertableEditableNodeConfig] => 'insertablePositions' in c[1])
     .map<[string, InsertablePositions]>(([tagName, {insertablePositions}]) => [tagName, insertablePositions]);
 
   return (
