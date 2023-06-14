@@ -7,6 +7,7 @@ import {MyLeft, parseNewXml, XmlElementNode} from 'simple_xml';
 import {XmlDocumentEditor} from '../../xmlEditor/XmlDocumentEditor';
 import {useTranslation} from 'react-i18next';
 import {writeXml} from '../../xmlEditor/StandAloneOXTED';
+import {tlhXmlEditorConfig} from '../../xmlEditor/tlhXmlEditorConfig';
 
 interface IProps {
   mainIdentifier: string;
@@ -19,7 +20,7 @@ function Inner({mainIdentifier, initialXml, reviewType}: IProps): JSX.Element {
   const {t} = useTranslation('common');
   const [submitXmlReview, {data, loading/*, error*/}] = useSubmitXmlReviewMutation();
 
-  const rootNodeParseResult = parseNewXml(initialXml);
+  const rootNodeParseResult = parseNewXml(initialXml, tlhXmlEditorConfig.readConfig);
 
   if (rootNodeParseResult instanceof MyLeft) {
     throw new Error('TODO!');

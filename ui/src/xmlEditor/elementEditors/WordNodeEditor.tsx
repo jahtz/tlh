@@ -62,6 +62,7 @@ export function WordNodeEditor({node, path, updateEditedNode, setKeyHandlingEnab
   }
 
   function handleEditUpdate(node: XmlElementNode): void {
+    // FIXME: set lb attr cu dirty!
     updateEditedNode({$set: node});
     cancelEdit();
   }

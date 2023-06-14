@@ -2,7 +2,17 @@ import {MergeLine} from './mergeDocument';
 import {JSX} from 'react';
 import {MergeDocumentLine} from './DocumentMerger';
 import {useTranslation} from 'react-i18next';
-import {findFirstXmlElementByTagName, isXmlElementNode, isXmlTextNode, writeNode, XmlElementNode, xmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
+import {
+  findFirstXmlElementByTagName,
+  isXmlElementNode,
+  isXmlTextNode,
+  writeNode,
+  writeNodeWithDefaultWriteConfig,
+  XmlElementNode,
+  xmlElementNode,
+  XmlNode,
+  xmlTextNode
+} from 'simple_xml';
 import {handleSaveToPC} from '../xmlEditor/StandAloneOXTED';
 import xmlFormat from 'xml-formatter';
 import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
@@ -126,7 +136,7 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
                onChange={e => setMergerReg(e.target.value)}></input>
       </div>
       <button type="button" className="mb-2 p-2 rounded bg-blue-500 text-white w-full" onClick={onExport}>{t('export')}</button>
-      <pre><code>{xmlFormat(writeNode(header).join('\n'), {
+      <pre><code>{xmlFormat(writeNodeWithDefaultWriteConfig(header).join('\n'), {
         indentation: '  ',
         collapseContent: true,
         lineSeparator: '\n'
