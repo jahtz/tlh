@@ -12,7 +12,11 @@ require_once __DIR__ . '/AbstractManuscript.php';
 use GraphQL\Type\Definition\{ObjectType, Type};
 use MySafeGraphQLException;
 use mysqli_stmt;
-use function sql_helpers\{executeMultiSelectQuery, executeSingleChangeQuery, executeSingleSelectQuery};
+use function sql_helpers\{executeMultiSelectQuery,
+  executeQueriesInTransactions,
+  executeSingleChangeQuery,
+  executeSingleChangeQueryWithConnection,
+  executeSingleSelectQuery};
 
 /** @return string[] */
 function getPictures(string $manuscriptMainIdentifier): array
@@ -78,7 +82,7 @@ class Manuscript extends AbstractManuscript
     $first = $page * $pageSize;
 
     return executeMultiSelectQuery(
-      "select * from tlh_dig_manuscript_status order by creation_date desc limit ?, ?;",
+      "select * from tlh_dig_manuscripts order by creation_date desc limit ?, ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('ii', $first, $pageSize),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
     );
@@ -97,7 +101,7 @@ class Manuscript extends AbstractManuscript
   static function selectManuscriptById(string $mainIdentifier): ?Manuscript
   {
     return executeSingleSelectQuery(
-      "select * from tlh_dig_manuscript_status where main_identifier = ?;",
+      "select * from tlh_dig_manuscripts where main_identifier = ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
     );
@@ -141,17 +145,28 @@ class Manuscript extends AbstractManuscript
     );
   }
 
-  function transliterationIsReleased(): bool
+  function selectTransliterationIsReleased(): bool
   {
     return !is_null($this->selectReleasedTransliteration());
   }
 
   function insertReleasedTransliteration(): bool
   {
-    return executeSingleChangeQuery(
-      "insert into tlh_dig_released_transliterations (main_identifier) values (?);",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier)
-    );
+    error_log('Releasing transliteration!');
+
+    return executeQueriesInTransactions(function ($conn): bool {
+      $transliterationInserted = executeSingleChangeQueryWithConnection(
+        $conn,
+        "insert into tlh_dig_released_transliterations (main_identifier) values (?);",
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier)
+      );
+
+      return $transliterationInserted && executeSingleChangeQueryWithConnection(
+          $conn,
+          "update tlh_dig_manuscripts set status = 'TransliterationReleased' where main_identifier = ?;",
+          fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier)
+        );
+    });
   }
 }
 
@@ -187,7 +202,7 @@ Manuscript::$graphQLType = new ObjectType([
     'transliterationReleased' => [
       // FIXME: also resolve creator!
       'type' => Type::nonNull(Type::boolean()),
-      'resolve' => fn(Manuscript $manuscript): bool => $manuscript->transliterationIsReleased()
+      'resolve' => fn(Manuscript $manuscript): bool => $manuscript->selectTransliterationIsReleased()
     ]
   ]
 ]);
@@ -207,7 +222,7 @@ Manuscript::$graphQLMutationsType = new ObjectType([
         if ($manuscript->creatorUsername !== $user->username) {
           throw new MySafeGraphQLException("Can only change own transliterations!");
         }
-        if ($manuscript->transliterationIsReleased()) {
+        if ($manuscript->selectTransliterationIsReleased()) {
           throw new MySafeGraphQLException("Transliteration is already released!");
         }
 
@@ -223,7 +238,7 @@ Manuscript::$graphQLMutationsType = new ObjectType([
         if ($manuscript->creatorUsername !== $user->username) {
           throw new MySafeGraphQLException('Only the owner can release the transliteration!');
         }
-        if ($manuscript->transliterationIsReleased()) {
+        if ($manuscript->selectTransliterationIsReleased()) {
           return true;
         }
 

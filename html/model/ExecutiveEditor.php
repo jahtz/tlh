@@ -8,10 +8,15 @@ require_once __DIR__ . '/User.php';
 require_once __DIR__ . '/Manuscript.php';
 require_once __DIR__ . '/DocumentInPipeline.php';
 
+use mysqli;
 use GraphQL\Type\Definition\{ObjectType, Type};
 use MySafeGraphQLException;
 use mysqli_stmt;
-use function sql_helpers\{executeMultiSelectQuery, executeSingleChangeQuery, executeSingleSelectQuery};
+use function sql_helpers\{executeMultiSelectQuery,
+  executeQueriesInTransactions,
+  executeSingleChangeQuery,
+  executeSingleChangeQueryWithConnection,
+  executeSingleSelectQuery};
 
 class ExecutiveEditor
 {
@@ -110,10 +115,19 @@ where approved_trans.input is null and second_xml_revs.main_identifier = ?;",
 
   static function insertApproval(string $mainIdentifier, string $xml, string $approvalUsername): bool
   {
-    return executeSingleChangeQuery(
-      "insert into tlh_dig_approved_transliterations (main_identifier, input, approval_username) values (?, ?, ?);",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $approvalUsername)
-    );
+    return executeQueriesInTransactions(function (mysqli $conn) use($mainIdentifier,$xml,$approvalUsername):bool {
+      $approvalInserted =  executeSingleChangeQueryWithConnection(
+        $conn,
+        "insert into tlh_dig_approved_transliterations (main_identifier, input, approval_username) values (?, ?, ?);",
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $approvalUsername)
+      );
+
+      return $approvalInserted && executeSingleChangeQueryWithConnection(
+        $conn,
+          "update tlh_dig_manuscripts set status = 'Approved' where main_identifier = ?;",
+          fn(mysqli_stmt $stmt):bool => $stmt->bind_param('s', $mainIdentifier)
+        );
+    });
   }
 }
 

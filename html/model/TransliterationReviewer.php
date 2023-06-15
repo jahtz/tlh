@@ -5,8 +5,9 @@ namespace model;
 require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/Appointment.php';
 
+use mysqli;
 use mysqli_stmt;
-use function sql_helpers\{executeMultiSelectQuery, executeSingleChangeQuery, executeSingleSelectQuery};
+use function sql_helpers\{executeMultiSelectQuery, executeQueriesInTransactions, executeSingleChangeQueryWithConnection, executeSingleSelectQuery};
 
 abstract class TransliterationReviewer
 {
@@ -52,9 +53,18 @@ where appointment.main_identifier = ? and username = ?;",
 
   static function insertTransliterationReview(string $mainIdentifier, string $reviewerUsername, string $input): bool
   {
-    return executeSingleChangeQuery(
-      "insert into tlh_dig_transliteration_reviews (main_identifier, reviewer_username, input) values (?, ?, ?);",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $reviewerUsername, $input),
-    );
+    return executeQueriesInTransactions(function (mysqli $conn) use ($mainIdentifier, $reviewerUsername, $input): bool {
+      $reviewInserted = executeSingleChangeQueryWithConnection(
+        $conn,
+        "insert into tlh_dig_transliteration_reviews (main_identifier, reviewer_username, input) values (?, ?, ?);",
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $reviewerUsername, $input),
+      );
+
+      return $reviewInserted && executeSingleChangeQueryWithConnection(
+          $conn,
+          "update tlh_dig_manuscripts set status = 'TransliterationReviewPerformed' where main_identifier = ?;",
+          fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier)
+        );
+    });
   }
 }

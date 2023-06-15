@@ -2,9 +2,11 @@
 
 namespace model;
 
+use mysqli;
 use mysqli_stmt;
 use function sql_helpers\executeMultiSelectQuery;
-use function sql_helpers\executeSingleChangeQuery;
+use function sql_helpers\executeQueriesInTransactions;
+use function sql_helpers\executeSingleChangeQueryWithConnection;
 use function sql_helpers\executeSingleSelectQuery;
 
 require_once __DIR__ . '/../sql_helpers.php';
@@ -64,10 +66,19 @@ where first_xml_rev.main_identifier = ? and username = ?;",
 
   static function insertSecondXmlReview(string $mainIdentifier, string $reviewerUsername, string $xml): bool
   {
-    return executeSingleChangeQuery(
-      "insert into tlh_dig_second_xml_reviews (main_identifier, input, reviewer_username) values (?, ?, ?);",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $reviewerUsername)
-    );
+    return executeQueriesInTransactions(function (mysqli $conn) use ($mainIdentifier, $reviewerUsername, $xml): bool {
+      $reviewInserted = executeSingleChangeQueryWithConnection(
+        $conn,
+        "insert into tlh_dig_second_xml_reviews (main_identifier, input, reviewer_username) values (?, ?, ?);",
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $reviewerUsername)
+      );
+
+      return $reviewInserted && executeSingleChangeQueryWithConnection(
+          $conn,
+          "update tlh_dig_manuscripts set status = 'SecondXmlReviewPerformed' where main_identifier = ?;",
+          fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier)
+        );
+    });
   }
 
 }

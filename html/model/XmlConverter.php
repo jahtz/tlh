@@ -5,8 +5,9 @@ namespace model;
 require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/Appointment.php';
 
+use mysqli;
 use mysqli_stmt;
-use function sql_helpers\{executeMultiSelectQuery, executeSingleChangeQuery, executeSingleSelectQuery};
+use function sql_helpers\{executeMultiSelectQuery, executeQueriesInTransactions, executeSingleChangeQueryWithConnection, executeSingleSelectQuery};
 
 abstract class XmlConverter
 {
@@ -48,10 +49,19 @@ where username = ? and conversion.input is null;",
 
   static function insertXmlConversion(string $mainIdentifier, string $converterUsername, string $xml): bool
   {
-    return executeSingleChangeQuery(
-      "insert into tlh_dig_xml_conversions (main_identifier, input, converter_username) values (?, ?, ?);",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $converterUsername)
-    );
+    return executeQueriesInTransactions(function (mysqli $conn) use ($mainIdentifier, $converterUsername, $xml): bool {
+      $conversionInserted = executeSingleChangeQueryWithConnection(
+        $conn,
+        "insert into tlh_dig_xml_conversions (main_identifier, input, converter_username) values (?, ?, ?);",
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $converterUsername)
+      );
+
+      return $conversionInserted && executeSingleChangeQueryWithConnection(
+          $conn,
+          "update tlh_dig_manuscripts set status = 'XmlConversionPerformed' where main_identifier = ?;",
+          fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier)
+        );
+    });
   }
 
   static function selectTransliterationInputForXmlConversionAppointment(string $mainIdentifier, string $username): ?string
