@@ -150,12 +150,6 @@ export const enum ManuscriptIdentifierType {
   PublicationShortReference = 'PublicationShortReference'
 };
 
-export type ManuscriptLanguage = {
-  __typename?: 'ManuscriptLanguage';
-  abbreviation: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-};
-
 export const enum ManuscriptLanguageAbbreviations {
   Akk = 'Akk',
   Hat = 'Hat',
@@ -253,8 +247,6 @@ export type Query = {
   executiveEditorQueries?: Maybe<ExecutiveEditor>;
   manuscript?: Maybe<ManuscriptMetaData>;
   manuscriptCount: Scalars['Int']['output'];
-  /** @deprecated Will be removed! */
-  manuscriptLanguages: Array<ManuscriptLanguage>;
   myManuscripts?: Maybe<Array<Scalars['String']['output']>>;
   reviewerQueries?: Maybe<Reviewer>;
 };
@@ -349,13 +341,6 @@ export const enum XmlReviewType {
 };
 
 export type ManuscriptIdentifierFragment = { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string };
-
-export type ManuscriptLanguageFragment = { __typename?: 'ManuscriptLanguage', name: string, abbreviation: string };
-
-export type AllManuscriptLanguagesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type AllManuscriptLanguagesQuery = { __typename?: 'Query', manuscriptLanguages: Array<{ __typename?: 'ManuscriptLanguage', name: string, abbreviation: string }> };
 
 export type ManuscriptBasicDataFragment = { __typename?: 'ManuscriptMetaData', status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
@@ -554,12 +539,6 @@ export type UpdateUserRightsMutationVariables = Exact<{
 
 export type UpdateUserRightsMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', updateUserRights: Rights } | null };
 
-export const ManuscriptLanguageFragmentDoc = gql`
-    fragment ManuscriptLanguage on ManuscriptLanguage {
-  name
-  abbreviation
-}
-    `;
 export const ManuscriptIdentifierFragmentDoc = gql`
     fragment ManuscriptIdentifier on ManuscriptIdentifier {
   identifierType
@@ -648,40 +627,6 @@ export const UserFragmentDoc = gql`
   rights
 }
     `;
-export const AllManuscriptLanguagesDocument = gql`
-    query AllManuscriptLanguages {
-  manuscriptLanguages {
-    ...ManuscriptLanguage
-  }
-}
-    ${ManuscriptLanguageFragmentDoc}`;
-
-/**
- * __useAllManuscriptLanguagesQuery__
- *
- * To run a query within a React component, call `useAllManuscriptLanguagesQuery` and pass it any options that fit your needs.
- * When your component renders, `useAllManuscriptLanguagesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useAllManuscriptLanguagesQuery({
- *   variables: {
- *   },
- * });
- */
-export function useAllManuscriptLanguagesQuery(baseOptions?: Apollo.QueryHookOptions<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>(AllManuscriptLanguagesDocument, options);
-      }
-export function useAllManuscriptLanguagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>(AllManuscriptLanguagesDocument, options);
-        }
-export type AllManuscriptLanguagesQueryHookResult = ReturnType<typeof useAllManuscriptLanguagesQuery>;
-export type AllManuscriptLanguagesLazyQueryHookResult = ReturnType<typeof useAllManuscriptLanguagesLazyQuery>;
-export type AllManuscriptLanguagesQueryResult = Apollo.QueryResult<AllManuscriptLanguagesQuery, AllManuscriptLanguagesQueryVariables>;
 export const IndexDocument = gql`
     query Index($page: Int! = 0) {
   manuscriptCount

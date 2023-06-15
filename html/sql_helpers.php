@@ -21,7 +21,7 @@ require_once __DIR__ . '/mysqliconn.php';
  *
  * @throws Exception
  */
-function execute_query_with_connection(mysqli $connection, string $sql, ?callable $bindParams, callable $f)
+function executeQueryWithConnection(mysqli $connection, string $sql, ?callable $bindParams, callable $f)
 {
   $statement = $connection->prepare($sql);
   if ($statement === false) {
@@ -70,7 +70,7 @@ function executeQuery(string $sql, ?callable $bindParams, callable $f)
   $conn = connect_to_db();
 
   try {
-    $executed = execute_query_with_connection($conn, $sql, $bindParams, $f);
+    $executed = executeQueryWithConnection($conn, $sql, $bindParams, $f);
   } catch (Exception $e) {
     $conn->close();
     throw $e;
@@ -156,6 +156,23 @@ function executeMultiSelectQuery(string $sql, ?callable $bindParams, callable $f
   }
 }
 
+// Change queries
+
+function executeSingleChangeQueryWithConnection(mysqli $conn, string $sql, callable $bindParams): bool
+{
+  try {
+    return executeQueryWithConnection($conn, $sql, $bindParams, fn() => true);
+  } catch (Exception $exception) {
+    error_log($exception);
+    return false;
+  }
+}
+
+/**
+ * @param string $sql
+ * @param callable(mysqli_stmt):void $bindParams
+ * @return bool
+ */
 function executeSingleChangeQuery(string $sql, callable $bindParams): bool
 {
   try {
@@ -164,4 +181,35 @@ function executeSingleChangeQuery(string $sql, callable $bindParams): bool
     error_log($exception);
     return false;
   }
+}
+
+// Transactions
+
+/**
+ * @param callable(mysqli):bool $f
+ * @return bool
+ */
+function executeQueriesInTransactions(callable $f): bool
+{
+  $conn = connect_to_db();
+
+  $conn->begin_transaction();
+
+  try {
+    $result = $f($conn);
+  } catch (Exception $exception) {
+    $conn->rollback();
+    $conn->close();
+
+    return false;
+  }
+
+  if ($result) {
+    $conn->commit();
+  } else {
+    $conn->rollback();
+  }
+
+  $conn->close();
+  return $result;
 }

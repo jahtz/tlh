@@ -1,5 +1,7 @@
 use hpm;
 
+drop view if exists tlh_dig_manuscript_status;
+
 drop table if exists
   tlh_dig_approved_transliterations,
   tlh_dig_second_xml_reviews,
@@ -19,46 +21,34 @@ drop table if exists
 -- users
 
 create table if not exists tlh_dig_users (
-  username    varchar(100) primary key not null,
-  pw_hash     varchar(255)             not null,
-  name        varchar(255)             not null,
+  username    varchar(100) primary key                       not null,
+  pw_hash     varchar(255)                                   not null,
+  name        varchar(255)                                   not null,
   affiliation varchar(255),
-  email       varchar(255) unique      not null,
-  rights      enum (
-    'Author', 'Reviewer', 'ExecutiveEditor'
-    )                                  not null default 'Author'
+  email       varchar(255) unique                            not null,
+  rights      enum ('Author', 'Reviewer', 'ExecutiveEditor') not null default 'Author'
 );
 
 -- manuscripts
 
 create table if not exists tlh_dig_manuscripts (
-  main_identifier            varchar(20)  not null primary key,
-  main_identifier_type       enum (
-    'ExcavationNumber', 'CollectionNumber'
-    )                                     not null default 'ExcavationNumber',
-  palaeo_classification      varchar(100) not null default 'OldScript',
-  palaeo_classification_sure boolean      not null default false,
-  default_language           enum (
-    'Hit', 'Luw', 'Pal', 'Hat', 'Hur', 'Akk', 'Sum'
-    )                                     not null default 'Hit',
+  main_identifier            varchar(20)                                            not null primary key,
+  main_identifier_type       enum ('ExcavationNumber', 'CollectionNumber')          not null default 'ExcavationNumber',
+  palaeo_classification      varchar(100)                                           not null default 'OldScript',
+  palaeo_classification_sure boolean                                                not null default false,
+  default_language           enum ('Hit', 'Luw', 'Pal', 'Hat', 'Hur', 'Akk', 'Sum') not null default 'Hit',
   provenance                 varchar(255),
   cth_classification         integer,
   bibliography               text,
-  creator_username           varchar(100) not null references tlh_dig_users (username) on update cascade on delete cascade,
-  creation_date              date         not null default now(),
-  status                     enum (
-    'Created', 'TransliterationReleased', 'TransliterationReviewPerformed', 'XmlConversionPerformed',
-    'FirstXmlReviewPerformed', 'SecondXmlReviewPerformed', 'Approved'
-    )                                     not null default 'Created'
+  creator_username           varchar(100)                                           not null references tlh_dig_users (username) on update cascade on delete cascade,
+  creation_date              date                                                   not null default now()
 );
 
 create table if not exists tlh_dig_manuscript_other_identifiers (
-  main_identifier varchar(20) not null references tlh_dig_manuscripts (main_identifier) on update cascade on delete cascade,
+  main_identifier varchar(20)                                                                 not null references tlh_dig_manuscripts (main_identifier) on update cascade on delete cascade,
 
-  identifier      varchar(20) not null unique,
-  identifier_type enum (
-    'ExcavationNumber', 'CollectionNumber', 'PublicationShortReference'
-    )                         not null default 'ExcavationNumber',
+  identifier      varchar(20)                                                                 not null unique,
+  identifier_type enum ('ExcavationNumber', 'CollectionNumber', 'PublicationShortReference' ) not null default 'ExcavationNumber',
 
   primary key (main_identifier, identifier, identifier_type)
 );
@@ -75,20 +65,6 @@ create table if not exists tlh_dig_released_transliterations (
   main_identifier varchar(20) not null primary key references tlh_dig_manuscripts (main_identifier) on update cascade on delete cascade,
   release_date    date        not null default now()
 );
-
-create trigger if not exists tlh_dig_set_manuscript_released_status
-  after insert
-  on tlh_dig_released_transliterations
-  for each row update tlh_dig_manuscripts
-               set status = 'TransliterationReleased'
-               where main_identifier = new.main_identifier;
-
-create trigger if not exists tlh_dig_reset_manuscript_released_status
-  after delete
-  on tlh_dig_released_transliterations
-  for each row update tlh_dig_manuscripts
-               set status = 'Created'
-               where main_identifier = old.main_identifier;
 
 -- transliteration review
 
@@ -110,20 +86,6 @@ create table if not exists tlh_dig_transliteration_reviews (
   foreign key (main_identifier, reviewer_username) references tlh_dig_transliteration_review_appointments (main_identifier, username) on update cascade on delete cascade
 );
 
-create trigger if not exists tlh_dig_set_manuscript_transliteration_reviewed_status
-  after insert
-  on tlh_dig_transliteration_reviews
-  for each row update tlh_dig_manuscripts
-               set status = 'TransliterationReviewPerformed'
-               where main_identifier = new.main_identifier;
-
-create trigger if not exists tlh_dig_reset_manuscript_transliteration_reviewed_status
-  after delete
-  on tlh_dig_transliteration_reviews
-  for each row update tlh_dig_manuscripts
-               set status = 'TransliterationReleased'
-               where main_identifier = old.main_identifier;
-
 -- xml conversion
 
 create table if not exists tlh_dig_xml_conversion_appointments (
@@ -143,20 +105,6 @@ create table if not exists tlh_dig_xml_conversions (
 
   foreign key (main_identifier, converter_username) references tlh_dig_xml_conversion_appointments (main_identifier, username) on update cascade on delete cascade
 );
-
-create trigger if not exists tlh_dig_set_manuscript_xml_converted_status
-  after insert
-  on tlh_dig_xml_conversions
-  for each row update tlh_dig_manuscripts
-               set status = 'XmlConversionPerformed'
-               where main_identifier = new.main_identifier;
-
-create trigger if not exists tlh_dig_reset_manuscript_xml_converted_status
-  after delete
-  on tlh_dig_xml_conversions
-  for each row update tlh_dig_manuscripts
-               set status = 'TransliterationReviewPerformed'
-               where main_identifier = old.main_identifier;
 
 -- first xml review
 
@@ -178,20 +126,6 @@ create table if not exists tlh_dig_first_xml_reviews (
   foreign key (main_identifier, reviewer_username) references tlh_dig_first_xml_review_appointments (main_identifier, username) on update cascade on delete cascade
 );
 
-create trigger if not exists tlh_dig_set_manuscript_first_xml_rev_status
-  after insert
-  on tlh_dig_first_xml_reviews
-  for each row update tlh_dig_manuscripts
-               set status = 'FirstXmlReviewPerformed'
-               where main_identifier = new.main_identifier;
-
-create trigger if not exists tlh_dig_reset_manuscript_first_xml_rev_status
-  after delete
-  on tlh_dig_first_xml_reviews
-  for each row update tlh_dig_manuscripts
-               set status = 'XmlConversionPerformed'
-               where main_identifier = old.main_identifier;
-
 -- second xml review
 
 create table if not exists tlh_dig_second_xml_review_appointments (
@@ -212,20 +146,6 @@ create table if not exists tlh_dig_second_xml_reviews (
   foreign key (main_identifier, reviewer_username) references tlh_dig_second_xml_review_appointments (main_identifier, username) on update cascade on delete cascade
 );
 
-create trigger if not exists tlh_dig_set_manuscript_second_xml_rev_status
-  after insert
-  on tlh_dig_second_xml_reviews
-  for each row update tlh_dig_manuscripts
-               set status = 'SecondXmlReviewPerformed'
-               where main_identifier = new.main_identifier;
-
-create trigger if not exists tlh_dig_reset_manuscript_second_xml_rev_status
-  after delete
-  on tlh_dig_second_xml_reviews
-  for each row update tlh_dig_manuscripts
-               set status = 'FirstXmlReviewPerformed'
-               where main_identifier = old.main_identifier;
-
 -- final approval
 
 create table if not exists tlh_dig_approved_transliterations (
@@ -235,16 +155,33 @@ create table if not exists tlh_dig_approved_transliterations (
   approval_date     date         not null default now()
 );
 
-create trigger if not exists tlh_dig_set_manuscript_approved_status
-  after insert
-  on tlh_dig_approved_transliterations
-  for each row update tlh_dig_manuscripts
-               set status = 'Approved'
-               where main_identifier = new.main_identifier;
+-- try view instead of trigger?
 
-create trigger if not exists tlh_dig_set_manuscript_approved_status
-  after delete
-  on tlh_dig_approved_transliterations
-  for each row update tlh_dig_manuscripts
-               set status = 'SecondXmlReviewPerformed'
-               where main_identifier = old.main_identifier;
+create view tlh_dig_manuscript_status as
+  select manuscript.*,
+         if(rel_trans.release_date is null,
+            'Created',
+            if(translit_review.review_date is null,
+               'TransliterationReleased',
+               if(xml_convs.conversion_date is null,
+                  'TransliterationReviewPerformed',
+                  if(first_xml_revs.review_date is null,
+                     'XmlConversionPerformed',
+                     if(second_xml_revs.review_date is null,
+                        'FirstXmlReviewPerformed',
+                        if(appr_translits.approval_date is null,
+                           'SecondXmlReviewPerformed',
+                           'Approved'
+                          )
+                       )
+                    )
+                 )
+              )
+           ) as status
+  from tlh_dig_manuscripts as manuscript
+         left outer join tlh_dig_released_transliterations as rel_trans on rel_trans.main_identifier = manuscript.main_identifier
+         left outer join tlh_dig_transliteration_reviews as translit_review on translit_review.main_identifier = manuscript.main_identifier
+         left outer join tlh_dig_xml_conversions as xml_convs on xml_convs.main_identifier = manuscript.main_identifier
+         left outer join tlh_dig_first_xml_reviews as first_xml_revs on first_xml_revs.main_identifier = manuscript.main_identifier
+         left outer join tlh_dig_second_xml_reviews as second_xml_revs on second_xml_revs.main_identifier = manuscript.main_identifier
+         left outer join tlh_dig_approved_transliterations as appr_translits on appr_translits.main_identifier = manuscript.main_identifier;

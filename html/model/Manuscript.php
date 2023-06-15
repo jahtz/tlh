@@ -78,7 +78,7 @@ class Manuscript extends AbstractManuscript
     $first = $page * $pageSize;
 
     return executeMultiSelectQuery(
-      "select * from tlh_dig_manuscripts order by creation_date desc limit ?, ?;",
+      "select * from tlh_dig_manuscript_status order by creation_date desc limit ?, ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('ii', $first, $pageSize),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
     );
@@ -97,7 +97,7 @@ class Manuscript extends AbstractManuscript
   static function selectManuscriptById(string $mainIdentifier): ?Manuscript
   {
     return executeSingleSelectQuery(
-      "select * from tlh_dig_manuscripts where main_identifier = ?;",
+      "select * from tlh_dig_manuscript_status where main_identifier = ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
     );
@@ -115,11 +115,11 @@ class Manuscript extends AbstractManuscript
 
   // Transliterations
 
-  function upsertProvisionalTransliteration(string $transliteration): bool
+  function insertProvisionalTransliteration(string $transliteration): bool
   {
     return executeSingleChangeQuery(
       "insert into tlh_dig_provisional_transliterations (main_identifier, input) values (?, ?) on duplicate key update input = ?;",
-      fn(mysqli_stmt $stmt) => $stmt->bind_param('sss', $this->mainIdentifier->identifier, $transliteration, $transliteration)
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $this->mainIdentifier->identifier, $transliteration, $transliteration)
     );
   }
 
@@ -211,7 +211,7 @@ Manuscript::$graphQLMutationsType = new ObjectType([
           throw new MySafeGraphQLException("Transliteration is already released!");
         }
 
-        return $manuscript->upsertProvisionalTransliteration($args['input']);
+        return $manuscript->insertProvisionalTransliteration($args['input']);
       }
     ],
     'releaseTransliteration' => [

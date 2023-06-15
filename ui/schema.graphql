@@ -64,11 +64,6 @@ enum ManuscriptIdentifierType {
   PublicationShortReference
 }
 
-type ManuscriptLanguage {
-  abbreviation: String!
-  name: String!
-}
-
 enum ManuscriptLanguageAbbreviations {
   Akk
   Hat
@@ -146,7 +141,6 @@ type Query {
   executiveEditorQueries: ExecutiveEditor
   manuscript(mainIdentifier: String!): ManuscriptMetaData
   manuscriptCount: Int!
-  manuscriptLanguages: [ManuscriptLanguage!]! @deprecated(reason: "Will be removed!")
   myManuscripts: [String!]
   reviewerQueries: Reviewer
 }

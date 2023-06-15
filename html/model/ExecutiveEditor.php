@@ -11,9 +11,7 @@ require_once __DIR__ . '/DocumentInPipeline.php';
 use GraphQL\Type\Definition\{ObjectType, Type};
 use MySafeGraphQLException;
 use mysqli_stmt;
-use function sql_helpers\executeMultiSelectQuery;
-use function sql_helpers\executeSingleChangeQuery;
-use function sql_helpers\executeSingleSelectQuery;
+use function sql_helpers\{executeMultiSelectQuery, executeSingleChangeQuery, executeSingleSelectQuery};
 
 class ExecutiveEditor
 {

@@ -12,7 +12,7 @@ require_once __DIR__ . '/AbstractManuscript.php';
 use Exception;
 use GraphQL\Type\Definition\{InputObjectType, Type};
 use mysqli_stmt;
-use function sql_helpers\execute_query_with_connection;
+use function sql_helpers\executeQueryWithConnection;
 
 class ManuscriptInput extends AbstractManuscript
 {
@@ -64,7 +64,7 @@ class ManuscriptInput extends AbstractManuscript
 
     # insert main data
     try {
-      execute_query_with_connection(
+      executeQueryWithConnection(
         $db,
         "
 insert into tlh_dig_manuscripts (main_identifier, main_identifier_type, default_language, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, creator_username)

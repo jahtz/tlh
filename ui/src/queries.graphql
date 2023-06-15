@@ -5,19 +5,6 @@ fragment ManuscriptIdentifier on ManuscriptIdentifier {
   identifier
 }
 
-# /xmlEditor
-
-fragment ManuscriptLanguage on ManuscriptLanguage {
-  name
-  abbreviation
-}
-
-query AllManuscriptLanguages {
-  manuscriptLanguages {
-    ...ManuscriptLanguage
-  }
-}
-
 # /
 
 fragment ManuscriptBasicData on ManuscriptMetaData {
