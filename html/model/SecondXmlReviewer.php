@@ -22,10 +22,8 @@ abstract class SecondXmlReviewer
       "
 select appointment.main_identifier, first_review.input is null as blocked
 from tlh_dig_second_xml_review_appointments as appointment
-    left outer join tlh_dig_second_xml_reviews as second_review
-        on second_review.main_identifier = appointment.main_identifier
-    left outer join tlh_dig_first_xml_reviews as first_review
-        on first_review.main_identifier = appointment.main_identifier
+    left outer join tlh_dig_second_xml_reviews as second_review using(main_identifier)
+    left outer join tlh_dig_first_xml_reviews as first_review using(main_identifier)
 where username = ? and second_review.input is null;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $username),
       fn(array $row): Appointment => new Appointment($row['main_identifier'], AppointmentType::secondXmlReview, $row['blocked'] ? AppointmentType::firstXmlReview : null)
@@ -56,8 +54,7 @@ where username = ? and second_review.input is null;",
       "
 select first_xml_rev.input
 from tlh_dig_first_xml_reviews as first_xml_rev
-    join tlh_dig_second_xml_review_appointments as second_xml_rev_app
-        on second_xml_rev_app.main_identifier = first_xml_rev.main_identifier
+    join tlh_dig_second_xml_review_appointments as second_xml_rev_app using(main_identifier)
 where first_xml_rev.main_identifier = ? and username = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $mainIdentifier, $username),
       fn(array $row): string => $row['input']

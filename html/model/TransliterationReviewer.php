@@ -32,10 +32,8 @@ select appointment.main_identifier
       "
 select transliteration.input
 from tlh_dig_transliteration_review_appointments as appointment
-    join tlh_dig_released_transliterations as released
-        on appointment.main_identifier = released.main_identifier
-    join tlh_dig_provisional_transliterations as transliteration
-        on released.main_identifier = transliteration.main_identifier
+    join tlh_dig_released_transliterations as released using(main_identifier)
+    join tlh_dig_provisional_transliterations as transliteration using(main_identifier)
 where appointment.main_identifier = ? and username = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $mainIdentifier, $username),
       fn(array $row): string => $row['input']

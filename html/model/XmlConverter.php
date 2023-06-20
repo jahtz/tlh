@@ -19,10 +19,8 @@ abstract class XmlConverter
       "
 select appointment.main_identifier, review.input is null as blocked
 from tlh_dig_xml_conversion_appointments as appointment
-  left outer join tlh_dig_xml_conversions as conversion
-      on conversion.main_identifier = appointment.main_identifier
-  left outer join tlh_dig_transliteration_reviews as review
-      on appointment.main_identifier = review.main_identifier
+  left outer join tlh_dig_xml_conversions as conversion using(main_identifier)
+  left outer join tlh_dig_transliteration_reviews as review using(main_identifier)
 where username = ? and conversion.input is null;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $username),
       fn(array $row): Appointment => new Appointment($row['main_identifier'], AppointmentType::xmlConversion, $row['blocked'] ? AppointmentType::transliterationReview : null)
@@ -71,8 +69,7 @@ where username = ? and conversion.input is null;",
       "
 select review.input
 from tlh_dig_transliteration_reviews as review
-    join tlh_dig_xml_conversion_appointments as appointment
-        on review.main_identifier = appointment.main_identifier
+    join tlh_dig_xml_conversion_appointments as appointment using(main_identifier)
 where review.main_identifier = ? and username = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $mainIdentifier, $username),
       fn(array $row): string => $row['input']

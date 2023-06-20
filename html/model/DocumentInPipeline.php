@@ -73,32 +73,23 @@ select translits.main_identifier,
        approved_trans.approval_date as approval_date
 from tlh_dig_released_transliterations as translits
     -- join for appointed transliteration reviewer
-    left outer join tlh_dig_transliteration_review_appointments as trans_rev_app
-        on trans_rev_app.main_identifier = translits.main_identifier
+    left outer join tlh_dig_transliteration_review_appointments as trans_rev_app using(main_identifier)
     -- join for transliteration review date
-    left outer join tlh_dig_transliteration_reviews as translit_rev
-        on translit_rev.main_identifier = translits.main_identifier
+    left outer join tlh_dig_transliteration_reviews as translit_rev using(main_identifier)
     -- join for appointed xml converter
-    left outer join tlh_dig_xml_conversion_appointments as xml_conv_app
-        on xml_conv_app.main_identifier = translits.main_identifier
+    left outer join tlh_dig_xml_conversion_appointments as xml_conv_app using(main_identifier)
     -- join for xml conversion date
-    left outer join tlh_dig_xml_conversions as xml_conv
-        on xml_conv.main_identifier = translits.main_identifier
+    left outer join tlh_dig_xml_conversions as xml_conv using(main_identifier)
     -- join for appointed first xml reviewer
-    left outer join tlh_dig_first_xml_review_appointments as first_xml_rev_app
-        on first_xml_rev_app.main_identifier = translits.main_identifier
+    left outer join tlh_dig_first_xml_review_appointments as first_xml_rev_app using(main_identifier)
     -- join for first xml review date
-    left outer join tlh_dig_first_xml_reviews as first_xml_rev
-        on first_xml_rev.main_identifier = translits.main_identifier
+    left outer join tlh_dig_first_xml_reviews as first_xml_rev using(main_identifier)
     -- join for second appointed xml reviewer
-    left outer join tlh_dig_second_xml_review_appointments as second_xml_rev_app
-        on second_xml_rev_app.main_identifier = translits.main_identifier
+    left outer join tlh_dig_second_xml_review_appointments as second_xml_rev_app using(main_identifier)
     -- join for second xml review date
-    left outer join tlh_dig_second_xml_reviews as second_xml_rev
-        on second_xml_rev.main_identifier = translits.main_identifier
+    left outer join tlh_dig_second_xml_reviews as second_xml_rev using(main_identifier)
     -- join for approval
-    left outer join tlh_dig_approved_transliterations as approved_trans
-        on approved_trans.main_identifier = translits.main_identifier
+    left outer join tlh_dig_approved_transliterations as approved_trans using(main_identifier)
 limit ?, ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ii', $firstIndex, $pageSize),
       fn(array $row): DocumentInPipeline => new DocumentInPipeline(

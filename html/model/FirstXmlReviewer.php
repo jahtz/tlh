@@ -4,11 +4,7 @@ namespace model;
 
 use mysqli;
 use mysqli_stmt;
-use function sql_helpers\{executeMultiSelectQuery,
-  executeQueriesInTransactions,
-  executeSingleChangeQuery,
-  executeSingleChangeQueryWithConnection,
-  executeSingleSelectQuery};
+use function sql_helpers\{executeMultiSelectQuery, executeQueriesInTransactions, executeSingleChangeQueryWithConnection, executeSingleSelectQuery};
 
 require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/Appointment.php';
@@ -23,10 +19,8 @@ abstract class FirstXmlReviewer
       "
 select appointment.main_identifier, conversion.input is null as blocked
 from tlh_dig_first_xml_review_appointments as appointment
-    left outer join tlh_dig_first_xml_reviews as review
-        on review.main_identifier = appointment.main_identifier
-    left outer join tlh_dig_xml_conversions as conversion
-        on conversion.main_identifier = appointment.main_identifier
+    left outer join tlh_dig_first_xml_reviews as review using(main_identifier)
+    left outer join tlh_dig_xml_conversions as conversion using(main_identifier)
 where username = ? and review.input is null;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $username),
       fn(array $row): Appointment => new Appointment($row['main_identifier'], AppointmentType::firstXmlReview, $row['blocked'] ? AppointmentType::xmlConversion : null)
@@ -74,8 +68,7 @@ where username = ? and review.input is null;",
       "
 select xml_conversion.input
 from tlh_dig_xml_conversions as xml_conversion
-    join tlh_dig_first_xml_review_appointments as first_xml_rev_app
-        on first_xml_rev_app.main_identifier = xml_conversion.main_identifier
+    join tlh_dig_first_xml_review_appointments as first_xml_rev_app using(main_identifier)
 where xml_conversion.main_identifier = ? and username = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $mainIdentifier, $username),
       fn(array $row): string => $row['input']

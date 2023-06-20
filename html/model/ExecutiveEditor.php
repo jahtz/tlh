@@ -82,8 +82,7 @@ on duplicate key update username = ?, appointed_by_username = ?, appointment_dat
       "
 select second_xml_revs.main_identifier
 from tlh_dig_second_xml_reviews as second_xml_revs
-    left outer join tlh_dig_approved_transliterations as approved_trans
-        on second_xml_revs.main_identifier = approved_trans.main_identifier
+    left outer join tlh_dig_approved_transliterations as approved_trans using(main_identifier)
 where approved_trans.input is null;",
       null,
       fn(array $row): string => $row['main_identifier']
@@ -96,8 +95,7 @@ where approved_trans.input is null;",
       "
 select second_xml_revs.input
 from tlh_dig_second_xml_reviews as second_xml_revs
-    left outer join tlh_dig_approved_transliterations as approved_trans
-        on second_xml_revs.main_identifier = approved_trans.main_identifier
+    left outer join tlh_dig_approved_transliterations as approved_trans using(main_identifier)
 where approved_trans.input is null and second_xml_revs.main_identifier = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
       fn(array $row): ?string => $row['input']
