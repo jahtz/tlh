@@ -8,15 +8,11 @@ require_once __DIR__ . '/User.php';
 require_once __DIR__ . '/Manuscript.php';
 require_once __DIR__ . '/DocumentInPipeline.php';
 
-use mysqli;
 use GraphQL\Type\Definition\{ObjectType, Type};
 use MySafeGraphQLException;
+use mysqli;
 use mysqli_stmt;
-use function sql_helpers\{executeMultiSelectQuery,
-  executeQueriesInTransactions,
-  executeSingleChangeQuery,
-  executeSingleChangeQueryWithConnection,
-  executeSingleSelectQuery};
+use sql_helpers\SqlHelpers;
 
 class ExecutiveEditor
 {
@@ -25,7 +21,7 @@ class ExecutiveEditor
 
   static function updateRights(string $username, string $newRights): bool
   {
-    return executeSingleChangeQuery(
+    return SqlHelpers::executeSingleChangeQuery(
       "update tlh_dig_users set rights = ? where username = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $newRights, $username)
     );
@@ -33,7 +29,7 @@ class ExecutiveEditor
 
   static function upsertReviewerAppointmentForReleasedTransliteration(string $mainIdentifier, string $reviewer, string $appointedBy): string
   {
-    return executeSingleChangeQuery(
+    return SqlHelpers::executeSingleChangeQuery(
       "
 insert into tlh_dig_transliteration_review_appointments (main_identifier, username, appointed_by_username)
 values (?, ?, ?)
@@ -44,7 +40,7 @@ on duplicate key update username = ?, appointed_by_username = ?, appointment_dat
 
   static function upsertXmlConversionAppointment(string $mainIdentifier, string $converter, string $appointedBy): string
   {
-    return executeSingleChangeQuery(
+    return SqlHelpers::executeSingleChangeQuery(
       "
 insert into tlh_dig_xml_conversion_appointments (main_identifier, username, appointed_by_username)
 values (?, ?, ?)
@@ -55,7 +51,7 @@ on duplicate key update username = ?, appointed_by_username = ?, appointment_dat
 
   static function upsertFirstXmlReviewAppointment(string $mainIdentifier, string $reviewer, string $appointedBy): string
   {
-    return executeSingleChangeQuery(
+    return SqlHelpers::executeSingleChangeQuery(
       "
 insert into tlh_dig_first_xml_review_appointments (main_identifier, username, appointed_by_username)
 values (?, ?, ?)
@@ -66,7 +62,7 @@ on duplicate key update username = ?, appointed_by_username = ?, appointment_dat
 
   static function upsertSecondXmlReviewAppointment(string $mainIdentifier, string $reviewer, string $appointedBy): string
   {
-    return executeSingleChangeQuery(
+    return SqlHelpers::executeSingleChangeQuery(
       "
 insert into tlh_dig_second_xml_review_appointments (main_identifier, username, appointed_by_username)
 values (?, ?, ?)
@@ -78,7 +74,7 @@ on duplicate key update username = ?, appointed_by_username = ?, appointment_dat
   /** @return string[] */
   static function selectDocumentsAwaitingApproval(): array
   {
-    return executeMultiSelectQuery(
+    return SqlHelpers::executeMultiSelectQuery(
       "
 select second_xml_revs.main_identifier
 from tlh_dig_second_xml_reviews as second_xml_revs
@@ -91,7 +87,7 @@ where approved_trans.input is null;",
 
   static function selectDocumentAwaitingApproval(string $mainIdentifier): ?string
   {
-    return executeSingleSelectQuery(
+    return SqlHelpers::executeSingleSelectQuery(
       "
 select second_xml_revs.input
 from tlh_dig_second_xml_reviews as second_xml_revs
@@ -104,7 +100,7 @@ where approved_trans.input is null and second_xml_revs.main_identifier = ?;",
 
   static function selectDocumentApproved(string $mainIdentifier): bool
   {
-    return executeSingleSelectQuery(
+    return SqlHelpers::executeSingleSelectQuery(
       "select count(*) as count from tlh_dig_approved_transliterations where main_identifier = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
       fn(array $row): bool => $row['count'] === 1
@@ -113,17 +109,18 @@ where approved_trans.input is null and second_xml_revs.main_identifier = ?;",
 
   static function insertApproval(string $mainIdentifier, string $xml, string $approvalUsername): bool
   {
-    return executeQueriesInTransactions(function (mysqli $conn) use($mainIdentifier,$xml,$approvalUsername):bool {
-      $approvalInserted =  executeSingleChangeQueryWithConnection(
-        $conn,
+    return SqlHelpers::executeQueriesInTransactions(function (mysqli $conn) use ($mainIdentifier, $xml, $approvalUsername): bool {
+      $approvalInserted = SqlHelpers::executeSingleChangeQuery(
+
         "insert into tlh_dig_approved_transliterations (main_identifier, input, approval_username) values (?, ?, ?);",
-        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $approvalUsername)
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $approvalUsername),
+        $conn
       );
 
-      return $approvalInserted && executeSingleChangeQueryWithConnection(
-        $conn,
+      return $approvalInserted && SqlHelpers::executeSingleChangeQuery(
           "update tlh_dig_manuscripts set status = 'Approved' where main_identifier = ?;",
-          fn(mysqli_stmt $stmt):bool => $stmt->bind_param('s', $mainIdentifier)
+          fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
+          $conn
         );
     });
   }

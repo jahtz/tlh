@@ -12,11 +12,7 @@ require_once __DIR__ . '/AbstractManuscript.php';
 use GraphQL\Type\Definition\{ObjectType, Type};
 use MySafeGraphQLException;
 use mysqli_stmt;
-use function sql_helpers\{executeMultiSelectQuery,
-  executeQueriesInTransactions,
-  executeSingleChangeQuery,
-  executeSingleChangeQueryWithConnection,
-  executeSingleSelectQuery};
+use sql_helpers\SqlHelpers;
 
 /** @return string[] */
 function getPictures(string $manuscriptMainIdentifier): array
@@ -68,7 +64,7 @@ class Manuscript extends AbstractManuscript
 
   static function selectManuscriptsCount(): int
   {
-    return executeSingleSelectQuery(
+    return SqlHelpers::executeSingleSelectQuery(
       "select count(*) as manuscript_count from tlh_dig_manuscripts;",
       null,
       fn(array $row): int => (int)$row['manuscript_count']
@@ -81,7 +77,7 @@ class Manuscript extends AbstractManuscript
     $pageSize = 10;
     $first = $page * $pageSize;
 
-    return executeMultiSelectQuery(
+    return SqlHelpers::executeMultiSelectQuery(
       "select * from tlh_dig_manuscripts order by creation_date desc limit ?, ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('ii', $first, $pageSize),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
@@ -91,7 +87,7 @@ class Manuscript extends AbstractManuscript
   /** @return string[] */
   static function selectManuscriptIdentifiersForUser(string $username): array
   {
-    return executeMultiSelectQuery(
+    return SqlHelpers::executeMultiSelectQuery(
       "select main_identifier from tlh_dig_manuscripts where creator_username = ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $username),
       fn(array $row): string => (string)$row['main_identifier'],
@@ -100,7 +96,7 @@ class Manuscript extends AbstractManuscript
 
   static function selectManuscriptById(string $mainIdentifier): ?Manuscript
   {
-    return executeSingleSelectQuery(
+    return SqlHelpers::executeSingleSelectQuery(
       "select * from tlh_dig_manuscripts where main_identifier = ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
@@ -110,7 +106,7 @@ class Manuscript extends AbstractManuscript
   /** @return ManuscriptIdentifier[] */
   function selectOtherIdentifiers(): array
   {
-    return executeMultiSelectQuery(
+    return SqlHelpers::executeMultiSelectQuery(
       "select identifier_type, identifier from tlh_dig_manuscript_other_identifiers where main_identifier = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
       fn(array $row): ManuscriptIdentifier => ManuscriptIdentifier::fromDbAssocArray($row),
@@ -121,7 +117,7 @@ class Manuscript extends AbstractManuscript
 
   function insertProvisionalTransliteration(string $transliteration): bool
   {
-    return executeSingleChangeQuery(
+    return SqlHelpers::executeSingleChangeQuery(
       "insert into tlh_dig_provisional_transliterations (main_identifier, input) values (?, ?) on duplicate key update input = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $this->mainIdentifier->identifier, $transliteration, $transliteration)
     );
@@ -129,7 +125,7 @@ class Manuscript extends AbstractManuscript
 
   function selectProvisionalTransliteration(): ?string
   {
-    return executeSingleSelectQuery(
+    return SqlHelpers::executeSingleSelectQuery(
       "select input from tlh_dig_provisional_transliterations where main_identifier = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
       fn(array $row): string => $row['input']
@@ -138,7 +134,7 @@ class Manuscript extends AbstractManuscript
 
   function selectReleasedTransliteration(): ?string
   {
-    return executeSingleSelectQuery(
+    return SqlHelpers::executeSingleSelectQuery(
       "select main_identifier from tlh_dig_released_transliterations where main_identifier = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
       fn(array $row): string => $row['main_identifier']
@@ -152,20 +148,26 @@ class Manuscript extends AbstractManuscript
 
   function insertReleasedTransliteration(): bool
   {
-    error_log('Releasing transliteration!');
-
-    return executeQueriesInTransactions(function ($conn): bool {
-      $transliterationInserted = executeSingleChangeQueryWithConnection(
-        $conn,
+    return SqlHelpers::executeQueriesInTransactions(function ($conn): bool {
+      $transliterationInserted = SqlHelpers::executeSingleChangeQuery(
         "insert into tlh_dig_released_transliterations (main_identifier) values (?);",
-        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier)
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
+        $conn
       );
 
-      return $transliterationInserted && executeSingleChangeQueryWithConnection(
-          $conn,
-          "update tlh_dig_manuscripts set status = 'TransliterationReleased' where main_identifier = ?;",
-          fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier)
-        );
+      $statusUpdated = SqlHelpers::executeSingleChangeQuery(
+        "update tlh_dig_manuscripts set status = 'TransliterationReleased' where main_identifier = ?;",
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
+        $conn
+      );
+
+      $releaseDate = SqlHelpers::executeSingleSelectQuery(
+        "",
+        fn(mysqli_stmt $stmt): bool => false,
+        $conn
+      );
+
+      return $transliterationInserted && $statusUpdated;
     });
   }
 }
@@ -234,11 +236,9 @@ Manuscript::$graphQLMutationsType = new ObjectType([
       'resolve' => function (Manuscript $manuscript, array $args, ?User $user): bool {
         if (is_null($user)) {
           throw new MySafeGraphQLException('User is not logged in!');
-        }
-        if ($manuscript->creatorUsername !== $user->username) {
+        } else if ($manuscript->creatorUsername !== $user->username) {
           throw new MySafeGraphQLException('Only the owner can release the transliteration!');
-        }
-        if ($manuscript->selectTransliterationIsReleased()) {
+        } else if ($manuscript->selectTransliterationIsReleased()) {
           return true;
         }
 
@@ -247,8 +247,6 @@ Manuscript::$graphQLMutationsType = new ObjectType([
         if (is_null($provisionalTransliteration)) {
           throw new MySafeGraphQLException('Can\'t release a non-existing transliteration!');
         }
-
-        // FIXME: send mail to executive editors!
 
         return $manuscript->insertReleasedTransliteration();
       }

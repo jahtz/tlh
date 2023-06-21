@@ -4,7 +4,7 @@ namespace model;
 
 use mysqli;
 use mysqli_stmt;
-use function sql_helpers\{executeMultiSelectQuery, executeQueriesInTransactions, executeSingleChangeQueryWithConnection, executeSingleSelectQuery};
+use sql_helpers\SqlHelpers;
 
 require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/Appointment.php';
@@ -15,7 +15,7 @@ abstract class FirstXmlReviewer
   /** @return Appointment[] */
   static function selectUnfinishedFirstXmlReviewAppointments(string $username): array
   {
-    return executeMultiSelectQuery(
+    return SqlHelpers::executeMultiSelectQuery(
       "
 select appointment.main_identifier, conversion.input is null as blocked
 from tlh_dig_first_xml_review_appointments as appointment
@@ -29,7 +29,7 @@ where username = ? and review.input is null;",
 
   static function selectFirstXmlReviewPerformed(string $mainIdentifier): bool
   {
-    return executeSingleSelectQuery(
+    return SqlHelpers::executeSingleSelectQuery(
       "select count(*) as count from tlh_dig_first_xml_reviews where main_identifier = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
       fn(array $row): bool => $row['count'] === 1
@@ -38,7 +38,7 @@ where username = ? and review.input is null;",
 
   static function selectUserIsAppointedForFirstXmlReview(string $mainIdentifier, string $username): bool
   {
-    return executeSingleSelectQuery(
+    return SqlHelpers::executeSingleSelectQuery(
       "select count(*) as count from tlh_dig_first_xml_review_appointments where main_identifier = ? and username = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $mainIdentifier, $username),
       fn(array $row): bool => $row['count'] === 1
@@ -47,24 +47,25 @@ where username = ? and review.input is null;",
 
   static function insertFirstXmlReview(string $mainIdentifier, string $reviewerUsername, string $xml): bool
   {
-    return executeQueriesInTransactions(function (mysqli $conn) use ($mainIdentifier, $reviewerUsername, $xml):bool {
-      $reviewInserted =  executeSingleChangeQueryWithConnection(
-        $conn,
+    return SqlHelpers::executeQueriesInTransactions(function (mysqli $conn) use ($mainIdentifier, $reviewerUsername, $xml): bool {
+      $reviewInserted = SqlHelpers::executeSingleChangeQuery(
+
         "insert into tlh_dig_first_xml_reviews (main_identifier, input, reviewer_username) values (?, ?, ?);",
-        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $reviewerUsername)
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $reviewerUsername),
+        $conn
       );
 
-      return $reviewInserted && executeSingleChangeQueryWithConnection(
-        $conn,
+      return $reviewInserted && SqlHelpers::executeSingleChangeQuery(
           "update tlh_dig_manuscripts set status = 'FirstXmlReviewPerformed' where main_identifier = ?;",
-          fn(mysqli_stmt $stmt):bool => $stmt->bind_param('s', $mainIdentifier)
+          fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
+          $conn
         );
     });
   }
 
   static function selectXmlForFirstXmlReviewAppointment(string $mainIdentifier, string $username): ?string
   {
-    return executeSingleSelectQuery(
+    return SqlHelpers::executeSingleSelectQuery(
       "
 select xml_conversion.input
 from tlh_dig_xml_conversions as xml_conversion

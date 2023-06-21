@@ -6,7 +6,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use GraphQL\Type\Definition\{ObjectType, Type};
 use mysqli_stmt;
-use function sql_helpers\executeMultiSelectQuery;
+use sql_helpers\SqlHelpers;
 
 class DocumentInPipeline
 {
@@ -59,7 +59,7 @@ class DocumentInPipeline
     $pageSize = 10;
     $firstIndex = $page * $pageSize;
 
-    return executeMultiSelectQuery(
+    return SqlHelpers::executeMultiSelectQuery(
       "
 select translits.main_identifier,
        trans_rev_app.username as app_translit_reviewer,

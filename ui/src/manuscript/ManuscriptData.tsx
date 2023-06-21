@@ -1,5 +1,5 @@
 import {useTranslation} from 'react-i18next';
-import {JSX} from 'react';
+import {JSX, useState} from 'react';
 import {Link, Navigate, useLoaderData} from 'react-router-dom';
 import {ManuscriptMetaDataFragment, useReleaseTransliterationMutation} from '../graphql';
 import {useSelector} from 'react-redux';
@@ -12,13 +12,17 @@ import {convertLine} from './LineParseResult';
 import {TransliterationParseResultDisplay} from './ColumnParseResultComponent';
 import {getNameForManuscriptLanguageAbbreviation} from '../forms/manuscriptLanguageAbbreviations';
 
+const buttonClasses = (color: string): string => `p-2 block rounded bg-${color}-500 text-white text-center w-full`;
+
 export function ManuscriptData(): JSX.Element {
+
+  const manuscript = useLoaderData() as ManuscriptMetaDataFragment | undefined;
 
   const {t} = useTranslation('common');
   const activeUser: User | null = useSelector(activeUserSelector);
   const [releaseTransliteration] = useReleaseTransliterationMutation();
 
-  const manuscript = useLoaderData() as ManuscriptMetaDataFragment | undefined;
+  const [isReleased, setIsReleased] = useState(manuscript?.transliterationReleased);
 
   if (!manuscript) {
     return <Navigate to={homeUrl}/>;
@@ -33,8 +37,16 @@ export function ManuscriptData(): JSX.Element {
   const mainIdentifier = manuscript.mainIdentifier.identifier;
 
   const onReleaseTransliteration = (): void => {
+    if (isReleased) {
+      return;
+    }
+
     releaseTransliteration({variables: {mainIdentifier}})
-      .then(() => window.location.reload())
+      .then(({data}) => {
+        if (data?.me?.manuscript?.releaseTransliteration) {
+          setIsReleased(true);
+        }
+      })
       .catch((error) => console.error(error));
   };
 
@@ -54,17 +66,13 @@ export function ManuscriptData(): JSX.Element {
               <td className="px-4 py-2">
                 {manuscript.otherIdentifiers.length === 0
                   ? <span className="italic">{t('noOtherIdentifiersFound')}.</span>
-                  : (
-                    <div className="content">
-                      <ul>
-                        {manuscript.otherIdentifiers.map(({identifier, identifierType}) => <li key={identifier}>{identifier} ({identifierType})</li>)}
-                      </ul>
-                    </div>
-                  )}
+                  : <ul className="content">
+                    {manuscript.otherIdentifiers.map(({identifier, identifierType}) => <li key={identifier}>{identifier} ({identifierType})</li>)}
+                  </ul>}
               </td>
             </tr>
             <tr>
-              <th className="text-right px-4 px-2">{t('defaultLanguage')}</th>
+              <th className="text-right px-4 py-2">{t('defaultLanguage')}</th>
               <td className="px-4 py-2">{getNameForManuscriptLanguageAbbreviation(manuscript.defaultLanguage, t)}</td>
             </tr>
             <tr>
@@ -94,17 +102,11 @@ export function ManuscriptData(): JSX.Element {
         <h2 className="font-bold text-xl">{t('picture_plural')}</h2>
 
         {manuscript.pictureUrls.length === 0
-          ? (
-            <div className="notification is-info has-text-centered">
-              {t('noPicturesUploadedYet')}.
-            </div>
-          )
+          ? <div className="my-4 italic text-cyan-500 text-center">{t('noPicturesUploadedYet')}.</div>
           : <PicturesBlock mainIdentifier={manuscript.mainIdentifier.identifier} pictures={manuscript.pictureUrls}/>
         }
 
-        {createdByUser && <Link className="mt-2 p-2 block rounded bg-blue-500 text-white text-center w-full" to={`../${uploadPicturesUrl}`}>
-          {t('uploadPicture_plural')}
-        </Link>}
+        {createdByUser && <Link className={buttonClasses('blue')} to={`../${uploadPicturesUrl}`}>{t('uploadPicture_plural')}</Link>}
       </div>
 
       <div className="my-3">
@@ -119,21 +121,16 @@ export function ManuscriptData(): JSX.Element {
           : <div className="notification is-info has-text-centered">{t('noTransliterationCreatedYet')}.</div>}
 
         {createdByUser && !manuscript.transliterationReleased &&
-          <>
+          <div className="space-x-2">
             {parsedTransliteration !== undefined
               ? (
                 <div className="my-2 grid grid-cols-2 gap-2">
-                  <Link className="p-2 block rounded bg-blue-500 text-white text-center w-full" to={`../${createTransliterationUrl}`}>
-                    {t('updateTransliteration')}
-                  </Link>
-                  <button type="button" className="p-2 rounded bg-green-500 text-white text-center w-full" onClick={onReleaseTransliteration}>
-                    {t('releaseTransliteration')}
-                  </button>
+                  <Link className={buttonClasses('blue')} to={`../${createTransliterationUrl}`}>{t('updateTransliteration')}</Link>
+                  <button type="button" className={buttonClasses('green')} onClick={onReleaseTransliteration}>{t('releaseTransliteration')}</button>
                 </div>
               )
-              : <Link className="mt-2 p-2 block rounded bg-blue-500 text-white text-center w-full"
-                      to={`../${createTransliterationUrl}`}>{t('createTransliteration')}</Link>}
-          </>}
+              : <Link className={buttonClasses('blue')} to={`../${createTransliterationUrl}`}>{t('createTransliteration')}</Link>}
+          </div>}
       </div>
     </div>
   );

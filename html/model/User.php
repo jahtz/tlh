@@ -10,7 +10,7 @@ require_once __DIR__ . '/Rights.php';
 use GraphQL\Type\Definition\{InputObjectType, ObjectType, Type};
 use MySafeGraphQLException;
 use mysqli_stmt;
-use function sql_helpers\{executeMultiSelectQuery, executeSingleChangeQuery, executeSingleSelectQuery};
+use sql_helpers\SqlHelpers;
 
 class User
 {
@@ -61,7 +61,7 @@ class User
 
   static function selectCount(): int
   {
-    return executeSingleSelectQuery(
+    return SqlHelpers::executeSingleSelectQuery(
       "select count(*) as user_count from tlh_dig_users;",
       null,
       fn(array $row): int => (int)$row['user_count']
@@ -70,7 +70,7 @@ class User
 
   static function selectUserFromDatabase(string $username): ?User
   {
-    return executeSingleSelectQuery(
+    return SqlHelpers::executeSingleSelectQuery(
       "select username, pw_hash, name, affiliation, email, rights from tlh_dig_users where username = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $username),
       fn(array $row): User => new User($row['username'], $row['pw_hash'], $row['name'], $row['affiliation'], $row['email'], $row['rights'])
@@ -83,7 +83,7 @@ class User
     $pageSize = 10;
     $first = $page * $pageSize;
 
-    return executeMultiSelectQuery(
+    return SqlHelpers::executeMultiSelectQuery(
       "select username, pw_hash, name, affiliation, email, rights from tlh_dig_users order by username limit ?, ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ii', $first, $pageSize),
       fn(array $row): User => new User($row['username'], $row['pw_hash'], $row['name'], $row['affiliation'], $row['email'], $row['rights'])
@@ -93,7 +93,7 @@ class User
   /** @return string[] */
   static function selectAllReviewers(): array
   {
-    return executeMultiSelectQuery(
+    return SqlHelpers::executeMultiSelectQuery(
       "select username from tlh_dig_users where rights <> 'Author';",
       null,
       fn(array $row): string => $row['username']
@@ -102,7 +102,7 @@ class User
 
   function insert(): bool
   {
-    return executeSingleChangeQuery(
+    return SqlHelpers::executeSingleChangeQuery(
       "insert into tlh_dig_users (username, pw_hash, name, affiliation, email) values (?, ?, ?, ?, ?);",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $this->username, $this->pwHash, $this->name, $this->affiliation, $this->email)
     );

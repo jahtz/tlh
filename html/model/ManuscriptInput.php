@@ -9,10 +9,10 @@ require_once __DIR__ . '/ManuscriptLanguage.php';
 require_once __DIR__ . '/AbstractManuscript.php';
 
 
-use Exception;
 use GraphQL\Type\Definition\{InputObjectType, Type};
+use mysqli;
 use mysqli_stmt;
-use function sql_helpers\executeQueryWithConnection;
+use sql_helpers\SqlHelpers;
 
 class ManuscriptInput extends AbstractManuscript
 {
@@ -58,14 +58,9 @@ class ManuscriptInput extends AbstractManuscript
 
   function insert(): bool
   {
-    $db = connect_to_db();
-
-    $db->begin_transaction();
-
-    # insert main data
-    try {
-      executeQueryWithConnection(
-        $db,
+    return SqlHelpers::executeQueriesInTransactions(function (mysqli $conn) {
+      # insert main data
+      $mainDataInserted = SqlHelpers::executeSingleChangeQuery(
         "
 insert into tlh_dig_manuscripts (main_identifier, main_identifier_type, default_language, palaeo_classification, palaeo_classification_sure, provenance, cth_classification, bibliography, creator_username)
 values (?, ?, ?, ?, ?, ?, ?, ?, ?);",
@@ -74,50 +69,22 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?);",
           $this->mainIdentifier->identifier, $this->mainIdentifier->identifierType, $this->defaultLanguage, $this->palaeographicClassification, $this->palaeographicClassificationSure,
           $this->provenance, $this->cthClassification, $this->bibliography, $this->creatorUsername
         ),
-        fn(mysqli_stmt $_stmt) => null
+        $conn,
       );
-    } catch (Exception $e) {
-      $db->rollback();
-      $db->close();
-      return false;
-    }
 
-    # insert other identifiers
-
-    $mainIdentifier = $this->mainIdentifier->identifier;
-
-    $otherIdentifierInsertStatement = $db->prepare("
-insert into tlh_dig_manuscript_other_identifiers (main_identifier, identifier, identifier_type)
-values (?, ?, ?)");
-
-    if (!$otherIdentifierInsertStatement) {
-      error_log('Could not prepare insert statements: ' . $db->error);
-      return false;
-    }
-
-    $allOtherIdentifiersInserted = true;
-
-    foreach ($this->otherIdentifiers as $identifier) {
-      $otherIdentifierInsertStatement->bind_param('sss', $mainIdentifier, $identifier->identifier, $identifier->identifierType);
-
-      if (!$otherIdentifierInsertStatement->execute()) {
-        error_log("Could not insert other identifier " . json_encode($identifier) . " into database: " . $otherIdentifierInsertStatement->error);
-
-        $allOtherIdentifiersInserted = false;
-        break;
+      if (!$mainDataInserted) {
+        return false;
       }
-    }
 
-    $otherIdentifierInsertStatement->close();
-
-    if (!$allOtherIdentifiersInserted) {
-      $db->rollback();
-    } else {
-      $db->commit();
-    }
-
-    $db->close();
-    return $allOtherIdentifiersInserted;
+      return SqlHelpers::executeMultiInsertQuery(
+        "
+insert into tlh_dig_manuscript_other_identifiers (main_identifier, identifier, identifier_type)
+values (?, ?, ?)",
+        $this->otherIdentifiers,
+        fn(mysqli_stmt $stmt, ManuscriptIdentifier $identifier): bool => $stmt->bind_param('sss', $this->mainIdentifier->identifier, $identifier->identifier, $identifier->identifierType),
+        $conn
+      );
+    });
   }
 }
 

@@ -7,7 +7,7 @@ require_once __DIR__ . '/Appointment.php';
 
 use mysqli;
 use mysqli_stmt;
-use function sql_helpers\{executeMultiSelectQuery, executeQueriesInTransactions, executeSingleChangeQueryWithConnection, executeSingleSelectQuery};
+use sql_helpers\SqlHelpers;
 
 abstract class TransliterationReviewer
 {
@@ -15,7 +15,7 @@ abstract class TransliterationReviewer
   /** @return Appointment[] */
   static function selectUnfinishedTransliterationReviewAppointments(string $username): array
   {
-    return executeMultiSelectQuery(
+    return SqlHelpers::executeMultiSelectQuery(
       "
 select appointment.main_identifier
     from tlh_dig_transliteration_review_appointments as appointment
@@ -28,7 +28,7 @@ select appointment.main_identifier
 
   static function selectTransliterationReviewAppointment(string $mainIdentifier, string $username): ?string
   {
-    return executeSingleSelectQuery(
+    return SqlHelpers::executeSingleSelectQuery(
       "
 select transliteration.input
 from tlh_dig_transliteration_review_appointments as appointment
@@ -42,7 +42,7 @@ where appointment.main_identifier = ? and username = ?;",
 
   static function selectTransliterationReviewPerformed(string $mainIdentifier): bool
   {
-    return executeSingleSelectQuery(
+    return SqlHelpers::executeSingleSelectQuery(
       "select count(*) as count from tlh_dig_transliteration_reviews where main_identifier = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
       fn(array $row): bool => $row['count'] == 1
@@ -51,17 +51,17 @@ where appointment.main_identifier = ? and username = ?;",
 
   static function insertTransliterationReview(string $mainIdentifier, string $reviewerUsername, string $input): bool
   {
-    return executeQueriesInTransactions(function (mysqli $conn) use ($mainIdentifier, $reviewerUsername, $input): bool {
-      $reviewInserted = executeSingleChangeQueryWithConnection(
-        $conn,
+    return SqlHelpers::executeQueriesInTransactions(function (mysqli $conn) use ($mainIdentifier, $reviewerUsername, $input): bool {
+      $reviewInserted = SqlHelpers::executeSingleChangeQuery(
         "insert into tlh_dig_transliteration_reviews (main_identifier, reviewer_username, input) values (?, ?, ?);",
         fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $reviewerUsername, $input),
+        $conn
       );
 
-      return $reviewInserted && executeSingleChangeQueryWithConnection(
-          $conn,
+      return $reviewInserted && SqlHelpers::executeSingleChangeQuery(
           "update tlh_dig_manuscripts set status = 'TransliterationReviewPerformed' where main_identifier = ?;",
-          fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier)
+          fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
+          $conn
         );
     });
   }
