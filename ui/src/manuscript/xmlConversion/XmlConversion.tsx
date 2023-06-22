@@ -1,5 +1,5 @@
 import {JSX, useState} from 'react';
-import {Navigate, useParams} from 'react-router-dom';
+import {Link, Navigate, useParams} from 'react-router-dom';
 import {homeUrl} from '../../urls';
 import {useSubmitXmlConversionMutation, useXmlConversionQuery} from '../../graphql';
 import {WithQuery} from '../../WithQuery';
@@ -23,25 +23,30 @@ function Inner({mainIdentifier, initialInput}: IProps): JSX.Element {
       .then(() => void 0)
       .catch((error) => console.error(error));
 
-  return (
-    <div className="container mx-auto">
-      <h2 className="font-bold text-xl text-center">{t('xmlConversion')}</h2>
+  if (data?.reviewerMutations?.submitXmlConversion) {
+    return (
+      <>
+        <div className="my-4 p-2 rounded bg-green-500 text-white text-center">{t('xmlConversionPerformed')}</div>
 
-      {data?.reviewerMutations?.submitXmlConversion
-        ? <pre>{xmlContent}</pre> // TODO: xml conversion performed
-        : (
-          xmlContent === undefined
-            ? <TransliterationCheck initialTransliteration={initialInput} onConvert={setXmlContent}/>
-            : <XmlCheck initialXml={xmlContent} loading={loading} onSubmit={onSubmit}/>
-        )}
+        <Link to={homeUrl} className="p-2 block rounded bg-blue-500 text-white text-center">{t('backToHome')}</Link>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {xmlContent === undefined
+        ? <TransliterationCheck initialTransliteration={initialInput} onConvert={setXmlContent}/>
+        : <XmlCheck initialXml={xmlContent} loading={loading} onSubmit={onSubmit}/>}
 
       {error && <div className="my-2 p-2 rounded bg-red-500 text-white text-center w-full">{error.message}</div>}
-    </div>
+    </>
   );
 }
 
 export function XmlConversion(): JSX.Element {
 
+  const {t} = useTranslation('common');
   const mainIdentifier = useParams<'mainIdentifier'>().mainIdentifier;
 
   if (mainIdentifier === undefined) {
@@ -51,11 +56,15 @@ export function XmlConversion(): JSX.Element {
   const xmlConversionQuery = useXmlConversionQuery({variables: {mainIdentifier}});
 
   return (
-    <WithQuery query={xmlConversionQuery}>
-      {(data) =>
-        data.reviewerQueries?.xmlConversion
-          ? <Inner mainIdentifier={mainIdentifier} initialInput={data.reviewerQueries.xmlConversion}/>
-          : <Navigate to={homeUrl}/>}
-    </WithQuery>
+    <div className="container mx-auto">
+      <h2 className="font-bold text-xl text-center">{t('xmlConversion')}</h2>
+
+      <WithQuery query={xmlConversionQuery}>
+        {(data) =>
+          data.reviewerQueries?.xmlConversion
+            ? <Inner mainIdentifier={mainIdentifier} initialInput={data.reviewerQueries.xmlConversion}/>
+            : <Navigate to={homeUrl}/>}
+      </WithQuery>
+    </div>
   );
 }

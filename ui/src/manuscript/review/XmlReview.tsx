@@ -1,6 +1,6 @@
 import {JSX} from 'react';
 import {useSubmitXmlReviewMutation, useXmlReviewQuery, XmlReviewType} from '../../graphql';
-import {Navigate, useParams} from 'react-router-dom';
+import {Link, Navigate, useParams} from 'react-router-dom';
 import {homeUrl} from '../../urls';
 import {WithQuery} from '../../WithQuery';
 import {MyLeft, parseNewXml, XmlElementNode} from 'simple_xml';
@@ -31,10 +31,22 @@ function Inner({mainIdentifier, initialXml, reviewType}: IProps): JSX.Element {
       .then(() => void 0)
       .catch((error) => console.error(error));
 
-  return data?.reviewerMutations?.submitXmlReview
-    ? <div>TODO!</div>
-    : <XmlDocumentEditor node={rootNodeParseResult.value as XmlElementNode} filename={mainIdentifier} onExport={onExport}
-                         exportName={t('submitReview') || 'submitReview'} exportDisabled={loading}/>;
+  if (data?.reviewerMutations?.submitXmlReview) {
+    return (
+      <div className="container mx-auto">
+        <div className="my-4 p-2 rounded bg-green-500 text-white text-center">
+          {reviewType === XmlReviewType.FirstXmlReview ? t('firstXmlReviewPerformed') : t('secondXmlReviewPerformed')}
+        </div>
+
+        <Link to={homeUrl} className="p-2 block rounded bg-blue-500 text-white text-center">{t('backToHome')}</Link>
+      </div>
+    );
+  }
+
+  return (
+    <XmlDocumentEditor node={rootNodeParseResult.value as XmlElementNode} filename={mainIdentifier} onExport={onExport}
+                       exportName={t('submitReview') || 'submitReview'} exportDisabled={loading}/>
+  );
 }
 
 export function XmlReview({reviewType}: { reviewType: XmlReviewType }): JSX.Element {

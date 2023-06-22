@@ -1,5 +1,5 @@
 import {JSX} from 'react';
-import {Navigate, useParams} from 'react-router-dom';
+import {Link, Navigate, useParams} from 'react-router-dom';
 import {homeUrl} from '../urls';
 import {useApprovalQuery, useSubmitApprovalMutation} from '../graphql';
 import {WithQuery} from '../WithQuery';
@@ -30,10 +30,20 @@ function Inner({mainIdentifier, initialXml}: IProps): JSX.Element {
       .then(() => void 0)
       .catch((error) => console.error(error));
 
-  return data?.executiveEditor?.submitApproval
-    ? <div>TODO!</div>
-    : <XmlDocumentEditor node={rootNodeParseResult.value as XmlElementNode} filename={mainIdentifier} onExport={onExport}
-                         exportName={t('submitApproval') || 'submitApproval'} exportDisabled={loading}/>;
+  if (data?.executiveEditor?.submitApproval) {
+    return (
+      <div className="container mx-auto">
+        <div className="my-4 p-2 rounded bg-green-500 text-white text-center">{t('documentApproved')}</div>
+
+        <Link to={homeUrl} className="p-2 block rounded bg-blue-500 text-white text-center">{t('backToHome')}</Link>
+      </div>
+    );
+  }
+
+  return (
+    <XmlDocumentEditor node={rootNodeParseResult.value as XmlElementNode} filename={mainIdentifier} onExport={onExport}
+                       exportName={t('submitApproval') || 'submitApproval'} exportDisabled={loading}/>
+  );
 }
 
 export function DocumentApproval(): JSX.Element {
