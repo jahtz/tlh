@@ -65,6 +65,7 @@ fragment ManuscriptMetaData on ManuscriptMetaData {
   palaeographicClassificationSure
   provenance
   creatorUsername
+  status
   pictureUrls
   provisionalTransliteration
   transliterationReleased

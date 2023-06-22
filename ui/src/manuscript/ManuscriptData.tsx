@@ -1,7 +1,7 @@
 import {useTranslation} from 'react-i18next';
 import {JSX, useState} from 'react';
 import {Link, Navigate, useLoaderData} from 'react-router-dom';
-import {ManuscriptMetaDataFragment, useReleaseTransliterationMutation} from '../graphql';
+import {ManuscriptMetaDataFragment, ManuscriptStatus, useReleaseTransliterationMutation} from '../graphql';
 import {useSelector} from 'react-redux';
 import {activeUserSelector, User} from '../newStore';
 import {getNameForPalaeoClassification} from '../model/manuscriptProperties/palaeoClassification';
@@ -11,18 +11,19 @@ import {TLHParser} from 'simtex';
 import {convertLine} from './LineParseResult';
 import {TransliterationParseResultDisplay} from './ColumnParseResultComponent';
 import {getNameForManuscriptLanguageAbbreviation} from '../forms/manuscriptLanguageAbbreviations';
+import update from 'immutability-helper';
 
 const buttonClasses = (color: string): string => `p-2 block rounded bg-${color}-500 text-white text-center w-full`;
 
 export function ManuscriptData(): JSX.Element {
 
-  const manuscript = useLoaderData() as ManuscriptMetaDataFragment | undefined;
+  const initialManuscript = useLoaderData() as ManuscriptMetaDataFragment | undefined;
 
   const {t} = useTranslation('common');
   const activeUser: User | null = useSelector(activeUserSelector);
   const [releaseTransliteration] = useReleaseTransliterationMutation();
 
-  const [isReleased, setIsReleased] = useState(manuscript?.transliterationReleased);
+  const [manuscript, setManuscript] = useState(initialManuscript);
 
   if (!manuscript) {
     return <Navigate to={homeUrl}/>;
@@ -37,14 +38,17 @@ export function ManuscriptData(): JSX.Element {
   const mainIdentifier = manuscript.mainIdentifier.identifier;
 
   const onReleaseTransliteration = (): void => {
-    if (isReleased) {
+    if (manuscript.transliterationReleased) {
       return;
     }
 
     releaseTransliteration({variables: {mainIdentifier}})
       .then(({data}) => {
         if (data?.me?.manuscript?.releaseTransliteration) {
-          setIsReleased(true);
+          setManuscript((manuscript) => update(manuscript, {
+            transliterationReleased: {$set: true},
+            status: {$set: ManuscriptStatus.TransliterationReleased}
+          }));
         }
       })
       .catch((error) => console.error(error));
@@ -93,6 +97,10 @@ export function ManuscriptData(): JSX.Element {
             <tr>
               <th className="text-right px-4 py-2">{t('bibliography')}</th>
               <td className="px-4 py-2">{manuscript.bibliography || '--'}</td>
+            </tr>
+            <tr>
+              <th className="text-right px-4 py-2">{t('status')}</th>
+              <td className="px-4 py-2">{manuscript.status}</td>
             </tr>
           </tbody>
         </table>
