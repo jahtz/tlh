@@ -28,6 +28,7 @@ const DateCheckMark = ({date, user}: { date: string; user: string; }): JSX.Eleme
 export function DocumentInPipelineTableRow({
   allReviewers,
   manuscriptIdentifier,
+  author,
   transliterationReviewDateString,
   appointedTransliterationReviewer,
   appointedXmlConverter,
@@ -42,6 +43,8 @@ export function DocumentInPipelineTableRow({
   const [executeAppointXmlConverter, {loading: executeAppointXmlConvertLoading/*, error*/}] = useAppointXmlConverterMutation();
   const [executeAppointFirstXmlReviewer, {loading: executeAppointFirstXmlReviewerLoading /*, error */}] = useAppointFirstXmlReviewerMutation();
   const [executeAppointSecondXmlReviewer, {loading: executeAppointSecondXmlReviewerLoading /*, error */}] = useAppointSecondXmlReviewerMutation();
+
+  const possibleReviewers = allReviewers.filter((reviewerUsername) => reviewerUsername !== author);
 
   const onChangeAppointedTransliterationReviewer = async (reviewer: string): Promise<string> => {
     const {data} = await executeAppointTransliterationReviewer({variables: {manuscriptIdentifier, reviewer}});
@@ -72,31 +75,33 @@ export function DocumentInPipelineTableRow({
     <tr className="border-t border-slate-600 text-center">
       <td className="p-2">{manuscriptIdentifier}</td>
 
+      <td className="p-2">{author}</td>
+
       <td className="p-2">
         {transliterationReviewDate !== undefined
           ? <DateCheckMark date={transliterationReviewDate} user={appointedTransliterationReviewer || 'ERROR!'}/>
-          : <UserSelect currentSelected={appointedTransliterationReviewer || undefined} allUsers={allReviewers}
+          : <UserSelect currentSelected={appointedTransliterationReviewer || undefined} allUsers={possibleReviewers}
                         loading={executeAppointTransliterationReviewerLoading} onNewUser={onChangeAppointedTransliterationReviewer}/>}
       </td>
 
       <td className="p-2">
         {xmlConversionDate !== undefined
           ? <DateCheckMark date={xmlConversionDate} user={appointedXmlConverter || 'ERROR!'}/>
-          : <UserSelect currentSelected={appointedXmlConverter || undefined} allUsers={allReviewers} loading={executeAppointXmlConvertLoading}
+          : <UserSelect currentSelected={appointedXmlConverter || undefined} allUsers={possibleReviewers} loading={executeAppointXmlConvertLoading}
                         onNewUser={onChangeAppointedXmlConverter}/>}
       </td>
 
       <td className="p-2">
         {firstXmlReviewDate !== undefined
           ? <DateCheckMark date={firstXmlReviewDate} user={appointedFirstXmlReviewer || 'ERROR!'}/>
-          : <UserSelect currentSelected={appointedFirstXmlReviewer || undefined} allUsers={allReviewers} loading={executeAppointFirstXmlReviewerLoading}
+          : <UserSelect currentSelected={appointedFirstXmlReviewer || undefined} allUsers={possibleReviewers} loading={executeAppointFirstXmlReviewerLoading}
                         onNewUser={onChangeAppointFirstXmlReviewer}/>}
       </td>
 
       <td className="p-2">
         {secondXmlReviewDate !== undefined
           ? <DateCheckMark date={secondXmlReviewDate} user={appointedSecondXmlReviewer || 'ERROR!'}/>
-          : <UserSelect currentSelected={appointedSecondXmlReviewer || undefined} allUsers={allReviewers} loading={executeAppointSecondXmlReviewerLoading}
+          : <UserSelect currentSelected={appointedSecondXmlReviewer || undefined} allUsers={possibleReviewers} loading={executeAppointSecondXmlReviewerLoading}
                         onNewUser={onChangeAppointSecondXmlReviewer}/>}
       </td>
     </tr>

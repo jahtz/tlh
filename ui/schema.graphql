@@ -17,6 +17,7 @@ type DocumentInPipeline {
   appointedTransliterationReviewer: String
   appointedXmlConverter: String
   approvalDateString: String
+  author: String!
   firstXmlReviewDateString: String
   manuscriptIdentifier: String!
   secondXmlReviewDateString: String

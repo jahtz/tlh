@@ -18,6 +18,7 @@ function Inner({page, queryPage, allReviewers, documentsInPipeline}: IProps): JS
 
   const columnNames = [
     t('manuscriptIdentifier'),
+    t('author'),
     t('appointedTransliterationReviewer'),
     t('appointedXmlConverter'),
     t('appointedFirstXmlReviewer'),

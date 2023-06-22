@@ -180,6 +180,7 @@ mutation SubmitApproval($mainIdentifier: String!, $input: String!) {
 
 fragment DocumentInPipeline on DocumentInPipeline {
   manuscriptIdentifier
+  author
   appointedTransliterationReviewer
   transliterationReviewDateString
   appointedXmlConverter

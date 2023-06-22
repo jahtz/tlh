@@ -13,6 +13,7 @@ class DocumentInPipeline
   static ObjectType $queryType;
 
   public string $manuscriptIdentifier;
+  public string $author;
   public ?string $appointedTransliterationReviewer;
   public ?string $transliterationReviewDateString;
   public ?string $appointedXmlConverter;
@@ -25,6 +26,7 @@ class DocumentInPipeline
 
   function __construct(
     string  $manuscriptIdentifier,
+    string $author,
     ?string $appointedTransliterationReviewer,
     ?string $transliterationReviewDate,
     ?string $appointedXmlConverter,
@@ -37,6 +39,7 @@ class DocumentInPipeline
   )
   {
     $this->manuscriptIdentifier = $manuscriptIdentifier;
+    $this->author = $author;
     $this->appointedTransliterationReviewer = $appointedTransliterationReviewer;
     $this->transliterationReviewDateString = $transliterationReviewDate;
     $this->appointedXmlConverter = $appointedXmlConverter;
@@ -62,6 +65,7 @@ class DocumentInPipeline
     return SqlHelpers::executeMultiSelectQuery(
       "
 select translits.main_identifier,
+       manuscript.creator_username as author,
        trans_rev_app.username as app_translit_reviewer,
        translit_rev.review_date as translit_review_date,
        xml_conv_app.username as app_xml_converter,
@@ -72,6 +76,7 @@ select translits.main_identifier,
        second_xml_rev.review_date as second_xml_rev_date,
        approved_trans.approval_date as approval_date
 from tlh_dig_released_transliterations as translits
+    join tlh_dig_manuscripts as manuscript using(main_identifier)
     -- join for appointed transliteration reviewer
     left outer join tlh_dig_transliteration_review_appointments as trans_rev_app using(main_identifier)
     -- join for transliteration review date
@@ -94,6 +99,7 @@ limit ?, ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ii', $firstIndex, $pageSize),
       fn(array $row): DocumentInPipeline => new DocumentInPipeline(
         $row['main_identifier'],
+        $row['author'],
         $row['app_translit_reviewer'],
         $row['translit_review_date'],
         $row['app_xml_converter'],
@@ -112,6 +118,7 @@ DocumentInPipeline::$queryType = new ObjectType([
   'name' => 'DocumentInPipeline',
   'fields' => [
     'manuscriptIdentifier' => Type::nonNull(Type::string()),
+    'author' => Type::nonNull(Type::string()),
     'appointedTransliterationReviewer' => Type::string(),
     'transliterationReviewDateString' => Type::string(),
     'appointedXmlConverter' => Type::string(),
