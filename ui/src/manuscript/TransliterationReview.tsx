@@ -5,6 +5,7 @@ import {homeUrl} from '../urls';
 import {TransliterationTextArea} from './TransliterationTextArea';
 import {useTranslation} from 'react-i18next';
 import {JSX, useState} from 'react';
+import { Link } from 'react-router-dom';
 
 interface IProps {
   mainIdentifier: string;
@@ -27,14 +28,23 @@ function Inner({mainIdentifier, initialInput}: IProps): JSX.Element {
       <h2 className="font-bold text-xl text-center">{t('reviewTransliteration')}</h2>
 
       {data?.reviewerMutations?.submitTransliterationReview
-        ? <div>TODO!</div> // TODO: review performed!
-        : <TransliterationTextArea input={input} onChange={setInput}/>}
+        ? (
+          <>
+            <div className="my-4 p-2 rounded bg-green-500 text-white text-center">{t('transliterationReviewPerformed')}</div>
+
+            <Link to={homeUrl} className="p-2 block rounded bg-blue-500 text-white text-center">{t('backToHome')}</Link>
+          </>
+        ) : (
+          <>
+            <TransliterationTextArea input={input} onChange={setInput}/>
+
+            <button type="button" onClick={onSubmit} disabled={loading} className="my-2 p-2 rounded bg-blue-500 text-white w-full disabled:opacity-50">
+              {t('submit')}
+            </button>
+          </>
+        )}
 
       {error && <div className="my-2 p-2 rounded bg-red-500 text-white text-center w-full">{error.message}</div>}
-
-      <button type="button" onClick={onSubmit} disabled={loading} className="my-2 p-2 rounded bg-blue-500 text-white w-full disabled:opacity-50">
-        {t('submit')}
-      </button>
     </div>
   );
 }
