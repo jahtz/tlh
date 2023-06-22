@@ -148,7 +148,7 @@ class Manuscript extends AbstractManuscript
 
   function insertReleasedTransliteration(): bool
   {
-    return SqlHelpers::executeQueriesInTransactions(function ($conn): bool {
+    $inserted = SqlHelpers::executeQueriesInTransactions(function ($conn): string {
       $transliterationInserted = SqlHelpers::executeSingleChangeQuery(
         "insert into tlh_dig_released_transliterations (main_identifier) values (?);",
         fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
@@ -161,14 +161,19 @@ class Manuscript extends AbstractManuscript
         $conn
       );
 
-      $releaseDate = SqlHelpers::executeSingleSelectQuery(
-        "",
-        fn(mysqli_stmt $stmt): bool => false,
-        $conn
-      );
 
       return $transliterationInserted && $statusUpdated;
     });
+
+    if (!$inserted) {
+      return false;
+    }
+
+    return SqlHelpers::executeSingleSelectQuery(
+      "select release_date from tlh_dig_released_transliterations where main_identifier = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
+      fn(array $row): string => $row['release_date']
+    );
   }
 }
 
@@ -232,7 +237,7 @@ Manuscript::$graphQLMutationsType = new ObjectType([
       }
     ],
     'releaseTransliteration' => [
-      'type' => Type::nonNull(Type::boolean()),
+      'type' => Type::nonNull(Type::string()),
       'resolve' => function (Manuscript $manuscript, array $args, ?User $user): bool {
         if (is_null($user)) {
           throw new MySafeGraphQLException('User is not logged in!');

@@ -6,7 +6,6 @@ import {SpacesEditor} from './SpacesEditor';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 import {JSX, ReactElement} from 'react';
 
-/** @deprecated */
 const foreignLanguageColors: { [key: string]: string } = {
   // FIXME: other colors!
   HURR: 'Hur',

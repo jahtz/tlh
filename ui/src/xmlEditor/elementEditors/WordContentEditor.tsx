@@ -42,7 +42,7 @@ function readTransliteration(transliteration: string, language: string): Result<
   const word: Word = Word.parseWord(convertLangauge(language), transliteration);
 
   // FIXME: use status!
-  const status = word.getStatus();
+  // const status = word.getStatus();
 
   return {status: true, value: word.exportXml()};
 }

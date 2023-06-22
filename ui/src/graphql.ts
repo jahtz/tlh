@@ -190,7 +190,7 @@ export type ManuscriptMetaDataInput = {
 
 export type ManuscriptMutations = {
   __typename?: 'ManuscriptMutations';
-  releaseTransliteration: Scalars['Boolean']['output'];
+  releaseTransliteration: Scalars['String']['output'];
   updateTransliteration: Scalars['Boolean']['output'];
 };
 
@@ -376,7 +376,7 @@ export type ReleaseTransliterationMutationVariables = Exact<{
 }>;
 
 
-export type ReleaseTransliterationMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', manuscript?: { __typename?: 'ManuscriptMutations', releaseTransliteration: boolean } | null } | null };
+export type ReleaseTransliterationMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', manuscript?: { __typename?: 'ManuscriptMutations', releaseTransliteration: string } | null } | null };
 
 export type ManuscriptIdentWithCreatorFragment = { __typename?: 'ManuscriptMetaData', pictureUrls: Array<string>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
