@@ -62,13 +62,10 @@ export const convertNodeFormat = (node: XmlNode): NewAoManuscriptsChildNode[] =>
         return [firstNew, ...otherNew.flatMap((n) => [aoDirectJoin, n])];
       });
 
-    // TODO: interleave indirect joins...
     const result = firstGroup;
-
     for (const otherGroup of otherGroups) {
       result.push(aoInDirectJoin, ...otherGroup);
     }
-
     return result;
   } else if (isXmlTextNode(node)) {
     return node.textContent.trim() === '(+)'
