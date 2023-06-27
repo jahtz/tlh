@@ -1,43 +1,30 @@
 import {XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from '../editorConfig';
 import {DeleteButton} from '../../genericElements/Buttons';
-import {isXmlElementNode, isXmlTextNode, XmlCommentNode, XmlElementNode, xmlElementNode, XmlNode, XmlTextNode, xmlTextNode} from 'simple_xml';
+import {XmlCommentNode, XmlElementNode, xmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
 import {Spec} from 'immutability-helper';
-import {JSX} from 'react';
-import {AoTextIdentifierField} from './AoTextIdentifierField';
+import {ReactElement} from 'react';
 import classNames from 'classnames';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 import {useTranslation} from 'react-i18next';
-import {convertNodeFormat, usesOldFormat} from './aoTextIdentifierConversion';
+import {aoDirectJoin, convertNodeFormat, usesOldFormat} from './aoTextIdentifierConversion';
+import {AoTextIdentifierField} from './AoTextIdentifierField';
+import {AoJoinEditor} from './AoJoinEditor';
+import {processElement} from '../xmlModelHelpers';
 
 export type SourceType = 'AO:TxtPubl' | 'AO:InvNr';
 export const sourceTypes: SourceType[] = ['AO:TxtPubl', 'AO:InvNr'];
 
 export type TextIdentifierNode = XmlElementNode<SourceType, 'nr' | 'joinGroup'>;
 
-type AoJoinTypes = 'AO:DirectJoin' | 'AO:InDirectJoin';
-const joinTypes: AoJoinTypes[] = ['AO:DirectJoin', 'AO:InDirectJoin'];
+export type AoJoinTypes = 'AO:DirectJoin' | 'AO:InDirectJoin';
 
 export type AoJoinNode = XmlElementNode<AoJoinTypes>;
 
 export type NewAoManuscriptsChildNode = TextIdentifierNode | AoJoinNode | XmlCommentNode;
 
-/** @deprecated */
-export interface AoSource {
-  type: SourceType;
-  name: string;
-}
-
-function readSource(node: XmlElementNode): AoSource {
-  if (node.tagName === 'AO:TxtPubl' || node.tagName === 'AO:InvNr') {
-    return {type: node.tagName, name: (node.children[0] as XmlTextNode).textContent};
-  } else {
-    throw new Error(`Could not read Source with tagName ${node.tagName}`);
-  }
-}
-
 const newEntry: XmlNode[] = [
-  xmlTextNode('+'),
-  xmlElementNode('AO:TxtPubl', {}, [xmlTextNode('')])
+  aoDirectJoin,
+  xmlElementNode('AO:TxtPubl', {nr: undefined}, [xmlTextNode('')])
 ];
 
 export const aoManuscriptsConfig: XmlSingleEditableNodeConfig = {
@@ -47,23 +34,30 @@ export const aoManuscriptsConfig: XmlSingleEditableNodeConfig = {
   edit: (props) => <AoManuscriptsEditor {...props}/>
 };
 
-function readContent(childNodes: XmlNode[]): (AoSource | string)[] {
-  return childNodes.map((n) => {
-    if (isXmlElementNode(n)) {
-      return readSource(n);
-    } else if (isXmlTextNode(n)) {
-      return n.textContent.trim();
-    } else {
-      return `<!-- ${n.comment} -->`;
-    }
-  });
+interface EditSingleChildProps {
+  child: XmlNode;
+  updatePlus: (newValue: string) => void;
+  updateText: (newValue: string) => void;
+  updateNode: (spec: Spec<XmlNode>) => void;
 }
 
-function AoManuscriptsEditor({node, updateEditedNode}: XmlEditableNodeIProps): JSX.Element {
+const EditSingleChild = ({child, updatePlus, updateText, updateNode}: EditSingleChildProps): ReactElement => processElement(child,
+  () => <></>,
+  ({textContent}) => (
+    <input className="flex-grow p-2 rounded-l border border-slate-500" type="text" defaultValue={textContent}
+           onChange={(event) => updatePlus(event.currentTarget.value)}/>
+  ),
+  (child) => child.tagName === 'AO:DirectJoin' || child.tagName === 'AO:InDirectJoin'
+    ? <AoJoinEditor node={child as AoJoinNode} updateType={(newType) => updateNode({tagName: {$set: newType}})}/> : (
+      <AoTextIdentifierField source={child} updateType={(value) => updateNode({tagName: {$set: value}})} updateText={(value) => updateText(value)}/>
+    )
+);
+
+function AoManuscriptsEditor({node, updateEditedNode}: XmlEditableNodeIProps): ReactElement {
 
   const {t} = useTranslation('common');
 
-  const content: (AoSource | string)[] = readContent(node.children);
+  const isInOldFormat = usesOldFormat(node.children);
 
   const updateChildNode = (index: number, spec: Spec<XmlNode>): void => updateEditedNode({children: {[index]: spec}});
 
@@ -75,27 +69,15 @@ function AoManuscriptsEditor({node, updateEditedNode}: XmlEditableNodeIProps): J
 
   // old format
 
-  const isInOldFormat = usesOldFormat(node.children);
-
-  const convertToNewFormat = (): void => {
-    const newChildren = node.children.flatMap<NewAoManuscriptsChildNode>(convertNodeFormat);
-
-    for (const newChild of newChildren) {
-      console.info(JSON.stringify(newChild));
-    }
-
-    // updateEditedNode({children: {$set: newChildren}});
-  };
+  const convertToNewFormat = (): void => updateEditedNode({children: {$set: node.children.flatMap<NewAoManuscriptsChildNode>(convertNodeFormat)}});
 
   return (
     <div>
-      {content.map((source, index) =>
+      {node.children.map((source, index) =>
         <div className="my-2 flex" key={index}>
-          {typeof source === 'string'
-            ? <input key={index} className="flex-grow p-2 rounded-l border border-slate-500" type="text" defaultValue={source}
-                     onChange={(event) => updatePlus(index, event.currentTarget.value)}/>
-            : <AoTextIdentifierField key={index} source={source} updateType={(value) => updateChildNode(index, {tagName: {$set: value}})}
-                                     updateText={(value) => updateText(index, value)}/>}
+          {/* FIXME: change key to reflect conversion to new format... */}
+          <EditSingleChild child={source} updatePlus={(newValue) => updatePlus(index, newValue)} updateText={(newValue) => updateText(index, newValue)}
+                           updateNode={(spec) => updateChildNode(index, spec)}/>
 
           <DeleteButton onClick={() => deleteEntry(index)} otherClasses={['px-4', 'py-2', 'rounded-r']}/>
         </div>

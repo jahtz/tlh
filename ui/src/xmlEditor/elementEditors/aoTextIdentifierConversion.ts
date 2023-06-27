@@ -8,14 +8,14 @@ export const aoInDirectJoin: AoJoinNode = xmlElementNode('AO:InDirectJoin');
 
 export const usesOldFormat = (childNodes: XmlNode[]): boolean => childNodes.some((node) => {
   if (isXmlElementNode(node)) {
-    // test if contains {€\d+}?
+    if (node.tagName === 'AO:DirectJoin' || node.tagName === 'AO:InDirectJoin') {
+      return false;
+    }
+
+    // test if text contains {€\d+}?
     const {textContent} = node.children[0] as XmlTextNode;
 
-    const maybeMatch = Array.from(textContent.matchAll(oldFragmentFormatRegExp));
-
-    if (maybeMatch !== null) {
-      return true;
-    }
+    return textContent.search(oldFragmentFormatRegExp) !== -1;
   } else {
     // should be <AO:DirectJoin/> or <AO:InDirectJoin/>
     return !!isXmlTextNode(node);

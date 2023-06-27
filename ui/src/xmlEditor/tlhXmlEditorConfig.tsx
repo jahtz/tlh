@@ -64,7 +64,14 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
   nodeConfigs: {
     docID: {replace: () => <span/>},
     merged: {replace: () => <span/>},
+
     'AO:Manuscripts': aoManuscriptsConfig,
+    'AO:TxtPubl': {
+      replace: (node, renderChildren/*, isSelected, isLeftSide*/) =>
+        <span>{renderChildren()} {node.attributes.nr && <span>&#123;{node.attributes.nr}&#125;</span>}</span>
+    },
+    'AO:DirectJoin': {replace: () => <span>&nbsp;+&nbsp;</span>},
+    'AO:InDirectJoin': {replace: () => <span>&nbsp;(+)&nbsp;</span>},
     'AO:ParagrNr': {replace: (node) => <div className="mt-4 font-bold italic">{node.attributes.c}</div>},
 
     lb: lineBreakNodeConfig as XmlEditorSingleNodeConfig,
