@@ -79,6 +79,7 @@ export const wordNodeConfig: XmlSingleInsertableEditableNodeConfig = {
   insertablePositions: {
     beforeElement: ['w'],
     afterElement: ['lb', 'w'],
-    asLastChildOf: ['div1', 'cl']
+    asFirstChildOf: ['devi'],
+    asLastChildOf: ['div1', 'cl', 'devi']
   }
 };

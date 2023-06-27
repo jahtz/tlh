@@ -13,7 +13,11 @@ export const deviConfig: XmlEditorSingleNodeConfig<'devi', deviAttrs> = {
     <>{renderChildren()}</>,
     <>)</>
   ),
-  edit: (props) => <DeviEditor {...props}/>
+  edit: (props) => <DeviEditor {...props}/>,
+  insertablePositions: {
+    beforeElement: ['w'],
+    afterElement: ['w']
+  }
 };
 
 function DeviEditor({node, updateAttribute, setKeyHandlingEnabled}: XmlEditableNodeIProps<'devi', deviAttrs>): JSX.Element {
