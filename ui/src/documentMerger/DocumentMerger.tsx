@@ -192,7 +192,9 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
     return (
       <ul className="grid-container-element-header publication">
         {
-          Array.from(publMap.values()).map((item, i) => <PublicationLine publicationString={item} key={i}></PublicationLine>)
+          Array.from(publMap.values()).sort((a, b) => {
+            return a[1].localeCompare(b[1], undefined, {numeric: true, sensitivity: 'base' }); }).map((item, i) =>
+            <PublicationLine publicationString={item} key={i}></PublicationLine>)
         }
       </ul>
     );
