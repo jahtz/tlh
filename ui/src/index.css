@@ -83,6 +83,10 @@ code {
   color: #006b6b;
 }
 
+.palawian, .Pal {
+  /* TODO! */
+}
+
 .determinativ {
   color: #663300;
   vertical-align: super;
@@ -118,6 +122,9 @@ code {
 .cl {
   background-color: lawngreen;
 }
+
+/* Document merger classes from here on... */
+
 .grid-container-element {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -125,6 +132,7 @@ code {
   border: 1px solid black;
   border-radius: 5px;
 }
+
 .grid-child-element {
   margin: 4px;
   border: 1px solid darkgrey;
@@ -158,22 +166,27 @@ code {
   border-radius: 5px;
   margin-bottom: 5px;
 }
+
 .grid-child-element-header {
   margin: 4px;
   border: 1px solid darkgrey;
   border-radius: 5px;
 }
+
 .publication {
   border-radius: 0px !important;
-  border:0px !important;
+  border: 0px !important;
 }
+
 .publication span {
   display: inline-block;
   width: 6rem;
 }
+
 .publication input {
   width: 3rem;
 }
+
 /*
 .leftList, rightList {
   display: inline;

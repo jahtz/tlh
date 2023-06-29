@@ -6,17 +6,9 @@ import {SpacesEditor} from './SpacesEditor';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 import {JSX, ReactElement} from 'react';
 
-const foreignLanguageColors: { [key: string]: string } = {
-  // FIXME: other colors!
-  HURR: 'Hur',
-  HATT: 'Hat',
-  // PAL: '',
-  LUW: 'Luw'
-};
+const foreignLangs = ['Hur', 'Hat', 'Luw', 'Pal'];
 
-function isOnlySpaces({children}: XmlElementNode): boolean {
-  return children.length === 1 && isXmlElementNode(children[0]) && children[0].tagName === 'space';
-}
+const isOnlySpaces = ({children}: XmlElementNode): boolean => children.length === 1 && isXmlElementNode(children[0]) && children[0].tagName === 'space';
 
 function backgroundColor(node: XmlElementNode, isSelected: boolean, selectedMorphology: string | undefined): string | undefined {
   // Prio 1: current selection
@@ -41,10 +33,6 @@ export const replaceWordDisplay = (node: XmlElementNode, renderChildren: () => J
 
   const selectedMorph = node.attributes.mrp0sel?.trim();
 
-  const isForeignLanguage = selectedMorph !== undefined
-    ? Object.keys(foreignLanguageColors).includes(selectedMorph)
-    : false;
-
   const hasEditingQuestion = node.attributes.editingQuestion !== undefined;
 
   const classes = classNames(node.attributes.lg || '',
@@ -52,10 +40,10 @@ export const replaceWordDisplay = (node: XmlElementNode, renderChildren: () => J
       ? [isSelected ? selectedNodeClass : 'bg-gray-200']
       : [
         backgroundColor(node, isSelected, selectedMorph),
+        node.attributes.lg,
         {
           'text-red-600': node.children.length === 0,
-          'font-bold': isForeignLanguage,
-          [foreignLanguageColors[node.attributes.mrp0sel || '']]: isForeignLanguage,
+          'font-bold': node.attributes.lg && foreignLangs.includes(node.attributes.lg),
         }
       ]
   );
