@@ -5,7 +5,7 @@ import {MorphologicalAnalysis, multiMorphAnalysisWithoutEnclitics, readMorpholog
 import {MorphAnalysisOptionContainer} from '../morphAnalysisOption/MorphAnalysisOptionContainer';
 import {findFirstXmlElementByTagName, isXmlElementNode, lastChildNode, xmlElementNode, XmlElementNode} from 'simple_xml';
 import {MorphAnalysisOptionEditor} from '../morphAnalysisOption/MorphAnalysisOptionEditor';
-import {WordContentEditor} from './WordContentEditor';
+import {WordContentEditor} from './wordContentEditor/WordContentEditor';
 import {LanguageInput} from '../LanguageInput';
 import {readSelectedMorphology, SelectedMorphAnalysis} from '../../model/selectedMorphologicalAnalysis';
 import {WordStringChildEditor} from './WordStringChildEditor';

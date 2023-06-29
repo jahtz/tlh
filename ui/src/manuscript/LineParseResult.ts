@@ -1,6 +1,6 @@
 import {Line, StatusEvent, StatusEventCode, StatusLevel} from 'simtex';
 import {XmlNode} from 'simple_xml';
-import {newError, newOk, NewResult} from '../newResult';
+import {isOk, newError, NewAbstractResult, newOk} from '../newResult';
 
 export interface IStatusEvent {
   readonly level: StatusLevel,
@@ -28,18 +28,22 @@ export const convertLine = (line: Line): LineParseResult => ({
   nodes: line.exportXml()
 });
 
-export const filterResults = (results: LineParseResult[]): NewResult<XmlNode[][], string[]> => results.reduce<NewResult<XmlNode[][], string[]>>(
+
+export const filterResults = (results: LineParseResult[]): NewAbstractResult<XmlNode[][], string[]> => results.reduce<NewAbstractResult<XmlNode[][], string[]>>(
   (acc, current) => {
     if (current.statusLevel === StatusLevel.ok) {
+      return acc.map((a) => [...a, current.nodes]);
+      /*
       return acc.status
         ? newOk([...acc.value, current.nodes])
         : acc;
+       */
     } else {
       const newSingleError = 'TODO!';
 
-      return acc.status
+      return isOk(acc)
         ? newError([newSingleError])
-        : newError([...acc.error, newSingleError]);
+        : acc.mapError((errors) => [...errors, newSingleError]);
     }
   },
   newOk([])

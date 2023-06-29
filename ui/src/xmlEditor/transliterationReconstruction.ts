@@ -1,72 +1,82 @@
-import {isXmlCommentNode, isXmlTextNode, XmlElementNode, XmlNode} from 'simple_xml';
-import {collectNewResult, mapNewResult, newError, newOk, NewResult} from '../newResult';
+import {XmlElementNode, XmlNode} from 'simple_xml';
+import {processElement} from './xmlModelHelpers';
 
-export function reconstructTransliterationForWordNode({tagName, children}: XmlElementNode): NewResult<string, string> {
-  if (tagName !== 'w') {
-    return newError('only <w/>-Tags can be reconstructed!');
-  }
-
-  return convertChildren(children);
+export interface TransliterationReconstruction {
+  reconstruction: string;
+  warnings: string[];
 }
 
-const convertChildren = (children: XmlNode[]): NewResult<string, string> => collectNewResult(
-  children.map((node): NewResult<string, string> => reconstructTransliterationFromNode(node)),
-  (acc, t) => acc + t,
-  ''
+const emptyTransliterationReconstruction: TransliterationReconstruction = {reconstruction: '', warnings: []};
+
+function recon(reconstruction: string): TransliterationReconstruction {
+  return {reconstruction, warnings: []};
+}
+
+function joinReconstructions(
+  {reconstruction: r1, warnings: w1}: TransliterationReconstruction,
+  {reconstruction: r2, warnings: w2}: TransliterationReconstruction
+): TransliterationReconstruction {
+  return {reconstruction: r1 + r2, warnings: [...w1, ...w2]};
+}
+
+function mapReconstruction({reconstruction, warnings}: TransliterationReconstruction, f: (s: string) => string): TransliterationReconstruction {
+  return {reconstruction: f(reconstruction), warnings};
+}
+
+export const reconstructTransliterationForWordNode = ({children}: XmlElementNode<'w'>): TransliterationReconstruction => convertChildren(children);
+
+const convertChildren = (children: XmlNode[]): TransliterationReconstruction => children
+  .map((node) => reconstructTransliterationFromNode(node))
+  .reduce(joinReconstructions, emptyTransliterationReconstruction);
+
+const reconstructTransliterationFromNode = (node: XmlNode): TransliterationReconstruction => processElement(node,
+  () => recon(''),
+  ({textContent}) => recon(textContent),
+  (elementNode) => reconstructTransliterationFromElementNode(elementNode)
 );
 
-function reconstructTransliterationFromNode(node: XmlNode): NewResult<string, string> {
-  if (isXmlCommentNode(node)) {
-    return newOk('');
-  }
-
-  if (isXmlTextNode(node)) {
-    return newOk(node.textContent);
-  }
-
+function reconstructTransliterationFromElementNode(node: XmlElementNode): TransliterationReconstruction {
   switch (node.tagName) {
     case 'add_in':
-      return newOk('〈');
+      return recon('〈');
     case 'add_fin':
-      return newOk('〉');
+      return recon('〉');
     case 'del_in':
-      return newOk('[');
+      return recon('[');
     case 'del_fin':
-      return newOk(']');
+      return recon(']');
     case 'laes_in':
-      return newOk('⸢');
+      return recon('⸢');
     case 'laes_fin':
-      return newOk('⸣');
+      return recon('⸣');
     case 'ras_in':
     case 'ras_fin':
-      return newOk('*');
+      return recon('*');
     case 'parsep':
-      return newOk('§');
+      return recon('§');
     case 'parsep_dbl':
-      return newOk('§§');
+      return recon('§§');
     case 'space':
-      return newOk(' '.repeat(parseInt(node.attributes.c || '0')));
+      return recon(' '.repeat(parseInt(node.attributes.c || '0')));
     case 'materlect':
-      return newOk(`°${node.attributes.c}°`);
+      return recon(`°${node.attributes.c}°`);
     case 'corr':
-      return newOk(node.attributes.c || '');
+      return recon(node.attributes.c || '');
     case 'note':
-      return newOk(`{F: ${node.attributes.c}}`);
+      return recon(`{F: ${node.attributes.c}}`);
     case 'subscr':
-      return newOk(`|${node.attributes.c}`);
+      return recon(`|${node.attributes.c}`);
     case 'surpl':
-      return newOk(`〈〈${node.attributes.c}}〉〉`);
+      return recon(`〈〈${node.attributes.c}}〉〉`);
     case 'num':
       return convertChildren(node.children);
     case 'sGr':
       return convertChildren(node.children);
     case 'aGr':
-      return mapNewResult(
-        convertChildren(node.children),
-        (innerContent) => innerContent.startsWith('-') || innerContent.startsWith('+') ? innerContent : '_' + innerContent);
+      return mapReconstruction(convertChildren(node.children), (innerContent) => innerContent.startsWith('-') || innerContent.startsWith('+') ? innerContent : '_' + innerContent);
     case 'd':
-      return mapNewResult(convertChildren(node.children), (innerContent) => `°${innerContent}°`);
+      return mapReconstruction(convertChildren(node.children), (innerContent) => `°${innerContent}°`);
     default:
-      return newError(`tagName ${node.tagName} is not yet supported!`);
+      return {reconstruction: '_?_', warnings: [(`tagName ${node.tagName} is not yet supported!`)]};
   }
 }

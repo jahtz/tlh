@@ -1,42 +1,98 @@
-interface NewOk<T> {
-  readonly status: true;
-  readonly value: T;
+export abstract class NewAbstractResult<T, E> {
+
+  abstract map<U>(f: (t: T) => U): NewAbstractResult<U, E>;
+
+  abstract mapError<F>(f: (e: E) => F): NewAbstractResult<T, F>;
+
+  abstract flatMap<U>(f: (t: T) => NewAbstractResult<U, E>): NewAbstractResult<U, E>;
+
+  abstract handle(f: (t: T) => void, g: (e: E) => void): void;
+
+  abstract toInterface(): IResult<T, E>;
+
+  static ok<T, E>(value: T): NewAbstractResult<T, E> {
+    return new NewNewOk(value);
+  }
+
+  static error<T, E>(error: E): NewAbstractResult<T, E> {
+    return new NewNewError(error);
+  }
 }
 
-export function newOk<T>(value: T): NewOk<T> {
-  return {status: true, value};
+export class NewNewOk<T> extends NewAbstractResult<T, never> {
+  constructor(private readonly value: T) {
+    super();
+  }
+
+  override map<U>(f: (t: T) => U): NewAbstractResult<U, never> {
+    return new NewNewOk(f(this.value));
+  }
+
+  override mapError<F>(): NewAbstractResult<T, F> {
+    return this;
+  }
+
+  override flatMap<U>(f: (t: T) => NewAbstractResult<U, never>): NewAbstractResult<U, never> {
+    return f(this.value);
+  }
+
+  override handle(f: (t: T) => void/*, g: (e: never) => void*/): void {
+    f(this.value);
+  }
+
+  override toInterface(): IResult<T, never> {
+    return {status: true, value: this.value};
+  }
 }
 
-interface NewError<E> {
-  readonly status: false;
-  readonly error: E;
+export function newOk<T, E>(value: T): NewAbstractResult<T, E> {
+  return new NewNewOk(value);
 }
 
-export function newError<E>(error: E): NewError<E> {
-  return {status: false, error};
+export function isOk<T, E>(result: NewAbstractResult<T, E>): result is NewNewOk<T> {
+  return result instanceof NewNewOk;
 }
 
-export type NewResult<T, E> = NewOk<T> | NewError<E>;
+export class NewNewError<E> extends NewAbstractResult<never, E> {
+  constructor(private readonly error: E) {
+    super();
+  }
 
-export function collectNewResult<T, U, E>(results: NewResult<T, E>[], f: (u: U, t: T) => U, start: U): NewResult<U, E> {
-  return results.reduce<NewResult<U, E>>(
-    (acc, t): NewResult<U, E> => flatMapNewResult(acc, (u) => t.status ? newOk(f(u, t.value)) : t),
-    newOk(start)
-  );
+  override map<U>(): NewAbstractResult<U, E> {
+    return this;
+  }
+
+  override mapError<T, F>(f: (e: E) => F): NewAbstractResult<T, F> {
+    return new NewNewError(f(this.error));
+  }
+
+  override flatMap<U>(): NewAbstractResult<U, E> {
+    return this;
+  }
+
+  override handle(f: (t: never) => void, g: (e: E) => void): void {
+    g(this.error);
+  }
+
+  override toInterface(): IResult<never, E> {
+    return {status: false, error: this.error};
+  }
 }
 
-export function isNewOk<T, E>(newResult: NewResult<T, E>): newResult is NewOk<T> {
-  return newResult.status;
+export function newError<T, E>(error: E): NewAbstractResult<T, E> {
+  return new NewNewError(error);
 }
 
-export function isNewError<T, E>(newResult: NewResult<T, E>): newResult is NewError<E> {
-  return !newResult.status;
+// Interfaces
+
+export interface IOk<T> {
+  status: true;
+  value: T;
 }
 
-export function mapNewResult<T, U, E>(res: NewResult<T, E>, f: (t: T) => U): NewResult<U, E> {
-  return isNewOk(res) ? {status: true, value: f(res.value)} : res;
+export interface IError<E> {
+  status: false;
+  error: E;
 }
 
-export function flatMapNewResult<T, U, E>(res: NewResult<T, E>, f: (t: T) => NewResult<U, E>): NewResult<U, E> {
-  return isNewOk(res) ? f(res.value) : res;
-}
+export type IResult<T, E> = IOk<T> | IError<E>;
