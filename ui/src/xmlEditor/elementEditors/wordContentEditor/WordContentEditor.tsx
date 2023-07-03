@@ -61,7 +61,7 @@ export function WordContentEditor({oldNode, language, cancelEdit, updateNode}: I
   const [state, setState] = useState<State>(
     readTransliteration(initialTransliteration, language).toInterface()
   );
-  
+
   return (
     <div>
       {transliterationReconstructionWarnings.length > 0 && <div className="my-4 p-2 rounded bg-red-600 text-white text-center">
