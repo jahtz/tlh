@@ -61,7 +61,7 @@ export function WordContentEditor({oldNode, language, cancelEdit, updateNode}: I
   const [state, setState] = useState<State>(
     readTransliteration(initialTransliteration, language).toInterface()
   );
-
+  
   return (
     <div>
       {transliterationReconstructionWarnings.length > 0 && <div className="my-4 p-2 rounded bg-red-600 text-white text-center">
@@ -83,7 +83,7 @@ export function WordContentEditor({oldNode, language, cancelEdit, updateNode}: I
         <div className={classNames('p-2', 'rounded-t', state.status ? 'bg-green-500' : 'bg-red-600', 'text-white', 'font-bold')}>{t('result')}</div>
         <div className={classNames('p-4', state.status ? 'bg-green-50' : 'bg-red-200')}>
           {state.status
-            ? <ParsedWord oldNode={oldNode} initialParsedWord={state.value} language={language} submitEdit={updateNode}/>
+            ? <ParsedWord key={JSON.stringify(state.value)} oldNode={oldNode} initialParsedWord={state.value} language={language} submitEdit={updateNode}/>
             : <pre>{JSON.stringify(state, null, 2)}</pre>}
         </div>
       </div>
