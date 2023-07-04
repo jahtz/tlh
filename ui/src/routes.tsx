@@ -36,7 +36,7 @@ import {apolloClient} from './apolloClient';
 import {OperationVariables, TypedDocumentNode} from '@apollo/client';
 import {ManuscriptData} from './manuscript/ManuscriptData';
 import {UploadPicturesForm} from './manuscript/UploadPicturesForm';
-import {TransliterationInput} from './manuscript/TransliterationInput';
+import {TransliterationInputContainer} from './manuscript/TransliterationInput';
 import {UserManagement} from './UserManagement';
 import {TransliterationReview} from './manuscript/TransliterationReview';
 import {XmlConversion} from './manuscript/xmlConversion/XmlConversion';
@@ -50,6 +50,10 @@ async function apolloLoader<T, V extends OperationVariables>(query: TypedDocumen
     .then(({data}) => data || undefined);
 }
 
+/**
+ * @deprecated
+ * @param params
+ */
 async function manuscriptDataLoader({params}: LoaderFunctionArgs): Promise<ManuscriptMetaDataFragment | undefined> {
   return params.mainIdentifier
     ? await apolloLoader<ManuscriptQuery, ManuscriptQueryVariables>(ManuscriptDocument, {mainIdentifier: params.mainIdentifier})
@@ -84,8 +88,7 @@ export const router = createBrowserRouter([
             {path: uploadPicturesUrl, element: <RequireAuth>{() => <UploadPicturesForm/>}</RequireAuth>, loader: manuscriptDataLoader},
             {
               path: createTransliterationUrl,
-              element: <RequireAuth minRights={Rights.Reviewer}>{() => <TransliterationInput/>}</RequireAuth>,
-              loader: manuscriptDataLoader
+              element: <RequireAuth>{(currentUser) => <TransliterationInputContainer currentUser={currentUser}/>}</RequireAuth>
             },
             {path: transliterationReviewUrl, element: <RequireAuth minRights={Rights.Reviewer}>{() => <TransliterationReview/>}</RequireAuth>},
             {path: xmlConversionUrl, element: <RequireAuth minRights={Rights.Reviewer}>{() => <XmlConversion/>}</RequireAuth>},

@@ -103,11 +103,17 @@ query UploadPictures($mainIdentifier: String!) {
 
 # /manuscripts/:id/transliterationInput
 
+fragment TransliterationInputData on ManuscriptMetaData {
+  mainIdentifier {
+    ...ManuscriptIdentifier
+  }
+  provisionalTransliteration
+  creatorUsername
+}
+
 query TransliterationInput($mainIdentifier: String!) {
   manuscript(mainIdentifier: $mainIdentifier) {
-    mainIdentifier {
-      ...ManuscriptIdentifier
-    }
+    ...TransliterationInputData
   }
 }
 

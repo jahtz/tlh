@@ -126,7 +126,7 @@ export function ManuscriptData(): JSX.Element {
               <TransliterationParseResultDisplay showStatusLevel={false} lines={parsedTransliteration}/>
             </div>
           )
-          : <div className="notification is-info has-text-centered">{t('noTransliterationCreatedYet')}.</div>}
+          : <div className="my-4 p-2 italic text-cyan-500 text-center">{t('noTransliterationCreatedYet')}.</div>}
 
         {createdByUser && !manuscript.transliterationReleased &&
           <div className="space-x-2">
