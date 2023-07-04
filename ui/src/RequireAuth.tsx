@@ -1,14 +1,12 @@
-import {Navigate} from 'react-router-dom';
 import {JSX} from 'react';
 import {useSelector} from 'react-redux';
 import {activeUserSelector, User} from './newStore';
-import {loginUrl} from './urls';
 import {Rights} from './graphql';
+import {useTranslation} from 'react-i18next';
 
 interface IProps {
-  to?: string,
   minRights?: Rights;
-  children: (user: User) => JSX.Element
+  children: (user: User) => JSX.Element;
 }
 
 const isMinRights = (rights: Rights, minRights: Rights): boolean => ({
@@ -17,11 +15,18 @@ const isMinRights = (rights: Rights, minRights: Rights): boolean => ({
   [Rights.ExecutiveEditor]: rights === Rights.ExecutiveEditor
 }[minRights]);
 
-export function RequireAuth({to = loginUrl, minRights, children}: IProps): JSX.Element {
+export function RequireAuth({minRights, children}: IProps): JSX.Element {
 
   const currentUser = useSelector(activeUserSelector);
+  const {t} = useTranslation('common');
 
   return currentUser !== null && (minRights === undefined || isMinRights(currentUser.rights, minRights))
     ? children(currentUser)
-    : <Navigate to={to}/>;
+    : (
+      <div className="container mx-auto">
+        <div className="my-4 p-2 rounded bg-red-600 text-white text-center">
+          {t('insufficientRightsNeeded:{{minRights}}', {minRights})}
+        </div>
+      </div>
+    );
 }
