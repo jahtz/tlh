@@ -14,7 +14,7 @@ import {AOption} from '../../myOption';
 
 type States = 'DefaultState' | 'AddMorphology' | 'EditEditingQuestion' | 'EditFootNoteState' | 'EditContent';
 
-export function WordNodeEditor({node, path, updateEditedNode, setKeyHandlingEnabled, rootNode, updateOtherNode}: XmlEditableNodeIProps): JSX.Element {
+export function WordNodeEditor({node, path, updateEditedNode, setKeyHandlingEnabled, rootNode, updateOtherNode}: XmlEditableNodeIProps<'w'>): JSX.Element {
 
   const {t} = useTranslation('common');
   const [state, setState] = useState<States>('DefaultState');
@@ -60,7 +60,7 @@ export function WordNodeEditor({node, path, updateEditedNode, setKeyHandlingEnab
     setState('EditContent');
   }
 
-  function handleEditUpdate(node: XmlElementNode): void {
+  function handleEditUpdate(node: XmlElementNode<'w'>): void {
     const maybeLineBreakPath = getPriorSiblingPath(rootNode, path, 'lb');
 
     if (maybeLineBreakPath !== undefined) {

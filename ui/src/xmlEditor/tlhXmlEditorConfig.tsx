@@ -82,7 +82,7 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     devi: deviConfig as XmlSingleEditableNodeConfig,
 
     // Words
-    w: wordNodeConfig,
+    w: wordNodeConfig as XmlSingleEditableNodeConfig,
 
     // Word contents
     aGr: {styling: () => ['akkadogramm']},

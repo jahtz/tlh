@@ -6,8 +6,6 @@ import {SpacesEditor} from './SpacesEditor';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 import {JSX, ReactElement} from 'react';
 
-const foreignLangs = ['Hur', 'Hat', 'Luw', 'Pal'];
-
 const isOnlySpaces = ({children}: XmlElementNode): boolean => children.length === 1 && isXmlElementNode(children[0]) && children[0].tagName === 'space';
 
 function backgroundColor(node: XmlElementNode, isSelected: boolean, selectedMorphology: string | undefined): string | undefined {
@@ -29,29 +27,27 @@ function backgroundColor(node: XmlElementNode, isSelected: boolean, selectedMorp
   return undefined;
 }
 
-export const replaceWordDisplay = (node: XmlElementNode, renderChildren: () => JSX.Element, isSelected: boolean): ReactElement => {
+export const replaceWordDisplay = (node: XmlElementNode<'w'>, renderChildren: () => JSX.Element, isSelected: boolean): ReactElement => {
 
   const selectedMorph = node.attributes.mrp0sel?.trim();
 
-  const hasEditingQuestion = node.attributes.editingQuestion !== undefined;
+  // FIXME: add <lb/>.lg and <text/>.lg!
+  const languageClass = node.attributes.lg || '';
 
   const classes = classNames(node.attributes.lg || '',
     isOnlySpaces(node)
       ? [isSelected ? selectedNodeClass : 'bg-gray-200']
       : [
         backgroundColor(node, isSelected, selectedMorph),
-        node.attributes.lg,
-        {
-          'text-red-600': node.children.length === 0,
-          'font-bold': node.attributes.lg && foreignLangs.includes(node.attributes.lg),
-        }
+        languageClass,
+        {'text-red-600': node.children.length === 0,}
       ]
   );
 
   return (
     <>
       &nbsp;
-      <span className={classes} title={hasEditingQuestion ? node.attributes.q : undefined}>
+      <span className={classes} title={node.attributes.editingQuestion}>
           {node.children.length === 0 ? <span>&#x2715;</span> : renderChildren()}
         </span>
       &nbsp;
@@ -59,7 +55,7 @@ export const replaceWordDisplay = (node: XmlElementNode, renderChildren: () => J
   );
 };
 
-export const wordNodeConfig: XmlSingleInsertableEditableNodeConfig = {
+export const wordNodeConfig: XmlSingleInsertableEditableNodeConfig<'w'> = {
   replace: replaceWordDisplay,
   edit: (props) => isOnlySpaces(props.node)
     ? <SpacesEditor {...props}/>

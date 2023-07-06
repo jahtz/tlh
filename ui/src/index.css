@@ -73,18 +73,22 @@ code {
 
 .hurrite, .Hur {
   color: #b80047;
+  font-weight: bold;
 }
 
 .luwian, .Luw {
   color: #088b6b;
+  font-weight: bold;
 }
 
 .hattian, .Hat {
   color: #006b6b;
+  font-weight: bold;
 }
 
 .palawian, .Pal {
   /* TODO! */
+  font-weight: bold;
 }
 
 .determinativ {

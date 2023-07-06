@@ -7,10 +7,10 @@ import {NodeDisplay} from '../../NodeDisplay';
 import {useTranslation} from 'react-i18next';
 
 interface IProps {
-  oldNode: XmlElementNode;
-  initialParsedWord: XmlElementNode;
+  oldNode: XmlElementNode<'w'>;
+  initialParsedWord: XmlElementNode<'w'>;
   language: string;
-  submitEdit: (node: XmlElementNode) => void;
+  submitEdit: (node: XmlElementNode<'w'>) => void;
 }
 
 export function ParsedWord({oldNode, initialParsedWord: initialParsedWord, language, submitEdit}: IProps): ReactElement {

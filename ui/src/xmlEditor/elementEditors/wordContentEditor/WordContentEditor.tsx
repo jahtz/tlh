@@ -8,10 +8,10 @@ import {IResult, NewAbstractResult, NewNewError, NewNewOk} from '../../../newRes
 import {ParsedWord} from './ParsedWord';
 
 interface IProps {
-  oldNode: XmlElementNode;
+  oldNode: XmlElementNode<'w'>;
   language: string;
   cancelEdit: () => void;
-  updateNode: (node: XmlElementNode) => void;
+  updateNode: (node: XmlElementNode<'w'>) => void;
 }
 
 const convertLangauge = (language: string): ParagraphLanguageType | null => {
@@ -35,14 +35,14 @@ const convertLangauge = (language: string): ParagraphLanguageType | null => {
   }
 };
 
-type State = IResult<XmlElementNode, string[]>;
+type State = IResult<XmlElementNode<'w'>, string[]>;
 
-function readTransliteration(transliteration: string, language: string): NewAbstractResult<XmlElementNode, string[]> {
+function readTransliteration(transliteration: string, language: string): NewAbstractResult<XmlElementNode<'w'>, string[]> {
   const word = Word.parseWord(convertLangauge(language), transliteration);
 
   if (word instanceof Word) {
     return word.getStatus().getLevel() === StatusLevel.ok
-      ? new NewNewOk(word.exportXml())
+      ? new NewNewOk(word.exportXml() as XmlElementNode<'w'>)
       : new NewNewError(word.getStatus().getEvents().map((event) => event.getMessage()));
   } else {
     return new NewNewError([]);
