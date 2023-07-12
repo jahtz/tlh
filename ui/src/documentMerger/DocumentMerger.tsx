@@ -4,6 +4,7 @@ import {zipWithOffset} from './zipWithOffset';
 import {useTranslation} from 'react-i18next';
 import {IoAddCircleOutline, IoChevronDown, IoChevronUp, IoRemoveCircleOutline} from 'react-icons/io5';
 import {NodeDisplay} from '../xmlEditor/NodeDisplay';
+import {xmlElementNode} from 'simple_xml';
 
 interface IProps {
   firstDocument: MergeDocument;
@@ -101,9 +102,11 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
 
   const addLine = (isLeft: boolean, index: number): void => {
     const undef: unknown = undefined;
+    const emptyLine: MergeLine = {lineNumberNode:xmlElementNode('EMPTY LINE', {}, []), rest: []};
+
     if (isLeft) {
       if (offset < 0) index = index + offset;
-      firstLines = firstLines.splice(index + 1, 0, undef as MergeLine);
+      firstLines = firstLines.splice(index + 1, 0, emptyLine as MergeLine);
     } else {
       if (offset > 0) index = index - offset;
       secondLines = secondLines.splice(index + 1, 0, undef as MergeLine);
