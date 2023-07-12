@@ -4,7 +4,7 @@ import {zipWithOffset} from './zipWithOffset';
 import {useTranslation} from 'react-i18next';
 import {IoAddCircleOutline, IoChevronDown, IoChevronUp, IoRemoveCircleOutline} from 'react-icons/io5';
 import {NodeDisplay} from '../xmlEditor/NodeDisplay';
-import {xmlElementNode, XmlElementNode, xmlTextNode} from 'simple_xml';
+import {xmlElementNode} from 'simple_xml';
 
 interface IProps {
   firstDocument: MergeDocument;
