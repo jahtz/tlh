@@ -9,38 +9,34 @@ import {JSX, ReactElement} from 'react';
 const isOnlySpaces = ({children}: XmlElementNode): boolean => children.length === 1 && isXmlElementNode(children[0]) && children[0].tagName === 'space';
 
 function backgroundColor(node: XmlElementNode, isSelected: boolean, selectedMorphology: string | undefined): string | undefined {
-  // Prio 1: current selection
-  if (isSelected) {
+  if (isSelected) { // Prio 1: current selection
     return selectedNodeClass;
   }
 
-  // Prio 2: has editing question
-  if (node.attributes.editingQuestion !== undefined) {
+  if (node.attributes.editingQuestion !== undefined) { // Prio 2: has editing question
     return 'bg-blue-300';
   }
 
-  // Prio 3: has no morphology selected
   if (selectedMorphology !== undefined && selectedMorphology.length === 0 && selectedMorphology !== '???' && selectedMorphology !== 'DEL') {
+    // Prio 3: has no morphology selected
     return 'bg-yellow-300';
   }
 
   return undefined;
 }
 
-export const replaceWordDisplay = (node: XmlElementNode<'w'>, renderChildren: () => JSX.Element, isSelected: boolean): ReactElement => {
-
-  const selectedMorph = node.attributes.mrp0sel?.trim();
+const replaceWordDisplay = (node: XmlElementNode<'w'>, renderChildren: () => JSX.Element, isSelected: boolean/*, isLeftSide: boolean*/): ReactElement => {
 
   // FIXME: add <lb/>.lg and <text/>.lg!
   const languageClass = node.attributes.lg || '';
 
-  const classes = classNames(node.attributes.lg || '',
+  const classes = classNames(
+    languageClass,
     isOnlySpaces(node)
       ? [isSelected ? selectedNodeClass : 'bg-gray-200']
       : [
-        backgroundColor(node, isSelected, selectedMorph),
-        languageClass,
-        {'text-red-600': node.children.length === 0,}
+        backgroundColor(node, isSelected, node.attributes.mrp0sel?.trim()),
+        {'text-red-600': node.children.length === 0}
       ]
   );
 
@@ -48,8 +44,8 @@ export const replaceWordDisplay = (node: XmlElementNode<'w'>, renderChildren: ()
     <>
       &nbsp;
       <span className={classes} title={node.attributes.editingQuestion}>
-          {node.children.length === 0 ? <span>&#x2715;</span> : renderChildren()}
-        </span>
+        {node.children.length === 0 ? <span>&#x2715;</span> : renderChildren()}
+      </span>
       &nbsp;
     </>
   );
@@ -57,9 +53,10 @@ export const replaceWordDisplay = (node: XmlElementNode<'w'>, renderChildren: ()
 
 export const wordNodeConfig: XmlSingleInsertableEditableNodeConfig<'w'> = {
   replace: replaceWordDisplay,
-  edit: (props) => isOnlySpaces(props.node)
-    ? <SpacesEditor {...props}/>
-    : <WordNodeEditor {...props}/>,
+  edit: (props) =>
+    isOnlySpaces(props.node)
+      ? <SpacesEditor {...props}/>
+      : <WordNodeEditor {...props}/>,
   insertablePositions: {
     beforeElement: ['w'],
     afterElement: ['lb', 'w'],
