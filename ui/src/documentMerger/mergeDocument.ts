@@ -1,9 +1,8 @@
 import {findFirstXmlElementByTagName, isXmlElementNode, isXmlTextNode, xmlElementNode, XmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
 import {ZipWithOffsetResult} from './zipWithOffset';
 
-const lineNumberRegex = /{€(?<fragment>\d)}\s*(?<lines>[\W\w]+)/;
-const txtPublicationRegex = /(?<publication>[\W\w]+)({€(?<lnr>\d+)})/;
-const lineNumberRegexNew = /{(?<index>€(\d+|\d+\+\d+))}\s*(?<lines>[\W\w]+)/;
+export const txtPublicationRegex = /(?<publication>[\W\w]+)({€(?<lnr>\d+)})/;
+export const lineNumberRegex = /{(?<index>€(?<numbers>\d+|\d+\+\d+))}\s*(?<lines>[\W\w]+)/;
 
 export interface MergeLine {
   lineNumberNode: XmlElementNode;
@@ -88,10 +87,15 @@ function computeNewLineNumber(lnr: string | undefined, rnr: string | undefined):
   const leftMatch = lnr.match(lineNumberRegex);
   const rightMatch = rnr.match(lineNumberRegex);
 
-  // TODO: make lineNumber a node!
-  return leftMatch && leftMatch.groups && rightMatch && rightMatch.groups
-    ? `{€${leftMatch.groups.fragment}+${rightMatch.groups.fragment}} ${leftMatch.groups.lines}/${rightMatch.groups.lines}`
-    : undefined;
+
+  if (leftMatch && leftMatch.groups && rightMatch && rightMatch.groups) {
+    const numbers: string[] = leftMatch.groups.numbers.split('+').concat(rightMatch.groups.numbers.split('+'));
+    const lines: string[] = leftMatch.groups.lines.split('/').concat(rightMatch.groups.lines.split('/'));
+
+    return `{€${numbers.join('+')}} ${lines.join('/')}`;
+  } else {
+    return undefined;
+  }
 }
 
 function mergeLine(
@@ -191,8 +195,8 @@ export function mergeHeader(firstDocumentHeader: XmlElementNode, secondDocumentH
 
 export function replaceLNR(node: XmlElementNode, publicationMap: Map<string, string[]>) {
   let textLine: string = node.attributes['lnr'] ? node.attributes['lnr'] : 'empty';
-
-  const lineMatch = textLine.match(lineNumberRegexNew);
+  
+  const lineMatch = textLine.match(lineNumberRegex);
   if (textLine && lineMatch && lineMatch.groups) {
     let lineIndex = lineMatch.groups.index;
     console.log(lineMatch.groups);
