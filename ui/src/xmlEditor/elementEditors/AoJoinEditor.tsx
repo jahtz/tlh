@@ -1,8 +1,14 @@
 import {ReactElement} from 'react';
-import {AoJoinNode} from './AoManuscriptsEditor';
+import {XmlElementNode} from 'simple_xml';
 
-export type AoJoinTypes = 'AO:DirectJoin' | 'AO:InDirectJoin';
+type AoJoinTypes = 'AO:DirectJoin' | 'AO:InDirectJoin';
 export const joinTypes: AoJoinTypes[] = ['AO:DirectJoin', 'AO:InDirectJoin'];
+
+export type AoJoinNode = XmlElementNode<AoJoinTypes>;
+
+export function isAoJoinNode(node: XmlElementNode): node is AoJoinNode {
+  return node.tagName === 'AO:DirectJoin' || node.tagName === 'AO:InDirectJoin';
+}
 
 interface IProps {
   node: AoJoinNode;

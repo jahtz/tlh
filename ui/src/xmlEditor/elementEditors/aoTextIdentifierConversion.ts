@@ -1,5 +1,7 @@
 import {isXmlElementNode, isXmlTextNode, xmlElementNode, XmlNode, xmlTextNode, XmlTextNode} from 'simple_xml';
-import {AoJoinNode, NewAoManuscriptsChildNode, SourceType} from './AoManuscriptsEditor';
+import {NewAoManuscriptsChildNode} from './AoManuscriptsEditor';
+import {AoJoinNode} from './AoJoinEditor';
+import {SourceType} from './AoTextIdentifierField';
 
 const oldFragmentFormatRegExp = /{(€\d+)}/;
 
