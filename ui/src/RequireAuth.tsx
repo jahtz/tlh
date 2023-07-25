@@ -31,7 +31,7 @@ export function RequireAuth({minRights, children}: IProps): JSX.Element {
     : (
       <div className="container mx-auto">
         <div className="my-4 p-2 rounded bg-red-600 text-white text-center">
-          {t('insufficientRightsNeeded:{{minRights}}', {minRights})}
+          {t('insufficientRightsNeeded')}
         </div>
       </div>
     );
