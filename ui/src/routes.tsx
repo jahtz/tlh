@@ -1,4 +1,4 @@
-import {createBrowserRouter, LoaderFunctionArgs, useRouteError} from 'react-router-dom';
+import {createBrowserRouter, useRouteError} from 'react-router-dom';
 import {JSX} from 'react';
 import {
   approveDocumentUrl,
@@ -31,9 +31,7 @@ import {DocumentMergerContainer} from './documentMerger/DocumentMergerContainer'
 import {tlhXmlEditorConfig} from './xmlEditor/tlhXmlEditorConfig';
 import {Preferences} from './Preferences';
 import {XmlComparatorContainer} from './xmlComparator/XmlComparatorContainer';
-import {ManuscriptDocument, ManuscriptMetaDataFragment, ManuscriptQuery, ManuscriptQueryVariables, Rights, XmlReviewType} from './graphql';
-import {apolloClient} from './apolloClient';
-import {OperationVariables, TypedDocumentNode} from '@apollo/client';
+import {Rights, XmlReviewType} from './graphql';
 import {ManuscriptData} from './manuscript/ManuscriptData';
 import {UploadPicturesForm} from './manuscript/UploadPicturesForm';
 import {TransliterationInputContainer} from './manuscript/TransliterationInput';
@@ -43,23 +41,6 @@ import {XmlConversion} from './manuscript/xmlConversion/XmlConversion';
 import {PipelineOverview} from './pipeline/PipelineOverview';
 import {XmlReview} from './manuscript/review/XmlReview';
 import {DocumentApproval} from './manuscript/DocumentApproval';
-
-async function apolloLoader<T, V extends OperationVariables>(query: TypedDocumentNode<T, V>, variables: V): Promise<T | undefined> {
-  return apolloClient
-    .query<T, V>({query, variables})
-    .then(({data}) => data || undefined);
-}
-
-/**
- * @deprecated
- * @param params
- */
-async function manuscriptDataLoader({params}: LoaderFunctionArgs): Promise<ManuscriptMetaDataFragment | undefined> {
-  return params.mainIdentifier
-    ? await apolloLoader<ManuscriptQuery, ManuscriptQueryVariables>(ManuscriptDocument, {mainIdentifier: params.mainIdentifier})
-      .then((data) => data?.manuscript || undefined)
-    : undefined;
-}
 
 const routerOptions = {
   basename: process.env.NODE_ENV !== 'development'
@@ -84,8 +65,8 @@ export const router = createBrowserRouter([
 
         {
           path: 'manuscripts/:mainIdentifier', children: [
-            {path: 'data', element: <ManuscriptData/>, loader: manuscriptDataLoader},
-            {path: uploadPicturesUrl, element: <RequireAuth>{() => <UploadPicturesForm/>}</RequireAuth>, loader: manuscriptDataLoader},
+            {path: 'data', element: <ManuscriptData/>},
+            {path: uploadPicturesUrl, element: <RequireAuth>{() => <UploadPicturesForm/>}</RequireAuth>},
             {
               path: createTransliterationUrl,
               element: <RequireAuth>{(currentUser) => <TransliterationInputContainer currentUser={currentUser}/>}</RequireAuth>

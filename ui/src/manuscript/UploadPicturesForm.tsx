@@ -1,9 +1,10 @@
-import {ChangeEvent, createRef, JSX, useState} from 'react';
+import {ChangeEvent, createRef, ReactElement, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {homeUrl} from '../urls';
 import {PicturesBlock} from './PicturesBlock';
-import {Navigate, useLoaderData} from 'react-router-dom';
-import {ManuscriptMetaDataFragment} from '../graphql';
+import {Navigate, useParams} from 'react-router-dom';
+import {ManuscriptIdentWithCreatorFragment, useUploadPicturesQuery} from '../graphql';
+import {WithQuery} from '../WithQuery';
 
 interface IState {
   selectedFile?: File;
@@ -12,20 +13,20 @@ interface IState {
 
 type UploadResponse = { fileName: string; } | { error: string; };
 
-export function UploadPicturesForm(): JSX.Element {
+interface IProps {
+  manuscript: ManuscriptIdentWithCreatorFragment;
+}
 
-  const manuscript = useLoaderData() as ManuscriptMetaDataFragment | undefined;
-
-  if (!manuscript) {
-    return <Navigate to={homeUrl}/>;
-  }
+function Inner({manuscript}: IProps): ReactElement {
 
   const {t} = useTranslation('common');
   const [state, setState] = useState<IState>({allPictures: [...manuscript.pictureUrls]});
   const fileUploadRef = createRef<HTMLInputElement>();
 
+  const mainIdentifier = manuscript.mainIdentifier.identifier;
+
   // FIXME: url needs version...
-  const uploadUrl = `${process.env.REACT_APP_SERVER_URL}/uploadPicture.php?id=${encodeURIComponent(manuscript.mainIdentifier.identifier)}`;
+  const uploadUrl = `${process.env.REACT_APP_SERVER_URL}/uploadPicture.php?id=${encodeURIComponent(mainIdentifier)}`;
 
   function selectFile(event: ChangeEvent<HTMLInputElement>): void {
     const fileList = event.target.files;
@@ -34,31 +35,29 @@ export function UploadPicturesForm(): JSX.Element {
     }
   }
 
-  function performUpload(): void {
+  async function performUpload(): Promise<void> {
     if (state.selectedFile) {
       const formData = new FormData();
       formData.append('file', state.selectedFile, state.selectedFile.name);
 
-      fetch(uploadUrl, {body: formData, method: 'POST'})
-        .then<UploadResponse>((response) => response.json())
-        .then((response) =>
-          'fileName' in response
-            ? setState((currentState) => ({allPictures: currentState.allPictures.concat([response.fileName])}))
-            : console.error(response.error)
-        )
-        .catch((error) => console.error(error));
+      const response = await fetch(uploadUrl, {body: formData, method: 'POST'});
+      const result: UploadResponse = await response.json();
+
+      'fileName' in result
+        ? setState((currentState) => ({allPictures: currentState.allPictures.concat([result.fileName])}))
+        : console.error(result.error);
     }
   }
 
   return (
     <div className="container mx-auto">
       <h1 className="font-bold text-2xl text-center mb-4">
-        {t('manuscript{{mainIdentifier}}', {mainIdentifier: manuscript.mainIdentifier.identifier})}: {t('uploadPicture_plural')}
+        {t('manuscript')} {mainIdentifier}: {t('uploadPicture_plural')}
       </h1>
 
       <div className="my-3">
         {state.allPictures.length > 0
-          ? <PicturesBlock mainIdentifier={manuscript.mainIdentifier.identifier} pictures={state.allPictures}/>
+          ? <PicturesBlock mainIdentifier={mainIdentifier} pictures={state.allPictures}/>
           : <div className="p-2 rounded bg-cyan-500 text-white text-center">{t('noPicturesUploadedYet')}.</div>}
       </div>
 
@@ -69,5 +68,25 @@ export function UploadPicturesForm(): JSX.Element {
         </button>
       </div>
     </div>
+  );
+
+}
+
+export function UploadPicturesForm(): ReactElement {
+
+  const {mainIdentifier} = useParams<'mainIdentifier'>();
+
+  if (mainIdentifier === undefined) {
+    return <Navigate to={homeUrl}/>;
+  }
+
+  const query = useUploadPicturesQuery({variables: {mainIdentifier}});
+
+  return (
+    <WithQuery query={query}>
+      {({manuscript}) => manuscript
+        ? <Inner manuscript={manuscript}/>
+        : <Navigate to={homeUrl}/>}
+    </WithQuery>
   );
 }

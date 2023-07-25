@@ -1,7 +1,7 @@
 import {useTranslation} from 'react-i18next';
-import {JSX, useState} from 'react';
-import {Link, Navigate, useLoaderData} from 'react-router-dom';
-import {ManuscriptMetaDataFragment, ManuscriptStatus, useReleaseTransliterationMutation} from '../graphql';
+import {ReactElement, useState} from 'react';
+import {Link, Navigate, useParams} from 'react-router-dom';
+import {ManuscriptMetaDataFragment, ManuscriptStatus, useManuscriptQuery, useReleaseTransliterationMutation} from '../graphql';
 import {useSelector} from 'react-redux';
 import {activeUserSelector, User} from '../newStore';
 import {getNameForPalaeoClassification} from '../model/manuscriptProperties/palaeoClassification';
@@ -12,12 +12,15 @@ import {convertLine} from './LineParseResult';
 import {TransliterationParseResultDisplay} from './ColumnParseResultComponent';
 import {getNameForManuscriptLanguageAbbreviation} from '../forms/manuscriptLanguageAbbreviations';
 import update from 'immutability-helper';
+import {WithQuery} from '../WithQuery';
 
 const buttonClasses = (color: string): string => `p-2 block rounded bg-${color}-500 text-white text-center w-full`;
 
-export function ManuscriptData(): JSX.Element {
+interface IProps {
+  initialManuscript: ManuscriptMetaDataFragment;
+}
 
-  const initialManuscript = useLoaderData() as ManuscriptMetaDataFragment | undefined;
+function Inner({initialManuscript}: IProps): ReactElement {
 
   const {t} = useTranslation('common');
   const activeUser: User | null = useSelector(activeUserSelector);
@@ -36,7 +39,7 @@ export function ManuscriptData(): JSX.Element {
     : undefined;
 
   const mainIdentifier = manuscript.mainIdentifier.identifier;
-  
+
   const onReleaseTransliteration = (): void => {
     if (manuscript.transliterationReleased) {
       return;
@@ -141,5 +144,25 @@ export function ManuscriptData(): JSX.Element {
           </div>}
       </div>
     </div>
+  );
+}
+
+export function ManuscriptData(): ReactElement {
+
+  const {mainIdentifier} = useParams<'mainIdentifier'>();
+
+  if (mainIdentifier === undefined) {
+    return <Navigate to={homeUrl}/>;
+  }
+
+  const query = useManuscriptQuery({variables: {mainIdentifier}});
+
+  return (
+    <WithQuery query={query}>
+      {({manuscript}) => manuscript
+        ? <Inner initialManuscript={manuscript}/>
+        : <Navigate to={homeUrl}/>
+      }
+    </WithQuery>
   );
 }
