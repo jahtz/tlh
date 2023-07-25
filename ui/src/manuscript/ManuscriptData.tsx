@@ -36,7 +36,7 @@ export function ManuscriptData(): JSX.Element {
     : undefined;
 
   const mainIdentifier = manuscript.mainIdentifier.identifier;
-
+  
   const onReleaseTransliteration = (): void => {
     if (manuscript.transliterationReleased) {
       return;
@@ -57,7 +57,7 @@ export function ManuscriptData(): JSX.Element {
   return (
     <div className="container mx-auto">
       <h1 className="font-bold text-2xl text-center">
-        {t('manuscript{{mainIdentifier}}', {mainIdentifier})}: {t('generalData_plural')}
+        {t('manuscript')} {mainIdentifier}: {t('generalData_plural')}
       </h1>
 
       <div className="my-3">
