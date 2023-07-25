@@ -72,14 +72,14 @@ class Manuscript extends AbstractManuscript
   }
 
   /** @return Manuscript[] */
-  static function selectAllManuscriptsPaginated(int $page): array
+  static function selectAllManuscriptsPaginated(int $page, ?string $creatorUsername): array
   {
     $pageSize = 10;
     $first = $page * $pageSize;
 
     return SqlHelpers::executeMultiSelectQuery(
-      "select * from tlh_dig_manuscripts order by creation_date desc limit ?, ?;",
-      fn(mysqli_stmt $stmt) => $stmt->bind_param('ii', $first, $pageSize),
+      "select * from tlh_dig_manuscripts where status = 'Approved' or creator_username = ? order by creation_date desc limit ?, ?;",
+      fn(mysqli_stmt $stmt) => $stmt->bind_param('sii', $creatorUsername, $first, $pageSize),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
     );
   }

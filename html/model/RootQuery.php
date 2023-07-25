@@ -27,7 +27,7 @@ RootQuery::$queryType = new ObjectType([
       'args' => [
         'page' => Type::nonNull(Type::int())
       ],
-      'resolve' => fn(?int $_rootValue, array $args): array => Manuscript::selectAllManuscriptsPaginated($args['page'])
+      'resolve' => fn(?int $_rootValue, array $args, ?User $user): array => Manuscript::selectAllManuscriptsPaginated($args['page'], is_null($user) ? null : $user->username)
     ],
     'myManuscripts' => [
       'type' => Type::listOf(Type::nonNull(Type::string())),
