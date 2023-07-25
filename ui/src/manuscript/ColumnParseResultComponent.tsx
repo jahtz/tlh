@@ -34,7 +34,7 @@ export function ColumnParseResultComponent({lines, showStatusLevel}: IProps): JS
         render: () => <TransliterationParseResultDisplay showStatusLevel={showStatusLevel} lines={lines}/>
       },
       asXml: {
-        name: t('asXml'),
+        name: t('xmlView'),
         render: () => (
           <div className="p-2 rounded border border-slate-300 shadow shadow-slate-200">
             {exportLines(lines).map((xmlLine, index) => <p key={index}>{xmlLine}</p>)}
