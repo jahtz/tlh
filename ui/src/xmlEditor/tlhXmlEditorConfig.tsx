@@ -10,6 +10,7 @@ import {paragraphSeparatorConfig} from './elementEditors/ParagraphSeparatorEdito
 import {clEditorConfig} from './elementEditors/ClEditor';
 import {textElementConfig} from './textElementConfig';
 import {deviConfig} from './deviConfig';
+import {wsepConfig} from './elementEditors/wsepEditor';
 
 export const selectedNodeClass = 'bg-teal-400';
 
@@ -104,6 +105,8 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
 
     gap: gapConfig,
     subscr: {replace: (node) => <sub>{node.attributes.c}</sub>},
+
+    wsep: wsepConfig as XmlEditorSingleNodeConfig,
 
     space: {
       replace: (node) => <>{Array.from({length: parseInt(node.attributes.c || '0') || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}</>,
