@@ -67,7 +67,7 @@ function reconstructTransliterationFromElementNode(node: XmlElementNode): Transl
     case 'subscr':
       return recon(`|${node.attributes.c}`);
     case 'surpl':
-      return recon(`〈〈${node.attributes.c}}〉〉`);
+      return recon(`〈〈${node.attributes.c}〉〉`);
     case 'num':
       return convertChildren(node.children);
     case 'sGr':
