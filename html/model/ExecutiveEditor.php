@@ -217,14 +217,9 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         //  make sure that reviewer exists and has review rights
         $reviewer = resolveReviewer($args['reviewer']);
 
-        // check that reviewer is not owner of manuscript!
-
         $manuscript = Manuscript::selectManuscriptById($mainIdentifier);
         if (is_null($manuscript)) {
           throw new MySafeGraphQLException("Can't appoint reviewer for non-existing manuscript $mainIdentifier!");
-        }
-        if ($manuscript->creatorUsername === $reviewer->username) {
-          throw new MySafeGraphQLException("User $reviewer->username can't review own manuscript!");
         }
 
         return ExecutiveEditor::upsertReviewerAppointmentForReleasedTransliteration($manuscript->mainIdentifier->identifier, $reviewer->username, $user->username);
