@@ -3,6 +3,8 @@ import {useSelector} from 'react-redux';
 import {activeUserSelector, User} from './newStore';
 import {Rights} from './graphql';
 import {useTranslation} from 'react-i18next';
+import {Navigate} from 'react-router-dom';
+import {loginUrl} from './urls';
 
 interface IProps {
   minRights?: Rights;
@@ -20,7 +22,11 @@ export function RequireAuth({minRights, children}: IProps): JSX.Element {
   const currentUser = useSelector(activeUserSelector);
   const {t} = useTranslation('common');
 
-  return currentUser !== null && (minRights === undefined || isMinRights(currentUser.rights, minRights))
+  if (currentUser === null) {
+    return <Navigate to={loginUrl}/>;
+  }
+
+  return minRights === undefined || isMinRights(currentUser.rights, minRights)
     ? children(currentUser)
     : (
       <div className="container mx-auto">
