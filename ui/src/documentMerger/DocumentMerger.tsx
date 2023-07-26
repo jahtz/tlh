@@ -221,7 +221,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
                                             onDragOver={() => handleDragOver(true, index)} data-index={index} key={index}>
           <button onClick={() => addLine(true, index)}><IoAddCircleOutline/></button>
           {entry && <MergeDocumentLine line={entry}/>}
-          {(entry === undefined  || entry!.lineNumberNode.tagName == 'EMPTY LINE') && <>
+          {(entry === undefined  || entry.lineNumberNode.tagName == 'EMPTY LINE') && <>
             <button onClick={() => removeLine(true, index)}><IoRemoveCircleOutline/></button>
             <br/></>}
         </li>)}
@@ -236,7 +236,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
                                              onDragOver={() => handleDragOver(false, index)} data-index={index} key={index}>
           <button onClick={() => addLine(false, index)}><IoAddCircleOutline/></button>
           {entry && <MergeDocumentLine line={entry}/>}
-          {(entry === undefined  || entry!.lineNumberNode.tagName == 'EMPTY LINE') && <>
+          {(entry === undefined  || entry.lineNumberNode.tagName == 'EMPTY LINE') && <>
             <button onClick={() => removeLine(false, index)}><IoRemoveCircleOutline/></button>
             <br/></>}
         </li>)}
