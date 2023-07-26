@@ -80,7 +80,7 @@ const mergeSeparatorElement: XmlElementNode = {
 };
 
 function computeNewLineNumber(lnr: string | undefined, rnr: string | undefined): string | undefined {
-  if (lnr === undefined || rnr === undefined) {
+  if (lnr === undefined || rnr === undefined || lnr == 'EMPTY LINE' || rnr == 'EMPTY LINE') {
     return undefined;
   }
 
