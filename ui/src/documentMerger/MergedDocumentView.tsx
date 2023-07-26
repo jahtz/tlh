@@ -1,5 +1,5 @@
 import {MergeLine} from './mergeDocument';
-import {JSX} from 'react';
+import {JSX, useState} from 'react';
 import {MergeDocumentLine} from './DocumentMerger';
 import {useTranslation} from 'react-i18next';
 import {
@@ -23,11 +23,16 @@ interface IProps {
   publicationMapping: Map<string, string[]>;
 }
 
+interface exportState {
+  mergerName: string;
+  isExportDisabled: boolean;
+}
+
 export function MergedDocumentView({lines, header, publicationMapping}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
+  const [state, setState] = useState<exportState>({mergerName: '', isExportDisabled: true});
 
-  let mergerName = 'DocumentMerger';
 
   function onExport(): void {
     const lineNodes = lines
@@ -46,7 +51,7 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
       if (isXmlElementNode(node) && node.tagName === 'meta') {
         node.children.forEach((cnode) => {
             if (isXmlElementNode(cnode) && cnode.tagName === 'merge') {
-              cnode.attributes['editor'] = mergerName;
+              cnode.attributes['editor'] = state.mergerName;
               cnode.attributes['docs'] = publicationMappingString.join(' ');
               console.log(cnode.attributes['editor']);
             }
@@ -125,17 +130,19 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
   }
 
   function setMergerReg(input: string) {
-    mergerName = input;
+    setState({mergerName: input, isExportDisabled: (input == '')});
   }
 
   return (
     <>
       <div className="mb-4">
         <label htmlFor="mergerName" className="font-bold">{t('editorName')}:</label>
-        <input name="mergerName" id="mergerName" placeholder="DocumentMerger" className="mt-2 p-2 rounded border w-full"
+        <input name="mergerName" id="mergerName" placeholder={t('editorAbbreviation')} className="mt-2 p-2 rounded border w-full"
                onChange={e => setMergerReg(e.target.value)}></input>
       </div>
-      <button type="button" className="mb-2 p-2 rounded bg-blue-500 text-white w-full" onClick={onExport}>{t('export')}</button>
+      <button type="button" className="mb-2 p-2 rounded bg-blue-500 text-white w-full" onClick={onExport} disabled={state.isExportDisabled}>{
+        state.isExportDisabled ? t('disabled_export') : t('export')
+      }</button>
       <pre><code>{xmlFormat(writeNodeWithDefaultWriteConfig(header).join('\n'), {
         indentation: '  ',
         collapseContent: true,
