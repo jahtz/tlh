@@ -66,7 +66,7 @@
     "eject": "react-scripts eject",
     "i18n": "i18next",
     "lint": "eslint src",
-    "codegen": "graphql-codegen --config codegen.ts"
+    "graphql-generate": "graphql-codegen --config codegen.ts"
   },
   "eslintConfig": {
     "extends": "react-app"

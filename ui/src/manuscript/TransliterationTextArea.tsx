@@ -9,8 +9,6 @@ interface IProps {
   onChange: (value: string) => void;
 }
 
-const textAreaClasses = 'mt-2 p-2 rounded border border-slate-500 w-full';
-
 export function TransliterationTextArea({input, onChange}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
@@ -22,7 +20,7 @@ export function TransliterationTextArea({input, onChange}: IProps): JSX.Element 
       <section>
         <label className="my-2 font-bold block text-center">{t('transliteration')}:</label>
 
-        <textarea rows={20} defaultValue={input} placeholder={t('transliteration') || 'transliteration'} className={textAreaClasses}
+        <textarea rows={20} defaultValue={input} placeholder={t('transliteration') || 'transliteration'} className="p-2 rounded border border-slate-500 w-full"
                   onChange={(event) => onChange(event.target.value)}/>
       </section>
 

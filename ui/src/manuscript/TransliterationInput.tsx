@@ -2,58 +2,94 @@ import {ReactElement, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {User} from '../newStore';
 import {homeUrl} from '../urls';
-import {TransliterationInputDataFragment, useTransliterationInputQuery, useUploadTransliterationMutation} from '../graphql';
+import {
+  ManuscriptStatus,
+  TransliterationInputDataFragment,
+  useReleaseTransliterationMutation,
+  useTransliterationInputQuery,
+  useUploadTransliterationMutation
+} from '../graphql';
 import {Navigate, useParams} from 'react-router-dom';
 import update from 'immutability-helper';
 import {TransliterationTextArea} from './TransliterationTextArea';
 import {WithQuery} from '../WithQuery';
 
-interface IProps {
-  currentUser: User;
-}
-
 interface InnerProps {
   mainIdentifier: string;
   manuscript: TransliterationInputDataFragment;
+  initialIsReleased: boolean;
 }
 
 interface IState {
   input: string;
   isSaved: boolean;
+  isReleased: boolean;
 }
 
-function TransliterationInput({mainIdentifier, manuscript}: InnerProps): ReactElement {
+const buttonClasses = (mainColor: string) => `px-4 py-2 rounded bg-${mainColor}-500 text-white drop-shadow-xl disabled:opacity-50`;
+
+function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: InnerProps): ReactElement {
 
   const {t} = useTranslation('common');
-  const [transliteration, setTransliteration] = useState<IState>({input: manuscript.provisionalTransliteration || '', isSaved: true});
-  const [uploadTransliteration, {loading, error}] = useUploadTransliterationMutation();
+  const [{input, isSaved, isReleased}, setTransliteration] = useState<IState>({
+    input: manuscript.provisionalTransliteration || '',
+    isSaved: true,
+    isReleased: initialIsReleased
+  });
+  const [uploadTransliteration, {loading: uploadLoading, error: uploadError}] = useUploadTransliterationMutation();
+  const [releaseTransliteration, {loading: releaseLoading, error: releaseError}] = useReleaseTransliterationMutation();
 
   const updateTransliteration = (value: string): void => setTransliteration((state) => update(state, {input: {$set: value}, isSaved: {$set: false}}));
 
-  const upload = (): Promise<void> => uploadTransliteration({variables: {mainIdentifier, input: transliteration.input}})
-    .then((res) => {
-      if (res.data?.me?.manuscript?.updateTransliteration) {
-        setTransliteration((state) => update(state, {isSaved: {$set: true}}));
-      }
-    })
-    .catch((error) => console.error('Could not upload transliteration:\n' + error));
+  const upload = async () => {
+    const res = await uploadTransliteration({variables: {mainIdentifier, input}});
+
+    if (res.data?.me?.manuscript?.updateTransliteration) {
+      setTransliteration((state) => update(state, {isSaved: {$set: true}}));
+    }
+  };
+
+  const onReleaseTransliteration = async () => {
+    const confirmed = confirm(t('onReleaseAlert'));
+
+    if (!confirmed) {
+      return;
+    }
+
+    const res = await releaseTransliteration({variables: {mainIdentifier}});
+
+    if (res.data?.me?.manuscript?.releaseTransliteration) {
+      setTransliteration((state) => update(state, {isReleased: {$set: true}}));
+    }
+  };
 
   return (
     <>
-      <TransliterationTextArea input={transliteration.input} onChange={updateTransliteration}/>
+      <TransliterationTextArea input={input} onChange={updateTransliteration}/>
 
-      {transliteration.isSaved && <div className="my-4 p-2 rounded bg-green-500 text-white text-center">&#10004; {t('currentVersionSaved')}</div>}
+      {uploadError && <div className="my-2 p-4 bg-red-500 text-white text-center">{uploadError.message}</div>}
+      {releaseError && <div className="my-2 p-4 bgred-500 text-white text-center">{releaseError.message}</div>}
 
-      {error && <div className="my-2 p-2 bg-red-500 text-white text-center">{error.message}</div>}
+      {isReleased && <div className="my-4 p-2 rounded bg-amber-500 text-white text-center">&#10004; {t('transliterationReleased')}</div>}
+      {isSaved && <div className="my-4 p-2 rounded bg-green-500 text-white text-center">&#10004; {t('currentVersionSaved')}</div>}
 
-      <button type="button" className="my-4 p-2 rounded bg-blue-500 text-white w-full" onClick={upload} disabled={loading}>
-        {t('uploadTransliteration')}
-      </button>
+      <div className="my-4 p-4 text-center">
+        <button type="button" className={buttonClasses('blue')} onClick={upload} disabled={uploadLoading || isSaved || isReleased}>
+          {t('uploadTransliteration')}
+        </button>
+      </div>
+
+      <div className="my-4 p-4 text-center">
+        <button type="button" className={buttonClasses('amber')} onClick={onReleaseTransliteration}
+                disabled={uploadLoading || releaseLoading || !isSaved || isReleased}>
+          {t('releaseTransliteration')}
+        </button>
+      </div>
     </>
   );
 }
 
-export function TransliterationInputContainer({currentUser}: IProps): ReactElement {
+export function TransliterationInputContainer({currentUser}: { currentUser: User }): ReactElement {
 
   const {mainIdentifier} = useParams<'mainIdentifier'>();
 
@@ -72,7 +108,7 @@ export function TransliterationInputContainer({currentUser}: IProps): ReactEleme
       <WithQuery query={query}>
         {({manuscript}) => {
 
-          if (manuscript === undefined || manuscript === null) {
+          if (!manuscript) {
             return <div className="p-2 italic text-cyan-500 text-center w-full">{t('manuscriptNotFound')}</div>;
           }
 
@@ -80,7 +116,9 @@ export function TransliterationInputContainer({currentUser}: IProps): ReactEleme
             return <div className="p-2 italic text-cyan-500 text-center w-full">{t('cannotEditForeignTransliteration')}</div>;
           }
 
-          return <TransliterationInput mainIdentifier={mainIdentifier} manuscript={manuscript}/>;
+          const isReleased = manuscript.status !== ManuscriptStatus.Created;
+
+          return <TransliterationInput mainIdentifier={mainIdentifier} manuscript={manuscript} initialIsReleased={isReleased}/>;
         }}
       </WithQuery>
     </div>

@@ -108,6 +108,7 @@ fragment TransliterationInputData on ManuscriptMetaData {
     ...ManuscriptIdentifier
   }
   provisionalTransliteration
+  status
   creatorUsername
 }
 

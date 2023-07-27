@@ -388,14 +388,14 @@ export type UploadPicturesQueryVariables = Exact<{
 
 export type UploadPicturesQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', pictureUrls: Array<string>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } } | null };
 
-export type TransliterationInputDataFragment = { __typename?: 'ManuscriptMetaData', provisionalTransliteration?: string | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
+export type TransliterationInputDataFragment = { __typename?: 'ManuscriptMetaData', provisionalTransliteration?: string | null, status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
 export type TransliterationInputQueryVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
 }>;
 
 
-export type TransliterationInputQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', provisionalTransliteration?: string | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } } | null };
+export type TransliterationInputQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', provisionalTransliteration?: string | null, status?: ManuscriptStatus | null, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } } | null };
 
 export type UploadTransliterationMutationVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
@@ -607,6 +607,7 @@ export const TransliterationInputDataFragmentDoc = gql`
     ...ManuscriptIdentifier
   }
   provisionalTransliteration
+  status
   creatorUsername
 }
     ${ManuscriptIdentifierFragmentDoc}`;
