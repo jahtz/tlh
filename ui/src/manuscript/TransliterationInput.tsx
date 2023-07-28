@@ -9,7 +9,7 @@ import {
   useTransliterationInputQuery,
   useUploadTransliterationMutation
 } from '../graphql';
-import {Navigate, useParams} from 'react-router-dom';
+import {Link, Navigate, useParams} from 'react-router-dom';
 import update from 'immutability-helper';
 import {TransliterationTextArea} from './TransliterationTextArea';
 import {WithQuery} from '../WithQuery';
@@ -50,9 +50,7 @@ function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: I
   };
 
   const onReleaseTransliteration = async () => {
-    const confirmed = confirm(t('onReleaseAlert'));
-
-    if (!confirmed) {
+    if (!confirm(t('onReleaseAlert'))) {
       return;
     }
 
@@ -65,13 +63,23 @@ function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: I
 
   return (
     <>
-      <TransliterationTextArea input={input} onChange={updateTransliteration}/>
+      <TransliterationTextArea input={input} onChange={updateTransliteration} disabled={isReleased}/>
 
       {uploadError && <div className="my-2 p-4 bg-red-500 text-white text-center">{uploadError.message}</div>}
       {releaseError && <div className="my-2 p-4 bgred-500 text-white text-center">{releaseError.message}</div>}
 
-      {isReleased && <div className="my-4 p-2 rounded bg-amber-500 text-white text-center">&#10004; {t('transliterationReleased')}</div>}
-      {isSaved && <div className="my-4 p-2 rounded bg-green-500 text-white text-center">&#10004; {t('currentVersionSaved')}</div>}
+      {isReleased
+        ? (
+          <div className="text-center">
+            <div className="my-4 p-4 rounded bg-amber-500 text-white text-center">&#10004; {t('transliterationReleased')}</div>
+
+            <Link to={'../data'} className="my-4 px-4 py-2 rounded bg-blue-500 text-white">{t('backToManuscript')}</Link>
+          </div>
+        ) : (
+          isSaved
+            ? <div className="my-4 p-4 rounded bg-green-500 text-white text-center">&#10004; {t('currentVersionSaved')}</div>
+            : <div className="my-4 p-4 rounded bg-cyan-500 text-white text-center">&#x26A0; {t('changesMade')}</div>
+        )}
 
       <div className="my-4 p-4 text-center">
         <button type="button" className={buttonClasses('blue')} onClick={upload} disabled={uploadLoading || isSaved || isReleased}>

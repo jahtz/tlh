@@ -7,9 +7,10 @@ import {convertLine} from './LineParseResult';
 interface IProps {
   input: string;
   onChange: (value: string) => void;
+  disabled: boolean;
 }
 
-export function TransliterationTextArea({input, onChange}: IProps): JSX.Element {
+export function TransliterationTextArea({input, onChange, disabled}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -20,7 +21,8 @@ export function TransliterationTextArea({input, onChange}: IProps): JSX.Element 
       <section>
         <label className="my-2 font-bold block text-center">{t('transliteration')}:</label>
 
-        <textarea rows={20} defaultValue={input} placeholder={t('transliteration') || 'transliteration'} className="p-2 rounded border border-slate-500 w-full"
+        <textarea rows={20} defaultValue={input} placeholder={t('transliteration') || 'transliteration'} disabled={disabled}
+                  className="p-2 rounded border border-slate-500 w-full disabled:opacity-50"
                   onChange={(event) => onChange(event.target.value)}/>
       </section>
 

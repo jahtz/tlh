@@ -34,7 +34,7 @@ function Inner({mainIdentifier, initialInput}: IProps): JSX.Element {
 
   return (
     <>
-      <TransliterationTextArea input={input} onChange={setInput}/>
+      <TransliterationTextArea input={input} onChange={setInput} disabled={false}/>
 
       {error && <div className="my-2 p-2 rounded bg-red-500 text-white text-center w-full">{error.message}</div>}
 

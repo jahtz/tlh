@@ -5,6 +5,7 @@ import {LineParseResultDisplay} from './LineParseResultDisplay';
 import {writeNode} from 'simple_xml';
 import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
 import {LineParseResult} from './LineParseResult';
+import {handleSaveToPC} from '../xmlEditor/StandAloneOXTED';
 
 interface IProps {
   showStatusLevel: boolean;
@@ -27,6 +28,10 @@ export function ColumnParseResultComponent({lines, showStatusLevel}: IProps): JS
 
   const {t} = useTranslation('common');
 
+  const exportedXmlLines = exportLines(lines);
+
+  const onXmlExport = () => handleSaveToPC(exportedXmlLines.join('\n'), 'exported.xml');
+  
   return (
     <BulmaTabs tabs={{
       rendered: {
@@ -36,9 +41,15 @@ export function ColumnParseResultComponent({lines, showStatusLevel}: IProps): JS
       asXml: {
         name: t('xmlView'),
         render: () => (
-          <div className="p-2 rounded border border-slate-300 shadow shadow-slate-200">
-            {exportLines(lines).map((xmlLine, index) => <p key={index}>{xmlLine}</p>)}
-          </div>
+          <>
+            <div className="p-2 rounded border border-slate-300 shadow shadow-slate-200">
+              {exportedXmlLines.map((xmlLine, index) => <p key={index}>{xmlLine}</p>)}
+            </div>
+
+            <div className="text-center">
+              <button type="button" className="my-4 px-4 py-2 rounded bg-blue-500 text-white" onClick={onXmlExport}>{t('exportXml')}</button>
+            </div>
+          </>
         )
       }
     }}/>

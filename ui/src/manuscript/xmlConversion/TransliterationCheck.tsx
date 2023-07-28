@@ -24,7 +24,7 @@ export function TransliterationCheck({initialTransliteration, onConvert}: IProps
 
   return (
     <>
-      <TransliterationTextArea input={input} onChange={setInput}/>
+      <TransliterationTextArea input={input} onChange={setInput} disabled={false}/>
 
       <button type="button" onClick={onSubmit} disabled={false} className="my-2 p-2 rounded bg-blue-500 text-white w-full disabled:opacity-50">
         {t('convertToXml')}
