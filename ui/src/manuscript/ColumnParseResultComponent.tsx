@@ -31,7 +31,7 @@ export function ColumnParseResultComponent({lines, showStatusLevel}: IProps): JS
   const exportedXmlLines = exportLines(lines);
 
   const onXmlExport = () => handleSaveToPC(exportedXmlLines.join('\n'), 'exported.xml');
-  
+
   return (
     <BulmaTabs tabs={{
       rendered: {

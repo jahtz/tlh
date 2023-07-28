@@ -129,8 +129,9 @@ mutation uploadTransliteration($mainIdentifier: String!, $input: String!) {
 # /manuscripts/:id/reviewTransliteration
 
 query ReviewTransliteration($mainIdentifier: String!) {
-  reviewerQueries {
-    transliterationReview(mainIdentifier: $mainIdentifier)
+  manuscript(mainIdentifier: $mainIdentifier) {
+    status
+    transliterationReviewData
   }
 }
 

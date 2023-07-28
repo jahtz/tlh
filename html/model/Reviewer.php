@@ -15,13 +15,12 @@ require_once __DIR__ . '/SecondXmlReviewer.php';
 use GraphQL\Type\Definition\{ObjectType, Type};
 use MySafeGraphQLException;
 
-class Reviewer
+abstract class Reviewer
 {
   /* TODO: make subclass of User? */
 
   static ObjectType $queryType;
   static ObjectType $mutationType;
-
 }
 
 Reviewer::$queryType = new ObjectType([
@@ -35,13 +34,6 @@ Reviewer::$queryType = new ObjectType([
         FirstXmlReviewer::selectUnfinishedFirstXmlReviewAppointments($user->username),
         SecondXmlReviewer::selectUnfinishedSecondXmlReviewAppointments($user->username)
       )
-    ],
-    'transliterationReview' => [
-      'type' => Type::string(),
-      'args' => [
-        'mainIdentifier' => Type::nonNull(Type::string())
-      ],
-      'resolve' => fn(User $user, array $args): ?string => TransliterationReviewer::selectTransliterationReviewAppointment($args['mainIdentifier'], $user->username)
     ],
     'xmlConversion' => [
       'type' => Type::string(),

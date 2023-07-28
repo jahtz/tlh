@@ -87,8 +87,9 @@ type ManuscriptMetaData {
   pictureUrls: [String!]!
   provenance: String
   provisionalTransliteration: String
-  status: ManuscriptStatus
+  status: ManuscriptStatus!
   transliterationReleased: Boolean!
+  transliterationReviewData: String
 }
 
 input ManuscriptMetaDataInput {
@@ -148,7 +149,6 @@ type Query {
 
 type Reviewer {
   appointments: [Appointment!]!
-  transliterationReview(mainIdentifier: String!): String
   xmlConversion(mainIdentifier: String!): String
   xmlReview(mainIdentifier: String!, reviewType: XmlReviewType!): String
 }

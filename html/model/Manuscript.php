@@ -175,6 +175,20 @@ class Manuscript extends AbstractManuscript
       fn(array $row): string => $row['release_date']
     );
   }
+
+  // transliteration review
+  function resolveTransliterationReview(?User $user): ?string
+  {
+    if (is_null($user)) {
+      return null;
+    }
+
+    $reviewData = TransliterationReviewer::selectTransliterationReviewData($this->mainIdentifier->identifier);
+
+    return !is_null($reviewData) && $reviewData->username == $user->username
+      ? $reviewData->input
+      : null;
+  }
 }
 
 // GraphQL
@@ -190,10 +204,7 @@ Manuscript::$graphQLType = new ObjectType([
     'palaeographicClassification' => Type::nonNull(AbstractManuscript::$palaeographicClassificationGraphQLEnumType),
     'palaeographicClassificationSure' => Type::nonNull(Type::boolean()),
     'defaultLanguage' => Type::nonNull(ManuscriptLanguage::$enumType),
-    'status' => [
-      'type' => ManuscriptStatus::$graphQLType,
-      'resolve' => fn(Manuscript $manuscript): string => $manuscript->status
-    ],
+    'status' => Type::nonNull(ManuscriptStatus::$graphQLType),
     'otherIdentifiers' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptIdentifier::$graphQLType))),
       'resolve' => fn(Manuscript $manuscript): array => $manuscript->selectOtherIdentifiers()
@@ -210,6 +221,10 @@ Manuscript::$graphQLType = new ObjectType([
       // FIXME: also resolve creator!
       'type' => Type::nonNull(Type::boolean()),
       'resolve' => fn(Manuscript $manuscript): bool => $manuscript->selectTransliterationIsReleased()
+    ],
+    'transliterationReviewData' => [
+      'type' => Type::string(),
+      'resolve' => fn(Manuscript $manuscript, array $args, ?User $user): ?string => $manuscript->resolveTransliterationReview($user)
     ]
   ]
 ]);

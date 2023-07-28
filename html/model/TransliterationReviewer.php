@@ -4,6 +4,7 @@ namespace model;
 
 require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/Appointment.php';
+require_once __DIR__ . '/ReviewData.php';
 
 use mysqli;
 use mysqli_stmt;
@@ -26,17 +27,17 @@ select appointment.main_identifier
     );
   }
 
-  static function selectTransliterationReviewAppointment(string $mainIdentifier, string $username): ?string
+  static function selectTransliterationReviewData(string $mainIdentifier): ?ReviewData
   {
     return SqlHelpers::executeSingleSelectQuery(
       "
-select transliteration.input
+select transliteration.input, appointment.username
 from tlh_dig_transliteration_review_appointments as appointment
     join tlh_dig_released_transliterations as released using(main_identifier)
     join tlh_dig_provisional_transliterations as transliteration using(main_identifier)
-where appointment.main_identifier = ? and username = ?;",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $mainIdentifier, $username),
-      fn(array $row): string => $row['input']
+where appointment.main_identifier = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
+      fn(array $row): ReviewData => new ReviewData($row['input'], $row['username'])
     );
   }
 

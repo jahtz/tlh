@@ -13,6 +13,7 @@ import {Link, Navigate, useParams} from 'react-router-dom';
 import update from 'immutability-helper';
 import {TransliterationTextArea} from './TransliterationTextArea';
 import {WithQuery} from '../WithQuery';
+import {ErrorMessage, InfoMessage, SuccessMessage} from '../designElements/Messages';
 
 interface InnerProps {
   mainIdentifier: string;
@@ -54,9 +55,9 @@ function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: I
       return;
     }
 
-    const res = await releaseTransliteration({variables: {mainIdentifier}});
+    const {data} = await releaseTransliteration({variables: {mainIdentifier}});
 
-    if (res.data?.me?.manuscript?.releaseTransliteration) {
+    if (data?.me?.manuscript?.releaseTransliteration) {
       setTransliteration((state) => update(state, {isReleased: {$set: true}}));
     }
   };
@@ -65,20 +66,20 @@ function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: I
     <>
       <TransliterationTextArea input={input} onChange={updateTransliteration} disabled={isReleased}/>
 
-      {uploadError && <div className="my-2 p-4 bg-red-500 text-white text-center">{uploadError.message}</div>}
-      {releaseError && <div className="my-2 p-4 bgred-500 text-white text-center">{releaseError.message}</div>}
+      {uploadError && <ErrorMessage>{uploadError.message}</ErrorMessage>}
+      {releaseError && <ErrorMessage>{releaseError.message}</ErrorMessage>}
 
       {isReleased
         ? (
           <div className="text-center">
-            <div className="my-4 p-4 rounded bg-amber-500 text-white text-center">&#10004; {t('transliterationReleased')}</div>
+            <SuccessMessage><span>&#10004; {t('transliterationReleased')}</span></SuccessMessage>
 
             <Link to={'../data'} className="my-4 px-4 py-2 rounded bg-blue-500 text-white">{t('backToManuscript')}</Link>
           </div>
         ) : (
           isSaved
-            ? <div className="my-4 p-4 rounded bg-green-500 text-white text-center">&#10004; {t('currentVersionSaved')}</div>
-            : <div className="my-4 p-4 rounded bg-cyan-500 text-white text-center">&#x26A0; {t('changesMade')}</div>
+            ? <SuccessMessage><span>&#10004; {t('currentVersionSaved')}</span></SuccessMessage>
+            : <InfoMessage><span>&#x26A0; {t('changesMade')}</span></InfoMessage>
         )}
 
       <div className="my-4 p-4 text-center">
