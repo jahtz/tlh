@@ -144,8 +144,9 @@ mutation SubmitTransliterationReview($mainIdentifier: String!, $review: String!)
 # /manuscripts/:id/xmlConversion
 
 query XmlConversion($mainIdentifier: String!) {
-  reviewerQueries {
-    xmlConversion(mainIdentifier: $mainIdentifier)
+  manuscript(mainIdentifier: $mainIdentifier) {
+    status
+    xmlConversion
   }
 }
 

@@ -35,13 +35,6 @@ Reviewer::$queryType = new ObjectType([
         SecondXmlReviewer::selectUnfinishedSecondXmlReviewAppointments($user->username)
       )
     ],
-    'xmlConversion' => [
-      'type' => Type::string(),
-      'args' => [
-        'mainIdentifier' => Type::nonNull(Type::string())
-      ],
-      'resolve' => fn(User $user, array $args): ?string => XmlConverter::selectTransliterationInputForXmlConversionAppointment($args['mainIdentifier'], $user->username)
-    ],
     'xmlReview' => [
       'type' => Type::string(),
       'args' => [

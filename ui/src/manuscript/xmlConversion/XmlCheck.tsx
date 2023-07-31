@@ -2,6 +2,7 @@ import {JSX, useState} from 'react';
 import ReactCodeMirror from '@uiw/react-codemirror';
 import {xml} from '@codemirror/lang-xml';
 import {useTranslation} from 'react-i18next';
+import {mainButtonClasses} from '../../defaultDesign';
 
 interface IProps {
   initialXml: string;
@@ -17,13 +18,14 @@ export function XmlCheck({initialXml, loading, onSubmit}: IProps): JSX.Element {
   return (
     <>
       <div className="p-2 rounded border border-slate-500">
-        <ReactCodeMirror value={xmlContent} extensions={[xml()]} onChange={setXmlContent}/>
+        <ReactCodeMirror extensions={[xml()]} value={xmlContent} onChange={setXmlContent}/>
       </div>
 
-      <button type="button" onClick={() => onSubmit(xmlContent)} disabled={loading}
-              className="my-2 p-2 rounded bg-blue-500 text-white w-full disabled:opacity-50">
-        {t('submit')}
-      </button>
+      <div className="text-center">
+        <button type="button" className={mainButtonClasses} onClick={() => onSubmit(xmlContent)} disabled={loading}>
+          {t('submit')}
+        </button>
+      </div>
     </>
   );
 }

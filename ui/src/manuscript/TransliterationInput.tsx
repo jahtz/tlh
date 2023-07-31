@@ -14,6 +14,7 @@ import update from 'immutability-helper';
 import {TransliterationTextArea} from './TransliterationTextArea';
 import {WithQuery} from '../WithQuery';
 import {ErrorMessage, InfoMessage, SuccessMessage} from '../designElements/Messages';
+import {mainButtonClasses} from '../defaultDesign';
 
 interface InnerProps {
   mainIdentifier: string;
@@ -83,7 +84,7 @@ function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: I
         )}
 
       <div className="my-4 p-4 text-center">
-        <button type="button" className={buttonClasses('blue')} onClick={upload} disabled={uploadLoading || isSaved || isReleased}>
+        <button type="button" className={mainButtonClasses} onClick={upload} disabled={uploadLoading || isSaved || isReleased}>
           {t('uploadTransliteration')}
         </button>
       </div>

@@ -189,6 +189,19 @@ class Manuscript extends AbstractManuscript
       ? $reviewData->input
       : null;
   }
+
+  function resolveXmlConversion(?User $user): ?string
+  {
+    if (is_null($user)) {
+      return null;
+    }
+
+    $conversionData = XmlConverter::selectXmlConversionData($this->mainIdentifier->identifier);
+
+    return !is_null($conversionData) && $conversionData->username == $user->username
+      ? $conversionData->input
+      : null;
+  }
 }
 
 // GraphQL
@@ -225,7 +238,11 @@ Manuscript::$graphQLType = new ObjectType([
     'transliterationReviewData' => [
       'type' => Type::string(),
       'resolve' => fn(Manuscript $manuscript, array $args, ?User $user): ?string => $manuscript->resolveTransliterationReview($user)
-    ]
+    ],
+    'xmlConversion' => [
+      'type' => Type::string(),
+      'resolve' => fn(Manuscript $manuscript, array $args, ?User $user): ?string => $manuscript->resolveXmlConversion($user)
+    ],
   ]
 ]);
 

@@ -4,6 +4,7 @@ namespace model;
 
 require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/Appointment.php';
+require_once __DIR__ . '/ReviewData.php';
 
 use mysqli;
 use mysqli_stmt;
@@ -62,17 +63,17 @@ where username = ? and conversion.input is null;",
     });
   }
 
-  static function selectTransliterationInputForXmlConversionAppointment(string $mainIdentifier, string $username): ?string
+  static function selectXmlConversionData(string $mainIdentifier): ?ReviewData
   {
     // TODO: check if blocked...
     return SqlHelpers::executeSingleSelectQuery(
       "
-select review.input
+select review.input, appointment.username
 from tlh_dig_transliteration_reviews as review
     join tlh_dig_xml_conversion_appointments as appointment using(main_identifier)
-where review.main_identifier = ? and username = ?;",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $mainIdentifier, $username),
-      fn(array $row): string => $row['input']
+where review.main_identifier = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
+      fn(array $row): ReviewData => new ReviewData($row['input'], $row['username'])
     );
   }
 }

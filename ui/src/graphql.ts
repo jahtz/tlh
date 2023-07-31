@@ -177,6 +177,7 @@ export type ManuscriptMetaData = {
   status: ManuscriptStatus;
   transliterationReleased: Scalars['Boolean']['output'];
   transliterationReviewData?: Maybe<Scalars['String']['output']>;
+  xmlConversion?: Maybe<Scalars['String']['output']>;
 };
 
 export type ManuscriptMetaDataInput = {
@@ -266,13 +267,7 @@ export type QueryManuscriptArgs = {
 export type Reviewer = {
   __typename?: 'Reviewer';
   appointments: Array<Appointment>;
-  xmlConversion?: Maybe<Scalars['String']['output']>;
   xmlReview?: Maybe<Scalars['String']['output']>;
-};
-
-
-export type ReviewerXmlConversionArgs = {
-  mainIdentifier: Scalars['String']['input'];
 };
 
 
@@ -420,7 +415,7 @@ export type XmlConversionQueryVariables = Exact<{
 }>;
 
 
-export type XmlConversionQuery = { __typename?: 'Query', reviewerQueries?: { __typename?: 'Reviewer', xmlConversion?: string | null } | null };
+export type XmlConversionQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', status: ManuscriptStatus, xmlConversion?: string | null } | null };
 
 export type SubmitXmlConversionMutationVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
@@ -963,8 +958,9 @@ export type SubmitTransliterationReviewMutationResult = Apollo.MutationResult<Su
 export type SubmitTransliterationReviewMutationOptions = Apollo.BaseMutationOptions<SubmitTransliterationReviewMutation, SubmitTransliterationReviewMutationVariables>;
 export const XmlConversionDocument = gql`
     query XmlConversion($mainIdentifier: String!) {
-  reviewerQueries {
-    xmlConversion(mainIdentifier: $mainIdentifier)
+  manuscript(mainIdentifier: $mainIdentifier) {
+    status
+    xmlConversion
   }
 }
     `;

@@ -90,6 +90,7 @@ type ManuscriptMetaData {
   status: ManuscriptStatus!
   transliterationReleased: Boolean!
   transliterationReviewData: String
+  xmlConversion: String
 }
 
 input ManuscriptMetaDataInput {
@@ -149,7 +150,6 @@ type Query {
 
 type Reviewer {
   appointments: [Appointment!]!
-  xmlConversion(mainIdentifier: String!): String
   xmlReview(mainIdentifier: String!, reviewType: XmlReviewType!): String
 }
 
