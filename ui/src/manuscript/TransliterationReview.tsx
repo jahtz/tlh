@@ -36,7 +36,7 @@ function Inner({mainIdentifier, initialInput, initialIsReviewed}: IProps): React
             <SuccessMessage><span>&#10004; {t('transliterationReviewPerformed')}</span></SuccessMessage>
 
             <div className="text-center">
-              <Link to={'../data'} className={mainButtonClasses}>{t('backToManuscript')}</Link>
+              <Link to={homeUrl} className={mainButtonClasses}>{t('backToHome')}</Link>
             </div>
           </>
         ) : (
