@@ -7,10 +7,11 @@ import {mainButtonClasses} from '../../defaultDesign';
 interface IProps {
   initialXml: string;
   loading: boolean;
+  annotated: boolean;
   onSubmit: (value: string) => void;
 }
 
-export function XmlCheck({initialXml, loading, onSubmit}: IProps): JSX.Element {
+export function XmlCheck({initialXml, loading, annotated, onSubmit}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [xmlContent, setXmlContent] = useState(initialXml);
@@ -23,7 +24,7 @@ export function XmlCheck({initialXml, loading, onSubmit}: IProps): JSX.Element {
 
       <div className="text-center">
         <button type="button" className={mainButtonClasses} onClick={() => onSubmit(xmlContent)} disabled={loading}>
-          {t('submit')}
+          {annotated ? t('submit') : t('annotate')}
         </button>
       </div>
     </>
