@@ -18,7 +18,7 @@ export function WithQuery<T, U extends OperationVariables>({query: {data, loadin
       <div className={classNames('notification', 'has-text-centered', {'is-info': loading, 'is-warning': !!error, 'is-primary': !called})}>
         {loading && <span>{t('loading_data')}...</span>}
         {error && error.message}
-        {!called && (notCalledMessage || <p>{t('mutationNotYetCalled')}</p>)}
+        {!called && (notCalledMessage || <p>TODO!</p>)}
       </div>
     );
   } else {
