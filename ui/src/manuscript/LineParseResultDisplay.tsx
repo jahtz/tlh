@@ -12,12 +12,9 @@ function displayStatusLevel(statusLevel: StatusLevel): ReactElement {
   switch (statusLevel) {
     case StatusLevel.ok:
       return <span className="text-green-500">&#10004;</span>;
-    case StatusLevel.minor:
-    case StatusLevel.moderate:
+    case StatusLevel.info:
       return <span className="text-amber-500">?</span>;
-    case StatusLevel.serious:
-    case StatusLevel.severe:
-    case StatusLevel.maximal:
+    case StatusLevel.error:
       return <span className="text-red-500">&#x26A0;</span>;
     case StatusLevel.critical:
       return <span className="text-red-600">&#x26A0;</span>;
