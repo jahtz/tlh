@@ -2,5 +2,8 @@
   "manuscript{{mainIdentifier}}": "Manuscript {{mainidentifier}}",
   "mutationNotYetCalled": "Mutation not yet retrieved",
   "startState": "Start state",
-  "currentState": "Current state"
+  "currentState": "Current state",
+  "editTranscriptioDocument": "Edit Transcriptio",
+  "authorAbbreviation?": "Author short name",
+  "noExportWithoutAuthor": "Enter author name"
 }

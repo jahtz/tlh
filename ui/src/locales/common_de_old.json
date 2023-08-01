@@ -2,5 +2,8 @@
   "manuscript{{mainIdentifier}}": "Manuskript {{mainIdentifier}}",
   "mutationNotYetCalled": "Umformung noch nicht aufgerufen",
   "startState": "Anfangszustand",
-  "currentState": "aktueller Zustand"
+  "currentState": "aktueller Zustand",
+  "editTranscriptioDocument": "Transcriptio bearbeiten",
+  "authorAbbreviation?": "Autor Kurzname",
+  "noExportWithoutAuthor": "Kein Export ohne Autorenangabe"
 }
