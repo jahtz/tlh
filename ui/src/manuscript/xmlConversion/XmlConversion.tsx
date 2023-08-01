@@ -68,7 +68,7 @@ function Inner({mainIdentifier, initialInput, initialIsConverted}: IProps): JSX.
     <>
       {state._type === 'TransliterationCheck'
         ? <TransliterationCheck initialTransliteration={initialInput} onConvert={(content: string) => setState({_type: 'XmlCheck', content})}/>
-        : <XmlCheck key={1} initialXml={state.content} annotated={state._type === 'XmlCheck'} loading={loading} onSubmit={onSubmit}/>
+        : <XmlCheck key={1} initialXml={state.content} annotated={state._type === 'AnnotatedXmlCheck'} loading={loading} onSubmit={onSubmit}/>
       }
 
       {error && <div className="my-2 p-2 rounded bg-red-500 text-white text-center w-full">{error.message}</div>}
