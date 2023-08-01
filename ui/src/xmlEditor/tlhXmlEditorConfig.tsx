@@ -71,6 +71,10 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
       replace: (node, renderChildren/*, isSelected, isLeftSide*/) =>
         <span>{renderChildren()} {node.attributes.nr && <span>&#123;{node.attributes.nr}&#125;</span>}</span>
     },
+    'AO:InvNr': {
+      replace: (node, renderChildren/*, isSelected, isLeftSide*/) =>
+        <span>{renderChildren()} {node.attributes.nr && <span>&#123;{node.attributes.nr}&#125;</span>}</span>
+    },
     'AO:DirectJoin': {replace: () => <span>&nbsp;+&nbsp;</span>},
     'AO:InDirectJoin': {replace: () => <span>&nbsp;(+)&nbsp;</span>},
     'AO:ParagrNr': {replace: (node) => <div className="mt-4 font-bold italic">{node.attributes.c}</div>},
