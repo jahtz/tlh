@@ -14,39 +14,43 @@ interface IProps {
   initialIsConverted: boolean;
 }
 
-interface IState {
-  content: string;
-  annotated: boolean;
+interface TransliterationCheckState {
+  _type: 'TransliterationCheck';
 }
+
+interface XmlCheckState {
+  _type: 'XmlCheck';
+  content: string;
+}
+
+interface AnnotatedXmlCheckState {
+  _type: 'AnnotatedXmlCheck';
+  content: string;
+}
+
+type IState = TransliterationCheckState | XmlCheckState | AnnotatedXmlCheckState;
 
 function Inner({mainIdentifier, initialInput, initialIsConverted}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
-  const [state, setState] = useState<IState>();
+  const [state, setState] = useState<IState>({_type: 'TransliterationCheck'});
   const [submitXmlConversion, {data, loading, error}] = useSubmitXmlConversionMutation();
 
   const converted = initialIsConverted || !!data?.reviewerMutations?.submitXmlConversion;
 
   const onSubmit = async (conversion: string) => {
-    if (state !== undefined) {
-      if (state.annotated) {
-        await submitXmlConversion({variables: {mainIdentifier, conversion}});
-      } else {
-        // TODO: call annotation url...
-        /*
-        const response = await fetch('http://localhost:8077/deuteDokument.php', {
-          method: 'POST',
-          body: conversion,
-          headers: {'Content-Type': 'application/xml*'}
-        });
+    if (state._type === 'XmlCheck') {
+      const response = await fetch('/TLHaly/deuteDokument.php', {
+        method: 'POST',
+        body: conversion,
+        headers: {'Content-Type': 'application/xml*'}
+      });
 
-        const content = await response.text();
+      const content = await response.text();
 
-         */
-        const content = conversion;
-
-        setState({content, annotated: true});
-      }
+      setState({_type: 'AnnotatedXmlCheck', content});
+    } else if (state._type === 'AnnotatedXmlCheck') {
+      await submitXmlConversion({variables: {mainIdentifier, conversion}});
     }
   };
 
@@ -62,9 +66,10 @@ function Inner({mainIdentifier, initialInput, initialIsConverted}: IProps): JSX.
 
   return (
     <>
-      {state === undefined
-        ? <TransliterationCheck initialTransliteration={initialInput} onConvert={(content: string) => setState({content, annotated: false})}/>
-        : <XmlCheck initialXml={state.content} annotated={state.annotated} loading={loading} onSubmit={onSubmit}/>}
+      {state._type === 'TransliterationCheck'
+        ? <TransliterationCheck initialTransliteration={initialInput} onConvert={(content: string) => setState({_type: 'XmlCheck', content})}/>
+        : <XmlCheck key={1} initialXml={state.content} annotated={state._type === 'XmlCheck'} loading={loading} onSubmit={onSubmit}/>
+      }
 
       {error && <div className="my-2 p-2 rounded bg-red-500 text-white text-center w-full">{error.message}</div>}
     </>
