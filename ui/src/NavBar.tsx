@@ -3,10 +3,9 @@ import {JSX} from 'react';
 import {
   createManuscriptUrl,
   documentMergerUrl,
-  editTranscriptionDocumentUrl,
-  editTransliterationDocumentUrl,
   homeUrl,
   loginUrl,
+  oxtedUrl,
   pipelineManagementUrl,
   preferencesUrl,
   registerUrl,
@@ -47,8 +46,7 @@ export function NavBar(): JSX.Element {
       <NavLink className="p-4 hover:bg-slate-700 font-extrabold" title={buildDate} to={homeUrl}>TLH<sup>dig</sup></NavLink>
 
       {user && <NavLink className={buttonClasses} to={createManuscriptUrl}>{t('createManuscript')}</NavLink>}
-      <NavLink className={buttonClasses} to={editTransliterationDocumentUrl}>{t('editDocument')}</NavLink>
-      <NavLink className={buttonClasses} to={editTranscriptionDocumentUrl}>{t('editTranscriptioDocument')}</NavLink>
+      <NavLink className={buttonClasses} to={oxtedUrl}>{t('editDocument')}</NavLink>
       <NavLink className={buttonClasses} to={xmlComparatorUrl}>{t('xmlComparator')}</NavLink>
       <NavLink className={buttonClasses} to={documentMergerUrl}>{t('documentMerger')}</NavLink>
 

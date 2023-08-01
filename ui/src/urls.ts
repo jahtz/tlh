@@ -11,8 +11,7 @@ export const loginUrl = '/login';
 
 export const preferencesUrl = '/preferences';
 
-export const editTransliterationDocumentUrl = '/editDocument';
-export const editTranscriptionDocumentUrl = '/transcriptioEditDocument';
+export const oxtedUrl = '/OXTED';
 
 export const xmlComparatorUrl = '/xmlComparator';
 

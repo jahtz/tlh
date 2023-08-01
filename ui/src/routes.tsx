@@ -5,11 +5,10 @@ import {
   createManuscriptUrl,
   createTransliterationUrl,
   documentMergerUrl,
-  editTranscriptionDocumentUrl,
-  editTransliterationDocumentUrl,
   firstXmlReviewUrl,
   homeUrl,
   loginUrl,
+  oxtedUrl,
   pipelineManagementUrl,
   preferencesUrl,
   registerUrl,
@@ -85,8 +84,7 @@ export const router = createBrowserRouter([
           ]
         },
 
-        {path: editTransliterationDocumentUrl, element: <StandAloneOXTED editorConfig={tlhXmlEditorConfig} documentType={'transliteration'}/>},
-        {path: editTranscriptionDocumentUrl, element: <StandAloneOXTED editorConfig={tlhXmlEditorConfig} documentType={'transcription'}/>},
+        {path: oxtedUrl, element: <StandAloneOXTED editorConfig={tlhXmlEditorConfig}/>},
 
         {path: xmlComparatorUrl, element: <XmlComparatorContainer/>},
 

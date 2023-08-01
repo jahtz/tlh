@@ -6,7 +6,7 @@ import {XmlEditorConfig} from './editorConfig';
 import {useTranslation} from 'react-i18next';
 import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
 
-const locStoreKey = (documentType: DocumentType): string => `editorState_${documentType}`;
+const locStoreKey = 'editorState';
 
 export function handleSaveToPC(data: string, filename: string): void {
   const link = document.createElement('a');
@@ -22,22 +22,18 @@ interface LoadedDocument {
   rootNode: XmlNode;
 }
 
-function initialState(documentType: DocumentType): LoadedDocument | undefined {
-  const maybeEditorState = localStorage.getItem(locStoreKey(documentType));
+function initialState(): LoadedDocument | undefined {
+  const maybeEditorState = localStorage.getItem(locStoreKey);
 
   return maybeEditorState
     ? JSON.parse(maybeEditorState)
     : undefined;
 }
 
-const autoSave = (documentType: DocumentType, filename: string, rootNode: XmlNode): void =>
-  localStorage.setItem(locStoreKey(documentType), JSON.stringify({filename, rootNode}));
-
-type DocumentType = 'transliteration' | 'transcription';
+const autoSave = (filename: string, rootNode: XmlNode): void => localStorage.setItem(locStoreKey, JSON.stringify({filename, rootNode}));
 
 interface IProps {
   editorConfig: XmlEditorConfig;
-  documentType: DocumentType;
 }
 
 function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode {
@@ -55,10 +51,10 @@ function addAuthorNode(rootNode: XmlElementNode, editor: string): XmlElementNode
 
 export const writeXml = (node: XmlElementNode): string => tlhXmlEditorConfig.afterExport(writeNode(tlhXmlEditorConfig.beforeExport(node), tlhXmlEditorConfig.writeConfig).join('\n'));
 
-export function StandAloneOXTED({editorConfig, documentType}: IProps): JSX.Element {
+export function StandAloneOXTED({editorConfig}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
-  const [state, setState] = useState<LoadedDocument | undefined>(initialState(documentType));
+  const [state, setState] = useState<LoadedDocument | undefined>(initialState());
   const [authorState, setAuthorState] = useState<string>();
 
   const readFile = (file: File): Promise<void> => loadNewXml(file, editorConfig.readConfig)
@@ -92,14 +88,14 @@ export function StandAloneOXTED({editorConfig, documentType}: IProps): JSX.Eleme
 
   function closeFile(): void {
     setState(undefined);
-    localStorage.removeItem(locStoreKey(documentType));
+    localStorage.removeItem(locStoreKey);
   }
 
   return (
     <div className="h-full max-h-full">
       {state
         ? <XmlDocumentEditor node={state.rootNode} editorConfig={editorConfig} onExport={download} filename={state.filename} closeFile={closeFile}
-                             autoSave={(node) => autoSave(documentType, state.filename, node)}/>
+                             autoSave={(node) => autoSave(state.filename, node)}/>
         : (
           <div className="container mx-auto">
             <FileLoader accept="text/xml" onLoad={readFile}/>
