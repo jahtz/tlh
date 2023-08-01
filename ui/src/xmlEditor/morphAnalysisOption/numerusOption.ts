@@ -1,5 +1,3 @@
-import {TFunction} from 'i18next';
-
 export enum NumerusOption {
   All = 'All',
   Singular = 'SG',
@@ -15,7 +13,7 @@ export function analysisIsInNumerus(analysis: string, numerus: NumerusOption): b
     firstAnalysisPart.includes('ABL') || firstAnalysisPart.includes('INS') || firstAnalysisPart.includes('ALL');
 }
 
-export function stringifyNumerus(numerus: NumerusOption, t: TFunction): string {
+export function stringifyNumerus(numerus: NumerusOption, t: (key: string) => string): string {
   return {
     [NumerusOption.Singular]: t('SG'),
     [NumerusOption.Plural]: t('PL'),

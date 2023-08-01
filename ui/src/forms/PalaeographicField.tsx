@@ -26,9 +26,7 @@ export function PalaeographicClassificationField({palaeographicClassificationSur
 
   const {t} = useTranslation('common');
 
-  const classes = classNames(
-    'flex-grow', 'p-2', 'rounded-l', 'border', 'border-slate-500', 'bg-white',
-  );
+  const classes = classNames('flex-grow', 'p-2', 'rounded-l', 'border', 'border-slate-500', 'bg-white');
 
   return (
     <div className="mt-2">
