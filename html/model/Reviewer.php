@@ -11,6 +11,7 @@ require_once __DIR__ . '/XmlConverter.php';
 require_once __DIR__ . '/XmlReviewType.php';
 require_once __DIR__ . '/FirstXmlReviewer.php';
 require_once __DIR__ . '/SecondXmlReviewer.php';
+require_once __DIR__ . '/../mailer.php';
 
 use GraphQL\Type\Definition\{ObjectType, Type};
 use MySafeGraphQLException;
@@ -49,6 +50,31 @@ Reviewer::$queryType = new ObjectType([
 ]);
 
 /** @throws MySafeGraphQLException */
+function resolveSubmitTransliterationReview(User $user, string $mainIdentifier, string $review): bool
+{
+  $manuscript = Manuscript::selectManuscriptById($mainIdentifier);
+
+  if (!$manuscript->selectTransliterationIsReleased()) {
+    throw new MySafeGraphQLException("Transliteration of manuscript $mainIdentifier is not yet released!");
+  }
+
+  if (!TransliterationReviewer::selectUserIsAppointedForTransliterationReview($mainIdentifier, $user->username)) {
+    throw new MySafeGraphQLException("User $user->username is not appointed for transliteration review of manuscript $mainIdentifier!");
+  }
+
+  // FIXME: check conditions!
+
+  $inserted = TransliterationReviewer::insertTransliterationReview($mainIdentifier, $user->username, $review);
+
+  sendMails(
+    "Transliteration review performed for manuscript $mainIdentifier",
+    "Transliteration review was performed for manuscript $mainIdentifier by " . $user->username,
+  );
+
+  return $inserted;
+}
+
+/** @throws MySafeGraphQLException */
 function resolveSubmitXmlConversion(User $user, string $mainIdentifier, string $conversion): bool
 {
   if (!TransliterationReviewer::selectTransliterationReviewPerformed($mainIdentifier)) {
@@ -65,7 +91,14 @@ function resolveSubmitXmlConversion(User $user, string $mainIdentifier, string $
 
   // TODO: check if $conversion is xml and fulfills schema?
 
-  return XmlConverter::insertXmlConversion($mainIdentifier, $user->username, $conversion);
+  $inserted = XmlConverter::insertXmlConversion($mainIdentifier, $user->username, $conversion);
+
+  sendMails(
+    "Xml conversion performed for manuscript $mainIdentifier",
+    "Xml conversion was performed for manuscript $mainIdentifier by " . $user->username,
+  );
+
+  return $inserted;
 }
 
 /** @throws MySafeGraphQLException */
@@ -83,7 +116,14 @@ function resolveSubmitFirstXmlReview(User $user, string $mainIdentifier, string 
     throw new MySafeGraphQLException("First xml review of manuscript $mainIdentifier has already been performed!");
   }
 
-  return FirstXmlReviewer::insertFirstXmlReview($mainIdentifier, $user->username, $review);
+  $inserted = FirstXmlReviewer::insertFirstXmlReview($mainIdentifier, $user->username, $review);
+
+  sendMails(
+    "First Xml review performed for manuscript $mainIdentifier",
+    "First Xml review was performed for manuscript $mainIdentifier by " . $user->username,
+  );
+
+  return $inserted;
 }
 
 /** @throws MySafeGraphQLException */
@@ -101,7 +141,14 @@ function resolveSubmitSecondXmlReview(User $user, string $mainIdentifier, string
     throw new MySafeGraphQLException("Second xml review of manuscript $mainIdentifier has already been performed!");
   }
 
-  return SecondXmlReviewer::insertSecondXmlReview($mainIdentifier, $user->username, $review);
+  $inserted = SecondXmlReviewer::insertSecondXmlReview($mainIdentifier, $user->username, $review);
+
+  sendMails(
+    "Second Xml review performed for manuscript $mainIdentifier",
+    "Second Xml review was performed for manuscript $mainIdentifier by " . $user->username,
+  );
+
+  return $inserted;
 }
 
 Reviewer::$mutationType = new ObjectType([
@@ -113,8 +160,7 @@ Reviewer::$mutationType = new ObjectType([
         'mainIdentifier' => Type::nonNull(Type::string()),
         'review' => Type::nonNull(Type::string()),
       ],
-      // FIXME: check conditions!
-      'resolve' => fn(User $user, array $args): bool => TransliterationReviewer::insertTransliterationReview($args['mainIdentifier'], $user->username, $args['review'])
+      'resolve' => fn(User $user, array $args): bool => resolveSubmitTransliterationReview($user, $args['mainIdentifier'], $args['review'])
     ],
     'submitXmlConversion' => [
       'type' => Type::nonNull(Type::boolean()),

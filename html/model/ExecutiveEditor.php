@@ -303,7 +303,14 @@ ExecutiveEditor::$mutationsType = new ObjectType([
           throw new MySafeGraphQLException("Manuscript $manuscriptIdentifier has already been approved!");
         }
 
-        return ExecutiveEditor::insertApproval($manuscriptIdentifier, $input, $user->username);
+        $inserted = ExecutiveEditor::insertApproval($manuscriptIdentifier, $input, $user->username);
+
+        sendMails(
+          "The Manuscript $manuscriptIdentifier was released",
+          "The Manuscript $manuscriptIdentifier was released",
+        );
+
+        return $inserted;
       }
     ]
   ]

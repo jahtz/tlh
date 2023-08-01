@@ -66,4 +66,13 @@ where appointment.main_identifier = ?;",
         );
     });
   }
+
+  static function selectUserIsAppointedForTransliterationReview(string $mainIdentifier, string $username): bool
+  {
+    return SqlHelpers::executeSingleSelectQuery(
+      "select count(*) as count from tlh_dig_transliteration_review_appointments where main_identifier = ? and username = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $mainIdentifier, $username),
+      fn(array $row): bool => $row['count'] === 1
+    );
+  }
 }

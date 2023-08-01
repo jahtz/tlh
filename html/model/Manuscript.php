@@ -8,6 +8,7 @@ require_once __DIR__ . '/ManuscriptIdentifier.php';
 require_once __DIR__ . '/ManuscriptStatus.php';
 require_once __DIR__ . '/ManuscriptLanguage.php';
 require_once __DIR__ . '/AbstractManuscript.php';
+require_once __DIR__ . '/../mailer.php';
 
 use GraphQL\Type\Definition\{ObjectType, Type};
 use MySafeGraphQLException;
@@ -285,7 +286,14 @@ Manuscript::$graphQLMutationsType = new ObjectType([
           throw new MySafeGraphQLException('Can\'t release a non-existing transliteration!');
         }
 
-        return $manuscript->insertReleasedTransliteration();
+        $inserted = $manuscript->insertReleasedTransliteration();
+
+        sendMails(
+          "New transliteration released for manuscript " . $manuscript->mainIdentifier->identifier,
+          "A new transliteration was released for manuscript " . $manuscript->mainIdentifier->identifier
+        );
+
+        return $inserted;
       }
     ]
   ]
