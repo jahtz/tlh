@@ -1,5 +1,7 @@
 export function pictureBaseUrl(manuscriptMainIdentifier: string): string {
-  return `${process.env.REACT_APP_SERVER_URL}/uploads/${manuscriptMainIdentifier}`;
+  return process.env.NODE_ENV === 'development'
+    ? `${process.env.REACT_APP_SERVER_URL}/uploads/${encodeURIComponent(manuscriptMainIdentifier)}`
+    : `/${process.env.REACT_APP_VERSION}/uploads/${encodeURIComponent(manuscriptMainIdentifier)}`;
 }
 
 export const homeUrl = '/';

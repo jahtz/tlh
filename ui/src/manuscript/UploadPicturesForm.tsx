@@ -26,7 +26,11 @@ function Inner({manuscript}: IProps): ReactElement {
   const mainIdentifier = manuscript.mainIdentifier.identifier;
 
   // FIXME: url needs version...
-  const uploadUrl = `${process.env.REACT_APP_SERVER_URL}/uploadPicture.php?id=${encodeURIComponent(mainIdentifier)}`;
+  const uploadUrl = process.env.NODE_ENV === 'development'
+    ? `${process.env.REACT_APP_SERVER_URL}/uploadPicture.php?id=${encodeURIComponent(mainIdentifier)}`
+    : `/${process.env.REACT_APP_VERSION}/uploadPicture.php?id=${encodeURIComponent(mainIdentifier)}`;
+
+  console.info(uploadUrl);
 
   function selectFile(event: ChangeEvent<HTMLInputElement>): void {
     const fileList = event.target.files;
