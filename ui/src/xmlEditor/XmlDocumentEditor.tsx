@@ -1,4 +1,4 @@
-import {JSX, useEffect, useState} from 'react';
+import {ReactElement, useEffect, useState} from 'react';
 import {isXmlElementNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {XmlEditorConfig, XmlSingleEditableNodeConfig} from './editorConfig';
 import {useTranslation} from 'react-i18next';
@@ -31,6 +31,7 @@ interface IProps {
   exportName?: string;
   exportDisabled?: boolean;
   onExport: (node: XmlElementNode) => void;
+  children: ReactElement | undefined;
 }
 
 interface IState {
@@ -88,8 +89,9 @@ export function XmlDocumentEditor({
   closeFile,
   autoSave,
   exportName,
-  exportDisabled
-}: IProps): JSX.Element {
+  exportDisabled,
+  children
+}: IProps): ReactElement {
 
   const {t} = useTranslation('common');
   const editorKeyConfig = useSelector(editorKeyConfigSelector);
@@ -198,7 +200,7 @@ export function XmlDocumentEditor({
     }
   }
 
-  function renderNodeEditor({node, path, changed}: IEditNodeEditorState): JSX.Element {
+  function renderNodeEditor({node, path, changed}: IEditNodeEditorState): ReactElement {
 
     const fontSizeSelectorProps: FontSizeSelectorProps = {
       currentFontSize: state.rightSideFontSize,
@@ -302,18 +304,21 @@ export function XmlDocumentEditor({
     )
     : (
       <div className="px-2 grid grid-cols-2 gap-4 h-full max-h-full">
-        <EditorLeftSide {...leftSideProps} filename={filename} node={state.rootNode} onNodeSelect={onNodeSelect} onExport={exportXml}
-                        exportTitle={exportTitle}/>
+        <div>
+          <EditorLeftSide {...leftSideProps} filename={filename} node={state.rootNode} onNodeSelect={onNodeSelect}/>
+        </div>
 
-        {state.editorState._type === 'EditNodeRightState'
-          ? (
-            <div className="max-h-full overflow-auto" key={state.editorState.path.join('.')}>
-              {renderNodeEditor(state.editorState) /* don't convert to a component! */}
-            </div>
-          )
-          : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}
-                                  toggleCompareChanges={toggleCompareChanges} onExport={exportXml} exportTitle={exportTitle}
-                                  exportDisabled={exportDisabled || false}/>}
+        <div>
+          {state.editorState._type === 'EditNodeRightState'
+            ? (
+              <div className="max-h-full overflow-auto" key={state.editorState.path.join('.')}>
+                {renderNodeEditor(state.editorState) /* don't convert to a component! */}
+              </div>
+            )
+            : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}
+                                    toggleCompareChanges={toggleCompareChanges} onExport={exportXml} exportTitle={exportTitle}
+                                    exportDisabled={exportDisabled || false}>{children}</EditorEmptyRightSide>}
+        </div>
       </div>
     );
 }

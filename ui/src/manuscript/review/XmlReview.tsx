@@ -45,7 +45,7 @@ function Inner({mainIdentifier, initialXml, reviewType}: IProps): JSX.Element {
 
   return (
     <XmlDocumentEditor node={rootNodeParseResult.value as XmlElementNode} filename={mainIdentifier} onExport={onExport}
-                       exportName={t('submitReview') || 'submitReview'} exportDisabled={loading}/>
+                       exportName={t('submitReview') || 'submitReview'} exportDisabled={loading}>{undefined}</XmlDocumentEditor>
   );
 }
 

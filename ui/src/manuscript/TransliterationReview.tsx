@@ -5,7 +5,7 @@ import {homeUrl} from '../urls';
 import {TransliterationTextArea} from './TransliterationTextArea';
 import {useTranslation} from 'react-i18next';
 import {ReactElement, useState} from 'react';
-import {mainButtonClasses} from '../defaultDesign';
+import {blueButtonClasses} from '../defaultDesign';
 import {SuccessMessage} from '../designElements/Messages';
 
 interface IProps {
@@ -36,12 +36,12 @@ function Inner({mainIdentifier, initialInput, initialIsReviewed}: IProps): React
             <SuccessMessage><span>&#10004; {t('transliterationReviewPerformed')}</span></SuccessMessage>
 
             <div className="text-center">
-              <Link to={homeUrl} className={mainButtonClasses}>{t('backToHome')}</Link>
+              <Link to={homeUrl} className={blueButtonClasses}>{t('backToHome')}</Link>
             </div>
           </>
         ) : (
           <div className="text-center">
-            <button type="button" onClick={onSubmit} disabled={loading || reviewed} className={mainButtonClasses}>{t('submit')}</button>
+            <button type="button" onClick={onSubmit} disabled={loading || reviewed} className={blueButtonClasses}>{t('submit')}</button>
           </div>
         )}
     </>

@@ -42,7 +42,7 @@ function Inner({mainIdentifier, initialXml}: IProps): JSX.Element {
 
   return (
     <XmlDocumentEditor node={rootNodeParseResult.value as XmlElementNode} filename={mainIdentifier} onExport={onExport}
-                       exportName={t('submitApproval') || 'submitApproval'} exportDisabled={loading}/>
+                       exportName={t('submitApproval') || 'submitApproval'} exportDisabled={loading}>{undefined}</XmlDocumentEditor>
   );
 }
 

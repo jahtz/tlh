@@ -2,7 +2,7 @@ import {JSX, useState} from 'react';
 import ReactCodeMirror from '@uiw/react-codemirror';
 import {xml} from '@codemirror/lang-xml';
 import {useTranslation} from 'react-i18next';
-import {mainButtonClasses} from '../../defaultDesign';
+import {blueButtonClasses} from '../../defaultDesign';
 
 interface IProps {
   initialXml: string;
@@ -23,7 +23,7 @@ export function XmlCheck({initialXml, loading, annotated, onSubmit}: IProps): JS
       </div>
 
       <div className="text-center">
-        <button type="button" className={mainButtonClasses} onClick={() => onSubmit(xmlContent)} disabled={loading}>
+        <button type="button" className={blueButtonClasses} onClick={() => onSubmit(xmlContent)} disabled={loading}>
           {annotated ? t('submit') : t('annotate')}
         </button>
       </div>

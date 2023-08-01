@@ -1,8 +1,9 @@
 import {isXmlSingleInsertableEditableNodeConfig, XmlEditorConfig, XmlSingleInsertableEditableNodeConfig} from './editorConfig';
-import {JSX} from 'react';
+import {ReactElement} from 'react';
 import {useTranslation} from 'react-i18next';
 import {InsertablePositions} from './insertablePositions';
 import {SelectableButton} from '../genericElements/Buttons';
+import {blueButtonClasses, greenButtonClasses} from '../defaultDesign';
 
 interface IProps {
   editorConfig: XmlEditorConfig;
@@ -12,6 +13,7 @@ interface IProps {
   onExport: () => void;
   exportTitle: string;
   exportDisabled: boolean;
+  children: ReactElement | undefined;
 }
 
 export function EditorEmptyRightSide({
@@ -21,8 +23,9 @@ export function EditorEmptyRightSide({
   toggleCompareChanges,
   onExport,
   exportTitle,
-  exportDisabled
-}: IProps): JSX.Element {
+  exportDisabled,
+  children
+}: IProps): ReactElement {
 
   const {t} = useTranslation('common');
 
@@ -32,20 +35,28 @@ export function EditorEmptyRightSide({
 
   return (
     <div>
-      <h2 className="p2 text-center font-bold text-lg">{t('insertableElements')}</h2>
+      <section className="p-2 rounded border border-slate-500">
+        <h2 className="p-2 text-center font-bold text-lg">{t('insertableElements')}</h2>
 
-      <div className="mt-4 grid grid-cols-4 gap-2">
-        {insertableTags.map(([tagName, insertablePositions]) =>
-          <SelectableButton key={tagName} title={tagName} selected={tagName === currentInsertedElement}
-                            onClick={() => toggleElementInsert(tagName, insertablePositions)} otherClasses={['p-2', 'rounded']}>
-            <>{tagName}</>
-          </SelectableButton>
-        )}
-      </div>
+        <div className="my-4 grid grid-cols-4 gap-2">
+          {insertableTags.map(([tagName, insertablePositions]) =>
+            <SelectableButton key={tagName} title={tagName} selected={tagName === currentInsertedElement}
+                              onClick={() => toggleElementInsert(tagName, insertablePositions)} otherClasses={['p-2', 'rounded']}>
+              <>{tagName}</>
+            </SelectableButton>
+          )}
+        </div>
+      </section>
+
+      {children}
 
       <div className="mt-4 grid grid-cols-2 gap-2">
-        <button type="button" className="p-2 rounded bg-blue-500 text-white w-full" onClick={toggleCompareChanges}>{t('compareChanges')}</button>
-        <button type="button" className="p-2 rounded bg-green-500 text-white w-full" onClick={onExport} disabled={exportDisabled}>{exportTitle}</button>
+        <div className="text-center">
+          <button type="button" className={blueButtonClasses} onClick={toggleCompareChanges}>{t('compareChanges')}</button>
+        </div>
+        <div className="text-center">
+          <button type="button" className={greenButtonClasses} onClick={onExport} disabled={exportDisabled}>{exportTitle}</button>
+        </div>
       </div>
     </div>
   );

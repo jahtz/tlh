@@ -17,8 +17,6 @@ export interface EditorLeftSideProps extends NodeDisplayIProps {
   updateNode: (node: XmlElementNode) => void;
   setKeyHandlingEnabled: (value: boolean) => void;
   closeFile: (() => void) | undefined;
-  exportTitle: string;
-  onExport: () => void;
 }
 
 interface IState {
@@ -35,9 +33,7 @@ export function EditorLeftSide({
   insertStuff,
   updateNode,
   setKeyHandlingEnabled,
-  closeFile,
-  exportTitle,
-  onExport,
+  closeFile
 }: EditorLeftSideProps): JSX.Element {
 
   const {t} = useTranslation('common');
@@ -99,10 +95,6 @@ export function EditorLeftSide({
                 </button>
               </>
             )}
-
-          <button className="px-2 rounded bg-green-400 text-white font-bold" onClick={onExport} title={exportTitle}>
-            &#x1F5AB;
-          </button>
 
           {closeFile && <button className="px-2 rounded bg-red-600 text-white font-bold" onClick={closeFile} title={t('closeFile') || 'closeFile'}>
             &#10799;
