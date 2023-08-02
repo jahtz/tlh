@@ -12,6 +12,17 @@ use sql_helpers\SqlHelpers;
 
 trait HasXmlConversion
 {
+  function upsertXmlConversionAppointment(string $converter, string $appointedBy): string
+  {
+    return SqlHelpers::executeSingleChangeQuery(
+      "
+insert into tlh_dig_xml_conversion_appointments (main_identifier, username, appointed_by_username)
+values (?, ?, ?)
+on duplicate key update username = ?, appointed_by_username = ?, appointment_date = now();",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $this->mainIdentifier->identifier, $converter, $appointedBy, $converter, $appointedBy)
+    );
+  }
+
   function selectUserAppointedForXmlConversion(): ?string
   {
     return SqlHelpers::executeSingleReturnRowQuery(

@@ -239,21 +239,6 @@ function resolveStepData(Manuscript $manuscript, ?User $user, callable $selectSt
   return $data->input;
 }
 
-function resolveXmlConversionData(Manuscript $manuscript, ?User $user): ?string
-{
-  if (is_null($user)) {
-    return null;
-  }
-
-  $data = $manuscript->selectXmlConversionData();
-
-  if ($user->username != $data->username) {
-    return null;
-  }
-
-  return $data->input;
-}
-
 Manuscript::$graphQLType = new ObjectType([
   'name' => 'ManuscriptMetaData',
   'fields' => [

@@ -28,50 +28,6 @@ class ExecutiveEditor
     );
   }
 
-  static function upsertReviewerAppointmentForReleasedTransliteration(string $mainIdentifier, string $reviewer, string $appointedBy): string
-  {
-    return SqlHelpers::executeSingleChangeQuery(
-      "
-insert into tlh_dig_transliteration_review_appointments (main_identifier, username, appointed_by_username)
-values (?, ?, ?)
-on duplicate key update username = ?, appointed_by_username = ?, appointment_date = now();",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $mainIdentifier, $reviewer, $appointedBy, $reviewer, $appointedBy)
-    );
-  }
-
-  static function upsertXmlConversionAppointment(string $mainIdentifier, string $converter, string $appointedBy): string
-  {
-    return SqlHelpers::executeSingleChangeQuery(
-      "
-insert into tlh_dig_xml_conversion_appointments (main_identifier, username, appointed_by_username)
-values (?, ?, ?)
-on duplicate key update username = ?, appointed_by_username = ?, appointment_date = now();",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $mainIdentifier, $converter, $appointedBy, $converter, $appointedBy)
-    );
-  }
-
-  static function upsertFirstXmlReviewAppointment(string $mainIdentifier, string $reviewer, string $appointedBy): string
-  {
-    return SqlHelpers::executeSingleChangeQuery(
-      "
-insert into tlh_dig_first_xml_review_appointments (main_identifier, username, appointed_by_username)
-values (?, ?, ?)
-on duplicate key update username = ?, appointed_by_username = ?, appointment_date = now();",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $mainIdentifier, $reviewer, $appointedBy, $reviewer, $appointedBy)
-    );
-  }
-
-  static function upsertSecondXmlReviewAppointment(string $mainIdentifier, string $reviewer, string $appointedBy): string
-  {
-    return SqlHelpers::executeSingleChangeQuery(
-      "
-insert into tlh_dig_second_xml_review_appointments (main_identifier, username, appointed_by_username)
-values (?, ?, ?)
-on duplicate key update username = ?, appointed_by_username = ?, appointment_date = now();",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $mainIdentifier, $reviewer, $appointedBy, $reviewer, $appointedBy)
-    );
-  }
-
   /** @return string[] */
   static function selectDocumentsAwaitingApproval(): array
   {
@@ -191,6 +147,55 @@ function resolveReviewer(string $username): User
   return $user;
 }
 
+/**
+ * @param string $stepName
+ * @param User $executiveEditor
+ * @param string $usernameToAppoint
+ * @param string $mainIdentifier
+ * @param callable(Manuscript):bool $selectStepAlreadyPerformed
+ * @param callable(Manuscript,string,string):bool $upsertStepAppointmentData
+ *
+ * @return bool
+ *
+ * @throws MySafeGraphQLException
+ */
+function resolveAppointUser(
+  string   $stepName,
+  User     $executiveEditor,
+  string   $usernameToAppoint,
+  string   $mainIdentifier,
+  callable $selectStepAlreadyPerformed,
+  callable $upsertStepAppointmentData
+): bool
+{
+  $reviewer = resolveReviewer($usernameToAppoint);
+  $manuscript = Manuscript::resolveManuscriptById($mainIdentifier);
+
+  // check that transliteration is released
+  if (!$manuscript->selectTransliterationIsReleased()) {
+    throw new MySafeGraphQLException("Transliteration of manuscript " . $manuscript->mainIdentifier->identifier . " is not yet released!");
+  }
+  if ($selectStepAlreadyPerformed($manuscript)) {
+    throw new MySafeGraphQLException("Step $stepName has already been performed for manuscript " . $manuscript->mainIdentifier->identifier . "!");
+  }
+
+  $inserted = $upsertStepAppointmentData($manuscript, $reviewer->username, $executiveEditor->username);
+
+  if (!$inserted) {
+    throw new MySafeGraphQLException("Could not update appointment for step $stepName for manuscript " . $manuscript->mainIdentifier->identifier . "!");
+  }
+
+  // TODO: check if assignment can be done and tell user!
+
+  mail(
+    $reviewer->email,
+    "[TLHdig] Assigned for step $stepName of manuscript " . $manuscript->mainIdentifier->identifier,
+    "You have been assigned for step $stepName of manuscript " . $manuscript->mainIdentifier->identifier . ".",
+  );
+
+  return true;
+}
+
 ExecutiveEditor::$mutationsType = new ObjectType([
   'name' => 'ExecutiveEditorMutations',
   'fields' => [
@@ -217,24 +222,14 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         'manuscriptIdentifier' => Type::nonNull(Type::string()),
         'reviewer' => Type::nonNull(Type::string()),
       ],
-      'resolve' => function (User $user, array $args): string {
-        $reviewer = resolveReviewer($args['reviewer']);
-        $manuscript = Manuscript::resolveManuscriptById($args['manuscriptIdentifier']);
-
-        $inserted = ExecutiveEditor::upsertReviewerAppointmentForReleasedTransliteration($manuscript->mainIdentifier->identifier, $reviewer->username, $user->username);
-
-        if (!$inserted) {
-          return false;
-        }
-
-        mail(
-          $reviewer->email,
-          "[TLHdig] Assigned to review the transliteration of manuscript " . $manuscript->mainIdentifier->identifier,
-          "You have been assigned to review the transliteration of manuscript " . $manuscript->mainIdentifier->identifier
-        );
-
-        return true;
-      }
+      'resolve' => fn(User $executiveEditor, array $args): string => resolveAppointUser(
+        "Transliteration review",
+        $executiveEditor,
+        $args['reviewer'],
+        $args['manuscriptIdentifier'],
+        fn(Manuscript $manuscript): bool => $manuscript->selectTransliterationReviewPerformed(),
+        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): bool => $manuscript->upsertReviewerAppointmentForReleasedTransliteration($reviewer, $appointedBy)
+      )
     ],
     'appointXmlConverter' => [
       'type' => Type::nonNull(Type::string()),
@@ -242,19 +237,14 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         'manuscriptIdentifier' => Type::nonNull(Type::string()),
         'converter' => Type::nonNull(Type::string())
       ],
-      'resolve' => function (User $user, array $args): string {
-        $converter = resolveReviewer($args['converter']);
-        $manuscript = Manuscript::resolveManuscriptById($args['manuscriptIdentifier']);
-
-        if (!$manuscript->selectTransliterationIsReleased()) {
-          throw new MySafeGraphQLException("Transliteration of manuscript " . $manuscript->mainIdentifier->identifier . " is not yet released!");
-        }
-        if ($manuscript->selectXmlConversionPerformed()) {
-          throw new MySafeGraphQLException("Xml conversion of manuscript " . $manuscript->mainIdentifier->identifier . " was already performed!");
-        }
-
-        return ExecutiveEditor::upsertXmlConversionAppointment($manuscript->mainIdentifier->identifier, $converter->username, $user->username);
-      }
+      'resolve' => fn(User $executiveEditor, array $args): string => resolveAppointUser(
+        "Xml conversion",
+        $executiveEditor,
+        $args['converter'],
+        $args['manuscriptIdentifier'],
+        fn(Manuscript $manuscript): bool => $manuscript->selectXmlConversionPerformed(),
+        fn(Manuscript $manuscript, string $converter, string $appointedBy): bool => $manuscript->upsertXmlConversionAppointment($converter, $appointedBy)
+      )
     ],
     'appointFirstXmlReviewer' => [
       'type' => Type::nonNull(Type::string()),
@@ -262,21 +252,14 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         'manuscriptIdentifier' => Type::nonNull(Type::string()),
         'reviewer' => Type::nonNull(Type::string())
       ],
-      'resolve' => function (User $user, array $args): string {
-        $manuscriptIdentifier = $args['manuscriptIdentifier'];
-        $reviewer = resolveReviewer($args['reviewer']);
-
-        $manuscript = Manuscript::selectManuscriptById($manuscriptIdentifier);
-
-        if (!$manuscript->selectTransliterationIsReleased()) {
-          throw new MySafeGraphQLException("Transliteration of manuscript $manuscriptIdentifier is not yet released!");
-        }
-        if (FirstXmlReviewer::selectFirstXmlReviewPerformed($manuscriptIdentifier)) {
-          throw new MySafeGraphQLException("First xml review of manuscript $manuscriptIdentifier was already performed!");
-        }
-
-        return ExecutiveEditor::upsertFirstXmlReviewAppointment($manuscript->mainIdentifier->identifier, $reviewer->username, $user->username);
-      }
+      'resolve' => fn(User $executiveEditor, array $args): string => resolveAppointUser(
+        "First xml review",
+        $executiveEditor,
+        $args['reviewer'],
+        $args['manuscriptIdentifier'],
+        fn(Manuscript $manuscript): bool => $manuscript->selectFirstXmlReviewPerformed(),
+        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): bool => $manuscript->upsertFirstXmlReviewAppointment($reviewer, $appointedBy)
+      )
     ],
     'appointSecondXmlReviewer' => [
       'type' => Type::nonNull(Type::string()),
@@ -284,21 +267,14 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         'manuscriptIdentifier' => Type::nonNull(Type::string()),
         'reviewer' => Type::nonNull(Type::string())
       ],
-      'resolve' => function (User $user, array $args): string {
-        $manuscriptIdentifier = $args['manuscriptIdentifier'];
-        $reviewer = resolveReviewer($args['reviewer']);
-
-        $manuscript = Manuscript::selectManuscriptById($manuscriptIdentifier);
-
-        if (!$manuscript->selectTransliterationIsReleased()) {
-          throw new MySafeGraphQLException("Transliteration of manuscript $manuscriptIdentifier is not yet released!");
-        }
-        if ($manuscript->selectSecondXmlReviewPerformed()) {
-          throw new MySafeGraphQLException("Second xml review of manuscript $manuscriptIdentifier was already performed!");
-        }
-
-        return ExecutiveEditor::upsertSecondXmlReviewAppointment($manuscript->mainIdentifier->identifier, $reviewer->username, $user->username);
-      }
+      'resolve' => fn(User $executiveEditor, array $args): string => resolveAppointUser(
+        "Second xml review",
+        $executiveEditor,
+        $args['reviewer'],
+        $args['manuscriptIdentifier'],
+        fn(Manuscript $manuscript): bool => $manuscript->selectSecondXmlReviewPerformed(),
+        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): bool => $manuscript->upsertSecondXmlReviewAppointment($reviewer, $appointedBy),
+      )
     ],
     'submitApproval' => [
       'type' => Type::nonNull(Type::boolean()),

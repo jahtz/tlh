@@ -12,6 +12,17 @@ use sql_helpers\SqlHelpers;
 
 trait HasSecondXmlReview
 {
+  function upsertSecondXmlReviewAppointment(string $reviewer, string $appointedBy): string
+  {
+    return SqlHelpers::executeSingleChangeQuery(
+      "
+insert into tlh_dig_second_xml_review_appointments (main_identifier, username, appointed_by_username)
+values (?, ?, ?)
+on duplicate key update username = ?, appointed_by_username = ?, appointment_date = now();",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $this->mainIdentifier->identifier, $reviewer, $appointedBy, $reviewer, $appointedBy)
+    );
+  }
+
   static function selectUserAppointedForSecondXmlReview(): ?string
   {
     return SqlHelpers::executeSingleReturnRowQuery(
