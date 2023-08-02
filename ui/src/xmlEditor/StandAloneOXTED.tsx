@@ -90,7 +90,7 @@ export function StandAloneOXTED({editorConfig}: IProps): ReactElement {
         ? (
           <XmlDocumentEditor node={loadedDocument.rootNode} editorConfig={editorConfig} onExport={download} filename={loadedDocument.filename}
                              closeFile={closeFile} autoSave={(node) => autoSave(loadedDocument.filename, node)}>
-            <div className="my-4 p-2 border border-slate-500">
+            <div className="my-4 p-2 rounded border border-slate-500">
               <h2 className="text-center font-bold">{t('exportData')}</h2>
 
               <div>

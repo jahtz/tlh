@@ -219,9 +219,11 @@ export function WordNodeEditor({node, path, updateEditedNode, setKeyHandlingEnab
                                        onSubmit={(newMa) => updateMorphology(morphologies.length, newMa)}
                                        cancelUpdate={toggleAddMorphology}/>
           : (
-            <button type="button" className="mt-4 p-2 rounded bg-cyan-300 text-white w-full" onClick={toggleAddMorphology}>
-              {t('addMorphologicalAnalysis')}
-            </button>
+            <div className="text-center">
+              <button type="button" className="my-4 px-4 py-2 rounded bg-cyan-400 text-white" onClick={toggleAddMorphology}>
+                {t('manuallyAddMorphologicalAnalysis')}
+              </button>
+            </div>
           )}
       </section>
     </>
