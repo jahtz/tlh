@@ -61,9 +61,9 @@ export function XmlReview({reviewType}: { reviewType: XmlReviewType }): JSX.Elem
 
   return (
     <WithQuery query={query}>
-      {(data) =>
-        data?.reviewerQueries?.xmlReview
-          ? <Inner mainIdentifier={mainIdentifier} initialXml={data.reviewerQueries.xmlReview} reviewType={reviewType}/>
+      {({manuscript}) =>
+        manuscript?.xmlReviewData
+          ? <Inner mainIdentifier={mainIdentifier} initialXml={manuscript.xmlReviewData} reviewType={reviewType}/>
           : <Navigate to={homeUrl}/>}
     </WithQuery>
   );

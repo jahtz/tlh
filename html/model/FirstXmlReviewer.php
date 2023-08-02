@@ -2,6 +2,7 @@
 
 namespace model;
 
+use Exception;
 use mysqli;
 use mysqli_stmt;
 use sql_helpers\SqlHelpers;
@@ -27,53 +28,35 @@ where username = ? and review.input is null;",
     );
   }
 
-  static function selectFirstXmlReviewPerformed(string $mainIdentifier): bool
-  {
-    return SqlHelpers::executeSingleSelectQuery(
-      "select count(*) as count from tlh_dig_first_xml_reviews where main_identifier = ?;",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
-      fn(array $row): bool => $row['count'] === 1
-    );
-  }
-
-  static function selectUserIsAppointedForFirstXmlReview(string $mainIdentifier, string $username): bool
-  {
-    return SqlHelpers::executeSingleSelectQuery(
-      "select count(*) as count from tlh_dig_first_xml_review_appointments where main_identifier = ? and username = ?;",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $mainIdentifier, $username),
-      fn(array $row): bool => $row['count'] === 1
-    );
-  }
-
+  /** @deprecated move to manuscript! */
   static function insertFirstXmlReview(string $mainIdentifier, string $reviewerUsername, string $xml): bool
   {
-    return SqlHelpers::executeQueriesInTransactions(function (mysqli $conn) use ($mainIdentifier, $reviewerUsername, $xml): bool {
-      $reviewInserted = SqlHelpers::executeSingleChangeQuery(
+    try {
+      return SqlHelpers::executeQueriesInTransactions(
+        function (mysqli $conn) use ($mainIdentifier, $reviewerUsername, $xml): bool {
+          $reviewDate = SqlHelpers::executeSingleReturnRowQuery(
+            "insert into tlh_dig_first_xml_reviews (main_identifier, input, reviewer_username) values (?, ?, ?) returning review_date;",
+            fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $reviewerUsername),
+            fn(array $row): string => $row['review_date'],
+            $conn
+          );
 
-        "insert into tlh_dig_first_xml_reviews (main_identifier, input, reviewer_username) values (?, ?, ?);",
-        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $reviewerUsername),
-        $conn
+          if (is_null($reviewDate)) {
+            throw new Exception("Could not insert first xml review!");
+          }
+
+          error_log($reviewDate);
+
+          return SqlHelpers::executeSingleChangeQuery(
+            "update tlh_dig_manuscripts set status = 'FirstXmlReviewPerformed' where main_identifier = ?;",
+            fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
+            $conn
+          );
+        }
       );
-
-      return $reviewInserted && SqlHelpers::executeSingleChangeQuery(
-          "update tlh_dig_manuscripts set status = 'FirstXmlReviewPerformed' where main_identifier = ?;",
-          fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
-          $conn
-        );
-    });
+    } catch (Exception $exception) {
+      error_log($exception);
+      return false;
+    }
   }
-
-  static function selectXmlForFirstXmlReviewAppointment(string $mainIdentifier, string $username): ?string
-  {
-    return SqlHelpers::executeSingleSelectQuery(
-      "
-select xml_conversion.input
-from tlh_dig_xml_conversions as xml_conversion
-    join tlh_dig_first_xml_review_appointments as first_xml_rev_app using(main_identifier)
-where xml_conversion.main_identifier = ? and username = ?;",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $mainIdentifier, $username),
-      fn(array $row): string => $row['input']
-    );
-  }
-
 }

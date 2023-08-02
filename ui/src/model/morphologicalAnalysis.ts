@@ -1,5 +1,5 @@
 import {LetteredAnalysisOption, parseMultiAnalysisString, SelectableLetteredAnalysisOption} from './analysisOptions';
-import {tlhAnalyzerUrl} from '../urls';
+import {tlhWordAnalyzerUrl} from '../urls';
 import {XmlElementNode} from 'simple_xml';
 import {EncliticsAnalysis, isSingleEncliticsAnalysis, MultiEncliticsAnalysis, SingleEncliticsAnalysis, writeEncliticsAnalysis} from './encliticsAnalysis';
 import {SelectedMorphAnalysis, SelectedMultiMorphAnalysisWithEnclitic, selectedMultiMorphAnalysisWithEnclitics} from './selectedMorphologicalAnalysis';
@@ -297,7 +297,7 @@ export function fetchMorphologicalAnalyses(w: string, tl: string): Promise<Recor
   formData.append('w', w);
   formData.append('tl', tl);
 
-  return fetch(tlhAnalyzerUrl, {method: 'POST', body: formData})
+  return fetch(tlhWordAnalyzerUrl, {method: 'POST', body: formData})
     .then((res) => res.json());
 }
 

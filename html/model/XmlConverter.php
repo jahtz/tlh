@@ -6,13 +6,13 @@ require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/Appointment.php';
 require_once __DIR__ . '/ReviewData.php';
 
+use Exception;
 use mysqli;
 use mysqli_stmt;
 use sql_helpers\SqlHelpers;
 
 abstract class XmlConverter
 {
-
   /** @return Appointment[] */
   static function selectUnfinishedXmlConversionAppointments(string $username): array
   {
@@ -28,52 +28,35 @@ where username = ? and conversion.input is null;",
     );
   }
 
-  static function selectUserIsAppointedForXmlConversion(string $mainIdentifier, string $username): bool
-  {
-    return SqlHelpers::executeSingleSelectQuery(
-      "select count(*) as count from tlh_dig_xml_conversion_appointments where main_identifier = ? and username = ?;",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $mainIdentifier, $username),
-      fn(array $row): bool => $row['count'] === 1
-    );
-  }
-
-  static function selectXmlConversionPerformed(string $mainIdentifier): bool
-  {
-    return SqlHelpers::executeSingleSelectQuery(
-      "select count(*) as count from tlh_dig_xml_conversions where main_identifier = ?;",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
-      fn(array $row): bool => $row['count'] === 1
-    );
-  }
-
+  /** @deprecated move to Manuscript! */
   static function insertXmlConversion(string $mainIdentifier, string $converterUsername, string $xml): bool
   {
-    return SqlHelpers::executeQueriesInTransactions(function (mysqli $conn) use ($mainIdentifier, $converterUsername, $xml): bool {
-      $conversionInserted = SqlHelpers::executeSingleChangeQuery(
-        "insert into tlh_dig_xml_conversions (main_identifier, input, converter_username) values (?, ?, ?);",
-        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $converterUsername),
-        $conn,
+    try {
+      return SqlHelpers::executeQueriesInTransactions(
+        function (mysqli $conn) use ($mainIdentifier, $converterUsername, $xml): bool {
+          $conversionDate = SqlHelpers::executeSingleReturnRowQuery(
+            "insert into tlh_dig_xml_conversions (main_identifier, input, converter_username) values (?, ?, ?) returning conversion_date;",
+            fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $converterUsername),
+            fn(array $row): string => $row['conversion_date'],
+            $conn,
+          );
+
+          if (is_null($conversionDate)) {
+            return false;
+          }
+
+          error_log($conversionDate);
+
+          return SqlHelpers::executeSingleChangeQuery(
+            "update tlh_dig_manuscripts set status = 'XmlConversionPerformed' where main_identifier = ?;",
+            fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
+            $conn
+          );
+        }
       );
-
-      return $conversionInserted && SqlHelpers::executeSingleChangeQuery(
-          "update tlh_dig_manuscripts set status = 'XmlConversionPerformed' where main_identifier = ?;",
-          fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
-          $conn,
-        );
-    });
-  }
-
-  static function selectXmlConversionData(string $mainIdentifier): ?ReviewData
-  {
-    // TODO: check if blocked...
-    return SqlHelpers::executeSingleSelectQuery(
-      "
-select review.input, appointment.username
-from tlh_dig_transliteration_reviews as review
-    join tlh_dig_xml_conversion_appointments as appointment using(main_identifier)
-where review.main_identifier = ?;",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
-      fn(array $row): ReviewData => new ReviewData($row['input'], $row['username'])
-    );
+    } catch (Exception $exception) {
+      error_log($exception);
+      return false;
+    }
   }
 }

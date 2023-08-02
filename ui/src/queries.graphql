@@ -146,7 +146,7 @@ mutation SubmitTransliterationReview($mainIdentifier: String!, $review: String!)
 query XmlConversion($mainIdentifier: String!) {
   manuscript(mainIdentifier: $mainIdentifier) {
     status
-    xmlConversion
+    xmlConversionData
   }
 }
 
@@ -159,8 +159,8 @@ mutation SubmitXmlConversion($mainIdentifier: String!, $conversion: String!) {
 # /manuscripts/:id/firstXmlReview, /manuscripts/:id/secondXmlReview
 
 query XmlReview($mainIdentifier: String!, $reviewType: XmlReviewType!) {
-  reviewerQueries {
-    xmlReview(mainIdentifier: $mainIdentifier, reviewType: $reviewType)
+  manuscript(mainIdentifier: $mainIdentifier) {
+    xmlReviewData(reviewType: $reviewType)
   }
 }
 

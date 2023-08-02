@@ -5,13 +5,11 @@ const mailAddresses = [
   "charles.steitler@adwmainz.de"
 ];
 
-function sendMails(string $header, string $body)
+function sendMailToAdmins(string $header, string $body)
 {
-  foreach (mailAddresses as $mailAddress) {
-    mail(
-      $mailAddress,
-      "[TLHdig]" . $header,
-      $body
-    );
-  }
+  mail(
+    implode(',', mailAddresses),
+    "[TLHdig]" . $header,
+    $body
+  );
 }

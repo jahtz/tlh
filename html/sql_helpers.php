@@ -116,7 +116,7 @@ abstract class SqlHelpers
    *
    * @throws Exception
    */
-  private static function __executeSelectQuery(?mysqli $conn, string $sql, ?callable $bindParams, callable $f)
+  private static function __executeReturningQuery(?mysqli $conn, string $sql, ?callable $bindParams, callable $f)
   {
     return SqlHelpers::executeQuery($conn, $sql, $bindParams, function (mysqli_stmt $stmt) use ($f) {
       $stmtResult = $stmt->get_result();
@@ -142,10 +142,10 @@ abstract class SqlHelpers
    *
    * @return T|null
    */
-  static function executeSingleSelectQuery(string $sql, ?callable $bindParams, callable $f, ?mysqli $conn = null)
+  static function executeSingleReturnRowQuery(string $sql, ?callable $bindParams, callable $f, ?mysqli $conn = null)
   {
     try {
-      return SqlHelpers::__executeSelectQuery($conn, $sql, $bindParams,
+      return SqlHelpers::__executeReturningQuery($conn, $sql, $bindParams,
         function (mysqli_result $result) use ($f) {
           $row = $result->fetch_assoc();
 
@@ -171,7 +171,7 @@ abstract class SqlHelpers
   static function executeMultiSelectQuery(string $sql, ?callable $bindParams, callable $f, ?mysqli $conn = null): array
   {
     try {
-      return SqlHelpers::__executeSelectQuery($conn, $sql, $bindParams,
+      return SqlHelpers::__executeReturningQuery($conn, $sql, $bindParams,
         fn(mysqli_result $result) => array_map(
           fn(array $row) => $f($row),
           $result->fetch_all(MYSQLI_ASSOC)
@@ -254,15 +254,18 @@ abstract class SqlHelpers
     return true;
   }
 
-
   /**
-   * @param callable(mysqli):bool $f
-   * @return bool
+   * @template T
+   *
+   * @param callable(mysqli):T $f
+   *
+   * @return T
+   *
+   * @throws Exception
    */
   static function executeQueriesInTransactions(callable $f): bool
   {
     $conn = connect_to_db();
-
     $conn->begin_transaction();
 
     try {
@@ -270,16 +273,10 @@ abstract class SqlHelpers
     } catch (Exception $exception) {
       $conn->rollback();
       $conn->close();
-
-      return false;
+      throw $exception;
     }
 
-    if ($result) {
-      $conn->commit();
-    } else {
-      $conn->rollback();
-    }
-
+    $conn->commit();
     $conn->close();
     return $result;
   }

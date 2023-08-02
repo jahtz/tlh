@@ -1,6 +1,6 @@
 import {JSX, useState} from 'react';
 import {Link, Navigate, useParams} from 'react-router-dom';
-import {homeUrl} from '../../urls';
+import {homeUrl, tlhDocumentAnalyzerUrl} from '../../urls';
 import {ManuscriptStatus, useSubmitXmlConversionMutation, useXmlConversionQuery} from '../../graphql';
 import {WithQuery} from '../../WithQuery';
 import {useTranslation} from 'react-i18next';
@@ -40,7 +40,7 @@ function Inner({mainIdentifier, initialInput, initialIsConverted}: IProps): JSX.
 
   const onSubmit = async (conversion: string) => {
     if (state._type === 'XmlCheck') {
-      const response = await fetch('/TLHaly/deuteDokument.php', {
+      const response = await fetch(tlhDocumentAnalyzerUrl, {
         method: 'POST',
         body: conversion,
         headers: {'Content-Type': 'application/xml*'}
@@ -68,7 +68,7 @@ function Inner({mainIdentifier, initialInput, initialIsConverted}: IProps): JSX.
     <>
       {state._type === 'TransliterationCheck'
         ? <TransliterationCheck initialTransliteration={initialInput} onConvert={(content: string) => setState({_type: 'XmlCheck', content})}/>
-        : <XmlCheck key={1} initialXml={state.content} annotated={state._type === 'AnnotatedXmlCheck'} loading={loading} onSubmit={onSubmit}/>
+        : <XmlCheck key={state._type} initialXml={state.content} annotated={state._type === 'AnnotatedXmlCheck'} loading={loading} onSubmit={onSubmit}/>
       }
 
       {error && <div className="my-2 p-2 rounded bg-red-500 text-white text-center w-full">{error.message}</div>}
@@ -97,8 +97,8 @@ export function XmlConversion(): JSX.Element {
 
       <WithQuery query={xmlConversionQuery}>
         {({manuscript}) =>
-          manuscript?.xmlConversion
-            ? <Inner mainIdentifier={mainIdentifier} initialInput={manuscript.xmlConversion} initialIsConverted={xmlConverted(manuscript.status)}/>
+          manuscript?.xmlConversionData
+            ? <Inner mainIdentifier={mainIdentifier} initialInput={manuscript.xmlConversionData} initialIsConverted={xmlConverted(manuscript.status)}/>
             : <Navigate to={homeUrl}/>}
       </WithQuery>
     </div>

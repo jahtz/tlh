@@ -43,4 +43,10 @@ export const approveDocumentUrl = 'approveDocument';
 
 // Foreign urls
 
-export const tlhAnalyzerUrl = '/TLHaly/jasonanalysis.php';
+const tlhAnalyzerBaseUrl = process.env.NODE_ENV === 'development'
+  ? 'https://www.hethport3.uni-wuerzburg.de/'
+  : '';
+
+export const tlhWordAnalyzerUrl = `${tlhAnalyzerBaseUrl}/TLHaly/jasonanalysis.php`;
+
+export const tlhDocumentAnalyzerUrl = `${tlhAnalyzerBaseUrl}/TLHaly/deuteDokument.php`;

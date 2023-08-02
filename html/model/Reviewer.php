@@ -35,120 +35,122 @@ Reviewer::$queryType = new ObjectType([
         FirstXmlReviewer::selectUnfinishedFirstXmlReviewAppointments($user->username),
         SecondXmlReviewer::selectUnfinishedSecondXmlReviewAppointments($user->username)
       )
-    ],
-    'xmlReview' => [
-      'type' => Type::string(),
-      'args' => [
-        'mainIdentifier' => Type::nonNull(Type::string()),
-        'reviewType' => Type::nonNull(XmlReviewType::$graphQLType)
-      ],
-      'resolve' => fn(User $user, array $args): ?string => $args['reviewType'] === XmlReviewType::firstXmlReview
-        ? FirstXmlReviewer::selectXmlForFirstXmlReviewAppointment($args['mainIdentifier'], $user->username)
-        : SecondXmlReviewer::selectXmlForSecondReviewAppointment($args['mainIdentifier'], $user->username)
     ]
   ]
 ]);
 
+/**
+ * @param string $stepName
+ * @param User $user
+ * @param string $mainIdentifier
+ * @param callable(Manuscript):bool $selectPriorStepPerformed
+ * @param callable(Manuscript):null|string $selectAppointedUsername
+ * @param callable(Manuscript):bool $selectStepIsAlreadyPerformed
+ * @param callable(Manuscript):bool $insertStepData
+ *
+ * @return bool
+ *
+ * @throws MySafeGraphQLException
+ */
+function resolveSubmitStep(
+  string   $stepName,
+  User     $user,
+  string   $mainIdentifier,
+  callable $selectPriorStepPerformed,
+  callable $selectAppointedUsername,
+  callable $selectStepIsAlreadyPerformed,
+  callable $insertStepData
+): bool
+{
+  $manuscript = Manuscript::resolveManuscriptById($mainIdentifier);
+
+  // ensure that prior step is performed
+  if (!$selectPriorStepPerformed($manuscript)) {
+    throw new MySafeGraphQLException("Prior step for $stepName is not performed yet!");
+  }
+
+  // ensure that user is appointed
+  $appointedUsername = $selectAppointedUsername($manuscript);
+  if (is_null($appointedUsername)) {
+    throw new MySafeGraphQLException("No user is appointed for $stepName of manuscript " . $manuscript->mainIdentifier->identifier);
+  }
+  if ($appointedUsername != $user->username) {
+    throw new MySafeGraphQLException("User $user->username is not appointed for $stepName of manuscript " . $manuscript->mainIdentifier->identifier);
+  }
+
+  if ($selectStepIsAlreadyPerformed($manuscript)) {
+    throw new MySafeGraphQLException("$stepName of manuscript " . $manuscript->mainIdentifier->identifier . " is already performed!");
+  }
+
+  $inserted = $insertStepData($manuscript);
+  if (!$inserted) {
+    return false;
+  }
+
+  // send mails...
+  sendMailToAdmins(
+    "$stepName performed for manuscript $mainIdentifier",
+    "$stepName was performed for manuscript $mainIdentifier by " . $user->username,
+  );
+
+  return true;
+}
+
 /** @throws MySafeGraphQLException */
 function resolveSubmitTransliterationReview(User $user, string $mainIdentifier, string $review): bool
 {
-  $manuscript = Manuscript::selectManuscriptById($mainIdentifier);
-
-  if (!$manuscript->selectTransliterationIsReleased()) {
-    throw new MySafeGraphQLException("Transliteration of manuscript $mainIdentifier is not yet released!");
-  }
-
-  if (!TransliterationReviewer::selectUserIsAppointedForTransliterationReview($mainIdentifier, $user->username)) {
-    throw new MySafeGraphQLException("User $user->username is not appointed for transliteration review of manuscript $mainIdentifier!");
-  }
-
-  // FIXME: check conditions!
-
-  $inserted = TransliterationReviewer::insertTransliterationReview($mainIdentifier, $user->username, $review);
-
-  sendMails(
-    "Transliteration review performed for manuscript $mainIdentifier",
-    "Transliteration review was performed for manuscript $mainIdentifier by " . $user->username,
+  return resolveSubmitStep(
+    "Transliteration review",
+    $user,
+    $mainIdentifier,
+    fn(Manuscript $manuscript): bool => $manuscript->selectTransliterationIsReleased(),
+    fn(Manuscript $manuscript): ?string => $manuscript->selectUserAppointedForTransliterationReview(),
+    fn(Manuscript $manuscript): bool => $manuscript->selectTransliterationReviewPerformed(),
+    fn(Manuscript $manuscript): bool => TransliterationReviewer::insertTransliterationReview($mainIdentifier, $user->username, $review)
   );
-
-  return $inserted;
 }
 
 /** @throws MySafeGraphQLException */
 function resolveSubmitXmlConversion(User $user, string $mainIdentifier, string $conversion): bool
 {
-  if (!TransliterationReviewer::selectTransliterationReviewPerformed($mainIdentifier)) {
-    throw new MySafeGraphQLException("Transliteration review of manuscript $mainIdentifier is not yet performed!");
-  }
-
-  if (!XmlConverter::selectUserIsAppointedForXmlConversion($mainIdentifier, $user->username)) {
-    throw new MySafeGraphQLException("User $user->username is not appointed for xml conversion of manuscript $mainIdentifier!");
-  }
-
-  if (XmlConverter::selectXmlConversionPerformed($mainIdentifier)) {
-    throw new MySafeGraphQLException("Xml conversion for manuscript $mainIdentifier has already been performed!");
-  }
-
   // TODO: check if $conversion is xml and fulfills schema?
-
-  $inserted = XmlConverter::insertXmlConversion($mainIdentifier, $user->username, $conversion);
-
-  sendMails(
-    "Xml conversion performed for manuscript $mainIdentifier",
-    "Xml conversion was performed for manuscript $mainIdentifier by " . $user->username,
+  return resolveSubmitStep(
+    "Xml conversion",
+    $user,
+    $mainIdentifier,
+    fn(Manuscript $manuscript): bool => $manuscript->selectTransliterationReviewPerformed(),
+    fn(Manuscript $manuscript): ?string => $manuscript->selectUserAppointedForXmlConversion(),
+    fn(Manuscript $manuscript): bool => $manuscript->selectXmlConversionPerformed(),
+    fn(Manuscript $manuscript): bool => XmlConverter::insertXmlConversion($manuscript->mainIdentifier->identifier, $user->username, $conversion)
   );
-
-  return $inserted;
 }
 
 /** @throws MySafeGraphQLException */
 function resolveSubmitFirstXmlReview(User $user, string $mainIdentifier, string $review): bool
 {
-  if (!XmlConverter::selectXmlConversionPerformed($mainIdentifier)) {
-    throw new MySafeGraphQLException("Xml conversion for manuscript $mainIdentifier has not yet been performed!");
-  }
-
-  if (!FirstXmlReviewer::selectUserIsAppointedForFirstXmlReview($mainIdentifier, $user->username)) {
-    throw new MySafeGraphQLException("User $user->username is not appointed for first xml review of manuscript $mainIdentifier!");
-  }
-
-  if (FirstXmlReviewer::selectFirstXmlReviewPerformed($mainIdentifier)) {
-    throw new MySafeGraphQLException("First xml review of manuscript $mainIdentifier has already been performed!");
-  }
-
-  $inserted = FirstXmlReviewer::insertFirstXmlReview($mainIdentifier, $user->username, $review);
-
-  sendMails(
-    "First Xml review performed for manuscript $mainIdentifier",
-    "First Xml review was performed for manuscript $mainIdentifier by " . $user->username,
+  return resolveSubmitStep(
+    "First xml review",
+    $user,
+    $mainIdentifier,
+    fn(Manuscript $manuscript): bool => $manuscript->selectXmlConversionPerformed(),
+    fn(Manuscript $manuscript): ?string => $manuscript->selectUserAppointedForFirstXmlReview(),
+    fn(Manuscript $manuscript): bool => $manuscript->selectFirstXmlReviewPerformed(),
+    fn(Manuscript $manuscript): bool => FirstXmlReviewer::insertFirstXmlReview($manuscript->mainIdentifier->identifier, $user->username, $review)
   );
-
-  return $inserted;
 }
 
 /** @throws MySafeGraphQLException */
 function resolveSubmitSecondXmlReview(User $user, string $mainIdentifier, string $review): bool
 {
-  if (!FirstXmlReviewer::selectFirstXmlReviewPerformed($mainIdentifier)) {
-    throw new MySafeGraphQLException("First xml review of manuscript $mainIdentifier has not yet been performed!");
-  }
-
-  if (!SecondXmlReviewer::selectUserIsAppointedForSecondXmlReview($mainIdentifier, $user->username)) {
-    throw new MySafeGraphQLException("User $user->username is not appointed for second xml review of manuscript $mainIdentifier!");
-  }
-
-  if (SecondXmlReviewer::selectSecondXmlReviewPerformed($mainIdentifier)) {
-    throw new MySafeGraphQLException("Second xml review of manuscript $mainIdentifier has already been performed!");
-  }
-
-  $inserted = SecondXmlReviewer::insertSecondXmlReview($mainIdentifier, $user->username, $review);
-
-  sendMails(
-    "Second Xml review performed for manuscript $mainIdentifier",
-    "Second Xml review was performed for manuscript $mainIdentifier by " . $user->username,
+  return resolveSubmitStep(
+    "Second xml review",
+    $user,
+    $mainIdentifier,
+    fn(Manuscript $manuscript): bool => $manuscript->selectFirstXmlReviewPerformed(),
+    fn(Manuscript $manuscript): ?string => $manuscript->selectUserAppointedForSecondXmlReview(),
+    fn(Manuscript $manuscript): bool => $manuscript->selectSecondXmlReviewPerformed(),
+    fn(Manuscript $manuscript): bool => SecondXmlReviewer::insertSecondXmlReview($manuscript->mainIdentifier->identifier, $user->username, $review)
   );
-
-  return $inserted;
 }
 
 Reviewer::$mutationType = new ObjectType([

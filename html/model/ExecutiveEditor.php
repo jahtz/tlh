@@ -8,6 +8,7 @@ require_once __DIR__ . '/User.php';
 require_once __DIR__ . '/Manuscript.php';
 require_once __DIR__ . '/DocumentInPipeline.php';
 
+use Exception;
 use GraphQL\Type\Definition\{ObjectType, Type};
 use MySafeGraphQLException;
 use mysqli;
@@ -87,7 +88,7 @@ where approved_trans.input is null;",
 
   static function selectDocumentAwaitingApproval(string $mainIdentifier): ?string
   {
-    return SqlHelpers::executeSingleSelectQuery(
+    return SqlHelpers::executeSingleReturnRowQuery(
       "
 select second_xml_revs.input
 from tlh_dig_second_xml_reviews as second_xml_revs
@@ -100,28 +101,33 @@ where approved_trans.input is null and second_xml_revs.main_identifier = ?;",
 
   static function selectDocumentApproved(string $mainIdentifier): bool
   {
-    return SqlHelpers::executeSingleSelectQuery(
+    return SqlHelpers::executeSingleReturnRowQuery(
       "select count(*) as count from tlh_dig_approved_transliterations where main_identifier = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
       fn(array $row): bool => $row['count'] === 1
     );
   }
 
+  /** @throws Exception */
   static function insertApproval(string $mainIdentifier, string $xml, string $approvalUsername): bool
   {
     return SqlHelpers::executeQueriesInTransactions(function (mysqli $conn) use ($mainIdentifier, $xml, $approvalUsername): bool {
-      $approvalInserted = SqlHelpers::executeSingleChangeQuery(
-
-        "insert into tlh_dig_approved_transliterations (main_identifier, input, approval_username) values (?, ?, ?);",
+      $approvalDate = SqlHelpers::executeSingleReturnRowQuery(
+        "insert into tlh_dig_approved_transliterations (main_identifier, input, approval_username) values (?, ?, ?) returning approval_date;",
         fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $approvalUsername),
+        fn(array $row): string => $row['approval_date'],
         $conn
       );
 
-      return $approvalInserted && SqlHelpers::executeSingleChangeQuery(
-          "update tlh_dig_manuscripts set status = 'Approved' where main_identifier = ?;",
-          fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
-          $conn
-        );
+      if (is_null($approvalDate)) {
+        throw new Exception("Could not insert approval!");
+      }
+
+      return SqlHelpers::executeSingleChangeQuery(
+        "update tlh_dig_manuscripts set status = 'Approved' where main_identifier = ?;",
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
+        $conn
+      );
     });
   }
 }
@@ -198,7 +204,7 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         $username = $args['username'];
         $newRights = $args['newRights'];
 
-        if (ExecutiveEditor::updateRights($args['username'], $newRights)) {
+        if (ExecutiveEditor::updateRights($username, $newRights)) {
           return $newRights;
         } else {
           throw new MySafeGraphQLException("Could not change rights for user $username to $newRights");
@@ -212,17 +218,22 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         'reviewer' => Type::nonNull(Type::string()),
       ],
       'resolve' => function (User $user, array $args): string {
-        $mainIdentifier = $args['manuscriptIdentifier'];
-
-        //  make sure that reviewer exists and has review rights
         $reviewer = resolveReviewer($args['reviewer']);
+        $manuscript = Manuscript::resolveManuscriptById($args['manuscriptIdentifier']);
 
-        $manuscript = Manuscript::selectManuscriptById($mainIdentifier);
-        if (is_null($manuscript)) {
-          throw new MySafeGraphQLException("Can't appoint reviewer for non-existing manuscript $mainIdentifier!");
+        $inserted = ExecutiveEditor::upsertReviewerAppointmentForReleasedTransliteration($manuscript->mainIdentifier->identifier, $reviewer->username, $user->username);
+
+        if (!$inserted) {
+          return false;
         }
 
-        return ExecutiveEditor::upsertReviewerAppointmentForReleasedTransliteration($manuscript->mainIdentifier->identifier, $reviewer->username, $user->username);
+        mail(
+          $reviewer->email,
+          "[TLHdig] Assigned to review the transliteration of manuscript " . $manuscript->mainIdentifier->identifier,
+          "You have been assigned to review the transliteration of manuscript " . $manuscript->mainIdentifier->identifier
+        );
+
+        return true;
       }
     ],
     'appointXmlConverter' => [
@@ -232,17 +243,17 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         'converter' => Type::nonNull(Type::string())
       ],
       'resolve' => function (User $user, array $args): string {
-        $manuscriptIdentifier = $args['manuscriptIdentifier'];
-
         $converter = resolveReviewer($args['converter']);
+        $manuscript = Manuscript::resolveManuscriptById($args['manuscriptIdentifier']);
 
-        // TODO: check conditions -> transliteration released!
-
-        if (XmlConverter::selectXmlConversionPerformed($manuscriptIdentifier)) {
-          throw new MySafeGraphQLException("Xml conversion of manuscript $manuscriptIdentifier was already performed!");
+        if (!$manuscript->selectTransliterationIsReleased()) {
+          throw new MySafeGraphQLException("Transliteration of manuscript " . $manuscript->mainIdentifier->identifier . " is not yet released!");
+        }
+        if ($manuscript->selectXmlConversionPerformed()) {
+          throw new MySafeGraphQLException("Xml conversion of manuscript " . $manuscript->mainIdentifier->identifier . " was already performed!");
         }
 
-        return ExecutiveEditor::upsertXmlConversionAppointment($manuscriptIdentifier, $converter->username, $user->username);
+        return ExecutiveEditor::upsertXmlConversionAppointment($manuscript->mainIdentifier->identifier, $converter->username, $user->username);
       }
     ],
     'appointFirstXmlReviewer' => [
@@ -255,13 +266,16 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         $manuscriptIdentifier = $args['manuscriptIdentifier'];
         $reviewer = resolveReviewer($args['reviewer']);
 
-        // TODO: check conditions -> transliteration released!
+        $manuscript = Manuscript::selectManuscriptById($manuscriptIdentifier);
 
+        if (!$manuscript->selectTransliterationIsReleased()) {
+          throw new MySafeGraphQLException("Transliteration of manuscript $manuscriptIdentifier is not yet released!");
+        }
         if (FirstXmlReviewer::selectFirstXmlReviewPerformed($manuscriptIdentifier)) {
           throw new MySafeGraphQLException("First xml review of manuscript $manuscriptIdentifier was already performed!");
         }
 
-        return ExecutiveEditor::upsertFirstXmlReviewAppointment($manuscriptIdentifier, $reviewer->username, $user->username);
+        return ExecutiveEditor::upsertFirstXmlReviewAppointment($manuscript->mainIdentifier->identifier, $reviewer->username, $user->username);
       }
     ],
     'appointSecondXmlReviewer' => [
@@ -274,13 +288,16 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         $manuscriptIdentifier = $args['manuscriptIdentifier'];
         $reviewer = resolveReviewer($args['reviewer']);
 
-        // TODO: check conditions -> transliteration released!
+        $manuscript = Manuscript::selectManuscriptById($manuscriptIdentifier);
 
-        if (SecondXmlReviewer::selectSecondXmlReviewPerformed($manuscriptIdentifier)) {
+        if (!$manuscript->selectTransliterationIsReleased()) {
+          throw new MySafeGraphQLException("Transliteration of manuscript $manuscriptIdentifier is not yet released!");
+        }
+        if ($manuscript->selectSecondXmlReviewPerformed()) {
           throw new MySafeGraphQLException("Second xml review of manuscript $manuscriptIdentifier was already performed!");
         }
 
-        return ExecutiveEditor::upsertSecondXmlReviewAppointment($manuscriptIdentifier, $reviewer->username, $user->username);
+        return ExecutiveEditor::upsertSecondXmlReviewAppointment($manuscript->mainIdentifier->identifier, $reviewer->username, $user->username);
       }
     ],
     'submitApproval' => [
@@ -293,11 +310,13 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         $manuscriptIdentifier = $args['manuscriptIdentifier'];
         $input = $args['input'];
 
+        $manuscript = Manuscript::resolveManuscriptById($manuscriptIdentifier);
+
         // TODO: check conditions -> not submitted yet...!
 
-        if (!SecondXmlReviewer::selectSecondXmlReviewPerformed($manuscriptIdentifier)) {
+        if (!$manuscript->selectSecondXmlReviewPerformed()) {
           throw new MySafeGraphQLException("Second xml review of manuscript $manuscriptIdentifier was not yet performed!");
-        };
+        }
 
         if (ExecutiveEditor::selectDocumentApproved($manuscriptIdentifier)) {
           throw new MySafeGraphQLException("Manuscript $manuscriptIdentifier has already been approved!");
@@ -305,7 +324,7 @@ ExecutiveEditor::$mutationsType = new ObjectType([
 
         $inserted = ExecutiveEditor::insertApproval($manuscriptIdentifier, $input, $user->username);
 
-        sendMails(
+        sendMailToAdmins(
           "The Manuscript $manuscriptIdentifier was released",
           "The Manuscript $manuscriptIdentifier was released",
         );

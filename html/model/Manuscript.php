@@ -8,8 +8,14 @@ require_once __DIR__ . '/ManuscriptIdentifier.php';
 require_once __DIR__ . '/ManuscriptStatus.php';
 require_once __DIR__ . '/ManuscriptLanguage.php';
 require_once __DIR__ . '/AbstractManuscript.php';
+require_once __DIR__ . '/HasTransliterationReview.php';
+require_once __DIR__ . '/HasXmlConversion.php';
+require_once __DIR__ . '/XmlReviewType.php';
+require_once __DIR__ . '/HasFirstXmlReview.php';
+require_once __DIR__ . '/HasSecondXmlReview.php';
 require_once __DIR__ . '/../mailer.php';
 
+use Exception;
 use GraphQL\Type\Definition\{ObjectType, Type};
 use MySafeGraphQLException;
 use mysqli_stmt;
@@ -29,6 +35,8 @@ class Manuscript extends AbstractManuscript
 {
   static ObjectType $graphQLType;
   static ObjectType $graphQLMutationsType;
+
+  use HasTransliterationReview, HasXmlConversion, HasFirstXmlReview, HasSecondXmlReview;
 
   public string $status;
 
@@ -65,7 +73,7 @@ class Manuscript extends AbstractManuscript
 
   static function selectManuscriptsCount(): int
   {
-    return SqlHelpers::executeSingleSelectQuery(
+    return SqlHelpers::executeSingleReturnRowQuery(
       "select count(*) as manuscript_count from tlh_dig_manuscripts;",
       null,
       fn(array $row): int => (int)$row['manuscript_count']
@@ -97,11 +105,23 @@ class Manuscript extends AbstractManuscript
 
   static function selectManuscriptById(string $mainIdentifier): ?Manuscript
   {
-    return SqlHelpers::executeSingleSelectQuery(
+    return SqlHelpers::executeSingleReturnRowQuery(
       "select * from tlh_dig_manuscripts where main_identifier = ?;",
       fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
     );
+  }
+
+  /** @throws MySafeGraphQLException */
+  static function resolveManuscriptById(string $mainIdentifier): Manuscript
+  {
+    $manuscript = Manuscript::selectManuscriptById($mainIdentifier);
+
+    if (is_null($manuscript)) {
+      throw new MySafeGraphQLException("Manuscript $mainIdentifier does not exist!");
+    } else {
+      return $manuscript;
+    }
   }
 
   /** @return ManuscriptIdentifier[] */
@@ -114,7 +134,7 @@ class Manuscript extends AbstractManuscript
     );
   }
 
-  // Transliterations
+  // Provisional Transliteration
 
   function insertProvisionalTransliteration(string $transliteration): bool
   {
@@ -126,16 +146,18 @@ class Manuscript extends AbstractManuscript
 
   function selectProvisionalTransliteration(): ?string
   {
-    return SqlHelpers::executeSingleSelectQuery(
+    return SqlHelpers::executeSingleReturnRowQuery(
       "select input from tlh_dig_provisional_transliterations where main_identifier = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
       fn(array $row): string => $row['input']
     );
   }
 
+  // Released Transliteration
+
   function selectReleasedTransliteration(): ?string
   {
-    return SqlHelpers::executeSingleSelectQuery(
+    return SqlHelpers::executeSingleReturnRowQuery(
       "select main_identifier from tlh_dig_released_transliterations where main_identifier = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
       fn(array $row): string => $row['main_identifier']
@@ -147,65 +169,90 @@ class Manuscript extends AbstractManuscript
     return !is_null($this->selectReleasedTransliteration());
   }
 
-  function insertReleasedTransliteration(): bool
+  /** @throws MySafeGraphQLException */
+  function insertReleasedTransliteration(): string
   {
-    $inserted = SqlHelpers::executeQueriesInTransactions(function ($conn): string {
-      $transliterationInserted = SqlHelpers::executeSingleChangeQuery(
-        "insert into tlh_dig_released_transliterations (main_identifier) values (?);",
-        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
-        $conn
+    try {
+      $inserted = SqlHelpers::executeQueriesInTransactions(
+        function ($conn): string {
+          $transliterationInserted = SqlHelpers::executeSingleChangeQuery(
+            "insert into tlh_dig_released_transliterations (main_identifier) values (?);",
+            fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
+            $conn
+          );
+
+          if (!$transliterationInserted) {
+            return false;
+          }
+
+          return SqlHelpers::executeSingleChangeQuery(
+            "update tlh_dig_manuscripts set status = 'TransliterationReleased' where main_identifier = ?;",
+            fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
+            $conn
+          );
+        }
       );
-
-      $statusUpdated = SqlHelpers::executeSingleChangeQuery(
-        "update tlh_dig_manuscripts set status = 'TransliterationReleased' where main_identifier = ?;",
-        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
-        $conn
-      );
-
-
-      return $transliterationInserted && $statusUpdated;
-    });
-
-    if (!$inserted) {
-      return false;
+    } catch (Exception $exception) {
+      error_log($exception);
+      throw new MySafeGraphQLException("Could not release transliteration of manuscript " . $this->mainIdentifier->identifier);
     }
 
-    return SqlHelpers::executeSingleSelectQuery(
+    if (!$inserted) {
+      throw new MySafeGraphQLException("Couldn't insert transliteration release of manuscript " . $this->mainIdentifier->identifier);
+    }
+
+    return SqlHelpers::executeSingleReturnRowQuery(
       "select release_date from tlh_dig_released_transliterations where main_identifier = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
       fn(array $row): string => $row['release_date']
     );
   }
-
-  // transliteration review
-  function resolveTransliterationReview(?User $user): ?string
-  {
-    if (is_null($user)) {
-      return null;
-    }
-
-    $reviewData = TransliterationReviewer::selectTransliterationReviewData($this->mainIdentifier->identifier);
-
-    return !is_null($reviewData) && $reviewData->username == $user->username
-      ? $reviewData->input
-      : null;
-  }
-
-  function resolveXmlConversion(?User $user): ?string
-  {
-    if (is_null($user)) {
-      return null;
-    }
-
-    $conversionData = XmlConverter::selectXmlConversionData($this->mainIdentifier->identifier);
-
-    return !is_null($conversionData) && $conversionData->username == $user->username
-      ? $conversionData->input
-      : null;
-  }
 }
 
 // GraphQL
+
+/**
+ * @param Manuscript $manuscript
+ * @param User|null $user
+ * @param callable(Manuscript):(null|ReviewData) $selectStepData
+ *
+ * @return ?string
+ *
+ * @throws MySafeGraphQLException
+ */
+function resolveStepData(Manuscript $manuscript, ?User $user, callable $selectStepData): ?string
+{
+  if (is_null($user)) {
+    throw new MySafeGraphQLException("User is not logged in!");
+  }
+
+  $data = $selectStepData($manuscript);
+
+  if (is_null($data)) {
+    return null;
+  }
+
+  if ($user->username != $data->username) {
+    return null;
+  }
+
+  return $data->input;
+}
+
+function resolveXmlConversionData(Manuscript $manuscript, ?User $user): ?string
+{
+  if (is_null($user)) {
+    return null;
+  }
+
+  $data = $manuscript->selectXmlConversionData();
+
+  if ($user->username != $data->username) {
+    return null;
+  }
+
+  return $data->input;
+}
 
 Manuscript::$graphQLType = new ObjectType([
   'name' => 'ManuscriptMetaData',
@@ -238,12 +285,33 @@ Manuscript::$graphQLType = new ObjectType([
     ],
     'transliterationReviewData' => [
       'type' => Type::string(),
-      'resolve' => fn(Manuscript $manuscript, array $args, ?User $user): ?string => $manuscript->resolveTransliterationReview($user)
+      'resolve' => fn(Manuscript $manuscript, array $args, ?User $user): ?string => resolveStepData(
+        $manuscript,
+        $user,
+        fn(Manuscript $manuscript): ?ReviewData => $manuscript->selectTransliterationReviewData()
+      )
     ],
-    'xmlConversion' => [
+    'xmlConversionData' => [
       'type' => Type::string(),
-      'resolve' => fn(Manuscript $manuscript, array $args, ?User $user): ?string => $manuscript->resolveXmlConversion($user)
+      'resolve' => fn(Manuscript $manuscript, array $args, ?User $user): ?string => resolveStepData(
+        $manuscript,
+        $user,
+        fn(Manuscript $manuscript): ?ReviewData => $manuscript->selectXmlConversionData()
+      )
     ],
+    'xmlReviewData' => [
+      'type' => Type::string(),
+      'args' => [
+        'reviewType' => Type::nonNull(XmlReviewType::$graphQLType)
+      ],
+      'resolve' => fn(Manuscript $manuscript, array $args, ?User $user): ?string => resolveStepData(
+        $manuscript,
+        $user,
+        fn(Manuscript $manuscript): ?ReviewData => $args['reviewType'] === XmlReviewType::firstXmlReview
+          ? $manuscript->selectFirstXmlReviewData()
+          : $manuscript->selectSecondXmlReviewData()
+      )
+    ]
   ]
 ]);
 
@@ -288,7 +356,7 @@ Manuscript::$graphQLMutationsType = new ObjectType([
 
         $inserted = $manuscript->insertReleasedTransliteration();
 
-        sendMails(
+        sendMailToAdmins(
           "New transliteration released for manuscript " . $manuscript->mainIdentifier->identifier,
           "A new transliteration was released for manuscript " . $manuscript->mainIdentifier->identifier
         );

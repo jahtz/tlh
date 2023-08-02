@@ -177,7 +177,13 @@ export type ManuscriptMetaData = {
   status: ManuscriptStatus;
   transliterationReleased: Scalars['Boolean']['output'];
   transliterationReviewData?: Maybe<Scalars['String']['output']>;
-  xmlConversion?: Maybe<Scalars['String']['output']>;
+  xmlConversionData?: Maybe<Scalars['String']['output']>;
+  xmlReviewData?: Maybe<Scalars['String']['output']>;
+};
+
+
+export type ManuscriptMetaDataXmlReviewDataArgs = {
+  reviewType: XmlReviewType;
 };
 
 export type ManuscriptMetaDataInput = {
@@ -267,13 +273,6 @@ export type QueryManuscriptArgs = {
 export type Reviewer = {
   __typename?: 'Reviewer';
   appointments: Array<Appointment>;
-  xmlReview?: Maybe<Scalars['String']['output']>;
-};
-
-
-export type ReviewerXmlReviewArgs = {
-  mainIdentifier: Scalars['String']['input'];
-  reviewType: XmlReviewType;
 };
 
 export type ReviewerMutations = {
@@ -415,7 +414,7 @@ export type XmlConversionQueryVariables = Exact<{
 }>;
 
 
-export type XmlConversionQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', status: ManuscriptStatus, xmlConversion?: string | null } | null };
+export type XmlConversionQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', status: ManuscriptStatus, xmlConversionData?: string | null } | null };
 
 export type SubmitXmlConversionMutationVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
@@ -431,7 +430,7 @@ export type XmlReviewQueryVariables = Exact<{
 }>;
 
 
-export type XmlReviewQuery = { __typename?: 'Query', reviewerQueries?: { __typename?: 'Reviewer', xmlReview?: string | null } | null };
+export type XmlReviewQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', xmlReviewData?: string | null } | null };
 
 export type SubmitXmlReviewMutationVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
@@ -960,7 +959,7 @@ export const XmlConversionDocument = gql`
     query XmlConversion($mainIdentifier: String!) {
   manuscript(mainIdentifier: $mainIdentifier) {
     status
-    xmlConversion
+    xmlConversionData
   }
 }
     `;
@@ -1028,8 +1027,8 @@ export type SubmitXmlConversionMutationResult = Apollo.MutationResult<SubmitXmlC
 export type SubmitXmlConversionMutationOptions = Apollo.BaseMutationOptions<SubmitXmlConversionMutation, SubmitXmlConversionMutationVariables>;
 export const XmlReviewDocument = gql`
     query XmlReview($mainIdentifier: String!, $reviewType: XmlReviewType!) {
-  reviewerQueries {
-    xmlReview(mainIdentifier: $mainIdentifier, reviewType: $reviewType)
+  manuscript(mainIdentifier: $mainIdentifier) {
+    xmlReviewData(reviewType: $reviewType)
   }
 }
     `;
