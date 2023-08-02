@@ -2,7 +2,7 @@ import {XmlEditableNodeIProps, XmlSingleEditableNodeConfig} from '../editorConfi
 import {DeleteButton} from '../../genericElements/Buttons';
 import {XmlCommentNode, XmlElementNode, xmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
 import {Spec} from 'immutability-helper';
-import {ReactElement} from 'react';
+import {ReactElement, useState} from 'react';
 import classNames from 'classnames';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 import {useTranslation} from 'react-i18next';
@@ -44,6 +44,7 @@ const EditSingleChild = ({child, updateNode}: EditSingleChildProps): ReactElemen
 function AoManuscriptsEditor({node, updateEditedNode}: XmlEditableNodeIProps): ReactElement {
 
   const {t} = useTranslation('common');
+  const [converted, setConverted] = useState(0);
 
   const isInOldFormat = usesOldFormat(node.children);
 
@@ -54,12 +55,15 @@ function AoManuscriptsEditor({node, updateEditedNode}: XmlEditableNodeIProps): R
 
   // old format
 
-  const convertToNewFormat = (): void => updateEditedNode({children: {$set: node.children.flatMap<NewAoManuscriptsChildNode>(convertNodeFormat)}});
+  const convertToNewFormat = (): void => {
+    setConverted(1);
+    updateEditedNode({children: {$set: node.children.flatMap<NewAoManuscriptsChildNode>(convertNodeFormat)}});
+  };
 
   return (
     <div>
       {node.children.map((source, index) =>
-        <div className="my-2 flex" key={index}>
+        <div className="my-2 flex" key={(converted * 100) + index}>
           {/* FIXME: change key to reflect conversion to new format... */}
           <EditSingleChild child={source} updateNode={(spec) => updateChildNode(index, spec)}/>
 
