@@ -64,7 +64,6 @@ function AoManuscriptsEditor({node, updateEditedNode}: XmlEditableNodeIProps): R
     <div>
       {node.children.map((source, index) =>
         <div className="my-2 flex" key={(converted * 100) + index}>
-          {/* FIXME: change key to reflect conversion to new format... */}
           <EditSingleChild child={source} updateNode={(spec) => updateChildNode(index, spec)}/>
 
           <DeleteButton onClick={() => deleteEntry(index)} otherClasses={['px-4', 'py-2', 'rounded-r']}/>
