@@ -154,9 +154,9 @@ type Reviewer {
 }
 
 type ReviewerMutations {
-  submitTransliterationReview(mainIdentifier: String!, review: String!): Boolean!
-  submitXmlConversion(conversion: String!, mainIdentifier: String!): Boolean!
-  submitXmlReview(mainIdentifier: String!, review: String!, reviewType: XmlReviewType!): Boolean!
+  submitTransliterationReview(mainIdentifier: String!, review: String!): String!
+  submitXmlConversion(conversion: String!, mainIdentifier: String!): String!
+  submitXmlReview(mainIdentifier: String!, review: String!, reviewType: XmlReviewType!): String!
 }
 
 enum Rights {

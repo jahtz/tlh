@@ -277,9 +277,9 @@ export type Reviewer = {
 
 export type ReviewerMutations = {
   __typename?: 'ReviewerMutations';
-  submitTransliterationReview: Scalars['Boolean']['output'];
-  submitXmlConversion: Scalars['Boolean']['output'];
-  submitXmlReview: Scalars['Boolean']['output'];
+  submitTransliterationReview: Scalars['String']['output'];
+  submitXmlConversion: Scalars['String']['output'];
+  submitXmlReview: Scalars['String']['output'];
 };
 
 
@@ -407,7 +407,7 @@ export type SubmitTransliterationReviewMutationVariables = Exact<{
 }>;
 
 
-export type SubmitTransliterationReviewMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitTransliterationReview: boolean } | null };
+export type SubmitTransliterationReviewMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitTransliterationReview: string } | null };
 
 export type XmlConversionQueryVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
@@ -422,7 +422,7 @@ export type SubmitXmlConversionMutationVariables = Exact<{
 }>;
 
 
-export type SubmitXmlConversionMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitXmlConversion: boolean } | null };
+export type SubmitXmlConversionMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitXmlConversion: string } | null };
 
 export type XmlReviewQueryVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
@@ -439,7 +439,7 @@ export type SubmitXmlReviewMutationVariables = Exact<{
 }>;
 
 
-export type SubmitXmlReviewMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitXmlReview: boolean } | null };
+export type SubmitXmlReviewMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitXmlReview: string } | null };
 
 export type ApprovalQueryVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];

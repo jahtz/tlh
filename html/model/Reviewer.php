@@ -46,7 +46,7 @@ Reviewer::$queryType = new ObjectType([
  * @param callable(Manuscript):bool $selectPriorStepPerformed
  * @param callable(Manuscript):null|string $selectAppointedUsername
  * @param callable(Manuscript):bool $selectStepIsAlreadyPerformed
- * @param callable(Manuscript):bool $insertStepData
+ * @param callable(Manuscript):string $insertStepData
  *
  * @return bool
  *
@@ -60,10 +60,9 @@ function resolveSubmitStep(
   callable $selectAppointedUsername,
   callable $selectStepIsAlreadyPerformed,
   callable $insertStepData
-): bool
+): string
 {
   $manuscript = Manuscript::resolveManuscriptById($mainIdentifier);
-
   // ensure that prior step is performed
   if (!$selectPriorStepPerformed($manuscript)) {
     throw new MySafeGraphQLException("Prior step for $stepName is not performed yet!");
@@ -82,10 +81,7 @@ function resolveSubmitStep(
     throw new MySafeGraphQLException("$stepName of manuscript " . $manuscript->mainIdentifier->identifier . " is already performed!");
   }
 
-  $inserted = $insertStepData($manuscript);
-  if (!$inserted) {
-    return false;
-  }
+  $dateString = $insertStepData($manuscript);
 
   // send mails...
   sendMailToAdmins(
@@ -93,7 +89,7 @@ function resolveSubmitStep(
     "$stepName was performed for manuscript $mainIdentifier by " . $user->username,
   );
 
-  return true;
+  return $dateString;
 }
 
 /** @throws MySafeGraphQLException */
@@ -106,7 +102,7 @@ function resolveSubmitTransliterationReview(User $user, string $mainIdentifier, 
     fn(Manuscript $manuscript): bool => $manuscript->selectTransliterationIsReleased(),
     fn(Manuscript $manuscript): ?string => $manuscript->selectUserAppointedForTransliterationReview(),
     fn(Manuscript $manuscript): bool => $manuscript->selectTransliterationReviewPerformed(),
-    fn(Manuscript $manuscript): bool => TransliterationReviewer::insertTransliterationReview($mainIdentifier, $user->username, $review)
+    fn(Manuscript $manuscript): string => $manuscript->insertTransliterationReview($user->username, $review)
   );
 }
 
@@ -121,7 +117,7 @@ function resolveSubmitXmlConversion(User $user, string $mainIdentifier, string $
     fn(Manuscript $manuscript): bool => $manuscript->selectTransliterationReviewPerformed(),
     fn(Manuscript $manuscript): ?string => $manuscript->selectUserAppointedForXmlConversion(),
     fn(Manuscript $manuscript): bool => $manuscript->selectXmlConversionPerformed(),
-    fn(Manuscript $manuscript): bool => XmlConverter::insertXmlConversion($manuscript->mainIdentifier->identifier, $user->username, $conversion)
+    fn(Manuscript $manuscript): string => $manuscript->insertXmlConversion($user->username, $conversion)
   );
 }
 
@@ -135,7 +131,7 @@ function resolveSubmitFirstXmlReview(User $user, string $mainIdentifier, string 
     fn(Manuscript $manuscript): bool => $manuscript->selectXmlConversionPerformed(),
     fn(Manuscript $manuscript): ?string => $manuscript->selectUserAppointedForFirstXmlReview(),
     fn(Manuscript $manuscript): bool => $manuscript->selectFirstXmlReviewPerformed(),
-    fn(Manuscript $manuscript): bool => FirstXmlReviewer::insertFirstXmlReview($manuscript->mainIdentifier->identifier, $user->username, $review)
+    fn(Manuscript $manuscript): string => $manuscript->insertFirstXmlReview($user->username, $review)
   );
 }
 
@@ -149,7 +145,7 @@ function resolveSubmitSecondXmlReview(User $user, string $mainIdentifier, string
     fn(Manuscript $manuscript): bool => $manuscript->selectFirstXmlReviewPerformed(),
     fn(Manuscript $manuscript): ?string => $manuscript->selectUserAppointedForSecondXmlReview(),
     fn(Manuscript $manuscript): bool => $manuscript->selectSecondXmlReviewPerformed(),
-    fn(Manuscript $manuscript): bool => SecondXmlReviewer::insertSecondXmlReview($manuscript->mainIdentifier->identifier, $user->username, $review)
+    fn(Manuscript $manuscript): string => $manuscript->insertSecondXmlReview($manuscript->mainIdentifier->identifier, $user->username, $review)
   );
 }
 
@@ -157,7 +153,7 @@ Reviewer::$mutationType = new ObjectType([
   'name' => 'ReviewerMutations',
   'fields' => [
     'submitTransliterationReview' => [
-      'type' => Type::nonNull(Type::boolean()),
+      'type' => Type::nonNull(Type::string()),
       'args' => [
         'mainIdentifier' => Type::nonNull(Type::string()),
         'review' => Type::nonNull(Type::string()),
@@ -165,7 +161,7 @@ Reviewer::$mutationType = new ObjectType([
       'resolve' => fn(User $user, array $args): bool => resolveSubmitTransliterationReview($user, $args['mainIdentifier'], $args['review'])
     ],
     'submitXmlConversion' => [
-      'type' => Type::nonNull(Type::boolean()),
+      'type' => Type::nonNull(Type::string()),
       'args' => [
         'mainIdentifier' => Type::nonNull(Type::string()),
         'conversion' => Type::nonNull(Type::string())
@@ -173,7 +169,7 @@ Reviewer::$mutationType = new ObjectType([
       'resolve' => fn(User $user, array $args): bool => resolveSubmitXmlConversion($user, $args['mainIdentifier'], $args['conversion'])
     ],
     'submitXmlReview' => [
-      'type' => Type::nonNull(Type::boolean()),
+      'type' => Type::nonNull(Type::string()),
       'args' => [
         'mainIdentifier' => Type::nonNull(Type::string()),
         'review' => Type::nonNull(Type::string()),
