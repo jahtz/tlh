@@ -2,9 +2,10 @@ import {ChangeEvent, createRef, ReactElement, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {homeUrl} from '../urls';
 import {PicturesBlock} from './PicturesBlock';
-import {Navigate, useParams} from 'react-router-dom';
+import {Link, Navigate, useParams} from 'react-router-dom';
 import {ManuscriptIdentWithCreatorFragment, useUploadPicturesQuery} from '../graphql';
 import {WithQuery} from '../WithQuery';
+import {blueButtonClasses} from '../defaultDesign';
 
 interface IState {
   selectedFile?: File;
@@ -59,17 +60,21 @@ function Inner({manuscript}: IProps): ReactElement {
         {t('manuscript')} {mainIdentifier}: {t('uploadPicture_plural')}
       </h1>
 
-      <div className="my-3">
+      <div className="my-4">
         {state.allPictures.length > 0
           ? <PicturesBlock mainIdentifier={mainIdentifier} pictures={state.allPictures}/>
           : <div className="p-2 rounded bg-cyan-500 text-white text-center">{t('noPicturesUploadedYet')}.</div>}
       </div>
 
-      <div className="flex">
+      <div className="my-4 flex">
         <input type="file" className="p-2 rounded-l border-l border-y border-slate-200 flex-grow" onChange={selectFile} ref={fileUploadRef}/>
         <button type="button" className="p-2 rounded-r border border-slate-200" disabled={!state.selectedFile} onClick={performUpload}>
           {t('uploadPicture')}
         </button>
+      </div>
+
+      <div className="my-4 text-center">
+        <Link to={'../data'} className={blueButtonClasses}>{t('backToManuscript')}</Link>
       </div>
     </div>
   );

@@ -62,7 +62,12 @@ export function StandAloneOXTED({editorConfig}: IProps): ReactElement {
   };
 
   function download(rootNode: XmlElementNode): void {
-    if (loadedDocument === undefined || author === undefined) {
+    if (loadedDocument === undefined) {
+      return;
+    }
+
+    if (author === undefined) {
+      alert(t('pleaseSpecifyAuthor'));
       return;
     }
 
