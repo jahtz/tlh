@@ -304,9 +304,7 @@ export function XmlDocumentEditor({
     )
     : (
       <div className="px-2 grid grid-cols-2 gap-4 h-full max-h-full">
-        <div>
-          <EditorLeftSide {...leftSideProps} filename={filename} node={state.rootNode} onNodeSelect={onNodeSelect}/>
-        </div>
+        <EditorLeftSide {...leftSideProps} filename={filename} node={state.rootNode} onNodeSelect={onNodeSelect}/>
 
         <div>
           {state.editorState._type === 'EditNodeRightState'
