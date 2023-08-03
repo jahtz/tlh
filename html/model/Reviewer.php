@@ -44,11 +44,11 @@ Reviewer::$queryType = new ObjectType([
  * @param User $user
  * @param string $mainIdentifier
  * @param callable(Manuscript):bool $selectPriorStepPerformed
- * @param callable(Manuscript):null|string $selectAppointedUsername
+ * @param callable(Manuscript):(null|string) $selectAppointedUsername
  * @param callable(Manuscript):bool $selectStepIsAlreadyPerformed
  * @param callable(Manuscript):string $insertStepData
  *
- * @return bool
+ * @return string
  *
  * @throws MySafeGraphQLException
  */
@@ -63,6 +63,7 @@ function resolveSubmitStep(
 ): string
 {
   $manuscript = Manuscript::resolveManuscriptById($mainIdentifier);
+
   // ensure that prior step is performed
   if (!$selectPriorStepPerformed($manuscript)) {
     throw new MySafeGraphQLException("Prior step for $stepName is not performed yet!");
@@ -145,7 +146,7 @@ function resolveSubmitSecondXmlReview(User $user, string $mainIdentifier, string
     fn(Manuscript $manuscript): bool => $manuscript->selectFirstXmlReviewPerformed(),
     fn(Manuscript $manuscript): ?string => $manuscript->selectUserAppointedForSecondXmlReview(),
     fn(Manuscript $manuscript): bool => $manuscript->selectSecondXmlReviewPerformed(),
-    fn(Manuscript $manuscript): string => $manuscript->insertSecondXmlReview($manuscript->mainIdentifier->identifier, $user->username, $review)
+    fn(Manuscript $manuscript): string => $manuscript->insertSecondXmlReview($user->username, $review)
   );
 }
 

@@ -12,15 +12,21 @@ use sql_helpers\SqlHelpers;
 
 trait HasTransliterationReview
 {
+  /** @throws MySafeGraphQLException */
   function upsertReviewerAppointmentForReleasedTransliteration(string $reviewer, string $appointedBy): string
   {
-    return SqlHelpers::executeSingleChangeQuery(
-      "
+    try {
+      return SqlHelpers::executeSingleChangeQuery(
+        "
 insert into tlh_dig_transliteration_review_appointments (main_identifier, username, appointed_by_username)
 values (?, ?, ?)
 on duplicate key update username = ?, appointed_by_username = ?, appointment_date = now();",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $this->mainIdentifier->identifier, $reviewer, $appointedBy, $reviewer, $appointedBy)
-    );
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $this->mainIdentifier->identifier, $reviewer, $appointedBy, $reviewer, $appointedBy)
+      );
+    } catch (Exception $exception) {
+      error_log($exception);
+      throw new MySafeGraphQLException("Could not save appointment!");
+    }
   }
 
   function selectUserAppointedForTransliterationReview(): ?string
@@ -58,32 +64,33 @@ where appointment.main_identifier = ?;",
   function insertTransliterationReview(string $reviewerUsername, string $input): string
   {
     try {
-      return SqlHelpers::executeQueriesInTransactions(
-        function (mysqli $conn) use ($reviewerUsername, $input): string {
-          $reviewDate = SqlHelpers::executeSingleReturnRowQuery(
-            "insert into tlh_dig_transliteration_reviews (main_identifier, reviewer_username, input) values (?, ?, ?) returning review_date;",
+      SqlHelpers::executeQueriesInTransactions(
+        function (mysqli $conn) use ($reviewerUsername, $input): void {
+          SqlHelpers::executeSingleChangeQuery(
+            "insert into tlh_dig_transliteration_reviews (main_identifier, reviewer_username, input) values (?, ?, ?);",
             fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $this->mainIdentifier->identifier, $reviewerUsername, $input),
-            fn(array $row): string => $row['review_date'],
             $conn
           );
 
-          if (is_null($reviewDate)) {
-            throw new Exception("Could not insert transliteration review");
-          }
-
-          $statusUpdated = SqlHelpers::executeSingleChangeQuery(
+          SqlHelpers::executeSingleChangeQuery(
             "update tlh_dig_manuscripts set status = 'TransliterationReviewPerformed' where main_identifier = ?;",
             fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
             $conn
           );
-
-          if (!$statusUpdated) {
-            throw new Exception("Could not update status for manuscript " . $this->mainIdentifier->identifier);
-          }
-
-          return $reviewDate;
         }
       );
+
+      $reviewDate = SqlHelpers::executeSingleReturnRowQuery(
+        "select review_date from tlh_dig_transliteration_reviews where main_identifier = ?;",
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
+        fn(array $row): string => $row['review_date']
+      );
+
+      if (is_null($reviewDate)) {
+        throw new Exception("Could not select previously inserted transliteration review!");
+      }
+
+      return $reviewDate;
     } catch (Exception $exception) {
       error_log($exception);
       throw new MySafeGraphQLException("Could not save transliteration review for manuscript " . $this->mainIdentifier->identifier . "!");

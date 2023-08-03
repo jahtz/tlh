@@ -12,15 +12,21 @@ use sql_helpers\SqlHelpers;
 
 trait HasXmlConversion
 {
+  /** @throws MySafeGraphQLException */
   function upsertXmlConversionAppointment(string $converter, string $appointedBy): string
   {
-    return SqlHelpers::executeSingleChangeQuery(
-      "
+    try {
+      return SqlHelpers::executeSingleChangeQuery(
+        "
 insert into tlh_dig_xml_conversion_appointments (main_identifier, username, appointed_by_username)
 values (?, ?, ?)
 on duplicate key update username = ?, appointed_by_username = ?, appointment_date = now();",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $this->mainIdentifier->identifier, $converter, $appointedBy, $converter, $appointedBy)
-    );
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $this->mainIdentifier->identifier, $converter, $appointedBy, $converter, $appointedBy)
+      );
+    } catch (Exception $exception) {
+      error_log($exception);
+      throw new MySafeGraphQLException("Could not save appointment!");
+    }
   }
 
   function selectUserAppointedForXmlConversion(): ?string
@@ -58,32 +64,33 @@ where review.main_identifier = ?;",
   function insertXmlConversion(string $converterUsername, string $xml): string
   {
     try {
-      return SqlHelpers::executeQueriesInTransactions(
-        function (mysqli $conn) use ($converterUsername, $xml): string {
-          $conversionDate = SqlHelpers::executeSingleReturnRowQuery(
-            "insert into tlh_dig_xml_conversions (main_identifier, input, converter_username) values (?, ?, ?) returning conversion_date;",
+      SqlHelpers::executeQueriesInTransactions(
+        function (mysqli $conn) use ($converterUsername, $xml): void {
+          SqlHelpers::executeSingleChangeQuery(
+            "insert into tlh_dig_xml_conversions (main_identifier, input, converter_username) values (?, ?, ?);",
             fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $this->mainIdentifier->identifier, $xml, $converterUsername),
-            fn(array $row): string => $row['conversion_date'],
             $conn,
           );
 
-          if (is_null($conversionDate)) {
-            throw new Exception("Could not insert xml conversion!");
-          }
-
-          $statusUpdated = SqlHelpers::executeSingleChangeQuery(
+          SqlHelpers::executeSingleChangeQuery(
             "update tlh_dig_manuscripts set status = 'XmlConversionPerformed' where main_identifier = ?;",
             fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
             $conn
           );
-
-          if (!$statusUpdated) {
-            throw new Exception("Could not update status for manuscript " . $this->mainIdentifier->identifier);
-          }
-
-          return $conversionDate;
         }
       );
+
+      $conversionDate = SqlHelpers::executeSingleReturnRowQuery(
+        "select conversion_date from tlh_dig_xml_conversions where main_identifier = ?;",
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
+        fn(array $row): string => $row['conversion_date']
+      );
+
+      if (is_null($conversionDate)) {
+        throw new Exception("Could not select previously inserted xml conversion!");
+      }
+
+      return $conversionDate;
     } catch (Exception $exception) {
       error_log($exception);
       throw new MySafeGraphQLException("Could not save xml conversion for manuscript " . $this->mainIdentifier->identifier . "!");

@@ -12,18 +12,24 @@ use sql_helpers\SqlHelpers;
 
 trait HasSecondXmlReview
 {
+  /** @throws MySafeGraphQLException */
   function upsertSecondXmlReviewAppointment(string $reviewer, string $appointedBy): string
   {
-    return SqlHelpers::executeSingleChangeQuery(
-      "
+    try {
+      return SqlHelpers::executeSingleChangeQuery(
+        "
 insert into tlh_dig_second_xml_review_appointments (main_identifier, username, appointed_by_username)
 values (?, ?, ?)
 on duplicate key update username = ?, appointed_by_username = ?, appointment_date = now();",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $this->mainIdentifier->identifier, $reviewer, $appointedBy, $reviewer, $appointedBy)
-    );
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $this->mainIdentifier->identifier, $reviewer, $appointedBy, $reviewer, $appointedBy)
+      );
+    } catch (Exception $exception) {
+      error_log($exception);
+      throw new MySafeGraphQLException("Could not save appointment!");
+    }
   }
 
-  static function selectUserAppointedForSecondXmlReview(): ?string
+  function selectUserAppointedForSecondXmlReview(): ?string
   {
     return SqlHelpers::executeSingleReturnRowQuery(
       "select username from tlh_dig_second_xml_review_appointments where main_identifier = ?;",
@@ -49,7 +55,7 @@ select first_xml_rev.input, appointment.username
 from tlh_dig_first_xml_reviews as first_xml_rev
     join tlh_dig_second_xml_review_appointments as appointment using(main_identifier)
 where first_xml_rev.main_identifier = ?;",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
       fn(array $row): ReviewData => new ReviewData($row['input'], $row['username'])
     );
   }
@@ -58,32 +64,34 @@ where first_xml_rev.main_identifier = ?;",
   function insertSecondXmlReview(string $reviewerUsername, string $xml): string
   {
     try {
-      return SqlHelpers::executeQueriesInTransactions(
-        function (mysqli $conn) use ($reviewerUsername, $xml): string {
-          $reviewDate = SqlHelpers::executeSingleReturnRowQuery(
-            "insert into tlh_dig_second_xml_reviews (main_identifier, input, reviewer_username) values (?, ?, ?) returning review_date;",
+      SqlHelpers::executeQueriesInTransactions(
+        function (mysqli $conn) use ($reviewerUsername, $xml): void {
+          SqlHelpers::executeSingleReturnRowQuery(
+            "insert into tlh_dig_second_xml_reviews (main_identifier, input, reviewer_username) values (?, ?, ?);",
             fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $this->mainIdentifier->identifier, $xml, $reviewerUsername),
             fn(array $row): string => $row['review_date'],
             $conn
           );
 
-          if (is_null($reviewDate)) {
-            throw new Exception("Could not insert second xml review!");
-          }
-
-          $statusUpdated = SqlHelpers::executeSingleChangeQuery(
+          SqlHelpers::executeSingleChangeQuery(
             "update tlh_dig_manuscripts set status = 'SecondXmlReviewPerformed' where main_identifier = ?;",
-            fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
+            fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
             $conn
           );
-
-          if (!$statusUpdated) {
-            throw new Exception("Could not update status for manuscript " . $this->mainIdentifier->identifier);
-          }
-
-          return $reviewDate;
         }
       );
+
+      $reviewDate = SqlHelpers::executeSingleReturnRowQuery(
+        "select review_date from tlh_dig_second_xml_reviews where main_identifier = ?;",
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
+        fn(array $row): string => $row['review_date']
+      );
+
+      if (is_null($reviewDate)) {
+        throw new Exception("Could not select previously inserted second xml review!");
+      }
+
+      return $reviewDate;
     } catch (Exception $exception) {
       error_log($exception);
       throw new MySafeGraphQLException("Could not save second xml review for manuscript " . $this->mainIdentifier->identifier . "!");

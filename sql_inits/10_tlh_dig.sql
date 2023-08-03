@@ -140,7 +140,7 @@ create table if not exists tlh_dig_second_xml_review_appointments (
 );
 
 create table if not exists tlh_dig_second_xml_reviews (
-  main_identifier   varchar(20)  not null primary key references tlh_dig_first_xml_reviews (main_identifier) on update cascade on delete cascade,
+  main_identifier   varchar(20)  not null primary key references tlh_dig_released_transliterations (main_identifier) on update cascade on delete cascade,
   input             text         not null,
   reviewer_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete restrict,
   review_date       date         not null default now(),

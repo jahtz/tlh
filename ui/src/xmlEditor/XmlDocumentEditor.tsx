@@ -301,8 +301,7 @@ export function XmlDocumentEditor({
         <XmlComparator leftFile={{name: t('startingDocumentState'), baseContent: writeXml(initialNode as XmlElementNode)}}
                        rightFile={{name: t('currentDocumentState'), baseContent: writeXml(state.rootNode as XmlElementNode)}}/>
       </div>
-    )
-    : (
+    ) : (
       <div className="px-2 grid grid-cols-2 gap-4 h-full max-h-full">
         <EditorLeftSide {...leftSideProps} filename={filename} node={state.rootNode} onNodeSelect={onNodeSelect}/>
 

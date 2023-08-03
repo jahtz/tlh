@@ -74,7 +74,7 @@ abstract class SqlHelpers
   /**
    * @template T
    *
-   * @param mysqli|null $conn
+   * @param mysqli|null $maybeConn
    * @param string $sql
    * @param null|callable(mysqli_stmt):bool $bindParams
    * @param callable(mysqli_stmt):T $f
@@ -189,15 +189,12 @@ abstract class SqlHelpers
    * @param callable(mysqli_stmt):bool $bindParams
    *
    * @return bool
+   *
+   * @throws Exception
    */
   static function executeSingleChangeQuery(string $sql, callable $bindParams, ?mysqli $conn = null): bool
   {
-    try {
-      return SqlHelpers::executeQuery($conn, $sql, $bindParams, fn() => true);
-    } catch (Exception $exception) {
-      error_log($exception);
-      return false;
-    }
+    return SqlHelpers::executeQuery($conn, $sql, $bindParams, fn(): bool => true);
   }
 
   /**
@@ -263,7 +260,7 @@ abstract class SqlHelpers
    *
    * @throws Exception
    */
-  static function executeQueriesInTransactions(callable $f): bool
+  static function executeQueriesInTransactions(callable $f)
   {
     $conn = connect_to_db();
     $conn->begin_transaction();

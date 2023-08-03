@@ -22,10 +22,15 @@ class ExecutiveEditor
 
   static function updateRights(string $username, string $newRights): bool
   {
-    return SqlHelpers::executeSingleChangeQuery(
-      "update tlh_dig_users set rights = ? where username = ?;",
-      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $newRights, $username)
-    );
+    try {
+      return SqlHelpers::executeSingleChangeQuery(
+        "update tlh_dig_users set rights = ? where username = ?;",
+        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $newRights, $username)
+      );
+    } catch (Exception $exception) {
+      error_log($exception);
+      return false;
+    }
   }
 
   /** @return string[] */
@@ -67,24 +72,21 @@ where approved_trans.input is null and second_xml_revs.main_identifier = ?;",
   /** @throws Exception */
   static function insertApproval(string $mainIdentifier, string $xml, string $approvalUsername): bool
   {
-    return SqlHelpers::executeQueriesInTransactions(function (mysqli $conn) use ($mainIdentifier, $xml, $approvalUsername): bool {
-      $approvalDate = SqlHelpers::executeSingleReturnRowQuery(
-        "insert into tlh_dig_approved_transliterations (main_identifier, input, approval_username) values (?, ?, ?) returning approval_date;",
-        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $approvalUsername),
-        fn(array $row): string => $row['approval_date'],
-        $conn
-      );
+    return SqlHelpers::executeQueriesInTransactions(
+      function (mysqli $conn) use ($mainIdentifier, $xml, $approvalUsername): bool {
+        SqlHelpers::executeSingleChangeQuery(
+          "insert into tlh_dig_approved_transliterations (main_identifier, input, approval_username) values (?, ?, ?);",
+          fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sss', $mainIdentifier, $xml, $approvalUsername),
+          $conn
+        );
 
-      if (is_null($approvalDate)) {
-        throw new Exception("Could not insert approval!");
+        return SqlHelpers::executeSingleChangeQuery(
+          "update tlh_dig_manuscripts set status = 'Approved' where main_identifier = ?;",
+          fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
+          $conn
+        );
       }
-
-      return SqlHelpers::executeSingleChangeQuery(
-        "update tlh_dig_manuscripts set status = 'Approved' where main_identifier = ?;",
-        fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
-        $conn
-      );
-    });
+    );
   }
 }
 
