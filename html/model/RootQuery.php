@@ -20,13 +20,15 @@ RootQuery::$queryType = new ObjectType([
   'fields' => [
     'manuscriptCount' => [
       'type' => Type::nonNull(Type::int()),
-      'resolve' => fn(): int => Manuscript::selectManuscriptsCount()
+      // FIXME: only own or approved manuscripts!
+      'resolve' => fn(?int $_rootValue, array $args, ?User $user): int => Manuscript::selectManuscriptsCount($user->username)
     ],
     'allManuscripts' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(Manuscript::$graphQLType))),
       'args' => [
         'page' => Type::nonNull(Type::int())
       ],
+
       'resolve' => fn(?int $_rootValue, array $args, ?User $user): array => Manuscript::selectAllManuscriptsPaginated($args['page'], is_null($user) ? null : $user->username)
     ],
     'myManuscripts' => [

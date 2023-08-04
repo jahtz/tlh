@@ -16,7 +16,7 @@ export function ManuscriptsOverview({manuscriptCount, allManuscripts, queryPage,
   const {t} = useTranslation('common');
 
   const columnNames = [t('mainIdentifier'), t('status'), t('creator')];
-
+ 
   return (
     <PaginatedTable count={manuscriptCount} data={allManuscripts} columnNames={columnNames} queryPage={queryPage} emptyMessage={t('noManuscriptsYet')}
                     page={page}>

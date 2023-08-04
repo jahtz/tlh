@@ -71,11 +71,11 @@ class Manuscript extends AbstractManuscript
     );
   }
 
-  static function selectManuscriptsCount(): int
+  static function selectManuscriptsCount(?string $username): int
   {
     return SqlHelpers::executeSingleReturnRowQuery(
-      "select count(*) as manuscript_count from tlh_dig_manuscripts;",
-      null,
+      "select count(*) as manuscript_count from tlh_dig_manuscripts where status = 'Approved' or creator_username = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $username),
       fn(array $row): int => (int)$row['manuscript_count']
     ) ?? -1;
   }
@@ -88,7 +88,7 @@ class Manuscript extends AbstractManuscript
 
     return SqlHelpers::executeMultiSelectQuery(
       "select * from tlh_dig_manuscripts where status = 'Approved' or creator_username = ? order by creation_date desc limit ?, ?;",
-      fn(mysqli_stmt $stmt) => $stmt->bind_param('sii', $creatorUsername, $first, $pageSize),
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sii', $creatorUsername, $first, $pageSize),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
     );
   }
@@ -98,7 +98,7 @@ class Manuscript extends AbstractManuscript
   {
     return SqlHelpers::executeMultiSelectQuery(
       "select main_identifier from tlh_dig_manuscripts where creator_username = ?;",
-      fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $username),
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $username),
       fn(array $row): string => (string)$row['main_identifier'],
     );
   }
@@ -107,7 +107,7 @@ class Manuscript extends AbstractManuscript
   {
     return SqlHelpers::executeSingleReturnRowQuery(
       "select * from tlh_dig_manuscripts where main_identifier = ?;",
-      fn(mysqli_stmt $stmt) => $stmt->bind_param('s', $mainIdentifier),
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mainIdentifier),
       fn(array $row): Manuscript => Manuscript::fromDbAssocArray($row)
     );
   }
