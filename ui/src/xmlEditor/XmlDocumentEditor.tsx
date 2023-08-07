@@ -305,17 +305,15 @@ export function XmlDocumentEditor({
       <div className="px-2 grid grid-cols-2 gap-4 h-full max-h-full">
         <EditorLeftSide {...leftSideProps} filename={filename} node={state.rootNode} onNodeSelect={onNodeSelect}/>
 
-        <div>
-          {state.editorState._type === 'EditNodeRightState'
-            ? (
-              <div className="max-h-full overflow-auto" key={state.editorState.path.join('.')}>
-                {renderNodeEditor(state.editorState) /* don't convert to a component! */}
-              </div>
-            )
-            : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}
-                                    toggleCompareChanges={toggleCompareChanges} onExport={exportXml} exportTitle={exportTitle}
-                                    exportDisabled={exportDisabled || false}>{children}</EditorEmptyRightSide>}
-        </div>
+        {state.editorState._type === 'EditNodeRightState'
+          ? (
+            <div className="max-h-full overflow-auto" key={state.editorState.path.join('.')}>
+              {renderNodeEditor(state.editorState) /* don't convert to a component! */}
+            </div>
+          )
+          : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}
+                                  toggleCompareChanges={toggleCompareChanges} onExport={exportXml} exportTitle={exportTitle}
+                                  exportDisabled={exportDisabled || false}>{children}</EditorEmptyRightSide>}
       </div>
     );
 }
