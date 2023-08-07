@@ -11,6 +11,7 @@ import {readSelectedMorphology, SelectedMorphAnalysis} from '../../model/selecte
 import {WordStringChildEditor} from './WordStringChildEditor';
 import {getPriorSibling, getPriorSiblingPath} from '../../nodeIterators';
 import {AOption} from '../../myOption';
+import {updateCuneiform} from './LineBreakEditor';
 
 type States = 'DefaultState' | 'AddMorphology' | 'EditEditingQuestion' | 'EditFootNoteState' | 'EditContent';
 
@@ -60,11 +61,12 @@ export function WordNodeEditor({node, path, updateEditedNode, setKeyHandlingEnab
     setState('EditContent');
   }
 
-  function handleEditUpdate(node: XmlElementNode<'w'>): void {
+  async function handleEditUpdate(node: XmlElementNode<'w'>): Promise<void> {
     const maybeLineBreakPath = getPriorSiblingPath(rootNode, path, 'lb');
 
+    // Update lb node...
     if (maybeLineBreakPath !== undefined) {
-      updateOtherNode(maybeLineBreakPath, {attributes: {cuDirty: {$set: '1'}}});
+      await updateCuneiform(rootNode, maybeLineBreakPath, (cuneiform) => updateOtherNode(maybeLineBreakPath, {attributes: {cu: {$set: cuneiform}}}));
     }
 
     updateEditedNode({$set: node});
