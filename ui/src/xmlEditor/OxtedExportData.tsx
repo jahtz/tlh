@@ -31,9 +31,9 @@ export function OxtedExportData({setExportNode}: IProps): ReactElement {
   };
 
   const onChangeEditType = (editType: DocumentEditTypes): void => {
-    const attributes = attributesForDocEditType(editType);
-    setState((state) => update(state, {editType: {$set: editType}, attributes: {$set: attributes}}));
-    setExportNode(xmlElementNode(editType, {editor, date: (new Date()).toISOString(), ...attributes}));
+    const newAttributes = attributesForDocEditType(editType);
+    setState((state) => update(state, {editType: {$set: editType}, attributes: {$set: newAttributes}}));
+    setExportNode(xmlElementNode(editType, {editor, date: (new Date()).toISOString(), ...newAttributes}));
   };
 
   const onChangeAttribute = (key: string, value: string): void => {
@@ -56,7 +56,7 @@ export function OxtedExportData({setExportNode}: IProps): ReactElement {
         <label htmlFor="editType" className="font-bold">{t('editType')}:</label>
         <select id="editType" className="my-2 p-2 rounded border border-slate-500 bg-white w-full" defaultValue={editType}
                 onChange={(event) => onChangeEditType(event.target.value as DocumentEditTypes)}>
-          {allDocEditTypes.map((docEditType) => <option key={docEditType}>{nameForDocEditType(docEditType, t)}</option>)}
+          {allDocEditTypes.map((docEditType) => <option key={docEditType} value={docEditType}>{nameForDocEditType(docEditType, t)}</option>)}
         </select>
       </div>
 
