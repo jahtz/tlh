@@ -193,6 +193,7 @@ function resolveAppointUser(
     $reviewer->email,
     "[TLHdig] Assigned for step $stepName of manuscript " . $manuscript->mainIdentifier->identifier,
     "You have been assigned for step $stepName of manuscript " . $manuscript->mainIdentifier->identifier . ".",
+    "From: TLH dig <tlhdig@uni-wuerzburg.de>\r\n"
   );
 
   return true;
