@@ -2,6 +2,7 @@ import {ReactElement} from 'react';
 import {XmlEditableNodeIProps, XmlSingleInsertableEditableNodeConfig} from '../editorConfig';
 import {useTranslation} from 'react-i18next';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
+import {xmlElementNode} from 'simple_xml';
 
 export const wsepConfig: XmlSingleInsertableEditableNodeConfig<'wsep', 'c'> = {
   replace: (node, renderChildren, isSelected) => (
@@ -10,7 +11,8 @@ export const wsepConfig: XmlSingleInsertableEditableNodeConfig<'wsep', 'c'> = {
   edit: (props) => <WsepEditor {...props}/>,
   insertablePositions: {
     beforeElement: ['w'],
-    afterElement: ['w']
+    afterElement: ['w'],
+    newElement: () => xmlElementNode('wsep', {c: '𒑱'})
   },
 };
 
