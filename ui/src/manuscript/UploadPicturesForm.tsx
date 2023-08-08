@@ -31,8 +31,6 @@ function Inner({manuscript}: IProps): ReactElement {
     ? `${process.env.REACT_APP_SERVER_URL}/uploadPicture.php?id=${encodeURIComponent(mainIdentifier)}`
     : `/${process.env.REACT_APP_VERSION}/uploadPicture.php?id=${encodeURIComponent(mainIdentifier)}`;
 
-  console.info(uploadUrl);
-
   function selectFile(event: ChangeEvent<HTMLInputElement>): void {
     const fileList = event.target.files;
     if (fileList !== null && fileList.length > 0) {
