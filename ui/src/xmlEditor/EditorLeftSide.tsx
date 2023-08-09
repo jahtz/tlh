@@ -30,7 +30,7 @@ export function EditorLeftSide({
   node,
   currentSelectedPath,
   onNodeSelect,
-  insertStuff,
+  insertionData,
   updateNode,
   setKeyHandlingEnabled,
   closeFile
@@ -107,7 +107,7 @@ export function EditorLeftSide({
           ? <ReactCodeMirror style={{fontSize: `${state.fontSize}%`}} value={state.xmlSource} extensions={[xml()]} onChange={setXmlSource}/>
           : (
             <div className={classNames(state.useSerifFont ? 'font-hpm-serif' : 'font-hpm')} style={{fontSize: `${state.fontSize}%`}}>
-              <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} onSelect={onNodeSelect} insertStuff={insertStuff} isLeftSide={true}/>
+              <NodeDisplay node={node} currentSelectedPath={currentSelectedPath} onSelect={onNodeSelect} insertionData={insertionData} isLeftSide={true}/>
             </div>
           )}
       </div>

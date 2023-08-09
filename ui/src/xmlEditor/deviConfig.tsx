@@ -8,7 +8,7 @@ import {selectedNodeClass} from './tlhXmlEditorConfig';
 type deviAttrs = 'expl';
 
 export const deviConfig: XmlEditorSingleNodeConfig<'devi', deviAttrs> = {
-  replace: (node, renderChildren, isSelected/*, isLeftSide*/) => displayReplace(
+  replace: ({node, renderChildren, isSelected}) => displayReplace(
     <>(<span className={classNames('font-bold', {[selectedNodeClass]: isSelected})}>{node.attributes.expl}</span>: </>,
     <>{renderChildren()}</>,
     <>)</>

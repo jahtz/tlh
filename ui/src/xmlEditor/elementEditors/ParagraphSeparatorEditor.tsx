@@ -5,9 +5,8 @@ import {selectedNodeClass} from '../tlhXmlEditorConfig';
 const separatorTypes: ('parsep' | 'parsep_dbl')[] = ['parsep', 'parsep_dbl'];
 
 export const paragraphSeparatorConfig: XmlSingleInsertableEditableNodeConfig = {
-  replace: (node, _renderedChildren, isSelected) => <span className={isSelected ? selectedNodeClass : ''}>
-      {node.tagName === 'parsep' ? '¬¬¬' : '==='}
-    </span>,
+  replace: ({node, isSelected}) =>
+    <span className={isSelected ? selectedNodeClass : ''}>{node.tagName === 'parsep' ? '¬¬¬' : '==='}</span>,
   insertablePositions: {
     beforeElement: ['w'],
     afterElement: ['lb', 'w'],

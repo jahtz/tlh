@@ -68,16 +68,16 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
 
     'AO:Manuscripts': aoManuscriptsConfig,
     'AO:TxtPubl': {
-      replace: (node, renderChildren/*, isSelected, isLeftSide*/) =>
+      replace: ({node, renderChildren}) =>
         <span>{renderChildren()} {node.attributes.nr && <span>&#123;{node.attributes.nr}&#125;</span>}</span>
     },
     'AO:InvNr': {
-      replace: (node, renderChildren/*, isSelected, isLeftSide*/) =>
+      replace: ({node, renderChildren}) =>
         <span>{renderChildren()} {node.attributes.nr && <span>&#123;{node.attributes.nr}&#125;</span>}</span>
     },
     'AO:DirectJoin': {replace: () => <span>&nbsp;+&nbsp;</span>},
     'AO:InDirectJoin': {replace: () => <span>&nbsp;(+)&nbsp;</span>},
-    'AO:ParagrNr': {replace: (node) => <div className="mt-4 font-bold italic">{node.attributes.c}</div>},
+    'AO:ParagrNr': {replace: ({node}) => <div className="mt-4 font-bold italic">{node.attributes.c}</div>},
 
     lb: lineBreakNodeConfig as XmlEditorSingleNodeConfig,
 
@@ -90,9 +90,9 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     w: wordNodeConfig as XmlSingleEditableNodeConfig,
 
     // Word contents
-    aGr: {styling: () => ['akkadogramm']},
-    sGr: {styling: () => ['sumerogramm']},
-    d: {styling: () => ['determinativ']},
+    aGr: {replace: ({renderChildren}) => <span className="akkadogramm">{renderChildren()}</span>},
+    sGr: {replace: ({renderChildren}) => <span className="sumerogramm">{renderChildren()}</span>},
+    d: {replace: ({renderChildren}) => <span className="determinativ">{renderChildren()}</span>},
 
     add_in: {replace: () => <span>〈</span>},
     add_fin: {replace: () => <span>〉</span>},
@@ -103,17 +103,17 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     laes_in: {replace: () => <span>⸢</span>},
     laes_fin: {replace: () => <span>⸣</span>},
 
-    materlect: {replace: (node) => <span className="materLectionis">{node.attributes.c}</span>},
+    materlect: {replace: ({node}) => <span className="materLectionis">{node.attributes.c}</span>},
 
-    surpl: {replace: (node) => <span>〈〈{node.attributes.c}〉〉</span>},
+    surpl: {replace: ({node}) => <span>〈〈{node.attributes.c}〉〉</span>},
 
     gap: gapConfig,
-    subscr: {replace: (node) => <sub>{node.attributes.c}</sub>},
+    subscr: {replace: ({node}) => <sub>{node.attributes.c}</sub>},
 
     wsep: wsepConfig as XmlEditorSingleNodeConfig,
 
     space: {
-      replace: (node) => <>{Array.from({length: parseInt(node.attributes.c || '0') || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}</>,
+      replace: ({node}) => <>{Array.from({length: parseInt(node.attributes.c || '0') || 0}).map((_, i) => <span key={i}>&nbsp;</span>)}</>,
       insertablePositions: {
         beforeElement: ['w'],
         afterElement: ['lb', 'w'],
@@ -128,8 +128,7 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     parsep_dbl: paragraphSeparatorConfig,
 
     corr: {
-      styling: () => ['corr'],
-      replace: (node) => <span>{node.attributes.c}</span>
+      replace: ({node}) => <span className="corr">{node.attributes.c}</span>
     },
     note: noteNodeConfig as XmlEditorSingleNodeConfig
   },

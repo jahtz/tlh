@@ -5,7 +5,7 @@ import {JSX} from 'react';
 type noteAttrs = 'n' | 'c';
 
 export const noteNodeConfig: XmlSingleEditableNodeConfig<'note', noteAttrs> = {
-  replace: (node) => <sup title={node.attributes.c} className="has-text-weight-bold">x</sup>,
+  replace: ({node}) => <sup title={node.attributes.c} className="has-text-weight-bold">x</sup>,
   edit: (props) => <NoteNodeEditor {...props}/>
 };
 

@@ -5,7 +5,7 @@ import {selectedNodeClass} from '../tlhXmlEditorConfig';
 import {xmlElementNode} from 'simple_xml';
 
 export const wsepConfig: XmlSingleInsertableEditableNodeConfig<'wsep', 'c'> = {
-  replace: (node, renderChildren, isSelected) => (
+  replace: ({node, isSelected}) => (
     <span className={isSelected ? selectedNodeClass : undefined}>{node.attributes.c}</span>
   ),
   edit: (props) => <WsepEditor {...props}/>,

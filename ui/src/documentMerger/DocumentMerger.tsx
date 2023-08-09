@@ -1,5 +1,5 @@
 import {MergeDocument, MergeLine, mergeLines, replaceLNR, resetPublicationMap} from './mergeDocument';
-import {JSX, useReducer, useState} from 'react';
+import {ReactElement, useReducer, useState} from 'react';
 import {zipWithOffset} from './zipWithOffset';
 import {useTranslation} from 'react-i18next';
 import {IoAddCircleOutline, IoChevronDown, IoChevronUp, IoRemoveCircleOutline} from 'react-icons/io5';
@@ -14,7 +14,7 @@ interface IProps {
   MergedPublicationMapping: Map<string, string[]> | undefined;
 }
 
-export function MergeDocumentLine({line}: { line: MergeLine }): JSX.Element {
+export function MergeDocumentLine({line}: { line: MergeLine }): ReactElement {
   return (
     <>
       <NodeDisplay node={line.lineNumberNode} isLeftSide={false}/>
@@ -23,7 +23,7 @@ export function MergeDocumentLine({line}: { line: MergeLine }): JSX.Element {
   );
 }
 
-export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps): JSX.Element {
+export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps): ReactElement {
 
   const {t} = useTranslation('common');
   const [offset, setOffset] = useState(0);
@@ -102,7 +102,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
 
   const addLine = (isLeft: boolean, index: number): void => {
     const undef: unknown = undefined;
-    const emptyLine: MergeLine = {lineNumberNode:xmlElementNode('EMPTY LINE', {}, []), rest: []};
+    const emptyLine: MergeLine = {lineNumberNode: xmlElementNode('EMPTY LINE', {}, []), rest: []};
 
     if (isLeft) {
       if (offset < 0) index = index + offset;
@@ -188,19 +188,20 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
     return new Map([...Array.from(leftMap.entries()), ...Array.from(rightMap.entries())]);
   }
 
-  function PublicationList({publMap}: { publMap: Map<string, string[]> }): JSX.Element {
+  function PublicationList({publMap}: { publMap: Map<string, string[]> }): ReactElement {
     return (
       <ul className="grid-container-element-header publication">
         {
           Array.from(publMap.values()).sort((a, b) => {
-            return a[1].localeCompare(b[1], undefined, {numeric: true, sensitivity: 'base' }); }).map((item, i) =>
+            return a[1].localeCompare(b[1], undefined, {numeric: true, sensitivity: 'base'});
+          }).map((item, i) =>
             <PublicationLine publicationString={item} key={i}></PublicationLine>)
         }
       </ul>
     );
   }
 
-  function PublicationLine({publicationString}: { publicationString: string[] }): JSX.Element {
+  function PublicationLine({publicationString}: { publicationString: string[] }): ReactElement {
     return (
       <li className="grid-child-element-header publication">
         <span className="publication grid-child-element">{publicationString[1]}</span>
@@ -214,14 +215,14 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
     );
   }
 
-  function LeftList() {
+  function LeftList(): ReactElement {
     return (
       <ul className="grid-child-element draggablediv" draggable="true" onDragStart={handleDrag} onDragEnd={() => handleDragEnd(true)}>
         {leftList.map((entry, index) => <li className={index % 5 == 4 && 'marker' || undefined} onMouseOver={() => listMouseOver(index)}
                                             onDragOver={() => handleDragOver(true, index)} data-index={index} key={index}>
           <button onClick={() => addLine(true, index)}><IoAddCircleOutline/></button>
           {entry && <MergeDocumentLine line={entry}/>}
-          {(entry === undefined  || entry.lineNumberNode.tagName == 'EMPTY LINE') && <>
+          {(entry === undefined || entry.lineNumberNode.tagName == 'EMPTY LINE') && <>
             <button onClick={() => removeLine(true, index)}><IoRemoveCircleOutline/></button>
             <br/></>}
         </li>)}
@@ -229,14 +230,14 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
     );
   }
 
-  function RightList() {
+  function RightList(): ReactElement {
     return (
       <ul className="grid-child-element draggablediv" draggable="true" onDragStart={handleDrag} onDragEnd={() => handleDragEnd(false)}>
         {rightList.map((entry, index) => <li className={index % 5 == 4 && 'marker' || undefined} onMouseOver={() => listMouseOver(index)}
                                              onDragOver={() => handleDragOver(false, index)} data-index={index} key={index}>
           <button onClick={() => addLine(false, index)}><IoAddCircleOutline/></button>
           {entry && <MergeDocumentLine line={entry}/>}
-          {(entry === undefined  || entry.lineNumberNode.tagName == 'EMPTY LINE') && <>
+          {(entry === undefined || entry.lineNumberNode.tagName == 'EMPTY LINE') && <>
             <button onClick={() => removeLine(false, index)}><IoRemoveCircleOutline/></button>
             <br/></>}
         </li>)}

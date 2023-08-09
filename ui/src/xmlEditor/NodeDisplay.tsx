@@ -1,11 +1,10 @@
 import {isXmlCommentNode, isXmlTextNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {isValidElement, ReactElement} from 'react';
 import {isXmlEditableNodeConfig, XmlEditorSingleNodeConfig} from './editorConfig';
-import classNames from 'classnames';
 import {NodePath} from './insertablePositions';
 import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
 
-export interface InsertStuff {
+export interface InsertionData {
   insertablePaths: string[];
   insertAsLastChildOf: string[];
   initiateInsert: (path: NodePath) => void;
@@ -16,24 +15,24 @@ export interface NodeDisplayIProps {
   currentSelectedPath?: NodePath;
   onSelect?: (node: XmlElementNode, path: NodePath) => void;
   path?: NodePath;
-  insertStuff?: InsertStuff;
+  insertionData?: InsertionData;
   isLeftSide: boolean;
 }
 
-function InsertButton({initiate}: { initiate: () => void }): ReactElement {
-  return (
-    <button type="button" onClick={initiate} className="mx-2 px-2 rounded bg-teal-100">+</button>
-  );
-}
+const InsertButton = ({initiate}: { initiate: () => void }): ReactElement => (
+  <button type="button" onClick={initiate} className="mx-2 px-2 rounded bg-teal-100">+</button>
+);
 
 export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIProps): ReactElement {
   if (isXmlCommentNode(node)) {
     return <></>;
-  } else if (isXmlTextNode(node)) {
+  }
+
+  if (isXmlTextNode(node)) {
     return <span>{node.textContent}</span>;
   }
 
-  const {currentSelectedPath, onSelect, insertStuff, isLeftSide} = inheritedProps;
+  const {currentSelectedPath, onSelect, insertionData, isLeftSide} = inheritedProps;
 
   const currentConfig: XmlEditorSingleNodeConfig | undefined = tlhXmlEditorConfig.nodeConfigs[node.tagName];
 
@@ -42,16 +41,12 @@ export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIPr
   const isSelected = !!currentSelectedPath && path.join('.') === currentSelectedPath.join('.');
 
   const replacement = currentConfig?.replace
-    ? currentConfig.replace(node, renderChildren, isSelected, isLeftSide)
+    ? currentConfig.replace({node, renderChildren, isSelected, isLeftSide})
     : {clickablePrior: renderChildren(), notClickable: undefined, posterior: undefined};
 
   const {clickablePrior, notClickable, posterior} = isValidElement(replacement)
     ? {clickablePrior: replacement, notClickable: undefined, posterior: undefined}
     : replacement;
-
-  const classes = currentConfig?.styling
-    ? currentConfig.styling(node, isSelected, isLeftSide)
-    : [];
 
   const onClick = currentConfig && isXmlEditableNodeConfig(currentConfig) && onSelect
     ? () => onSelect(node, path)
@@ -59,11 +54,11 @@ export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIPr
 
   return (
     <>
-      {insertStuff && insertStuff.insertablePaths.includes(path.join('.')) && <InsertButton initiate={() => insertStuff.initiateInsert(path)}/>}
-      <span className={classNames(classes)} onClick={onClick}>{clickablePrior}</span>
-      {isLeftSide && notClickable && <span className={classNames(classes)}>{notClickable}</span>}
-      {insertStuff && insertStuff.insertAsLastChildOf.includes(node.tagName) &&
-        <InsertButton initiate={() => insertStuff.initiateInsert([...path, node.children.length])}/>}
+      {insertionData && insertionData.insertablePaths.includes(path.join('.')) && <InsertButton initiate={() => insertionData.initiateInsert(path)}/>}
+      <span onClick={onClick}>{clickablePrior}</span>
+      {isLeftSide && notClickable}
+      {insertionData && insertionData.insertAsLastChildOf.includes(node.tagName) &&
+        <InsertButton initiate={() => insertionData.initiateInsert([...path, node.children.length])}/>}
       {posterior}
     </>
   );

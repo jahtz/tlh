@@ -19,9 +19,8 @@ const newEntry: XmlNode[] = [
 ];
 
 export const aoManuscriptsConfig: XmlSingleEditableNodeConfig = {
-  replace: (node, renderChildren, isSelected) => <span className={classNames({[selectedNodeClass]: isSelected, 'bg-amber-500': usesOldFormat(node.children)})}>
-    {renderChildren()}
-  </span>,
+  replace: ({node, renderChildren, isSelected}) =>
+    <span className={classNames({[selectedNodeClass]: isSelected, 'bg-amber-500': usesOldFormat(node.children)})}>{renderChildren()}</span>,
   edit: (props) => <AoManuscriptsEditor {...props}/>
 };
 

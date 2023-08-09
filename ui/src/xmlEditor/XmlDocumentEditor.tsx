@@ -275,7 +275,7 @@ export function XmlDocumentEditor({
     currentSelectedPath: state.editorState && 'path' in state.editorState
       ? state.editorState.path
       : undefined,
-    insertStuff: state.editorState && 'tagName' in state.editorState
+    insertionData: state.editorState && 'tagName' in state.editorState
       ? {
         insertablePaths: Array.from(new Set(calculateInsertablePositions(state.editorState.insertablePositions, state.rootNode))),
         insertAsLastChildOf: state.editorState.insertablePositions.asLastChildOf || [],

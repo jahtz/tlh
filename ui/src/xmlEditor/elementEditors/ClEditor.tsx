@@ -8,7 +8,7 @@ import {displayReplace} from '../editorConfig/displayReplacement';
 type clAttrs = 'id';
 
 export const clEditorConfig: XmlSingleInsertableEditableNodeConfig<'cl', clAttrs> = {
-  replace: (node, renderChildren) => displayReplace(
+  replace: ({node, renderChildren}) => displayReplace(
     <><br/><span className="px-1 cl">{node.attributes.id || ' '}</span>&nbsp;</>,
     renderChildren()
   ),

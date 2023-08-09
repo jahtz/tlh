@@ -7,7 +7,7 @@ import {LanguageInput} from './LanguageInput';
 const langAttrName = 'xml:lang';
 
 export const textElementConfig: XmlSingleEditableNodeConfig<'text', typeof langAttrName> = {
-  replace: (node, renderChildren, isSelected, isLeftSide) => displayReplace(
+  replace: ({node, renderChildren, isSelected, isLeftSide}) => displayReplace(
     <>
       <span className={classNames('italic', {[selectedNodeClass]: isLeftSide && isSelected})}>[Textsprache: {node.attributes[langAttrName]}]</span>
       {isLeftSide && <br/>}

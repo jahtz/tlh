@@ -28,7 +28,7 @@ export const updateCuneiform = async (rootNode: XmlElementNode, lbNodePath: numb
 type LineBreakAttributes = 'lnr' | 'cu' | 'txtid' | 'lg' | 'cuDirty';
 
 export const lineBreakNodeConfig: XmlSingleInsertableEditableNodeConfig<'lb', LineBreakAttributes> = {
-  replace: (node, _renderedChildren, isSelected, isLeftSide) => (
+  replace: ({node, isSelected, isLeftSide}) => (
     <>
       {isLeftSide && <br/>}
       <span className={classNames(isSelected ? [selectedNodeClass, 'text-black'] : ['text-gray-500'], {'bg-amber-500': node.attributes.cuDirty})}>

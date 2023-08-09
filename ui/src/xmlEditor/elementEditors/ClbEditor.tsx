@@ -8,7 +8,7 @@ import {xmlElementNode} from 'simple_xml';
 type clbAttrs = 'id';
 
 export const clbNodeConfig: XmlSingleInsertableEditableNodeConfig<'clb', clbAttrs> = {
-  replace: (node, _element, isSelected) => <span className={classNames(isSelected ? selectedNodeClass : 'bg-amber-500')}>{node.attributes.id}&nbsp;</span>,
+  replace: ({node, isSelected}) => <span className={classNames(isSelected ? selectedNodeClass : 'bg-amber-500')}>{node.attributes.id}&nbsp;</span>,
   edit: (props) => <ClbEditor {...props}/>,
   insertablePositions: {
     beforeElement: ['w', 'parsep', 'parsep_dbl'],
