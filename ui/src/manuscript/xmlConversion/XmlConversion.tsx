@@ -50,7 +50,11 @@ function Inner({mainIdentifier, initialInput, initialIsConverted}: IProps): JSX.
 
       setState({_type: 'AnnotatedXmlCheck', content});
     } else if (state._type === 'AnnotatedXmlCheck') {
-      await submitXmlConversion({variables: {mainIdentifier, conversion}});
+      try {
+        await submitXmlConversion({variables: {mainIdentifier, conversion}});
+      } catch (exception) {
+        console.error(exception);
+      }
     }
   };
 

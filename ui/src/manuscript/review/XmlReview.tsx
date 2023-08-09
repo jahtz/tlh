@@ -23,6 +23,7 @@ function Inner({mainIdentifier, initialXml, reviewType}: IProps): JSX.Element {
   const rootNodeParseResult = parseNewXml(initialXml, tlhXmlEditorConfig.readConfig);
 
   if (rootNodeParseResult instanceof MyLeft) {
+    // FIXME: show source code to let reviewer edit xml!
     throw new Error('TODO!');
   }
 

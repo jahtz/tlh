@@ -108,9 +108,23 @@ function resolveSubmitTransliterationReview(User $user, string $mainIdentifier, 
 }
 
 /** @throws MySafeGraphQLException */
+function verifyXml(string $xml): void
+{
+  $xmlParser = xml_parser_create();
+
+  if (xml_parse($xmlParser, $xml, true) === 0) {
+    // Xml parse error...
+    $errorLineNum = xml_get_current_line_number($xmlParser);
+    $errorColumnNum = xml_get_current_column_number($xmlParser);
+    throw new MySafeGraphQLException("Error in XML in line $errorLineNum, column $errorColumnNum " . xml_error_string(xml_get_error_code($xmlParser)));
+  }
+}
+
+/** @throws MySafeGraphQLException */
 function resolveSubmitXmlConversion(User $user, string $mainIdentifier, string $conversion): bool
 {
-  // TODO: check if $conversion is xml and fulfills schema?
+  verifyXml($conversion);
+
   return resolveSubmitStep(
     "Xml conversion",
     $user,
@@ -125,6 +139,8 @@ function resolveSubmitXmlConversion(User $user, string $mainIdentifier, string $
 /** @throws MySafeGraphQLException */
 function resolveSubmitFirstXmlReview(User $user, string $mainIdentifier, string $review): bool
 {
+  verifyXml($review);
+
   return resolveSubmitStep(
     "First xml review",
     $user,
@@ -139,6 +155,8 @@ function resolveSubmitFirstXmlReview(User $user, string $mainIdentifier, string 
 /** @throws MySafeGraphQLException */
 function resolveSubmitSecondXmlReview(User $user, string $mainIdentifier, string $review): bool
 {
+  verifyXml($review);
+
   return resolveSubmitStep(
     "Second xml review",
     $user,
