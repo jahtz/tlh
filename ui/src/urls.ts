@@ -1,3 +1,7 @@
+export const baseUrl = process.env.NODE_ENV !== 'development'
+  ? `/${process.env.REACT_APP_VERSION}/public`
+  : '';
+
 export function pictureBaseUrl(manuscriptMainIdentifier: string): string {
   return process.env.NODE_ENV === 'development'
     ? `${process.env.REACT_APP_SERVER_URL}/uploads/${encodeURIComponent(manuscriptMainIdentifier)}`

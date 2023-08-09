@@ -2,6 +2,7 @@ import {createBrowserRouter, useRouteError} from 'react-router-dom';
 import {JSX} from 'react';
 import {
   approveDocumentUrl,
+  baseUrl,
   createManuscriptUrl,
   createTransliterationUrl,
   documentMergerUrl,
@@ -40,12 +41,6 @@ import {XmlConversion} from './manuscript/xmlConversion/XmlConversion';
 import {PipelineOverview} from './pipeline/PipelineOverview';
 import {XmlReview} from './manuscript/review/XmlReview';
 import {DocumentApproval} from './manuscript/DocumentApproval';
-
-const routerOptions = {
-  basename: process.env.NODE_ENV !== 'development'
-    ? `/${process.env.REACT_APP_VERSION}/public`
-    : '',
-};
 
 export const router = createBrowserRouter([
     {
@@ -95,7 +90,9 @@ export const router = createBrowserRouter([
       errorElement: <ErrorBoundary/>
     }
   ],
-  routerOptions
+  {
+    basename: baseUrl
+  }
 );
 
 function ErrorBoundary(): JSX.Element {
