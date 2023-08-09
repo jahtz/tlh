@@ -37,7 +37,7 @@ export const wordNodeConfig: XmlSingleInsertableEditableNodeConfig<'w'> = {
     const textElement = rootNode
       ? findFirstXmlElementByTagName(rootNode, 'text')
       : undefined;
-   
+
     const classes = classNames(
       node.attributes.lg || lbElement?.attributes.lg || textElement?.attributes.lg,
       isOnlySpaces(node)

@@ -3,10 +3,11 @@ import {XmlEditableNodeIProps, XmlSingleInsertableEditableNodeConfig} from '../e
 import {useTranslation} from 'react-i18next';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 import {xmlElementNode} from 'simple_xml';
+import classNames from 'classnames';
 
 export const wsepConfig: XmlSingleInsertableEditableNodeConfig<'wsep', 'c'> = {
   replace: ({node, isSelected}) => (
-    <span className={isSelected ? selectedNodeClass : undefined}>{node.attributes.c}</span>
+    <span className={classNames('font-hpm', {[selectedNodeClass]: isSelected})}>{node.attributes.c}</span>
   ),
   edit: (props) => <WsepEditor {...props}/>,
   insertablePositions: {
@@ -16,6 +17,8 @@ export const wsepConfig: XmlSingleInsertableEditableNodeConfig<'wsep', 'c'> = {
   },
 };
 
+const legalValues = ['𒑱', '𒀹', '|'];
+
 export function WsepEditor({node, updateAttribute}: XmlEditableNodeIProps<'wsep', 'c'>): ReactElement {
 
   const {t} = useTranslation('common');
@@ -23,8 +26,10 @@ export function WsepEditor({node, updateAttribute}: XmlEditableNodeIProps<'wsep'
   return (
     <>
       <label htmlFor="c" className="font-bold">{t('wsepType')}:</label>
-      <input id="c" className="p-2 rounded border border-slate-500 bg-white w-full" defaultValue={node.attributes.c}
-             onChange={(event) => updateAttribute('c', event.target.value)}></input>
+      <select id="c" className="p-2 rounded border border-slate-500 bg-white w-full font-hpm" defaultValue={node.attributes.c}
+              onChange={(event) => updateAttribute('c', event.target.value)}>
+        {legalValues.map((value) => <option key={value} className="font-hpm">{value}</option>)}
+      </select>
     </>
   );
 }
