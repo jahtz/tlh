@@ -6,6 +6,7 @@ import {useTranslation} from 'react-i18next';
 import {FontSizeSelector, FontSizeSelectorProps} from './FontSizeSelector';
 
 export interface NodeEditorRightSideProps {
+  rootNode: XmlElementNode;
   originalNode: XmlElementNode;
   changed: boolean;
   applyUpdates: () => void;
@@ -20,6 +21,7 @@ interface IProps extends NodeEditorRightSideProps {
 }
 
 export function NodeEditorRightSide({
+  rootNode,
   originalNode,
   children,
   changed,
@@ -35,7 +37,7 @@ export function NodeEditorRightSide({
   return (
     <div>
       <div className="p-4 rounded-t border border-slate-300 shadow-md">
-        <NodeDisplay node={originalNode} isLeftSide={false}/>
+        <NodeDisplay rootNode={rootNode} node={originalNode} isLeftSide={false}/>
 
         <div className="float-right">
           <FontSizeSelector {...fontSizeSelectorProps}/>

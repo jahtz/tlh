@@ -221,7 +221,8 @@ export function XmlDocumentEditor({
     };
 
     return (
-      <NodeEditorRightSide key={path.join('.')} originalNode={node} changed={changed} deleteNode={() => deleteNode(path)} applyUpdates={() => applyUpdates()}
+      <NodeEditorRightSide key={path.join('.')} rootNode={state.rootNode as XmlElementNode} originalNode={node} changed={changed}
+                           deleteNode={() => deleteNode(path)} applyUpdates={() => applyUpdates()}
                            cancelSelection={() => setState((state) => update(state, {editorState: {$set: defaultRightSideState}}))}
                            jumpElement={(forward) => jumpEditableNodes(node.tagName, forward)} fontSizeSelectorProps={fontSizeSelectorProps}>
         {config.edit({node, path, updateEditedNode, updateAttribute, setKeyHandlingEnabled, rootNode: state.rootNode as XmlElementNode, updateOtherNode})}
@@ -272,6 +273,7 @@ export function XmlDocumentEditor({
   const exportTitle = exportName ? exportName : t('exportXml') || 'exportXml';
 
   const leftSideProps: Omit<EditorLeftSideProps, 'exportTitle' | 'filename' | 'node' | 'onNodeSelect' | 'onExport'> = {
+    rootNode: state.rootNode as XmlElementNode,
     currentSelectedPath: state.editorState && 'path' in state.editorState
       ? state.editorState.path
       : undefined,

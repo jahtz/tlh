@@ -1,6 +1,5 @@
 import {XmlElementNode, XmlNode, XmlReadConfig, XmlWriteConfig} from 'simple_xml';
 import {JSX, ReactElement} from 'react';
-import {Argument as ClassNamesArgument} from 'classnames';
 import {InsertablePositions} from './insertablePositions';
 import {Spec} from 'immutability-helper';
 import {DisplayReplacement} from './editorConfig/displayReplacement';
@@ -8,7 +7,9 @@ import {DisplayReplacement} from './editorConfig/displayReplacement';
 export const inputClasses = 'mt-2 p-2 rounded border border-slate-500 w-full';
 
 interface ReplaceArgs<T extends string = string, A extends string = string> {
+  rootNode: XmlElementNode | undefined;
   node: XmlElementNode<T, A>;
+  path: number[];
   renderChildren: () => ReactElement;
   isSelected: boolean;
   isLeftSide: boolean;
@@ -26,8 +27,6 @@ export interface XmlEditableNodeIProps<T extends string = string, A extends stri
 
 export interface XmlSingleNodeConfig<T extends string = string, A extends string = string> {
   replace?: (args: ReplaceArgs<T, A>) => ReactElement | DisplayReplacement;
-  /** @deprecated */
-  styling?: (node: XmlElementNode<T, A>, isSelected: boolean, isLeftSide: boolean) => ClassNamesArgument;
   dontRenderChildrenInline?: boolean;
 }
 

@@ -1,10 +1,11 @@
-import {isXmlElementNode, XmlElementNode} from 'simple_xml';
+import {findFirstXmlElementByTagName, isXmlElementNode, XmlElementNode} from 'simple_xml';
 import {XmlSingleInsertableEditableNodeConfig} from '../editorConfig';
 import classNames from 'classnames';
 import {WordNodeEditor} from './WordNodeEditor';
 import {SpacesEditor} from './SpacesEditor';
 import {selectedNodeClass} from '../tlhXmlEditorConfig';
 import {ReactElement} from 'react';
+import {getPriorSibling} from '../../nodeIterators';
 
 const isOnlySpaces = ({children}: XmlElementNode): boolean => children.length === 1 && isXmlElementNode(children[0]) && children[0].tagName === 'space';
 
@@ -27,11 +28,18 @@ function backgroundColor(node: XmlElementNode, isSelected: boolean, selectedMorp
 
 
 export const wordNodeConfig: XmlSingleInsertableEditableNodeConfig<'w'> = {
-  replace: ({node, renderChildren, isSelected}): ReactElement => {
+  replace: ({rootNode, node, path, renderChildren, isSelected}): ReactElement => {
 
+    const lbElement = rootNode
+      ? getPriorSibling(rootNode, path, 'lb')
+      : undefined;
+
+    const textElement = rootNode
+      ? findFirstXmlElementByTagName(rootNode, 'text')
+      : undefined;
+   
     const classes = classNames(
-      // FIXME: add <lb/>.lg and <text/>.lg!
-      node.attributes.lg,
+      node.attributes.lg || lbElement?.attributes.lg || textElement?.attributes.lg,
       isOnlySpaces(node)
         ? [isSelected ? selectedNodeClass : 'bg-gray-200']
         : [

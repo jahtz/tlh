@@ -16,14 +16,14 @@ interface IProps {
 export function ParsedWord({oldNode, initialParsedWord: initialParsedWord, language, submitEdit}: IProps): ReactElement {
 
   const {t} = useTranslation('common');
-  const [state, setState] = useState(initialParsedWord);
+  const [parsedNode, setParsedNode] = useState(initialParsedWord);
 
-  const copyMorphologicalAnalyses = (): void => setState((state) => update(state, {attributes: {$set: oldNode.attributes}}));
+  const copyMorphologicalAnalyses = (): void => setParsedNode((state) => update(state, {attributes: {$set: oldNode.attributes}}));
 
-  const updateMorphologies = (): Promise<void> => fetchMorphologicalAnalyses(writeNode(state, tlhXmlEditorConfig.writeConfig).join(''), language)
+  const updateMorphologies = (): Promise<void> => fetchMorphologicalAnalyses(writeNode(parsedNode, tlhXmlEditorConfig.writeConfig).join(''), language)
     .then((res) => {
       if (res) {
-        setState((state) => update(state, {attributes: {$set: res}}));
+        setParsedNode((state) => update(state, {attributes: {$set: res}}));
       } else {
         alert('Could not find any morphological analyses...');
       }
@@ -33,10 +33,10 @@ export function ParsedWord({oldNode, initialParsedWord: initialParsedWord, langu
   return (
     <>
       <div className="p-2 rounded bg-white">
-        <NodeDisplay node={state} currentSelectedPath={undefined} isLeftSide={false}/>
+        <NodeDisplay rootNode={undefined} node={parsedNode} currentSelectedPath={undefined} isLeftSide={false}/>
       </div>
 
-      <div className="mt-2 p-2 rounded bg-white">{writeNode(state, tlhXmlEditorConfig.writeConfig).join('')}</div>
+      <div className="mt-2 p-2 rounded bg-white">{writeNode(parsedNode, tlhXmlEditorConfig.writeConfig).join('')}</div>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
         <button type="button" className="p-2 rounded border border-slate-500 bg-white w-full" onClick={copyMorphologicalAnalyses}>
@@ -47,7 +47,7 @@ export function ParsedWord({oldNode, initialParsedWord: initialParsedWord, langu
         </button>
       </div>
 
-      <button type="button" onClick={() => submitEdit(state)} className="mt-4 p-2 rounded bg-blue-600 text-white w-full">{t('submitEdit')}</button>
+      <button type="button" onClick={() => submitEdit(parsedNode)} className="mt-4 p-2 rounded bg-blue-600 text-white w-full">{t('submitEdit')}</button>
     </>
   );
 }

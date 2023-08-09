@@ -11,6 +11,7 @@ export interface InsertionData {
 }
 
 export interface NodeDisplayIProps {
+  rootNode?: XmlElementNode;
   node: XmlNode;
   currentSelectedPath?: NodePath;
   onSelect?: (node: XmlElementNode, path: NodePath) => void;
@@ -32,7 +33,7 @@ export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIPr
     return <span>{node.textContent}</span>;
   }
 
-  const {currentSelectedPath, onSelect, insertionData, isLeftSide} = inheritedProps;
+  const {rootNode, currentSelectedPath, onSelect, insertionData, isLeftSide} = inheritedProps;
 
   const currentConfig: XmlEditorSingleNodeConfig | undefined = tlhXmlEditorConfig.nodeConfigs[node.tagName];
 
@@ -41,7 +42,7 @@ export function NodeDisplay({node, path = [], ...inheritedProps}: NodeDisplayIPr
   const isSelected = !!currentSelectedPath && path.join('.') === currentSelectedPath.join('.');
 
   const replacement = currentConfig?.replace
-    ? currentConfig.replace({node, renderChildren, isSelected, isLeftSide})
+    ? currentConfig.replace({rootNode, node, path, renderChildren, isSelected, isLeftSide})
     : {clickablePrior: renderChildren(), notClickable: undefined, posterior: undefined};
 
   const {clickablePrior, notClickable, posterior} = isValidElement(replacement)
