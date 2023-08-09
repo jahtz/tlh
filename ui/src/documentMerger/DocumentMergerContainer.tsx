@@ -7,6 +7,7 @@ import {loadNewXml, XmlElementNode} from 'simple_xml';
 import {MergeDocument, mergeHeader, MergeLine, readMergeDocument} from './mergeDocument';
 import {MergedDocumentView} from './MergedDocumentView';
 import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
+import {DocumentMergerDescription} from './DocumentMergerDescription';
 
 interface MergeFile {
   filename: string;
@@ -81,6 +82,8 @@ export function DocumentMergerContainer(): JSX.Element {
   return (
     <div className="container mx-auto">
       <h1 className="font-bold text-2xl text-center mb-2">{t('documentMerger')}</h1>
+
+      {!('firstFile' in state) && <DocumentMergerDescription/>}
 
       {'firstFile' in state && <div className="grid grid-cols-2 gap-2 my-2">
         <button type="button" className="p-2 rounded border border-slate-500">{state.firstFile.filename}</button>
