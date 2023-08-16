@@ -21,7 +21,7 @@ RootQuery::$queryType = new ObjectType([
     'manuscriptCount' => [
       'type' => Type::nonNull(Type::int()),
       // FIXME: only own or approved manuscripts!
-      'resolve' => fn(?int $_rootValue, array $args, ?User $user): int => Manuscript::selectManuscriptsCount($user->username)
+      'resolve' => fn(?int $_rootValue, array $args, ?User $user): int => Manuscript::selectManuscriptsCount(is_null($user) ? null : $user->username)
     ],
     'allManuscripts' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(Manuscript::$graphQLType))),
