@@ -1,11 +1,13 @@
 import {ChangeEvent, createRef, ReactElement, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {homeUrl} from '../urls';
+import {homeUrl, pictureBaseUrl} from '../urls';
 import {PicturesBlock} from './PicturesBlock';
 import {Link, Navigate, useParams} from 'react-router-dom';
-import {ManuscriptIdentWithCreatorFragment, useUploadPicturesQuery} from '../graphql';
+import {ManuscriptIdentWithCreatorFragment, Rights, useDeletePictureMutation, useUploadPicturesQuery} from '../graphql';
 import {WithQuery} from '../WithQuery';
-import {blueButtonClasses} from '../defaultDesign';
+import {blueButtonClasses, redButtonClasses} from '../defaultDesign';
+import {User} from '../newStore';
+import update from 'immutability-helper';
 
 interface IState {
   selectedFile?: File;
@@ -15,16 +17,27 @@ interface IState {
 type UploadResponse = { fileName: string; } | { error: string; };
 
 interface IProps {
+  currentUser: User;
   manuscript: ManuscriptIdentWithCreatorFragment;
 }
 
-function Inner({manuscript}: IProps): ReactElement {
+function Inner({currentUser, manuscript}: IProps): ReactElement {
 
   const {t} = useTranslation('common');
   const [{selectedFile, allPictures}, setState] = useState<IState>({allPictures: [...manuscript.pictureUrls]});
   const fileUploadRef = createRef<HTMLInputElement>();
+  const [deletePicture] = useDeletePictureMutation();
 
   const mainIdentifier = manuscript.mainIdentifier.identifier;
+
+  const download = (pictureName: string) => {
+    const element = document.createElement('a');
+    element.href = URL.createObjectURL(
+      new Blob([`${pictureBaseUrl(mainIdentifier)}/${pictureName}`], {type: 'image/*'})
+    );
+    element.download = pictureName;
+    element.click();
+  };
 
   // FIXME: url needs version...
   const uploadUrl = process.env.NODE_ENV === 'development'
@@ -47,26 +60,42 @@ function Inner({manuscript}: IProps): ReactElement {
       const result: UploadResponse = await response.json();
 
       'fileName' in result
-        ? setState((currentState) => ({allPictures: currentState.allPictures.concat([result.fileName])}))
+        ? setState((currentState) => ({selectedFile: undefined, allPictures: currentState.allPictures.concat([result.fileName])}))
         : console.error(result.error);
     }
   }
 
-  // FIXME: show current picture?
+  const onDelete = async (pictureName: string): Promise<void> => {
+    try {
+      const {data} = await deletePicture({variables: {mainIdentifier, pictureName}});
+
+      if (data?.manuscript?.deletePicture) {
+        // FIXME: delete image from list?
+        setState((state) => update(state, {allPictures: (pictures) => pictures.filter(picName => picName !== pictureName)}));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const canDeleteImages = currentUser.sub === manuscript.creatorUsername || currentUser.rights === Rights.ExecutiveEditor;
 
   return (
     <div className="container mx-auto">
-      <h1 className="font-bold text-2xl text-center mb-4">
-        {t('manuscript')} {mainIdentifier}: {t('uploadPicture_plural')}
-      </h1>
+      <h1 className="font-bold text-2xl text-center mb-4">{t('manuscript')} {mainIdentifier}: {t('uploadPicture_plural')}</h1>
 
       <div className="my-4">
-        {allPictures.length > 0
-          ? <PicturesBlock mainIdentifier={mainIdentifier} pictures={allPictures} onPictureDelete={() => {
-            throw new Error('TODO!');
-          }
-          }/>
-          : <div className="p-2 rounded bg-cyan-500 text-white text-center">{t('noPicturesUploadedYet')}.</div>}
+        {allPictures.length === 0
+          ? <div className="my-4 p-2 rounded bg-cyan-500 text-white text-center">{t('noPicturesUploadedYet')}.</div>
+          : <PicturesBlock mainIdentifier={mainIdentifier} pictures={allPictures}>
+            {(pictureName) => (
+              <div className="text-center space-x-2">
+                <button type="button" className={blueButtonClasses} onClick={() => download(pictureName)}>&#x1F847; {t('downloadImage')}</button>
+                {canDeleteImages &&
+                  <button type="button" className={redButtonClasses} onClick={() => onDelete(pictureName)}>&#x2421; {t('deleteImage')}</button>}
+              </div>
+            )}
+          </PicturesBlock>}
       </div>
 
       <div className="my-4 p-2 rounded border border-slate-500">
@@ -89,7 +118,8 @@ function Inner({manuscript}: IProps): ReactElement {
 
 }
 
-export function UploadPicturesForm(): ReactElement {
+
+export function UploadPicturesForm({currentUser}: { currentUser: User }): ReactElement {
 
   const {mainIdentifier} = useParams<'mainIdentifier'>();
 
@@ -102,7 +132,7 @@ export function UploadPicturesForm(): ReactElement {
   return (
     <WithQuery query={query}>
       {({manuscript}) => manuscript
-        ? <Inner manuscript={manuscript}/>
+        ? <Inner manuscript={manuscript} currentUser={currentUser}/>
         : <Navigate to={homeUrl}/>}
     </WithQuery>
   );

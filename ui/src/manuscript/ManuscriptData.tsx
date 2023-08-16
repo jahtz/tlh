@@ -6,15 +6,14 @@ import {useSelector} from 'react-redux';
 import {activeUserSelector, User} from '../newStore';
 import {getNameForPalaeoClassification} from '../model/manuscriptProperties/palaeoClassification';
 import {PicturesBlock} from './PicturesBlock';
-import {createTransliterationUrl, homeUrl, uploadPicturesUrl} from '../urls';
+import {createTransliterationUrl, homeUrl, managePicturesUrl} from '../urls';
 import {TLHParser} from 'simtex';
 import {convertLine} from './LineParseResult';
 import {TransliterationParseResultDisplay} from './ColumnParseResultComponent';
 import {getNameForManuscriptLanguageAbbreviation} from '../forms/manuscriptLanguageAbbreviations';
 import update from 'immutability-helper';
 import {WithQuery} from '../WithQuery';
-
-const buttonClasses = (color: string): string => `p-2 block rounded bg-${color}-500 text-white text-center w-full`;
+import {blueButtonClasses, greenButtonClasses} from '../defaultDesign';
 
 interface IProps {
   initialManuscript: ManuscriptMetaDataFragment;
@@ -116,13 +115,11 @@ function Inner({initialManuscript}: IProps): ReactElement {
 
         {manuscript.pictureUrls.length === 0
           ? <div className="my-4 italic text-cyan-500 text-center">{t('noPicturesUploadedYet')}.</div>
-          : <PicturesBlock mainIdentifier={manuscript.mainIdentifier.identifier} pictures={manuscript.pictureUrls}
-                           onPictureDelete={() => {
-                             throw new Error('TODO!');
-                           }}/>
-        }
+          : <PicturesBlock mainIdentifier={manuscript.mainIdentifier.identifier} pictures={manuscript.pictureUrls}/>}
 
-        {createdByUser && <Link className={buttonClasses('blue')} to={`../${uploadPicturesUrl}`}>{t('uploadPicture_plural')}</Link>}
+        {createdByUser && <div className="text-center">
+          <Link className={blueButtonClasses} to={`../${managePicturesUrl}`}>{t('managePictures')}</Link>
+        </div>}
       </div>
 
       <div className="my-3">
@@ -141,11 +138,11 @@ function Inner({initialManuscript}: IProps): ReactElement {
             {parsedTransliteration !== undefined
               ? (
                 <div className="my-2 grid grid-cols-2 gap-2">
-                  <Link className={buttonClasses('blue')} to={`../${createTransliterationUrl}`}>{t('updateTransliteration')}</Link>
-                  <button type="button" className={buttonClasses('green')} onClick={onReleaseTransliteration}>{t('releaseTransliteration')}</button>
+                  <Link className={blueButtonClasses} to={`../${createTransliterationUrl}`}>{t('updateTransliteration')}</Link>
+                  <button type="button" className={greenButtonClasses} onClick={onReleaseTransliteration}>{t('releaseTransliteration')}</button>
                 </div>
               )
-              : <Link className={buttonClasses('blue')} to={`../${createTransliterationUrl}`}>{t('createTransliteration')}</Link>}
+              : <Link className={blueButtonClasses} to={`../${createTransliterationUrl}`}>{t('createTransliteration')}</Link>}
           </div>}
       </div>
     </div>

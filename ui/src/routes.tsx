@@ -15,7 +15,7 @@ import {
   registerUrl,
   secondXmlReviewUrl,
   transliterationReviewUrl,
-  uploadPicturesUrl,
+  managePicturesUrl,
   userManagementUrl,
   xmlComparatorUrl,
   xmlConversionUrl
@@ -60,7 +60,7 @@ export const router = createBrowserRouter([
         {
           path: 'manuscripts/:mainIdentifier', children: [
             {path: 'data', element: <ManuscriptData/>},
-            {path: uploadPicturesUrl, element: <RequireAuth>{() => <UploadPicturesForm/>}</RequireAuth>},
+            {path: managePicturesUrl, element: <RequireAuth>{(currentUser) => <UploadPicturesForm currentUser={currentUser}/>}</RequireAuth>},
             {
               path: createTransliterationUrl,
               element: <RequireAuth>{(currentUser) => <TransliterationInputContainer currentUser={currentUser}/>}</RequireAuth>

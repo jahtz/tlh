@@ -31,7 +31,7 @@ export const pipelineManagementUrl = '/pipelineManagement';
 
 export const manuscriptsUrlFragment = 'manuscripts';
 
-export const uploadPicturesUrl = 'uploadPictures';
+export const managePicturesUrl = 'managePictures';
 
 export const createTransliterationUrl = 'createTransliteration';
 
