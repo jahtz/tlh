@@ -44,9 +44,7 @@ query Index($page: Int! = 0) {
 # /createManuscript
 
 mutation CreateManuscript($manuscriptMetaData : ManuscriptMetaDataInput) {
-  me {
-    identifier: createManuscript(values: $manuscriptMetaData)
-  }
+  identifier: createManuscript(values: $manuscriptMetaData)
 }
 
 # /manuscripts/:id
@@ -78,10 +76,8 @@ query Manuscript($mainIdentifier: String!) {
 }
 
 mutation ReleaseTransliteration($mainIdentifier: String!) {
-  me {
-    manuscript(mainIdentifier: $mainIdentifier) {
-      releaseTransliteration
-    }
+  manuscript(mainIdentifier: $mainIdentifier) {
+    releaseTransliteration
   }
 }
 
@@ -98,6 +94,12 @@ fragment ManuscriptIdentWithCreator on ManuscriptMetaData {
 query UploadPictures($mainIdentifier: String!) {
   manuscript(mainIdentifier: $mainIdentifier) {
     ...ManuscriptIdentWithCreator
+  }
+}
+
+mutation DeletePicture($mainIdentifier: String!, $pictureName: String!) {
+  manuscript(mainIdentifier: $mainIdentifier) {
+    deletePicture(pictureName: $pictureName)
   }
 }
 
@@ -119,10 +121,8 @@ query TransliterationInput($mainIdentifier: String!) {
 }
 
 mutation uploadTransliteration($mainIdentifier: String!, $input: String!) {
-  me {
-    manuscript(mainIdentifier: $mainIdentifier) {
-      updateTransliteration(input: $input)
-    }
+  manuscript(mainIdentifier: $mainIdentifier) {
+    updateTransliteration(input: $input)
   }
 }
 

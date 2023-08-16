@@ -41,16 +41,19 @@ export function CreateManuscriptForm(): JSX.Element {
   const {t} = useTranslation('common');
   const [createManuscript, {data, loading, error}] = useCreateManuscriptMutation();
 
-  const newIdentifier = data?.me?.identifier;
+  const newIdentifier = data?.identifier;
 
   if (newIdentifier) {
     return <Navigate to={`/${manuscriptsUrlFragment}/${encodeURIComponent(newIdentifier)}/data`}/>;
   }
 
-  const handleSubmit = (manuscriptMetaData: ManuscriptMetaDataInput): Promise<void> =>
-    createManuscript({variables: {manuscriptMetaData}})
-      .then(() => void 0)
-      .catch((e) => console.error(e));
+  const handleSubmit = async (manuscriptMetaData: ManuscriptMetaDataInput): Promise<void> => {
+    try {
+      await createManuscript({variables: {manuscriptMetaData}});
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <div className="container mx-auto">
@@ -70,7 +73,7 @@ export function CreateManuscriptForm(): JSX.Element {
               <div className="mt-2">
                 <label className="font-bold">{t('otherIdentifier_plural')}:</label>
 
-                {values.otherIdentifiers && values.otherIdentifiers.map((otherIdentifier: ManuscriptIdentifierInput, index: number) =>
+                {values.otherIdentifiers && values.otherIdentifiers.map((_otherIdentifier: ManuscriptIdentifierInput, index: number) =>
                   <ManuscriptIdInputField
                     key={index} mainId={`otherIdentifiers.${index}`}
                     deleteFunc={() => arrayHelpers.remove(index)}

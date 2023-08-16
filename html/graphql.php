@@ -18,7 +18,7 @@ use GraphQL\Error\{DebugFlag, FormattedError};
 use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
-use model\{ExecutiveEditor, Reviewer, RootQuery, User};
+use model\{ExecutiveEditor, Manuscript, ManuscriptInput, Reviewer, RootQuery, User};
 use function jwt_helpers\{createJsonWebToken, extractJsonWebToken};
 
 /** @throws MySafeGraphQLException */
@@ -74,9 +74,31 @@ $mutationType = new ObjectType([
       'type' => Type::string(),
       'resolve' => fn(?int $_rootValue, array $args) => resolveLogin($args['username'], $args['password'])
     ],
-    'me' => [
-      'type' => User::$graphQLMutationsType,
-      'resolve' => fn(?int $_rootValue, array $_args, ?User $user): ?User => $user
+    'createManuscript' => [
+      'type' => Type::nonNull(Type::string()),
+      'args' => [
+        'values' => ManuscriptInput::$graphQLInputObjectType
+      ],
+      'resolve' => function (?int $_rootValue, array $args, ?User $user): string {
+        if (is_null($user)) {
+          throw new MySafeGraphQLException('Not logged in!');
+        }
+
+        $manuscript = ManuscriptInput::fromGraphQLInput($args['values'], $user->username);
+
+        if ($manuscript->insert()) {
+          return $manuscript->mainIdentifier->identifier;
+        } else {
+          throw new MySafeGraphQLException("Could not insert manuscript " . $manuscript->mainIdentifier->identifier);
+        }
+      }
+    ],
+    'manuscript' => [
+      'type' => Manuscript::$graphQLMutationsType,
+      'args' => [
+        'mainIdentifier' => Type::nonNull(Type::string())
+      ],
+      'resolve' => fn(?int $_rootValue, array $args): ?Manuscript => Manuscript::selectManuscriptById($args['mainIdentifier'])
     ],
     'reviewerMutations' => [
       'type' => Reviewer::$mutationType,

@@ -46,7 +46,7 @@ function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: I
   const upload = async () => {
     const res = await uploadTransliteration({variables: {mainIdentifier, input}});
 
-    if (res.data?.me?.manuscript?.updateTransliteration) {
+    if (res.data?.manuscript?.updateTransliteration) {
       setTransliteration((state) => update(state, {isSaved: {$set: true}}));
     }
   };
@@ -58,7 +58,7 @@ function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: I
 
     const {data} = await releaseTransliteration({variables: {mainIdentifier}});
 
-    if (data?.me?.manuscript?.releaseTransliteration) {
+    if (data?.manuscript?.releaseTransliteration) {
       setTransliteration((state) => update(state, {isReleased: {$set: true}}));
     }
   };

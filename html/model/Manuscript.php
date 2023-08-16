@@ -4,6 +4,7 @@ namespace model;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../sql_helpers.php';
+require_once __DIR__ . '/Rights.php';
 require_once __DIR__ . '/ManuscriptIdentifier.php';
 require_once __DIR__ . '/ManuscriptStatus.php';
 require_once __DIR__ . '/ManuscriptLanguage.php';
@@ -347,6 +348,25 @@ Manuscript::$graphQLMutationsType = new ObjectType([
         );
 
         return $inserted;
+      }
+    ],
+    'deletePicture' => [
+      'type' => Type::nonNull(Type::boolean()),
+      'args' => [
+        'pictureName' => Type::nonNull(Type::string())
+      ],
+      'resolve' => function (Manuscript $manuscript, array $args, ?User $user): bool {
+        if (is_null($user)) {
+          throw new MySafeGraphQLException('Not logged in!');
+        }
+        if ($manuscript->creatorUsername !== $user->username || $user->rights !== Rights::ExecutiveEditor) {
+          throw new MySafeGraphQLException('Insufficient rights!');
+        }
+
+        $mainIdentifier = $manuscript->mainIdentifier->identifier;
+        $pictureName = $args['pictureName'];
+
+        return unlink("./uploads/$mainIdentifier/$pictureName");
       }
     ]
   ]

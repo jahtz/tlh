@@ -40,21 +40,23 @@ function Inner({initialManuscript}: IProps): ReactElement {
 
   const mainIdentifier = manuscript.mainIdentifier.identifier;
 
-  const onReleaseTransliteration = (): void => {
+  const onReleaseTransliteration = async (): Promise<void> => {
     if (manuscript.transliterationReleased) {
       return;
     }
 
-    releaseTransliteration({variables: {mainIdentifier}})
-      .then(({data}) => {
-        if (data?.me?.manuscript?.releaseTransliteration) {
-          setManuscript((manuscript) => update(manuscript, {
-            transliterationReleased: {$set: true},
-            status: {$set: ManuscriptStatus.TransliterationReleased}
-          }));
-        }
-      })
-      .catch((error) => console.error(error));
+    try {
+      const {data} = await releaseTransliteration({variables: {mainIdentifier}});
+
+      if (data?.manuscript?.releaseTransliteration) {
+        setManuscript((manuscript) => update(manuscript, {
+          transliterationReleased: {$set: true},
+          status: {$set: ManuscriptStatus.TransliterationReleased}
+        }));
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -114,7 +116,10 @@ function Inner({initialManuscript}: IProps): ReactElement {
 
         {manuscript.pictureUrls.length === 0
           ? <div className="my-4 italic text-cyan-500 text-center">{t('noPicturesUploadedYet')}.</div>
-          : <PicturesBlock mainIdentifier={manuscript.mainIdentifier.identifier} pictures={manuscript.pictureUrls}/>
+          : <PicturesBlock mainIdentifier={manuscript.mainIdentifier.identifier} pictures={manuscript.pictureUrls}
+                           onPictureDelete={() => {
+                             throw new Error('TODO!');
+                           }}/>
         }
 
         {createdByUser && <Link className={buttonClasses('blue')} to={`../${uploadPicturesUrl}`}>{t('uploadPicture_plural')}</Link>}

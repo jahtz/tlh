@@ -44,11 +44,6 @@ type ExecutiveEditorMutations {
   updateUserRights(newRights: Rights!, username: String!): Rights!
 }
 
-type LoggedInUserMutations {
-  createManuscript(values: ManuscriptMetaDataInput): String!
-  manuscript(mainIdentifier: String!): ManuscriptMutations
-}
-
 type ManuscriptIdentifier {
   identifier: String!
   identifierType: ManuscriptIdentifierType!
@@ -106,6 +101,7 @@ input ManuscriptMetaDataInput {
 }
 
 type ManuscriptMutations {
+  deletePicture(pictureName: String!): Boolean!
   releaseTransliteration: String!
   updateTransliteration(input: String!): Boolean!
 }
@@ -121,9 +117,10 @@ enum ManuscriptStatus {
 }
 
 type Mutation {
+  createManuscript(values: ManuscriptMetaDataInput): String!
   executiveEditor: ExecutiveEditorMutations
   login(password: String!, username: String!): String
-  me: LoggedInUserMutations
+  manuscript(mainIdentifier: String!): ManuscriptMutations
   register(userInput: UserInput!): String
   reviewerMutations: ReviewerMutations
 }

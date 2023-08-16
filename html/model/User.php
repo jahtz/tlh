@@ -7,6 +7,7 @@ require_once __DIR__ . '/../sql_helpers.php';
 require_once __DIR__ . '/ManuscriptInput.php';
 require_once __DIR__ . '/Rights.php';
 
+use Exception;
 use GraphQL\Type\Definition\{InputObjectType, ObjectType, Type};
 use MySafeGraphQLException;
 use mysqli_stmt;
@@ -16,7 +17,6 @@ class User
 {
   static InputObjectType $graphQLInputObjectType;
   static ObjectType $graphQLQueryType;
-  static ObjectType $graphQLMutationsType;
 
   public string $username;
   public string $pwHash;
@@ -100,6 +100,7 @@ class User
     );
   }
 
+  /** @throws Exception */
   function insert(): bool
   {
     return SqlHelpers::executeSingleChangeQuery(
@@ -117,34 +118,6 @@ User::$graphQLQueryType = new ObjectType([
     'affiliation' => Type::string(),
     'email' => Type::nonNull(Type::string()),
     'rights' => Type::nonNull(Rights::$graphQLType)
-  ]
-]);
-
-User::$graphQLMutationsType = new ObjectType([
-  'name' => 'LoggedInUserMutations',
-  'fields' => [
-    'createManuscript' => [
-      'type' => Type::nonNull(Type::string()),
-      'args' => [
-        'values' => ManuscriptInput::$graphQLInputObjectType
-      ],
-      'resolve' => function (User $user, array $args): string {
-        $manuscript = ManuscriptInput::fromGraphQLInput($args['values'], $user->username);
-
-        if ($manuscript->insert()) {
-          return $manuscript->mainIdentifier->identifier;
-        } else {
-          throw new MySafeGraphQLException("Could not insert manuscript " . $manuscript->mainIdentifier->identifier);
-        }
-      }
-    ],
-    'manuscript' => [
-      'type' => Manuscript::$graphQLMutationsType,
-      'args' => [
-        'mainIdentifier' => Type::nonNull(Type::string())
-      ],
-      'resolve' => fn(User $_user, array $args): ?Manuscript => Manuscript::selectManuscriptById($args['mainIdentifier'])
-    ]
   ]
 ]);
 

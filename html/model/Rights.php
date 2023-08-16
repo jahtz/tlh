@@ -8,10 +8,14 @@ use GraphQL\Type\Definition\EnumType;
 
 class Rights
 {
+  const Author = 'Author';
+  const Reviewer = 'Reviewer';
+  const ExecutiveEditor = 'ExecutiveEditor';
+
   static EnumType $graphQLType;
 }
 
 Rights::$graphQLType = new EnumType([
   'name' => 'Rights',
-  'values' => ['Author', 'Reviewer', 'ExecutiveEditor']
+  'values' => [Rights::Author, Rights::Reviewer, Rights::ExecutiveEditor]
 ]);

@@ -21,7 +21,7 @@ interface IProps {
 function Inner({manuscript}: IProps): ReactElement {
 
   const {t} = useTranslation('common');
-  const [state, setState] = useState<IState>({allPictures: [...manuscript.pictureUrls]});
+  const [{selectedFile, allPictures}, setState] = useState<IState>({allPictures: [...manuscript.pictureUrls]});
   const fileUploadRef = createRef<HTMLInputElement>();
 
   const mainIdentifier = manuscript.mainIdentifier.identifier;
@@ -39,9 +39,9 @@ function Inner({manuscript}: IProps): ReactElement {
   }
 
   async function performUpload(): Promise<void> {
-    if (state.selectedFile) {
+    if (selectedFile) {
       const formData = new FormData();
-      formData.append('file', state.selectedFile, state.selectedFile.name);
+      formData.append('file', selectedFile, selectedFile.name);
 
       const response = await fetch(uploadUrl, {body: formData, method: 'POST'});
       const result: UploadResponse = await response.json();
@@ -52,6 +52,8 @@ function Inner({manuscript}: IProps): ReactElement {
     }
   }
 
+  // FIXME: show current picture?
+
   return (
     <div className="container mx-auto">
       <h1 className="font-bold text-2xl text-center mb-4">
@@ -59,16 +61,24 @@ function Inner({manuscript}: IProps): ReactElement {
       </h1>
 
       <div className="my-4">
-        {state.allPictures.length > 0
-          ? <PicturesBlock mainIdentifier={mainIdentifier} pictures={state.allPictures}/>
+        {allPictures.length > 0
+          ? <PicturesBlock mainIdentifier={mainIdentifier} pictures={allPictures} onPictureDelete={() => {
+            throw new Error('TODO!');
+          }
+          }/>
           : <div className="p-2 rounded bg-cyan-500 text-white text-center">{t('noPicturesUploadedYet')}.</div>}
       </div>
 
-      <div className="my-4 flex">
-        <input type="file" className="p-2 rounded-l border-l border-y border-slate-200 flex-grow" onChange={selectFile} ref={fileUploadRef}/>
-        <button type="button" className="p-2 rounded-r border border-slate-200" disabled={!state.selectedFile} onClick={performUpload}>
-          {t('uploadPicture')}
-        </button>
+      <div className="my-4 p-2 rounded border border-slate-500">
+        <div className="my-4 flex">
+          <input type="file" className="p-2 rounded-l border-l border-y border-slate-200 flex-grow" defaultValue={selectedFile?.name} onChange={selectFile}
+                 ref={fileUploadRef}/>
+          <button type="button" className="px-4 py-2 rounded-r bg-blue-500 text-white" disabled={!selectedFile} onClick={performUpload}>
+            {t('uploadPicture')}
+          </button>
+        </div>
+
+        {selectedFile && <img className="w-1/2 mx-auto" src={URL.createObjectURL(selectedFile)} alt={selectedFile.name}/>}
       </div>
 
       <div className="my-4 text-center">

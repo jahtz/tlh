@@ -118,22 +118,6 @@ export type ExecutiveEditorMutationsUpdateUserRightsArgs = {
   username: Scalars['String']['input'];
 };
 
-export type LoggedInUserMutations = {
-  __typename?: 'LoggedInUserMutations';
-  createManuscript: Scalars['String']['output'];
-  manuscript?: Maybe<ManuscriptMutations>;
-};
-
-
-export type LoggedInUserMutationsCreateManuscriptArgs = {
-  values?: InputMaybe<ManuscriptMetaDataInput>;
-};
-
-
-export type LoggedInUserMutationsManuscriptArgs = {
-  mainIdentifier: Scalars['String']['input'];
-};
-
 export type ManuscriptIdentifier = {
   __typename?: 'ManuscriptIdentifier';
   identifier: Scalars['String']['output'];
@@ -199,8 +183,14 @@ export type ManuscriptMetaDataInput = {
 
 export type ManuscriptMutations = {
   __typename?: 'ManuscriptMutations';
+  deletePicture: Scalars['Boolean']['output'];
   releaseTransliteration: Scalars['String']['output'];
   updateTransliteration: Scalars['Boolean']['output'];
+};
+
+
+export type ManuscriptMutationsDeletePictureArgs = {
+  pictureName: Scalars['String']['input'];
 };
 
 
@@ -220,17 +210,28 @@ export const enum ManuscriptStatus {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createManuscript: Scalars['String']['output'];
   executiveEditor?: Maybe<ExecutiveEditorMutations>;
   login?: Maybe<Scalars['String']['output']>;
-  me?: Maybe<LoggedInUserMutations>;
+  manuscript?: Maybe<ManuscriptMutations>;
   register?: Maybe<Scalars['String']['output']>;
   reviewerMutations?: Maybe<ReviewerMutations>;
+};
+
+
+export type MutationCreateManuscriptArgs = {
+  values?: InputMaybe<ManuscriptMetaDataInput>;
 };
 
 
 export type MutationLoginArgs = {
   password: Scalars['String']['input'];
   username: Scalars['String']['input'];
+};
+
+
+export type MutationManuscriptArgs = {
+  mainIdentifier: Scalars['String']['input'];
 };
 
 
@@ -350,7 +351,7 @@ export type CreateManuscriptMutationVariables = Exact<{
 }>;
 
 
-export type CreateManuscriptMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', identifier: string } | null };
+export type CreateManuscriptMutation = { __typename?: 'Mutation', identifier: string };
 
 export type ManuscriptMetaDataFragment = { __typename?: 'ManuscriptMetaData', defaultLanguage: ManuscriptLanguageAbbreviations, bibliography?: string | null, cthClassification?: number | null, palaeographicClassification: PalaeographicClassification, palaeographicClassificationSure: boolean, provenance?: string | null, creatorUsername: string, status: ManuscriptStatus, pictureUrls: Array<string>, provisionalTransliteration?: string | null, transliterationReleased: boolean, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }, otherIdentifiers: Array<{ __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string }> };
 
@@ -366,7 +367,7 @@ export type ReleaseTransliterationMutationVariables = Exact<{
 }>;
 
 
-export type ReleaseTransliterationMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', manuscript?: { __typename?: 'ManuscriptMutations', releaseTransliteration: string } | null } | null };
+export type ReleaseTransliterationMutation = { __typename?: 'Mutation', manuscript?: { __typename?: 'ManuscriptMutations', releaseTransliteration: string } | null };
 
 export type ManuscriptIdentWithCreatorFragment = { __typename?: 'ManuscriptMetaData', pictureUrls: Array<string>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
@@ -376,6 +377,14 @@ export type UploadPicturesQueryVariables = Exact<{
 
 
 export type UploadPicturesQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', pictureUrls: Array<string>, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } } | null };
+
+export type DeletePictureMutationVariables = Exact<{
+  mainIdentifier: Scalars['String']['input'];
+  pictureName: Scalars['String']['input'];
+}>;
+
+
+export type DeletePictureMutation = { __typename?: 'Mutation', manuscript?: { __typename?: 'ManuscriptMutations', deletePicture: boolean } | null };
 
 export type TransliterationInputDataFragment = { __typename?: 'ManuscriptMetaData', provisionalTransliteration?: string | null, status: ManuscriptStatus, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
@@ -392,7 +401,7 @@ export type UploadTransliterationMutationVariables = Exact<{
 }>;
 
 
-export type UploadTransliterationMutation = { __typename?: 'Mutation', me?: { __typename?: 'LoggedInUserMutations', manuscript?: { __typename?: 'ManuscriptMutations', updateTransliteration: boolean } | null } | null };
+export type UploadTransliterationMutation = { __typename?: 'Mutation', manuscript?: { __typename?: 'ManuscriptMutations', updateTransliteration: boolean } | null };
 
 export type ReviewTransliterationQueryVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
@@ -678,9 +687,7 @@ export type IndexLazyQueryHookResult = ReturnType<typeof useIndexLazyQuery>;
 export type IndexQueryResult = Apollo.QueryResult<IndexQuery, IndexQueryVariables>;
 export const CreateManuscriptDocument = gql`
     mutation CreateManuscript($manuscriptMetaData: ManuscriptMetaDataInput) {
-  me {
-    identifier: createManuscript(values: $manuscriptMetaData)
-  }
+  identifier: createManuscript(values: $manuscriptMetaData)
 }
     `;
 export type CreateManuscriptMutationFn = Apollo.MutationFunction<CreateManuscriptMutation, CreateManuscriptMutationVariables>;
@@ -746,10 +753,8 @@ export type ManuscriptLazyQueryHookResult = ReturnType<typeof useManuscriptLazyQ
 export type ManuscriptQueryResult = Apollo.QueryResult<ManuscriptQuery, ManuscriptQueryVariables>;
 export const ReleaseTransliterationDocument = gql`
     mutation ReleaseTransliteration($mainIdentifier: String!) {
-  me {
-    manuscript(mainIdentifier: $mainIdentifier) {
-      releaseTransliteration
-    }
+  manuscript(mainIdentifier: $mainIdentifier) {
+    releaseTransliteration
   }
 }
     `;
@@ -814,6 +819,40 @@ export function useUploadPicturesLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type UploadPicturesQueryHookResult = ReturnType<typeof useUploadPicturesQuery>;
 export type UploadPicturesLazyQueryHookResult = ReturnType<typeof useUploadPicturesLazyQuery>;
 export type UploadPicturesQueryResult = Apollo.QueryResult<UploadPicturesQuery, UploadPicturesQueryVariables>;
+export const DeletePictureDocument = gql`
+    mutation DeletePicture($mainIdentifier: String!, $pictureName: String!) {
+  manuscript(mainIdentifier: $mainIdentifier) {
+    deletePicture(pictureName: $pictureName)
+  }
+}
+    `;
+export type DeletePictureMutationFn = Apollo.MutationFunction<DeletePictureMutation, DeletePictureMutationVariables>;
+
+/**
+ * __useDeletePictureMutation__
+ *
+ * To run a mutation, you first call `useDeletePictureMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeletePictureMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deletePictureMutation, { data, loading, error }] = useDeletePictureMutation({
+ *   variables: {
+ *      mainIdentifier: // value for 'mainIdentifier'
+ *      pictureName: // value for 'pictureName'
+ *   },
+ * });
+ */
+export function useDeletePictureMutation(baseOptions?: Apollo.MutationHookOptions<DeletePictureMutation, DeletePictureMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeletePictureMutation, DeletePictureMutationVariables>(DeletePictureDocument, options);
+      }
+export type DeletePictureMutationHookResult = ReturnType<typeof useDeletePictureMutation>;
+export type DeletePictureMutationResult = Apollo.MutationResult<DeletePictureMutation>;
+export type DeletePictureMutationOptions = Apollo.BaseMutationOptions<DeletePictureMutation, DeletePictureMutationVariables>;
 export const TransliterationInputDocument = gql`
     query TransliterationInput($mainIdentifier: String!) {
   manuscript(mainIdentifier: $mainIdentifier) {
@@ -851,10 +890,8 @@ export type TransliterationInputLazyQueryHookResult = ReturnType<typeof useTrans
 export type TransliterationInputQueryResult = Apollo.QueryResult<TransliterationInputQuery, TransliterationInputQueryVariables>;
 export const UploadTransliterationDocument = gql`
     mutation uploadTransliteration($mainIdentifier: String!, $input: String!) {
-  me {
-    manuscript(mainIdentifier: $mainIdentifier) {
-      updateTransliteration(input: $input)
-    }
+  manuscript(mainIdentifier: $mainIdentifier) {
+    updateTransliteration(input: $input)
   }
 }
     `;
