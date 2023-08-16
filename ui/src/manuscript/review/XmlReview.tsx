@@ -1,4 +1,4 @@
-import {JSX} from 'react';
+import {ReactElement, useState} from 'react';
 import {useSubmitXmlReviewMutation, useXmlReviewQuery, XmlReviewType} from '../../graphql';
 import {Link, Navigate, useParams} from 'react-router-dom';
 import {homeUrl} from '../../urls';
@@ -8,29 +8,27 @@ import {XmlDocumentEditor} from '../../xmlEditor/XmlDocumentEditor';
 import {useTranslation} from 'react-i18next';
 import {writeXml} from '../../xmlEditor/StandAloneOXTED';
 import {tlhXmlEditorConfig} from '../../xmlEditor/tlhXmlEditorConfig';
+import {XmlRepair} from './XmlRepair';
 
-interface IProps {
+interface InnerInnerProps {
   mainIdentifier: string;
-  initialXml: string;
+  rootNode: XmlElementNode;
   reviewType: XmlReviewType;
 }
 
-function Inner({mainIdentifier, initialXml, reviewType}: IProps): JSX.Element {
+function InnerInner({mainIdentifier, rootNode, reviewType}: InnerInnerProps): ReactElement {
 
   const {t} = useTranslation('common');
-  const [submitXmlReview, {data, loading/*, error*/}] = useSubmitXmlReviewMutation();
+  const [submitXmlReview, {data, loading}] = useSubmitXmlReviewMutation();
 
-  const rootNodeParseResult = parseNewXml(initialXml, tlhXmlEditorConfig.readConfig);
 
-  if (rootNodeParseResult instanceof MyLeft) {
-    // FIXME: show source code to let reviewer edit xml!
-    throw new Error('TODO!');
-  }
-
-  const onExport = (rootNode: XmlElementNode): Promise<void | undefined> =>
-    submitXmlReview({variables: {mainIdentifier, review: writeXml(rootNode), reviewType}})
-      .then(() => void 0)
-      .catch((error) => console.error(error));
+  const onExport = async (rootNode: XmlElementNode): Promise<void> => {
+    try {
+      await submitXmlReview({variables: {mainIdentifier, review: writeXml(rootNode), reviewType}});
+    } catch (exception) {
+      console.error(exception);
+    }
+  };
 
   if (data?.reviewerMutations?.submitXmlReview) {
     return (
@@ -45,12 +43,32 @@ function Inner({mainIdentifier, initialXml, reviewType}: IProps): JSX.Element {
   }
 
   return (
-    <XmlDocumentEditor node={rootNodeParseResult.value as XmlElementNode} filename={mainIdentifier} onExport={onExport}
-                       exportName={t('submitReview') || 'submitReview'} exportDisabled={loading}>{undefined}</XmlDocumentEditor>
+    <XmlDocumentEditor node={rootNode} filename={mainIdentifier} onExport={onExport} exportName={t('submitReview')} exportDisabled={loading}>
+      {undefined}
+    </XmlDocumentEditor>
   );
 }
 
-export function XmlReview({reviewType}: { reviewType: XmlReviewType }): JSX.Element {
+interface InnerProps {
+  mainIdentifier: string;
+  initialXml: string;
+  reviewType: XmlReviewType;
+}
+
+function Inner({mainIdentifier, initialXml, reviewType}: InnerProps): ReactElement {
+
+  const [rootNodeParseResult, setRootNodeParseResult] = useState(parseNewXml(initialXml, tlhXmlEditorConfig.readConfig));
+
+  return rootNodeParseResult instanceof MyLeft
+    ? (
+      <div className="container mx-auto">
+        <XmlRepair brokenXml={initialXml} onUpdate={(value) => setRootNodeParseResult(parseNewXml(value, tlhXmlEditorConfig.readConfig))}/>
+      </div>
+    ) : <InnerInner mainIdentifier={mainIdentifier} rootNode={rootNodeParseResult.value as XmlElementNode} reviewType={reviewType}/>;
+}
+
+
+export function XmlReview({reviewType}: { reviewType: XmlReviewType }): ReactElement {
 
   const {mainIdentifier} = useParams<'mainIdentifier'>();
 
