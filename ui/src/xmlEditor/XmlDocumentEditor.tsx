@@ -14,6 +14,8 @@ import {XmlComparator} from '../xmlComparator/XmlComparator';
 import {NodeEditorRightSide} from './NodeEditorRightSide';
 import {FontSizeSelectorProps} from './FontSizeSelector';
 import {writeXml} from './StandAloneOXTED';
+import {fetchCuneiform} from './elementEditors/LineBreakEditor';
+import {getPriorSiblingPath} from '../nodeIterators';
 
 export function buildActionSpec(innerAction: Spec<XmlNode>, path: number[]): Spec<XmlNode> {
   return path.reduceRight(
@@ -41,6 +43,7 @@ interface IState {
   changed: boolean;
   author?: string;
   rightSideFontSize: number;
+  lbCuneiformDirtyPath?: number[];
 }
 
 function searchEditableNode(tagName: string, rootNode: XmlElementNode, currentPath: number[], forward: boolean): number[] | undefined {
@@ -195,10 +198,15 @@ export function XmlDocumentEditor({
       return;
     }
 
+    const lbCuneiformDirtyPath = findElement(state.rootNode as XmlElementNode, path).tagName === 'w'
+      ? getPriorSiblingPath(state.rootNode as XmlElementNode, path, 'lb')
+      : undefined;
+
     setState((state) => update(state, {
         rootNode: buildSpec(path.slice(0, -1), {children: {$splice: [[path[path.length - 1], 1]]}}),
         editorState: {$set: defaultRightSideState},
-        changed: {$set: true}
+        changed: {$set: true},
+        lbCuneiformDirtyPath: {$set: lbCuneiformDirtyPath}
       })
     );
   }
@@ -256,10 +264,15 @@ export function XmlDocumentEditor({
       ? insertAction(path, newNode, state.rootNode as XmlElementNode)
       : buildActionSpec({children: {$splice: [[path[path.length - 1], 0, newNode]]}}, path.slice(0, -1));
 
+    const lbCuneiformDirtyPath = newNode.tagName === 'w'
+      ? getPriorSiblingPath(state.rootNode as XmlElementNode, path, 'lb')
+      : undefined;
+
     setState((state) => update(state, {
       rootNode: actionSpec,
       editorState: {$set: editNodeEditorState(newNode, editorConfig, path)},
-      changed: {$set: true}
+      changed: {$set: true},
+      lbCuneiformDirtyPath: {$set: lbCuneiformDirtyPath}
     }));
   }
 
@@ -292,6 +305,17 @@ export function XmlDocumentEditor({
     setKeyHandlingEnabled: (value) => setState((state) => update(state, {keyHandlingEnabled: {$set: value}})),
     isLeftSide: true
   };
+
+  if (state.lbCuneiformDirtyPath !== undefined) {
+    const path = state.lbCuneiformDirtyPath;
+    // TODO: update cuneiform of specified node...
+
+    fetchCuneiform(state.rootNode as XmlElementNode, path)
+      .then((cuneiform) => setState((state) => update(state, {
+        rootNode: buildSpec(path, {attributes: {cu: {$set: cuneiform}}}),
+        lbCuneiformDirtyPath: {$set: undefined}
+      })));
+  }
 
   return state.editorState._type === 'CompareChangesEditorState'
     ? (

@@ -9,18 +9,21 @@ import {getSiblingsUntil} from '../../nodeIterators';
 import {AOption} from '../../myOption';
 import {getCuneiformUrl} from '../../urls';
 
-interface GetCuneiformResponse {
-  number: number;
-  cuneiform: string;
-}
-
-export const updateCuneiform = async (rootNode: XmlElementNode, lbNodePath: number[], applyUpdate: (cuneiform: string) => void): Promise<void> => {
+export const fetchCuneiform = async (rootNode: XmlElementNode, lbNodePath: number[]): Promise<string> => {
   const content = getSiblingsUntil(rootNode, lbNodePath, 'lb')
     .map((node) => writeNode(node, tlhXmlEditorConfig.writeConfig))
     .join(' ');
 
-  const {cuneiform} = await fetch(getCuneiformUrl, {method: 'POST', body: JSON.stringify({number: 1, content})})
-    .then<GetCuneiformResponse>((response) => response.json());
+  const response = await fetch(getCuneiformUrl, {method: 'POST', body: JSON.stringify({number: 1, content})});
+
+  const {cuneiform} = await response.json();
+
+  return cuneiform;
+};
+
+/** @deprecated */
+export const updateCuneiform = async (rootNode: XmlElementNode, lbNodePath: number[], applyUpdate: (cuneiform: string) => void): Promise<void> => {
+  const cuneiform = await fetchCuneiform(rootNode, lbNodePath);
 
   applyUpdate(cuneiform);
 };
@@ -58,8 +61,10 @@ const LineBreakEditor = ({
     .map((textElement) => textElement.attributes['xml:lang'])
     .get();
 
-  const onCuneiformUpdate = async (): Promise<void> =>
-    updateCuneiform(rootNode, path, (cuneiform) => updateEditedNode({attributes: {'cu': {$set: cuneiform}, cuDirty: {$set: undefined}}}));
+  const onCuneiformUpdate = async (): Promise<void> => {
+    const cuneiform = await fetchCuneiform(rootNode, path);
+    updateEditedNode({attributes: {'cu': {$set: cuneiform}, cuDirty: {$set: undefined}}});
+  };
 
   return (
     <>
@@ -86,7 +91,6 @@ const LineBreakEditor = ({
                onBlur={() => setKeyHandlingEnabled(true)} onChange={(event) => updateAttribute('cu', event.target.value)}/>
         <button type="button" className="mt-2 p-2 rounded bg-amber-500 text-white w-full" onClick={onCuneiformUpdate}>{t('updateCuneiform')}</button>
       </div>
-
     </>
   );
 };
