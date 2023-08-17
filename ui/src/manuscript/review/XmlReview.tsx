@@ -43,9 +43,7 @@ function InnerInner({mainIdentifier, rootNode, reviewType}: InnerInnerProps): Re
   }
 
   return (
-    <XmlDocumentEditor node={rootNode} filename={mainIdentifier} onExport={onExport} exportName={t('submitReview')} exportDisabled={loading}>
-      {undefined}
-    </XmlDocumentEditor>
+    <XmlDocumentEditor node={rootNode} filename={mainIdentifier} onExport={onExport} exportName={t('submitReview')} exportDisabled={loading}/>
   );
 }
 

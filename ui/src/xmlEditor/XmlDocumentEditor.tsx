@@ -31,7 +31,7 @@ interface IProps {
   exportName?: string;
   exportDisabled?: boolean;
   onExport: (node: XmlElementNode) => void;
-  children: ReactElement | undefined;
+  children?: ReactElement;
 }
 
 interface IState {
@@ -77,9 +77,13 @@ function searchEditableNode(tagName: string, rootNode: XmlElementNode, currentPa
   return go(rootNode, currentPath);
 }
 
-function findElement(node: XmlElementNode, path: number[]): XmlElementNode {
-  return path.reduce<XmlElementNode>((nodeToUpdate, pathContent) => nodeToUpdate.children[pathContent] as XmlElementNode, node);
-}
+const findElement = (node: XmlElementNode, path: number[]): XmlElementNode =>
+  path.reduce((nodeToUpdate, pathContent) => nodeToUpdate.children[pathContent] as XmlElementNode, node);
+
+const buildSpec = (path: number  [], innerSpec: Spec<XmlNode>) => path.reduceRight<Spec<XmlNode>>(
+  (acc, index) => ({children: {[index]: acc}}),
+  innerSpec
+);
 
 export function XmlDocumentEditor({
   node: initialNode,
@@ -123,26 +127,22 @@ export function XmlDocumentEditor({
       : editNodeEditorState(node, editorConfig, path)
   }));
 
-  function applyUpdates(nextEditablePath?: number[]): void {
+  const applyUpdates = (nextEditablePath?: number[]): void => setState((state) => {
+      if (state.editorState._type !== 'EditNodeRightState') {
+        return state;
+      }
 
-    const newEditorState = nextEditablePath !== undefined && state.editorState && 'path' in state.editorState
-      ? editNodeEditorState(findElement(state.rootNode as XmlElementNode, nextEditablePath), editorConfig, nextEditablePath)
-      : undefined;
+      const newEditorState = nextEditablePath !== undefined
+        ? editNodeEditorState(findElement(state.rootNode as XmlElementNode, nextEditablePath), editorConfig, nextEditablePath)
+        : undefined;
 
-    setState((state) => state.editorState._type === 'EditNodeRightState'
-      ? update(state, {
-        rootNode: state.editorState.path.reduceRight<Spec<XmlNode>>(
-          (acc, index) => ({children: {[index]: acc}}),
-          {$set: state.editorState.node}
-        ),
-        editorState: newEditorState !== undefined
-          ? {$set: newEditorState}
-          : {changed: {$set: false}},
+      return update(state, {
+        rootNode: buildSpec(state.editorState.path, {$set: state.editorState.node}),
+        editorState: newEditorState !== undefined ? {$set: newEditorState} : {changed: {$set: false}},
         changed: {$set: true}
-      })
-      : state
-    );
-  }
+      });
+    }
+  );
 
   const updateEditedNode = (updateSpec: Spec<XmlElementNode>): void => setState((state) => update(state, {
     editorState: (editorState) => editorState._type === 'EditNodeRightState'
@@ -153,51 +153,54 @@ export function XmlDocumentEditor({
   const updateAttribute = (key: string, value: string | undefined): void => updateEditedNode({attributes: {[key]: {$set: value}}});
 
   function jumpEditableNodes(tagName: string, forward: boolean): void {
-    if (state.editorState && 'path' in state.editorState) {
-      const currentPath = state.editorState.path;
-
-      const path = searchEditableNode(tagName, state.rootNode as XmlElementNode, currentPath, forward);
-      if (path) {
-        const node = findElement(state.rootNode as XmlElementNode, path);
-
-        setState((state) => update(state, {editorState: {$set: editNodeEditorState(node, editorConfig, path)}}));
-      }
+    if (state.editorState._type !== 'EditNodeRightState') {
+      return;
     }
+
+    const path = searchEditableNode(tagName, state.rootNode as XmlElementNode, state.editorState.path, forward);
+
+    if (!path) {
+      return;
+    }
+
+    const node = findElement(state.rootNode as XmlElementNode, path);
+
+    setState((state) => update(state, {editorState: {$set: editNodeEditorState(node, editorConfig, path)}}));
   }
 
   function handleJumpKey(event: KeyboardEvent): void {
-    if (state.editorState && 'path' in state.editorState && state.keyHandlingEnabled) {
+    if (state.editorState._type !== 'EditNodeRightState' || !state.keyHandlingEnabled) {
+      return;
+    }
 
-      const tagName = state.editorState.node.tagName;
+    const tagName = state.editorState.node.tagName;
 
-      if (editorKeyConfig.updateAndNextEditableNodeKeys.includes(event.key)) {
-        applyUpdates(
-          searchEditableNode(tagName, state.rootNode as XmlElementNode, state.editorState.path, true)
-        );
-      } else if (editorKeyConfig.nextEditableNodeKeys.includes(event.key)) {
-        jumpEditableNodes(tagName, true);
-      } else if (editorKeyConfig.updateAndPreviousEditableNodeKeys.includes(event.key)) {
-        applyUpdates(
-          searchEditableNode(tagName, state.rootNode as XmlElementNode, state.editorState.path, false)
-        );
-      } else if (editorKeyConfig.previousEditableNodeKeys.includes(event.key)) {
-        jumpEditableNodes(tagName, false);
-      }
+    if (editorKeyConfig.updateAndNextEditableNodeKeys.includes(event.key)) {
+      applyUpdates(
+        searchEditableNode(tagName, state.rootNode as XmlElementNode, state.editorState.path, true)
+      );
+    } else if (editorKeyConfig.nextEditableNodeKeys.includes(event.key)) {
+      jumpEditableNodes(tagName, true);
+    } else if (editorKeyConfig.updateAndPreviousEditableNodeKeys.includes(event.key)) {
+      applyUpdates(
+        searchEditableNode(tagName, state.rootNode as XmlElementNode, state.editorState.path, false)
+      );
+    } else if (editorKeyConfig.previousEditableNodeKeys.includes(event.key)) {
+      jumpEditableNodes(tagName, false);
     }
   }
 
   function deleteNode(path: number[]): void {
-    if (confirm(t('deleteThisElement') || 'deleteThisElement')) {
-      setState((state) => update(state, {
-          rootNode: path.slice(0, -1).reduceRight<Spec<XmlNode>>(
-            (acc, index) => ({children: {[index]: acc}}),
-            {children: {$splice: [[path[path.length - 1], 1]]}}
-          ),
-          editorState: {$set: defaultRightSideState},
-          changed: {$set: true}
-        })
-      );
+    if (!confirm(t('deleteThisElement'))) {
+      return;
     }
+
+    setState((state) => update(state, {
+        rootNode: buildSpec(path.slice(0, -1), {children: {$splice: [[path[path.length - 1], 1]]}}),
+        editorState: {$set: defaultRightSideState},
+        changed: {$set: true}
+      })
+    );
   }
 
   function renderNodeEditor({node, path, changed}: IEditNodeEditorState): ReactElement {
@@ -211,14 +214,7 @@ export function XmlDocumentEditor({
 
     const config = editorConfig.nodeConfigs[node.tagName] as XmlSingleEditableNodeConfig;
 
-    const updateOtherNode = (path: number[], spec: Spec<XmlNode>): void => {
-      setState((state) => update(state, {
-        rootNode: path.reduceRight<Spec<XmlNode>>(
-          (acc, index) => ({children: {[index]: acc}}),
-          spec
-        )
-      }));
-    };
+    const updateOtherNode = (path: number[], spec: Spec<XmlNode>): void => setState((state) => update(state, {rootNode: buildSpec(path, spec)}));
 
     return (
       <NodeEditorRightSide key={path.join('.')} rootNode={state.rootNode as XmlElementNode} originalNode={node} changed={changed}
@@ -248,25 +244,26 @@ export function XmlDocumentEditor({
   const toggleDefaultMode = (): void => setState((state) => update(state, {editorState: {$set: defaultRightSideState}}));
 
   function initiateInsert(path: NodePath): void {
-    if (state.editorState && 'tagName' in state.editorState) {
-
-      const {newElement, insertAction} = state.editorState.insertablePositions;
-
-      const newNode = newElement !== undefined ? newElement() : {tagName: state.editorState.tagName, attributes: {}, children: []};
-
-      const actionSpec: Spec<XmlNode> = insertAction
-        ? insertAction(path, newNode, state.rootNode as XmlElementNode)
-        : buildActionSpec({children: {$splice: [[path[path.length - 1], 0, newNode]]}}, path.slice(0, -1));
-
-      setState((state) => update(state, {
-        rootNode: actionSpec,
-        editorState: {$set: editNodeEditorState(newNode, editorConfig, path)},
-        changed: {$set: true}
-      }));
+    if (state.editorState._type !== 'AddNodeRightState') {
+      return;
     }
+
+    const {newElement, insertAction} = state.editorState.insertablePositions;
+
+    const newNode = newElement !== undefined ? newElement() : {tagName: state.editorState.tagName, attributes: {}, children: []};
+
+    const actionSpec: Spec<XmlNode> = insertAction
+      ? insertAction(path, newNode, state.rootNode as XmlElementNode)
+      : buildActionSpec({children: {$splice: [[path[path.length - 1], 0, newNode]]}}, path.slice(0, -1));
+
+    setState((state) => update(state, {
+      rootNode: actionSpec,
+      editorState: {$set: editNodeEditorState(newNode, editorConfig, path)},
+      changed: {$set: true}
+    }));
   }
 
-  const currentInsertedElement = state.editorState && 'tagName' in state.editorState
+  const currentInsertedElement = 'tagName' in state.editorState
     ? state.editorState.tagName
     : undefined;
 
@@ -274,10 +271,10 @@ export function XmlDocumentEditor({
 
   const leftSideProps: Omit<EditorLeftSideProps, 'exportTitle' | 'filename' | 'node' | 'onNodeSelect' | 'onExport'> = {
     rootNode: state.rootNode as XmlElementNode,
-    currentSelectedPath: state.editorState && 'path' in state.editorState
+    currentSelectedPath: 'path' in state.editorState
       ? state.editorState.path
       : undefined,
-    insertionData: state.editorState && 'tagName' in state.editorState
+    insertionData: 'tagName' in state.editorState
       ? {
         insertablePaths: Array.from(new Set(calculateInsertablePositions(state.editorState.insertablePositions, state.rootNode))),
         insertAsLastChildOf: state.editorState.insertablePositions.asLastChildOf || [],
