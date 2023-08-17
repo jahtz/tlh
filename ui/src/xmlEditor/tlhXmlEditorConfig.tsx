@@ -132,7 +132,7 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     },
     note: noteNodeConfig as XmlEditorSingleNodeConfig
   },
-  beforeExport: (rootNode: XmlElementNode) => {
+  beforeExport: (rootNode) => {
     reCountNodeNumbers(rootNode, 'node', 'n');
     reCountNodeNumbers(rootNode, 'clb', 'nr');
     return rootNode;
