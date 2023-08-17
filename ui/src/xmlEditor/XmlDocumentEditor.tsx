@@ -308,8 +308,7 @@ export function XmlDocumentEditor({
 
   if (state.lbCuneiformDirtyPath !== undefined) {
     const path = state.lbCuneiformDirtyPath;
-    // TODO: update cuneiform of specified node...
-
+    
     fetchCuneiform(state.rootNode as XmlElementNode, path)
       .then((cuneiform) => setState((state) => update(state, {
         rootNode: buildSpec(path, {attributes: {cu: {$set: cuneiform}}}),

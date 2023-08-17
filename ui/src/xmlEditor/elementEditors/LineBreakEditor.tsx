@@ -21,13 +21,6 @@ export const fetchCuneiform = async (rootNode: XmlElementNode, lbNodePath: numbe
   return cuneiform;
 };
 
-/** @deprecated */
-export const updateCuneiform = async (rootNode: XmlElementNode, lbNodePath: number[], applyUpdate: (cuneiform: string) => void): Promise<void> => {
-  const cuneiform = await fetchCuneiform(rootNode, lbNodePath);
-
-  applyUpdate(cuneiform);
-};
-
 type LineBreakAttributes = 'lnr' | 'cu' | 'txtid' | 'lg' | 'cuDirty';
 
 export const lineBreakNodeConfig: XmlSingleInsertableEditableNodeConfig<'lb', LineBreakAttributes> = {
