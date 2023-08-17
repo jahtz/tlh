@@ -7,6 +7,7 @@ import {useTranslation} from 'react-i18next';
 import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
 import {OxtedExportData} from './OxtedExportData';
 import {makeDownload} from '../downloadHelper';
+import {DocumentEditTypes} from './documentEditTypes';
 
 const locStoreKey = 'editorState';
 
@@ -53,14 +54,21 @@ export function StandAloneOXTED({editorConfig}: IProps): ReactElement {
       return;
     }
 
-    // set update type
+    // TODO: check all attributes?
 
-    const annotationNode = findFirstXmlElementByTagName(rootNode, 'annotation');
-    if (annotationNode === undefined) {
+    // set update type
+    const tagNameToInsert = exportAddNode.tagName === DocumentEditTypes.Annotation || exportAddNode.tagName === DocumentEditTypes.Validation
+      ? 'annotation'
+      : 'meta';
+
+    const nodeToAddTo = findFirstXmlElementByTagName(rootNode, tagNameToInsert);
+
+    if (nodeToAddTo === undefined) {
       alert('Internal error!');
       return;
     }
-    annotationNode.children.push(exportAddNode);
+
+    nodeToAddTo.children.push(exportAddNode);
 
     makeDownload(writeXml(rootNode), loadedDocument.filename);
   }
