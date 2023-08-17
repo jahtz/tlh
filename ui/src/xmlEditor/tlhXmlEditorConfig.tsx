@@ -131,18 +131,5 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
       replace: ({node}) => <span className="corr">{node.attributes.c}</span>
     },
     note: noteNodeConfig as XmlEditorSingleNodeConfig
-  },
-  beforeExport: (rootNode) => {
-    reCountNodeNumbers(rootNode, 'node', 'n');
-    reCountNodeNumbers(rootNode, 'clb', 'nr');
-    return rootNode;
-  },
-  afterExport: (exported: string) => exported
-    .replace(/®/g, '\n\t')
-    .replace(/{/g, '\n\t\t{')
-    .replace(/\+=/g, '\n\t\t   += ')
-    .replace(/<w/g, '\n <w')
-    .replace(/<lb/g, '\n\n<lb')
-    .replace(/ mrp/g, '\n\tmrp')
-    .replace(/@/g, ' @ ')
+  }
 };

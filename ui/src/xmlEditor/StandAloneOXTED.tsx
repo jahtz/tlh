@@ -4,7 +4,7 @@ import {findFirstXmlElementByTagName, loadNewXml, writeNode, XmlElementNode, Xml
 import {XmlDocumentEditor} from './XmlDocumentEditor';
 import {XmlEditorConfig} from './editorConfig';
 import {useTranslation} from 'react-i18next';
-import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
+import {reCountNodeNumbers, tlhXmlEditorConfig} from './tlhXmlEditorConfig';
 import {OxtedExportData} from './OxtedExportData';
 import {makeDownload} from '../downloadHelper';
 import {DocumentEditTypes} from './documentEditTypes';
@@ -27,7 +27,21 @@ function initialState(): LoadedDocument | undefined {
 
 const autoSave = (filename: string, rootNode: XmlNode): void => localStorage.setItem(locStoreKey, JSON.stringify({filename, rootNode}));
 
-export const writeXml = (node: XmlElementNode): string => tlhXmlEditorConfig.afterExport(writeNode(tlhXmlEditorConfig.beforeExport(node), tlhXmlEditorConfig.writeConfig).join('\n'));
+export const writeXml = (rootNode: XmlElementNode): string => {
+  reCountNodeNumbers(rootNode, 'node', 'n');
+  reCountNodeNumbers(rootNode, 'clb', 'nr');
+
+  return writeNode(rootNode, tlhXmlEditorConfig.writeConfig)
+    .join('\n')
+    .replaceAll(/\s+/g, ' ')
+    .replaceAll(' @ ', '@')
+    .replaceAll('</w><w', '</w> <w')
+    .replaceAll('</text>', '\n</text>')
+    .replaceAll('<lb ', '\n<lb ')
+    .replaceAll('<gap t="line"', '\n<gap t="line"')
+    .replaceAll('<AO:Manuscripts>', '\n<AO:Manuscripts>')
+    .replaceAll('</AO:Manuscripts>', '</AO:Manuscripts>\n');
+};
 
 export function StandAloneOXTED({editorConfig}: IProps): ReactElement {
 

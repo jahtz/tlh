@@ -52,11 +52,10 @@ export type XmlEditorSingleNodeConfig<T extends string = string, A extends strin
   | XmlSingleInsertableEditableNodeConfig<T, A>;
 
 export interface XmlEditorConfig {
+  // include readConfig & writeConfig in nodeConfigs?
   readConfig: XmlReadConfig;
   writeConfig: XmlWriteConfig;
   nodeConfigs: {
     [tagName: string]: XmlEditorSingleNodeConfig;
   };
-  beforeExport: (node: XmlElementNode) => XmlElementNode;
-  afterExport: (content: string) => string;
 }
