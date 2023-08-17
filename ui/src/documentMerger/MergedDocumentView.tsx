@@ -13,9 +13,9 @@ import {
   XmlNode,
   xmlTextNode
 } from 'simple_xml';
-import {handleSaveToPC} from '../xmlEditor/StandAloneOXTED';
 import xmlFormat from 'xml-formatter';
 import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
+import {makeDownload} from '../downloadHelper';
 
 interface IProps {
   lines: MergeLine[];
@@ -81,10 +81,12 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
     console.log(exported);
     let filename = 'merged';
     const docIDnode = findFirstXmlElementByTagName(header, 'docID');
+
     if (docIDnode && isXmlTextNode(docIDnode.children[0])) {
       filename = docIDnode.children[0].textContent;
     }
-    handleSaveToPC(exported, filename + '.xml');
+
+    makeDownload(exported, filename + '.xml');
   }
 
   function writePublMapping(): XmlNode[] {
@@ -100,7 +102,7 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
         {},
         [xmlTextNode(
           (publ[1] + ' {€' + publ[0] + '}')
-            .replaceAll('\n','')
+            .replaceAll('\n', '')
             .replaceAll('\t', '')
         )]));
       i++;
@@ -118,8 +120,7 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
         for (const childPub of publication.children) {
           if (isXmlElementNode(childPub) && isXmlTextNode(childPub.children[0])) {
             output.push(childPub.children[0].textContent);
-          }
-          else if (isXmlTextNode(childPub)) {
+          } else if (isXmlTextNode(childPub)) {
             output.push(childPub.textContent);
           }
         }

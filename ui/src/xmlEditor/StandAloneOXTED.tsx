@@ -6,17 +6,9 @@ import {XmlEditorConfig} from './editorConfig';
 import {useTranslation} from 'react-i18next';
 import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
 import {OxtedExportData} from './OxtedExportData';
+import {makeDownload} from '../downloadHelper';
 
 const locStoreKey = 'editorState';
-
-export function handleSaveToPC(data: string, filename: string): void {
-  const link = document.createElement('a');
-  link.download = filename;
-  link.href = URL.createObjectURL(
-    new Blob([data], {type: 'text/plain'})
-  );
-  link.click();
-}
 
 interface IProps {
   editorConfig: XmlEditorConfig;
@@ -29,10 +21,7 @@ interface LoadedDocument {
 
 function initialState(): LoadedDocument | undefined {
   const maybeEditorState = localStorage.getItem(locStoreKey);
-
-  return maybeEditorState
-    ? JSON.parse(maybeEditorState)
-    : undefined;
+  return maybeEditorState ? JSON.parse(maybeEditorState) : undefined;
 }
 
 const autoSave = (filename: string, rootNode: XmlNode): void => localStorage.setItem(locStoreKey, JSON.stringify({filename, rootNode}));
@@ -73,7 +62,7 @@ export function StandAloneOXTED({editorConfig}: IProps): ReactElement {
     }
     annotationNode.children.push(exportAddNode);
 
-    handleSaveToPC(writeXml(rootNode), loadedDocument.filename);
+    makeDownload(writeXml(rootNode), loadedDocument.filename);
   }
 
   function closeFile(): void {

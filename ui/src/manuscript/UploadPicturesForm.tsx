@@ -8,6 +8,7 @@ import {WithQuery} from '../WithQuery';
 import {blueButtonClasses, redButtonClasses} from '../defaultDesign';
 import {User} from '../newStore';
 import update from 'immutability-helper';
+import {makeDownload} from '../downloadHelper';
 
 interface IState {
   selectedFile?: File;
@@ -30,14 +31,7 @@ function Inner({currentUser, manuscript}: IProps): ReactElement {
 
   const mainIdentifier = manuscript.mainIdentifier.identifier;
 
-  const download = (pictureName: string) => {
-    const element = document.createElement('a');
-    element.href = URL.createObjectURL(
-      new Blob([`${pictureBaseUrl(mainIdentifier)}/${pictureName}`], {type: 'image/*'})
-    );
-    element.download = pictureName;
-    element.click();
-  };
+  const download = (pictureName: string) => makeDownload(`${pictureBaseUrl(mainIdentifier)}/${pictureName}`, pictureName, 'image/*');
 
   // FIXME: url needs version...
   const uploadUrl = process.env.NODE_ENV === 'development'

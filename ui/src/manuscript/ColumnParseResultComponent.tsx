@@ -5,7 +5,7 @@ import {LineParseResultDisplay} from './LineParseResultDisplay';
 import {writeNode} from 'simple_xml';
 import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
 import {LineParseResult} from './LineParseResult';
-import {handleSaveToPC} from '../xmlEditor/StandAloneOXTED';
+import {makeDownload} from '../downloadHelper';
 
 interface IProps {
   showStatusLevel: boolean;
@@ -30,7 +30,7 @@ export function ColumnParseResultComponent({lines, showStatusLevel}: IProps): JS
 
   const exportedXmlLines = exportLines(lines);
 
-  const onXmlExport = () => handleSaveToPC(exportedXmlLines.join('\n'), 'exported.xml');
+  const onXmlExport = () => makeDownload(exportedXmlLines.join('\n'), 'exported.xml');
 
   return (
     <BulmaTabs tabs={{
