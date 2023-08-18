@@ -1,11 +1,11 @@
 export const baseUrl = process.env.NODE_ENV !== 'development'
-  ? `/${process.env.REACT_APP_VERSION}/public`
+  ? `/tlh_editor/${process.env.REACT_APP_VERSION}/public`
   : '';
 
 export function pictureBaseUrl(manuscriptMainIdentifier: string): string {
   return process.env.NODE_ENV === 'development'
     ? `${process.env.REACT_APP_SERVER_URL}/uploads/${encodeURIComponent(manuscriptMainIdentifier)}`
-    : `/${process.env.REACT_APP_VERSION}/uploads/${encodeURIComponent(manuscriptMainIdentifier)}`;
+    : `/tlh_editor/${process.env.REACT_APP_VERSION}/uploads/${encodeURIComponent(manuscriptMainIdentifier)}`;
 }
 
 export const homeUrl = '/';
