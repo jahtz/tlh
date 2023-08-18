@@ -1,1 +1,1 @@
-rclone copy html/ hethport3:htdocs/$VERSION --progress --transfers=8
+rclone copy html/ hethport3:htdocs/tlh_editor/$VERSION --progress --transfers=8

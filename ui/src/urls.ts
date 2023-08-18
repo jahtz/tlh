@@ -1,12 +1,16 @@
+const baseServerUrl = process.env.NODE_ENV !== 'development'
+  ? `/tlh_editor/${process.env.REACT_APP_VERSION}`
+  : 'http://localhost:8066';
+
 export const baseUrl = process.env.NODE_ENV !== 'development'
-  ? `/tlh_editor/${process.env.REACT_APP_VERSION}/public`
+  ? `${baseServerUrl}/public`
   : '';
 
-export function pictureBaseUrl(manuscriptMainIdentifier: string): string {
-  return process.env.NODE_ENV === 'development'
-    ? `${process.env.REACT_APP_SERVER_URL}/uploads/${encodeURIComponent(manuscriptMainIdentifier)}`
-    : `/tlh_editor/${process.env.REACT_APP_VERSION}/uploads/${encodeURIComponent(manuscriptMainIdentifier)}`;
-}
+export const apolloUri = `${baseServerUrl}/graphql.php`;
+
+export const pictureUploadUrl = (mainIdentifier: string): string => `${baseServerUrl}/uploadPicture.php?id=${encodeURIComponent(mainIdentifier)}`;
+
+export const pictureBaseUrl = (mainIdentifier: string): string => `${baseServerUrl}/uploads/${encodeURIComponent(mainIdentifier)}`;
 
 export const homeUrl = '/';
 

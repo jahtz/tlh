@@ -1,6 +1,6 @@
 import {ChangeEvent, createRef, ReactElement, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {homeUrl, pictureBaseUrl} from '../urls';
+import {homeUrl, pictureBaseUrl, pictureUploadUrl} from '../urls';
 import {PicturesBlock} from './PicturesBlock';
 import {Link, Navigate, useParams} from 'react-router-dom';
 import {ManuscriptIdentWithCreatorFragment, Rights, useDeletePictureMutation, useUploadPicturesQuery} from '../graphql';
@@ -33,11 +33,6 @@ function Inner({currentUser, manuscript}: IProps): ReactElement {
 
   const download = (pictureName: string) => makeDownload(`${pictureBaseUrl(mainIdentifier)}/${pictureName}`, pictureName, 'image/*');
 
-  // FIXME: url needs version...
-  const uploadUrl = process.env.NODE_ENV === 'development'
-    ? `${process.env.REACT_APP_SERVER_URL}/uploadPicture.php?id=${encodeURIComponent(mainIdentifier)}`
-    : `/${process.env.REACT_APP_VERSION}/uploadPicture.php?id=${encodeURIComponent(mainIdentifier)}`;
-
   function selectFile(event: ChangeEvent<HTMLInputElement>): void {
     const fileList = event.target.files;
     if (fileList !== null && fileList.length > 0) {
@@ -50,7 +45,7 @@ function Inner({currentUser, manuscript}: IProps): ReactElement {
       const formData = new FormData();
       formData.append('file', selectedFile, selectedFile.name);
 
-      const response = await fetch(uploadUrl, {body: formData, method: 'POST'});
+      const response = await fetch(pictureUploadUrl(mainIdentifier), {body: formData, method: 'POST'});
       const result: UploadResponse = await response.json();
 
       'fileName' in result
