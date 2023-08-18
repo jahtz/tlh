@@ -296,7 +296,7 @@ export function XmlDocumentEditor({
       : undefined,
     closeFile: closeFile
       ? () => {
-        if (!state.changed || confirm(t('closeFileOnUnfinishedChangesMessage') || 'closeFileOnUnfinishedChangesMessage')) {
+        if (!state.changed || confirm(t('closeFileOnUnfinishedChangesMessage'))) {
           closeFile();
         }
       }
@@ -308,7 +308,7 @@ export function XmlDocumentEditor({
 
   if (state.lbCuneiformDirtyPath !== undefined) {
     const path = state.lbCuneiformDirtyPath;
-    
+
     fetchCuneiform(state.rootNode as XmlElementNode, path)
       .then((cuneiform) => setState((state) => update(state, {
         rootNode: buildSpec(path, {attributes: {cu: {$set: cuneiform}}}),
