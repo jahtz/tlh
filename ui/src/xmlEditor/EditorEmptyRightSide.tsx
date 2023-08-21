@@ -3,16 +3,16 @@ import {ReactElement} from 'react';
 import {useTranslation} from 'react-i18next';
 import {InsertablePositions} from './insertablePositions';
 import {SelectableButton} from '../genericElements/Buttons';
-import {blueButtonClasses, greenButtonClasses} from '../defaultDesign';
+import {amberButtonClasses, blueButtonClasses} from '../defaultDesign';
 
 interface IProps {
   editorConfig: XmlEditorConfig;
   currentInsertedElement?: string;
   toggleElementInsert: (tagName: string, ip: InsertablePositions) => void;
   toggleCompareChanges: () => void;
-  onExport: () => void;
-  exportTitle: string;
+  onExportXml: () => void;
   exportDisabled: boolean;
+  otherButton: ReactElement | undefined;
   children: ReactElement | undefined;
 }
 
@@ -21,9 +21,9 @@ export function EditorEmptyRightSide({
   currentInsertedElement,
   toggleElementInsert,
   toggleCompareChanges,
-  onExport,
-  exportTitle,
+  onExportXml,
   exportDisabled,
+  otherButton,
   children
 }: IProps): ReactElement {
 
@@ -50,13 +50,10 @@ export function EditorEmptyRightSide({
 
       {children}
 
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        <div className="text-center">
-          <button type="button" className={blueButtonClasses} onClick={toggleCompareChanges}>{t('compareChanges')}</button>
-        </div>
-        <div className="text-center">
-          <button type="button" className={greenButtonClasses} onClick={onExport} disabled={exportDisabled}>{exportTitle}</button>
-        </div>
+      <div className="mt-4 flex space-x-4 justify-center">
+        <button type="button" className={amberButtonClasses} onClick={toggleCompareChanges}>{t('compareChanges')}</button>
+        <button type="button" className={blueButtonClasses} onClick={onExportXml} disabled={exportDisabled}>{t('exportXml')}</button>
+        {otherButton}
       </div>
     </div>
   );

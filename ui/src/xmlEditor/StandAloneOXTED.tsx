@@ -96,7 +96,7 @@ export function StandAloneOXTED({editorConfig}: IProps): ReactElement {
     <div className="h-full max-h-full">
       {loadedDocument
         ? (
-          <XmlDocumentEditor node={loadedDocument.rootNode} editorConfig={editorConfig} onExport={download} filename={loadedDocument.filename}
+          <XmlDocumentEditor node={loadedDocument.rootNode} editorConfig={editorConfig} onExportXml={download} filename={loadedDocument.filename}
                              closeFile={closeFile} autoSave={(node) => autoSave(loadedDocument.filename, node)}>
             <OxtedExportData setExportNode={setExportAddNode}/>
           </XmlDocumentEditor>

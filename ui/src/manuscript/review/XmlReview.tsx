@@ -9,7 +9,6 @@ import {useTranslation} from 'react-i18next';
 import {writeXml} from '../../xmlEditor/StandAloneOXTED';
 import {tlhXmlEditorConfig} from '../../xmlEditor/tlhXmlEditorConfig';
 import {XmlRepair} from './XmlRepair';
-import {blueButtonClasses} from '../../defaultDesign';
 import {makeDownload} from '../../downloadHelper';
 
 interface InnerInnerProps {
@@ -23,8 +22,6 @@ function InnerInner({mainIdentifier, rootNode, reviewType}: InnerInnerProps): Re
   const {t} = useTranslation('common');
   const [submitXmlReview, {data, loading}] = useSubmitXmlReviewMutation();
 
-  const onExport = () => makeDownload(writeXml(rootNode), 'exported.xml');
-
   const onSubmit = async (rootNode: XmlElementNode): Promise<void> => {
     try {
       await submitXmlReview({variables: {mainIdentifier, review: writeXml(rootNode), reviewType}});
@@ -32,6 +29,8 @@ function InnerInner({mainIdentifier, rootNode, reviewType}: InnerInnerProps): Re
       console.error(exception);
     }
   };
+
+  const onExportXml = (rootNode: XmlElementNode) => makeDownload(writeXml(rootNode), 'exported.xml');
 
   return data?.reviewerMutations?.submitXmlReview
     ? (
@@ -44,11 +43,8 @@ function InnerInner({mainIdentifier, rootNode, reviewType}: InnerInnerProps): Re
       </div>
     )
     : (
-      <XmlDocumentEditor node={rootNode} filename={mainIdentifier} onExport={onSubmit} exportName={t('submitReview')} exportDisabled={loading}>
-        <div className="text-center">
-          <button type="button" className={blueButtonClasses} onClick={onExport}>{t('exportXml')}</button>
-        </div>
-      </XmlDocumentEditor>
+      <XmlDocumentEditor node={rootNode} filename={mainIdentifier} onExportXml={onExportXml} exportDisabled={loading}
+                         otherButtonConfig={{title: t('submitReview'), color: 'green', onClick: onSubmit}}/>
     );
 }
 

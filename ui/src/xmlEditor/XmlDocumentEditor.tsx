@@ -16,6 +16,7 @@ import {FontSizeSelectorProps} from './FontSizeSelector';
 import {writeXml} from './StandAloneOXTED';
 import {fetchCuneiform} from './elementEditors/LineBreakEditor';
 import {getPriorSiblingPath} from '../nodeIterators';
+import {buttonClasses} from '../defaultDesign';
 
 export function buildActionSpec(innerAction: Spec<XmlNode>, path: number[]): Spec<XmlNode> {
   return path.reduceRight(
@@ -24,15 +25,21 @@ export function buildActionSpec(innerAction: Spec<XmlNode>, path: number[]): Spe
   );
 }
 
+export interface ButtonConfig {
+  title: string;
+  color: string;
+  onClick: (rootNode: XmlElementNode) => void;
+}
+
 interface IProps {
   node: XmlNode;
   editorConfig?: XmlEditorConfig;
   filename: string;
   closeFile?: () => void;
   autoSave?: (rootNode: XmlNode) => void;
-  exportName?: string;
   exportDisabled?: boolean;
-  onExport: (node: XmlElementNode) => void;
+  onExportXml: (node: XmlElementNode) => void;
+  otherButtonConfig?: ButtonConfig;
   children?: ReactElement;
 }
 
@@ -91,12 +98,12 @@ const buildSpec = (path: number  [], innerSpec: Spec<XmlNode>) => path.reduceRig
 export function XmlDocumentEditor({
   node: initialNode,
   editorConfig = tlhXmlEditorConfig,
-  onExport,
+  onExportXml,
   filename,
   closeFile,
   autoSave,
-  exportName,
   exportDisabled,
+  otherButtonConfig,
   children
 }: IProps): ReactElement {
 
@@ -121,7 +128,7 @@ export function XmlDocumentEditor({
 
   function exportXml(): void {
     setState((state) => update(state, {changed: {$set: false}}));
-    onExport(state.rootNode as XmlElementNode);
+    onExportXml(state.rootNode as XmlElementNode);
   }
 
   const onNodeSelect = (node: XmlElementNode, path: number[]): void => setState((state) => update(state, {
@@ -280,8 +287,6 @@ export function XmlDocumentEditor({
     ? state.editorState.tagName
     : undefined;
 
-  const exportTitle = exportName ? exportName : t('exportXml') || 'exportXml';
-
   const leftSideProps: Omit<EditorLeftSideProps, 'exportTitle' | 'filename' | 'node' | 'onNodeSelect' | 'onExport'> = {
     rootNode: state.rootNode as XmlElementNode,
     currentSelectedPath: 'path' in state.editorState
@@ -316,6 +321,14 @@ export function XmlDocumentEditor({
       })));
   }
 
+  const makeOtherButton = ({color, onClick, title}: ButtonConfig): ReactElement => (
+    <button type="button" className={buttonClasses(color)} onClick={() => onClick(state.rootNode as XmlElementNode)}>{title}</button>
+  );
+
+  const otherButton = otherButtonConfig
+    ? makeOtherButton(otherButtonConfig)
+    : undefined;
+
   return state.editorState._type === 'CompareChangesEditorState'
     ? (
       <div className="container mx-auto">
@@ -333,9 +346,13 @@ export function XmlDocumentEditor({
               {renderNodeEditor(state.editorState) /* don't convert to a component! */}
             </div>
           )
-          : <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}
-                                  toggleCompareChanges={toggleCompareChanges} onExport={exportXml} exportTitle={exportTitle}
-                                  exportDisabled={exportDisabled || false}>{children}</EditorEmptyRightSide>}
+          : (
+            <EditorEmptyRightSide editorConfig={editorConfig} currentInsertedElement={currentInsertedElement} toggleElementInsert={toggleElementInsert}
+                                  toggleCompareChanges={toggleCompareChanges} onExportXml={exportXml} exportDisabled={exportDisabled || false}
+                                  otherButton={otherButton}>
+              {children}
+            </EditorEmptyRightSide>
+          )}
       </div>
     );
 }

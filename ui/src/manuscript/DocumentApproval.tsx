@@ -25,10 +25,13 @@ function Inner({mainIdentifier, initialXml}: IProps): JSX.Element {
     throw new Error('TODO!');
   }
 
-  const onExport = (rootNode: XmlElementNode): Promise<void | undefined> =>
-    submitApproval({variables: {mainIdentifier, input: writeXml(rootNode)}})
-      .then(() => void 0)
-      .catch((error) => console.error(error));
+  const onExport = async (rootNode: XmlElementNode): Promise<void | undefined> => {
+    try {
+      await submitApproval({variables: {mainIdentifier, input: writeXml(rootNode)}});
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (data?.executiveEditor?.submitApproval) {
     return (
@@ -41,8 +44,7 @@ function Inner({mainIdentifier, initialXml}: IProps): JSX.Element {
   }
 
   return (
-    <XmlDocumentEditor node={rootNodeParseResult.value as XmlElementNode} filename={mainIdentifier} onExport={onExport}
-                       exportName={t('submitApproval') || 'submitApproval'} exportDisabled={loading}>{undefined}</XmlDocumentEditor>
+    <XmlDocumentEditor node={rootNodeParseResult.value as XmlElementNode} filename={mainIdentifier} onExportXml={onExport} exportDisabled={loading}/>
   );
 }
 
