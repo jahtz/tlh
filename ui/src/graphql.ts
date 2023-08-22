@@ -159,6 +159,7 @@ export type ManuscriptMetaData = {
   provenance?: Maybe<Scalars['String']['output']>;
   provisionalTransliteration?: Maybe<Scalars['String']['output']>;
   status: ManuscriptStatus;
+  transliterationReleaseDate?: Maybe<Scalars['String']['output']>;
   transliterationReleased: Scalars['Boolean']['output'];
   transliterationReviewData?: Maybe<Scalars['String']['output']>;
   xmlConversionData?: Maybe<Scalars['String']['output']>;
@@ -423,7 +424,7 @@ export type XmlConversionQueryVariables = Exact<{
 }>;
 
 
-export type XmlConversionQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', status: ManuscriptStatus, xmlConversionData?: string | null } | null };
+export type XmlConversionQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', status: ManuscriptStatus, xmlConversionData?: string | null, transliterationReleaseDate?: string | null, mainIdentifier: { __typename?: 'ManuscriptIdentifier', mainIdentifierType: ManuscriptIdentifierType } } | null };
 
 export type SubmitXmlConversionMutationVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
@@ -995,8 +996,12 @@ export type SubmitTransliterationReviewMutationOptions = Apollo.BaseMutationOpti
 export const XmlConversionDocument = gql`
     query XmlConversion($mainIdentifier: String!) {
   manuscript(mainIdentifier: $mainIdentifier) {
+    mainIdentifier {
+      mainIdentifierType: identifierType
+    }
     status
     xmlConversionData
+    transliterationReleaseDate
   }
 }
     `;

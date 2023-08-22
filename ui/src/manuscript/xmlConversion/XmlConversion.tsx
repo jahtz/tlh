@@ -1,7 +1,7 @@
 import {JSX, useState} from 'react';
 import {Link, Navigate, useParams} from 'react-router-dom';
 import {homeUrl, tlhDocumentAnalyzerUrl} from '../../urls';
-import {ManuscriptStatus, useSubmitXmlConversionMutation, useXmlConversionQuery} from '../../graphql';
+import {ManuscriptIdentifierType, ManuscriptStatus, useSubmitXmlConversionMutation, useXmlConversionQuery} from '../../graphql';
 import {WithQuery} from '../../WithQuery';
 import {useTranslation} from 'react-i18next';
 import {TransliterationCheck} from './TransliterationCheck';
@@ -10,6 +10,8 @@ import {SuccessMessage} from '../../designElements/Messages';
 
 interface IProps {
   mainIdentifier: string;
+  mainIdentifierType: ManuscriptIdentifierType;
+  transliterationReleaseDate: string;
   initialInput: string;
   initialIsConverted: boolean;
 }
@@ -30,7 +32,7 @@ interface AnnotatedXmlCheckState {
 
 type IState = TransliterationCheckState | XmlCheckState | AnnotatedXmlCheckState;
 
-function Inner({mainIdentifier, initialInput, initialIsConverted}: IProps): JSX.Element {
+function Inner({mainIdentifier, mainIdentifierType, transliterationReleaseDate, initialInput, initialIsConverted}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [state, setState] = useState<IState>({_type: 'TransliterationCheck'});
@@ -71,7 +73,8 @@ function Inner({mainIdentifier, initialInput, initialIsConverted}: IProps): JSX.
   return (
     <>
       {state._type === 'TransliterationCheck'
-        ? <TransliterationCheck initialTransliteration={initialInput} onConvert={(content: string) => setState({_type: 'XmlCheck', content})}/>
+        ? <TransliterationCheck mainIdentifier={mainIdentifier} mainIdentifierType={mainIdentifierType} transliterationReleaseDate={transliterationReleaseDate}
+                                initialTransliteration={initialInput} onConvert={(content: string) => setState({_type: 'XmlCheck', content})}/>
         : <XmlCheck key={state._type} initialXml={state.content} annotated={state._type === 'AnnotatedXmlCheck'} loading={loading} onSubmit={onSubmit}/>
       }
 
@@ -100,10 +103,19 @@ export function XmlConversion(): JSX.Element {
       <h2 className="font-bold text-xl text-center">{t('xmlConversion')}</h2>
 
       <WithQuery query={xmlConversionQuery}>
-        {({manuscript}) =>
-          manuscript?.xmlConversionData
-            ? <Inner mainIdentifier={mainIdentifier} initialInput={manuscript.xmlConversionData} initialIsConverted={xmlConverted(manuscript.status)}/>
-            : <Navigate to={homeUrl}/>}
+        {({manuscript}) => {
+
+          if (!manuscript || !manuscript.xmlConversionData || !manuscript.transliterationReleaseDate) {
+            return <Navigate to={homeUrl}/>;
+          }
+
+          const {xmlConversionData, status, transliterationReleaseDate} = manuscript;
+
+          return (
+            <Inner mainIdentifier={mainIdentifier} mainIdentifierType={manuscript.mainIdentifier.mainIdentifierType}
+                   transliterationReleaseDate={transliterationReleaseDate} initialInput={xmlConversionData} initialIsConverted={xmlConverted(status)}/>
+          );
+        }}
       </WithQuery>
     </div>
   );

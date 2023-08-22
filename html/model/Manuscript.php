@@ -156,6 +156,15 @@ class Manuscript extends AbstractManuscript
 
   // Released Transliteration
 
+  function selectTransliterationReleaseDate(): ?string
+  {
+    return SqlHelpers::executeSingleReturnRowQuery(
+      "select release_date from tlh_dig_released_transliterations where main_identifier = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
+      fn(array $row): string => $row['release_date']
+    );
+  }
+
   function selectReleasedTransliteration(): ?string
   {
     return SqlHelpers::executeSingleReturnRowQuery(
@@ -265,9 +274,12 @@ Manuscript::$graphQLType = new ObjectType([
       'resolve' => fn(Manuscript $manuscript): ?string => $manuscript->selectProvisionalTransliteration()
     ],
     'transliterationReleased' => [
-      // FIXME: also resolve creator!
       'type' => Type::nonNull(Type::boolean()),
       'resolve' => fn(Manuscript $manuscript): bool => $manuscript->selectTransliterationIsReleased()
+    ],
+    'transliterationReleaseDate' => [
+      'type' => Type::string(),
+      'resolve' => fn(Manuscript $manuscript): ?string => $manuscript->selectTransliterationReleaseDate()
     ],
     'transliterationReviewData' => [
       'type' => Type::string(),

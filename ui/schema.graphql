@@ -83,6 +83,7 @@ type ManuscriptMetaData {
   provenance: String
   provisionalTransliteration: String
   status: ManuscriptStatus!
+  transliterationReleaseDate: String
   transliterationReleased: Boolean!
   transliterationReviewData: String
   xmlConversionData: String

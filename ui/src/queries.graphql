@@ -143,10 +143,15 @@ mutation SubmitTransliterationReview($mainIdentifier: String!, $review: String!)
 
 # /manuscripts/:id/xmlConversion
 
+# TODO: data for xml header...
 query XmlConversion($mainIdentifier: String!) {
   manuscript(mainIdentifier: $mainIdentifier) {
+    mainIdentifier {
+      mainIdentifierType: identifierType
+    }
     status
     xmlConversionData
+    transliterationReleaseDate
   }
 }
 
