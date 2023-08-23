@@ -37,6 +37,8 @@ const reconstructTransliterationFromNode = (node: XmlNode): TransliterationRecon
 
 function reconstructTransliterationFromElementNode(node: XmlElementNode): TransliterationReconstruction {
   switch (node.tagName) {
+    case 'lb':
+      return recon('\n');
     case 'add_in':
       return recon('〈');
     case 'add_fin':
