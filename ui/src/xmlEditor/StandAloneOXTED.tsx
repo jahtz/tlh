@@ -27,20 +27,33 @@ function initialState(): LoadedDocument | undefined {
 
 const autoSave = (filename: string, rootNode: XmlNode): void => localStorage.setItem(locStoreKey, JSON.stringify({filename, rootNode}));
 
-export const writeXml = (rootNode: XmlElementNode): string => {
+export const writeXml = (rootNode: XmlElementNode, expand = false): string => {
   reCountNodeNumbers(rootNode, 'node', 'n');
   reCountNodeNumbers(rootNode, 'clb', 'nr');
 
-  return writeNode(rootNode, tlhXmlEditorConfig.writeConfig)
-    .join('\n')
-    .replaceAll(/\s+/g, ' ')
-    .replaceAll(' @ ', '@')
-    .replaceAll('</w><w', '</w> <w')
-    .replaceAll('</text>', '\n</text>')
-    .replaceAll('<lb ', '\n<lb ')
-    .replaceAll('<gap t="line"', '\n<gap t="line"')
-    .replaceAll('<AO:Manuscripts>', '\n<AO:Manuscripts>')
-    .replaceAll('</AO:Manuscripts>', '</AO:Manuscripts>\n');
+  const lines = writeNode(rootNode, tlhXmlEditorConfig.writeConfig)
+    .join('\n');
+
+  if (expand) {
+    return lines
+      .replaceAll(/®/g, '\n\t')
+      .replaceAll(/{/g, '\n\t\t{')
+      .replaceAll(/\+=/g, '\n\t\t   += ')
+      .replaceAll(/<w/g, '\n <w')
+      .replaceAll(/<lb/g, '\n\n<lb')
+      .replaceAll(/ mrp/g, '\n\tmrp')
+      .replaceAll(/@/g, ' @ ');
+  } else {
+    return lines
+      .replaceAll(/\s+/g, ' ')
+      .replaceAll(' @ ', '@')
+      .replaceAll('</w><w', '</w> <w')
+      .replaceAll('</text>', '\n</text>')
+      .replaceAll('<lb ', '\n<lb ')
+      .replaceAll('<gap t="line"', '\n<gap t="line"')
+      .replaceAll('<AO:Manuscripts>', '\n<AO:Manuscripts>')
+      .replaceAll('</AO:Manuscripts>', '</AO:Manuscripts>\n');
+  }
 };
 
 export function StandAloneOXTED({editorConfig}: IProps): ReactElement {

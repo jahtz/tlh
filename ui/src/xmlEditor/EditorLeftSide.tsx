@@ -41,7 +41,7 @@ export function EditorLeftSide({
 
   function activateShowSource(): void {
     setKeyHandlingEnabled(false);
-    setXmlSource(writeXml(node as XmlElementNode));
+    setXmlSource(writeXml(node as XmlElementNode, true));
   }
 
   function deactivateShowSource(): void {

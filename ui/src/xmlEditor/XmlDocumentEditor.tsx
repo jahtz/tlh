@@ -333,8 +333,8 @@ export function XmlDocumentEditor({
     ? (
       <div className="container mx-auto">
         <button type="button" onClick={toggleDefaultMode} className="my-4 p-2 rounded bg-blue-500 text-white w-full">{t('close')}</button>
-        <XmlComparator leftFile={{name: t('startingDocumentState'), baseContent: writeXml(initialNode as XmlElementNode)}}
-                       rightFile={{name: t('currentDocumentState'), baseContent: writeXml(state.rootNode as XmlElementNode)}}/>
+        <XmlComparator leftFile={{name: t('startingDocumentState'), baseContent: writeXml(initialNode as XmlElementNode, true)}}
+                       rightFile={{name: t('currentDocumentState'), baseContent: writeXml(state.rootNode as XmlElementNode, true)}}/>
       </div>
     ) : (
       <div className="px-2 grid grid-cols-2 gap-4 h-full max-h-full">
