@@ -2,16 +2,10 @@
 
 CLIENT_TARGET_DIR=html/public
 
-# ensure jq installed
-if ! command -v jq &>/dev/null; then
-  echo "jq could not be found..."
-  exit 1
-fi
-
 # create production build of client app
 cd ui || exit
 npm i
-REACT_APP_VERSION=$(jq -r .version <package.json) npm run build
+npm run build
 
 # copy client app
 cd .. || exit

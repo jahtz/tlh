@@ -43,7 +43,7 @@ export function NavBar(): JSX.Element {
 
   return (
     <nav className="flex flex-row bg-gray-800 text-white">
-      <NavLink className="p-4 hover:bg-slate-700 font-extrabold" title={buildDate} to={homeUrl}>TLH<sup>dig</sup></NavLink>
+      <NavLink className="p-4 hover:bg-slate-700 font-extrabold" title={buildDate} to={homeUrl}>TLH<sup>dig</sup> ({process.env.REACT_APP_VERSION})</NavLink>
 
       {user && <NavLink className={buttonClasses} to={createManuscriptUrl}>{t('createManuscript')}</NavLink>}
       <NavLink className={buttonClasses} to={oxtedUrl}>{t('editDocument')}</NavLink>
