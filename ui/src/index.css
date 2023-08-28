@@ -16,6 +16,7 @@ code {
 }
 
 /* HPM fonts */
+
 @font-face {
   font-family: 'HPM';
   src: url(./fonts/HPMLinBiolinumO.woff);
@@ -24,22 +25,6 @@ code {
 @font-face {
   font-family: 'HPM-serif';
   src: url(./fonts/HPMLinLibertineO.woff);
-}
-
-/* special classes */
-
-.navbar {
-  margin-bottom: 20px;
-}
-
-.is-underlined {
-  text-decoration: underline
-}
-
-.scrollable {
-  min-height: 1000px;
-  max-height: 1000px;
-  overflow-y: auto;
 }
 
 /* Load new font for editor */
@@ -51,11 +36,12 @@ code {
   font-family: HPM-serif, monospace
 }
 
-.button-text-left {
-  justify-content: flex-start
+/* Word content styles */
+
+.font-non-italic {
+  font-style: normal;
 }
 
-/* Word content styles */
 .hittite, .Hit {
   color: #000080;
   font-style: italic;

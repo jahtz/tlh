@@ -94,14 +94,16 @@ export const tlhXmlEditorConfig: XmlEditorConfig = {
     sGr: {replace: ({renderChildren}) => <span className="sumerogramm">{renderChildren()}</span>},
     d: {replace: ({renderChildren}) => <span className="determinativ">{renderChildren()}</span>},
 
-    add_in: {replace: () => <span>〈</span>},
-    add_fin: {replace: () => <span>〉</span>},
-    del_in: {replace: () => <span>[</span>},
-    del_fin: {replace: () => <span>]</span>},
-    ras_in: {replace: () => <span>*</span>},
-    ras_fin: {replace: () => <span>*</span>},
-    laes_in: {replace: () => <span>⸢</span>},
-    laes_fin: {replace: () => <span>⸣</span>},
+    num: {replace: ({renderChildren}) => <span className="font-non-italic">{renderChildren()}</span>},
+
+    add_in: {replace: () => <span className="font-non-italic">〈</span>},
+    add_fin: {replace: () => <span className="font-non-italic">〉</span>},
+    del_in: {replace: () => <span className="font-non-italic">[</span>},
+    del_fin: {replace: () => <span className="font-non-italic">]</span>},
+    ras_in: {replace: () => <span className="font-non-italic">*</span>},
+    ras_fin: {replace: () => <span className="font-non-italic">*</span>},
+    laes_in: {replace: () => <span className="font-non-italic">⸢</span>},
+    laes_fin: {replace: () => <span className="font-non-italic">⸣</span>},
 
     materlect: {replace: ({node}) => <span className="materLectionis">{node.attributes.c}</span>},
 
