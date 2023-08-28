@@ -17,7 +17,7 @@ interface IProps {
 const defaultAoXmlAttributes: Attributes = {
   'xmlns:hpm': 'http://hethiter.net/ns/hpm/1.0',
   'xmlns:AO': 'http://hethiter.net/ns/AO/1.0',
-  'xmlns:dc': ' http://purl.org/dc/elements/1.1/',
+  'xmlns:dc': 'http://purl.org/dc/elements/1.1/',
   'xmlns:meta': 'urn:oasis:names:tc:opendocument:xmlns:meta:1.0',
   'xmlns:text': 'urn:oasis:names:tc:opendocument:xmlns:text:1.0',
   'xmlns:table': 'urn:oasis:names:tc:opendocument:xmlns:table:1.0',
