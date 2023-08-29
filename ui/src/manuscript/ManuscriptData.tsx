@@ -1,7 +1,7 @@
 import {useTranslation} from 'react-i18next';
 import {ReactElement, useState} from 'react';
 import {Link, Navigate, useParams} from 'react-router-dom';
-import {ManuscriptMetaDataFragment, ManuscriptStatus, useManuscriptQuery, useReleaseTransliterationMutation} from '../graphql';
+import {ManuscriptMetaDataFragment, ManuscriptStatus, Rights, useManuscriptQuery, useReleaseTransliterationMutation} from '../graphql';
 import {useSelector} from 'react-redux';
 import {activeUserSelector, User} from '../newStore';
 import {getNameForPalaeoClassification} from '../model/manuscriptProperties/palaeoClassification';
@@ -32,6 +32,7 @@ function Inner({initialManuscript}: IProps): ReactElement {
   }
 
   const createdByUser: boolean = !!activeUser && activeUser.sub === manuscript.creatorUsername;
+  const userIsAdmin = !!activeUser && activeUser.rights === Rights.ExecutiveEditor;
 
   const parsedTransliteration = manuscript.provisionalTransliteration !== undefined && manuscript.provisionalTransliteration !== null
     ? new TLHParser(manuscript.provisionalTransliteration).getLines().map(convertLine)
@@ -117,7 +118,7 @@ function Inner({initialManuscript}: IProps): ReactElement {
           ? <div className="my-4 italic text-cyan-500 text-center">{t('noPicturesUploadedYet')}.</div>
           : <PicturesBlock mainIdentifier={manuscript.mainIdentifier.identifier} pictures={manuscript.pictureUrls}/>}
 
-        {createdByUser && <div className="text-center">
+        {(createdByUser || userIsAdmin) && <div className="text-center">
           <Link className={blueButtonClasses} to={`../${managePicturesUrl}`}>{t('managePictures')}</Link>
         </div>}
       </div>
