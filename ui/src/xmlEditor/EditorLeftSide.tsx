@@ -73,12 +73,10 @@ export function EditorLeftSide({
           {state.xmlSource
             ? (
               <>
-                <button className="px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource}
-                        title={t('cancelEditXmlSource') || 'cancelEditXmlSource'}>
+                <button className="px-2 rounded bg-red-500 text-white font-bold" onClick={deactivateShowSource} title={t('cancelEditXmlSource')}>
                   &#x270E;
                 </button>
-                <button className="px-2 rounded bg-blue-500 text-white font-bold" onClick={onXmlSourceUpdate}
-                        title={t('applyXmlSourceChange') || 'applyXmlSourceChange'}>
+                <button className="px-2 rounded bg-blue-500 text-white font-bold" onClick={onXmlSourceUpdate} title={t('applyXmlSourceChange')}>
                   &#x270E;
                 </button>
               </>

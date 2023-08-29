@@ -7,7 +7,7 @@ import classNames from 'classnames';
 
 export const wsepConfig: XmlSingleInsertableEditableNodeConfig<'wsep', 'c'> = {
   replace: ({node, isSelected}) => (
-    <span className={classNames('font-hpm', {[selectedNodeClass]: isSelected})}>{node.attributes.c}</span>
+    <span className={classNames('font-ullikumi-a', {[selectedNodeClass]: isSelected})}>{node.attributes.c}</span>
   ),
   edit: (props) => <WsepEditor {...props}/>,
   insertablePositions: {
@@ -26,7 +26,7 @@ export function WsepEditor({node, updateAttribute}: XmlEditableNodeIProps<'wsep'
   return (
     <>
       <label htmlFor="c" className="font-bold">{t('wsepType')}:</label>
-      <select id="c" className="p-2 rounded border border-slate-500 bg-white w-full font-hpm" defaultValue={node.attributes.c}
+      <select id="c" className="p-2 rounded border border-slate-500 bg-white w-full font-ullikumi-a" defaultValue={node.attributes.c}
               onChange={(event) => updateAttribute('c', event.target.value)}>
         {legalValues.map((value) => <option key={value} className="font-hpm">{value}</option>)}
       </select>

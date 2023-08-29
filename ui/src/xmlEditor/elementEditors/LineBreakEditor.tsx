@@ -80,7 +80,7 @@ const LineBreakEditor = ({
 
       <div className="mb-4">
         <label htmlFor="cuneiform" className="font-bold">{t('cuneiform')}</label>
-        <input type="text" id="cuneiform" className={inputClasses} defaultValue={node.attributes.cu} onFocus={() => setKeyHandlingEnabled(false)}
+        <input type="text" id="cuneiform" className={classNames(inputClasses, 'font-ullikumi-a')} defaultValue={node.attributes.cu} onFocus={() => setKeyHandlingEnabled(false)}
                onBlur={() => setKeyHandlingEnabled(true)} onChange={(event) => updateAttribute('cu', event.target.value)}/>
         <button type="button" className="mt-2 p-2 rounded bg-amber-500 text-white w-full" onClick={onCuneiformUpdate}>{t('updateCuneiform')}</button>
       </div>

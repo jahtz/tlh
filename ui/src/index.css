@@ -18,6 +18,11 @@ code {
 /* HPM fonts */
 
 @font-face {
+  font-family: 'UllikumiA';
+  src: url(./fonts/UllikummiA.woff);
+}
+
+@font-face {
   font-family: 'HPM';
   src: url(./fonts/HPMLinBiolinumO.woff);
 }
@@ -29,11 +34,15 @@ code {
 
 /* Load new font for editor */
 .font-hpm {
-  font-family: HPM, monospace
+  font-family: HPM, monospace;
 }
 
 .font-hpm-serif {
-  font-family: HPM-serif, monospace
+  font-family: HPM-serif, monospace;
+}
+
+.font-ullikumi-a {
+  font-family: UllikumiA, sans-serif;
 }
 
 /* Word content styles */
