@@ -8,7 +8,6 @@ import {WithQuery} from '../WithQuery';
 import {blueButtonClasses, redButtonClasses} from '../defaultDesign';
 import {User} from '../newStore';
 import update from 'immutability-helper';
-import {makeDownload} from '../downloadHelper';
 
 interface IState {
   selectedFile?: File;
@@ -30,8 +29,6 @@ function Inner({currentUser, manuscript}: IProps): ReactElement {
   const [deletePicture] = useDeletePictureMutation();
 
   const mainIdentifier = manuscript.mainIdentifier.identifier;
-
-  const download = (pictureName: string) => makeDownload(`${pictureBaseUrl(mainIdentifier)}/${pictureName}`, pictureName, 'image/*');
 
   function selectFile(event: ChangeEvent<HTMLInputElement>): void {
     const fileList = event.target.files;
@@ -79,7 +76,9 @@ function Inner({currentUser, manuscript}: IProps): ReactElement {
           : <PicturesBlock mainIdentifier={mainIdentifier} pictures={allPictures}>
             {(pictureName) => (
               <div className="text-center space-x-2">
-                <button type="button" className={blueButtonClasses} onClick={() => download(pictureName)}>&#x1F847; {t('downloadImage')}</button>
+                <a className={blueButtonClasses} href={`${pictureBaseUrl(mainIdentifier)}/${pictureName}`} download>
+                  &#x1F847; {t('downloadImage')}
+                </a>
                 {canDeleteImages &&
                   <button type="button" className={redButtonClasses} onClick={() => onDelete(pictureName)}>&#x2421; {t('deleteImage')}</button>}
               </div>

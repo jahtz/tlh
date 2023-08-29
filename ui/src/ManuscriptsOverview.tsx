@@ -15,17 +15,18 @@ export function ManuscriptsOverview({manuscriptCount, allManuscripts, queryPage,
 
   const {t} = useTranslation('common');
 
-  const columnNames = [t('mainIdentifier'), t('status'), t('creator')];
- 
+  const columnNames = [t('mainIdentifier'), t('status'), t('pictureCount'), t('creator')];
+
   return (
     <PaginatedTable count={manuscriptCount} data={allManuscripts} columnNames={columnNames} queryPage={queryPage} emptyMessage={t('noManuscriptsYet')}
                     page={page}>
-      {({mainIdentifier: {identifier, identifierType}, status, creatorUsername}) =>
+      {({mainIdentifier: {identifier, identifierType}, pictureCount, status, creatorUsername}) =>
         <tr key={identifier} className="border-t border-slate-600 text-center">
           <td className="p-2">
             <Link to={`manuscripts/${encodeURIComponent(identifier)}/data`}>{identifier} ({identifierType})</Link>
           </td>
           <td className="p-2">{status}</td>
+          <td className="p-2">{pictureCount}</td>
           <td className="p-2">{creatorUsername}</td>
         </tr>}
     </PaginatedTable>

@@ -80,6 +80,7 @@ type ManuscriptMetaData {
   otherIdentifiers: [ManuscriptIdentifier!]!
   palaeographicClassification: PalaeographicClassification!
   palaeographicClassificationSure: Boolean!
+  pictureCount: Int!
   pictureUrls: [String!]!
   provenance: String
   provisionalTransliteration: String

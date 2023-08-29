@@ -11,6 +11,7 @@ fragment ManuscriptBasicData on ManuscriptMetaData {
   mainIdentifier {
     ...ManuscriptIdentifier
   }
+  pictureCount
   status
   creatorUsername
 }

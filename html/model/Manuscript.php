@@ -52,7 +52,7 @@ class Manuscript extends AbstractManuscript
     ?string              $bibliography,
     string               $status,
     string               $creatorUsername,
-    string $creationDate
+    string               $creationDate
   )
   {
     parent::__construct($mainIdentifier, $palaeographicClassification, $palaeographicClassificationSure, $defaultLanguage, $provenance, $cthClassification, $bibliography, $creatorUsername);
@@ -269,6 +269,10 @@ Manuscript::$graphQLType = new ObjectType([
     'otherIdentifiers' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(ManuscriptIdentifier::$graphQLType))),
       'resolve' => fn(Manuscript $manuscript): array => $manuscript->selectOtherIdentifiers()
+    ],
+    'pictureCount' => [
+      'type' => Type::nonNull(Type::int()),
+      'resolve' => fn(Manuscript $manuscript): int => count(getPictures($manuscript->mainIdentifier->identifier))
     ],
     'pictureUrls' => [
       'type' => Type::nonNull(Type::listOf(Type::nonNull(Type::string()))),

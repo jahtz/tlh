@@ -156,6 +156,7 @@ export type ManuscriptMetaData = {
   otherIdentifiers: Array<ManuscriptIdentifier>;
   palaeographicClassification: PalaeographicClassification;
   palaeographicClassificationSure: Scalars['Boolean']['output'];
+  pictureCount: Scalars['Int']['output'];
   pictureUrls: Array<Scalars['String']['output']>;
   provenance?: Maybe<Scalars['String']['output']>;
   provisionalTransliteration?: Maybe<Scalars['String']['output']>;
@@ -335,7 +336,7 @@ export const enum XmlReviewType {
 
 export type ManuscriptIdentifierFragment = { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string };
 
-export type ManuscriptBasicDataFragment = { __typename?: 'ManuscriptMetaData', status: ManuscriptStatus, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
+export type ManuscriptBasicDataFragment = { __typename?: 'ManuscriptMetaData', pictureCount: number, status: ManuscriptStatus, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } };
 
 export type ReviewerHomeDataFragment = { __typename?: 'Reviewer', appointments: Array<{ __typename?: 'Appointment', type: AppointmentType, manuscriptIdentifier: string, waitingFor?: AppointmentType | null }> };
 
@@ -346,7 +347,7 @@ export type IndexQueryVariables = Exact<{
 }>;
 
 
-export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, myManuscripts?: Array<string> | null, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', status: ManuscriptStatus, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }>, reviewerQueries?: { __typename?: 'Reviewer', appointments: Array<{ __typename?: 'Appointment', type: AppointmentType, manuscriptIdentifier: string, waitingFor?: AppointmentType | null }> } | null, executiveEditorQueries?: { __typename?: 'ExecutiveEditor', documentsAwaitingApproval: Array<string> } | null };
+export type IndexQuery = { __typename?: 'Query', manuscriptCount: number, myManuscripts?: Array<string> | null, allManuscripts: Array<{ __typename?: 'ManuscriptMetaData', pictureCount: number, status: ManuscriptStatus, creatorUsername: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType, identifier: string } }>, reviewerQueries?: { __typename?: 'Reviewer', appointments: Array<{ __typename?: 'Appointment', type: AppointmentType, manuscriptIdentifier: string, waitingFor?: AppointmentType | null }> } | null, executiveEditorQueries?: { __typename?: 'ExecutiveEditor', documentsAwaitingApproval: Array<string> } | null };
 
 export type CreateManuscriptMutationVariables = Exact<{
   manuscriptMetaData?: InputMaybe<ManuscriptMetaDataInput>;
@@ -553,6 +554,7 @@ export const ManuscriptBasicDataFragmentDoc = gql`
   mainIdentifier {
     ...ManuscriptIdentifier
   }
+  pictureCount
   status
   creatorUsername
 }
