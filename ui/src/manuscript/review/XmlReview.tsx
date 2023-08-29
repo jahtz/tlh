@@ -1,15 +1,14 @@
-import {ReactElement, useState} from 'react';
+import {ReactElement} from 'react';
 import {useSubmitXmlReviewMutation, useXmlReviewQuery, XmlReviewType} from '../../graphql';
 import {Link, Navigate, useParams} from 'react-router-dom';
 import {homeUrl} from '../../urls';
 import {WithQuery} from '../../WithQuery';
-import {MyLeft, parseNewXml, XmlElementNode} from 'simple_xml';
+import {XmlElementNode} from 'simple_xml';
 import {XmlDocumentEditor} from '../../xmlEditor/XmlDocumentEditor';
 import {useTranslation} from 'react-i18next';
 import {writeXml} from '../../xmlEditor/StandAloneOXTED';
-import {tlhXmlEditorConfig} from '../../xmlEditor/tlhXmlEditorConfig';
-import {XmlRepair} from './XmlRepair';
 import {makeDownload} from '../../downloadHelper';
+import {XmlValidityChecker} from '../../xmlEditor/XmlValidityChecker';
 
 interface InnerInnerProps {
   mainIdentifier: string;
@@ -48,25 +47,6 @@ function InnerInner({mainIdentifier, rootNode, reviewType}: InnerInnerProps): Re
     );
 }
 
-interface InnerProps {
-  mainIdentifier: string;
-  initialXml: string;
-  reviewType: XmlReviewType;
-}
-
-function Inner({mainIdentifier, initialXml, reviewType}: InnerProps): ReactElement {
-
-  const [rootNodeParseResult, setRootNodeParseResult] = useState(parseNewXml(initialXml, tlhXmlEditorConfig.readConfig));
-
-  return rootNodeParseResult instanceof MyLeft
-    ? (
-      <div className="container mx-auto">
-        <XmlRepair brokenXml={initialXml} onUpdate={(value) => setRootNodeParseResult(parseNewXml(value, tlhXmlEditorConfig.readConfig))}/>
-      </div>
-    )
-    : <InnerInner mainIdentifier={mainIdentifier} rootNode={rootNodeParseResult.value as XmlElementNode} reviewType={reviewType}/>;
-}
-
 export function XmlReview({reviewType}: { reviewType: XmlReviewType }): ReactElement {
 
   const {mainIdentifier} = useParams<'mainIdentifier'>();
@@ -81,8 +61,11 @@ export function XmlReview({reviewType}: { reviewType: XmlReviewType }): ReactEle
     <WithQuery query={query}>
       {({manuscript}) =>
         manuscript?.xmlReviewData
-          ? <Inner mainIdentifier={mainIdentifier} initialXml={manuscript.xmlReviewData} reviewType={reviewType}/>
-          : <Navigate to={homeUrl}/>}
+          ? (
+            <XmlValidityChecker xmlSource={manuscript.xmlReviewData}>
+              {(rootNode) => <InnerInner mainIdentifier={mainIdentifier} rootNode={rootNode} reviewType={reviewType}/>}
+            </XmlValidityChecker>
+          ) : <Navigate to={homeUrl}/>}
     </WithQuery>
   );
 }

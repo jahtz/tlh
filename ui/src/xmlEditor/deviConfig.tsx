@@ -5,12 +5,10 @@ import {useTranslation} from 'react-i18next';
 import classNames from 'classnames';
 import {selectedNodeClass} from './tlhXmlEditorConfig';
 
-type deviAttrs = 'expl';
-
-export const deviConfig: XmlEditorSingleNodeConfig<'devi', deviAttrs> = {
+export const deviConfig: XmlEditorSingleNodeConfig<'devi', 'expl'> = {
   replace: ({node, renderChildren, isSelected}) => displayReplace(
     <>(<span className={classNames('font-bold', {[selectedNodeClass]: isSelected})}>{node.attributes.expl}</span>: </>,
-    <>{renderChildren()}</>,
+    renderChildren(),
     <>)</>
   ),
   edit: (props) => <DeviEditor {...props}/>,
@@ -20,7 +18,7 @@ export const deviConfig: XmlEditorSingleNodeConfig<'devi', deviAttrs> = {
   }
 };
 
-function DeviEditor({node, updateAttribute, setKeyHandlingEnabled}: XmlEditableNodeIProps<'devi', deviAttrs>): JSX.Element {
+function DeviEditor({node, updateAttribute, setKeyHandlingEnabled}: XmlEditableNodeIProps<'devi', 'expl'>): JSX.Element {
 
   const {t} = useTranslation('common');
 

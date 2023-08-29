@@ -1,6 +1,6 @@
 import {ReactElement, useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
-import {findFirstXmlElementByTagName, loadNewXml, writeNode, XmlElementNode, XmlNode} from 'simple_xml';
+import {findFirstXmlElementByTagName, writeNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {XmlDocumentEditor} from './XmlDocumentEditor';
 import {XmlEditorConfig} from './editorConfig';
 import {useTranslation} from 'react-i18next';
@@ -8,6 +8,7 @@ import {reCountNodeNumbers, tlhXmlEditorConfig} from './tlhXmlEditorConfig';
 import {OxtedExportData} from './OxtedExportData';
 import {makeDownload} from '../downloadHelper';
 import {DocumentEditTypes} from './documentEditTypes';
+import {XmlValidityChecker} from './XmlValidityChecker';
 
 const locStoreKey = 'editorState';
 
@@ -17,7 +18,7 @@ interface IProps {
 
 interface LoadedDocument {
   filename: string;
-  rootNode: XmlNode;
+  source: string;
 }
 
 function initialState(): LoadedDocument | undefined {
@@ -63,14 +64,9 @@ export function StandAloneOXTED({editorConfig}: IProps): ReactElement {
   const [exportAddNode, setExportAddNode] = useState<XmlElementNode>();
 
   const readFile = async (file: File) => {
-    const parseResult = await loadNewXml(file, editorConfig.readConfig);
+    const source = await file.text();
 
-    // FIXME: source editor for broken docs!
-
-    parseResult.handle(
-      (rootNode) => setLoadedDocument({rootNode, filename: file.name}),
-      (value) => alert(value)
-    );
+    setLoadedDocument({source, filename: file.name});
   };
 
   function download(rootNode: XmlElementNode): void {
@@ -111,10 +107,13 @@ export function StandAloneOXTED({editorConfig}: IProps): ReactElement {
     <div className="h-full max-h-full">
       {loadedDocument
         ? (
-          <XmlDocumentEditor node={loadedDocument.rootNode} editorConfig={editorConfig} onExportXml={download} filename={loadedDocument.filename}
-                             closeFile={closeFile} autoSave={(node) => autoSave(loadedDocument.filename, node)}>
-            <OxtedExportData setExportNode={setExportAddNode}/>
-          </XmlDocumentEditor>
+          <XmlValidityChecker xmlSource={loadedDocument.source}>
+            {(rootNode) =>
+              <XmlDocumentEditor node={rootNode} editorConfig={editorConfig} onExportXml={download} filename={loadedDocument.filename}
+                                 closeFile={closeFile} autoSave={(node) => autoSave(loadedDocument.filename, node)}>
+                <OxtedExportData setExportNode={setExportAddNode}/>
+              </XmlDocumentEditor>}
+          </XmlValidityChecker>
         ) : (
           <div className="container mx-auto">
             <FileLoader accept="text/xml" onLoad={readFile}/>
