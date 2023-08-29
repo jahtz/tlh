@@ -1,11 +1,9 @@
 import {ReactElement, useState} from 'react';
-import ReactCodeMirror from '@uiw/react-codemirror';
-import {xml} from '@codemirror/lang-xml';
 import {MyLeft, parseNewXml} from 'simple_xml';
 import {tlhXmlEditorConfig} from '../../xmlEditor/tlhXmlEditorConfig';
 import {useTranslation} from 'react-i18next';
 import {blueButtonClasses} from '../../defaultDesign';
-import {EditorView} from 'codemirror';
+import {XmlSourceEditor} from '../../xmlEditor/XmlSourceEditor';
 
 interface IProps {
   brokenXml: string;
@@ -24,7 +22,7 @@ export function XmlRepair({brokenXml, onUpdate}: IProps): ReactElement {
       {parseResult instanceof MyLeft && <pre className="my-4 p-2 rounded bg-red-600 text-white">{parseResult.value}</pre>}
 
       <div className="my-4 p-2 border border-slate-500">
-        <ReactCodeMirror extensions={[xml(), EditorView.lineWrapping]} value={brokenXml} onChange={setXmlContent}/>
+        <XmlSourceEditor source={brokenXml} onChange={setXmlContent}/>
       </div>
 
       <div className="text-center">

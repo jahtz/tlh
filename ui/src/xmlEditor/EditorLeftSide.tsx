@@ -3,14 +3,12 @@ import {NodeDisplay, NodeDisplayIProps} from './NodeDisplay';
 import {useTranslation} from 'react-i18next';
 import {parseNewXml, XmlElementNode} from 'simple_xml';
 import classNames from 'classnames';
-import {xml} from '@codemirror/lang-xml';
-import ReactCodeMirror from '@uiw/react-codemirror';
 import {writeXml} from './StandAloneOXTED';
 import update from 'immutability-helper';
 import {FontSizeSelector} from './FontSizeSelector';
 import {NodePath} from './insertablePositions';
 import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
-import {EditorView} from 'codemirror';
+import {XmlSourceEditor} from './XmlSourceEditor';
 
 export interface EditorLeftSideProps extends NodeDisplayIProps {
   filename: string;
@@ -105,8 +103,7 @@ export function EditorLeftSide({
 
       <div className="flex p-4 rounded-b border border-slate-300 shadow-md flex-auto overflow-auto">
         {state.xmlSource
-          ? <ReactCodeMirror style={{fontSize: `${state.fontSize}%`}} value={state.xmlSource} extensions={[xml(), EditorView.lineWrapping]}
-                             onChange={setXmlSource}/>
+          ? <XmlSourceEditor style={{fontSize: `${state.fontSize}%`}} source={state.xmlSource} onChange={setXmlSource}/>
           : (
             <div className={classNames(state.useSerifFont ? 'font-hpm-serif' : 'font-hpm')} style={{fontSize: `${state.fontSize}%`}}>
               <NodeDisplay rootNode={node as XmlElementNode} node={node} currentSelectedPath={currentSelectedPath} onSelect={onNodeSelect}
