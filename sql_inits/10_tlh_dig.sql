@@ -72,8 +72,8 @@ create table if not exists tlh_dig_released_transliterations (
 
 create table if not exists tlh_dig_transliteration_review_appointments (
   main_identifier       varchar(20)  not null primary key references tlh_dig_released_transliterations (main_identifier) on update cascade on delete cascade,
-  username              varchar(100) not null references tlh_dig_users (username) on update cascade on delete restrict,
-  appointed_by_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete restrict,
+  username              varchar(100) not null references tlh_dig_users (username) on update cascade on delete cascade ,
+  appointed_by_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete cascade ,
   appointment_date      date         not null default now(),
 
   unique (main_identifier, username)
@@ -92,8 +92,8 @@ create table if not exists tlh_dig_transliteration_reviews (
 
 create table if not exists tlh_dig_xml_conversion_appointments (
   main_identifier       varchar(20)  not null primary key references tlh_dig_released_transliterations (main_identifier) on update cascade on delete cascade,
-  username              varchar(100) not null references tlh_dig_users (username) on update cascade on delete restrict,
-  appointed_by_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete restrict,
+  username              varchar(100) not null references tlh_dig_users (username) on update cascade on delete cascade ,
+  appointed_by_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete cascade ,
   appointment_date      date         not null default now(),
 
   unique (main_identifier, username)
@@ -112,8 +112,8 @@ create table if not exists tlh_dig_xml_conversions (
 
 create table if not exists tlh_dig_first_xml_review_appointments (
   main_identifier       varchar(20)  not null primary key references tlh_dig_released_transliterations (main_identifier) on update cascade on delete cascade,
-  username              varchar(100) not null references tlh_dig_users (username) on update cascade on delete restrict,
-  appointed_by_username varchar(100) references tlh_dig_users (username) on update cascade on delete restrict,
+  username              varchar(100) not null references tlh_dig_users (username) on update cascade on delete cascade ,
+  appointed_by_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete cascade ,
   appointment_date      date         not null default now(),
 
   unique (main_identifier, username)
@@ -122,7 +122,7 @@ create table if not exists tlh_dig_first_xml_review_appointments (
 create table if not exists tlh_dig_first_xml_reviews (
   main_identifier   varchar(20)  not null primary key references tlh_dig_xml_conversions (main_identifier) on update cascade on delete cascade,
   input             text         not null,
-  reviewer_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete restrict,
+  reviewer_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete cascade ,
   review_date       date         not null default now(),
 
   foreign key (main_identifier, reviewer_username) references tlh_dig_first_xml_review_appointments (main_identifier, username) on update cascade on delete cascade
@@ -132,8 +132,8 @@ create table if not exists tlh_dig_first_xml_reviews (
 
 create table if not exists tlh_dig_second_xml_review_appointments (
   main_identifier       varchar(20)  not null primary key references tlh_dig_released_transliterations (main_identifier) on update cascade on delete cascade,
-  username              varchar(100) not null references tlh_dig_users (username) on update cascade on delete restrict,
-  appointed_by_username varchar(100) references tlh_dig_users (username) on update cascade on delete restrict,
+  username              varchar(100) not null references tlh_dig_users (username) on update cascade on delete cascade ,
+  appointed_by_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete cascade ,
   appointment_date      date         not null default now(),
 
   unique (main_identifier, username)
@@ -142,7 +142,7 @@ create table if not exists tlh_dig_second_xml_review_appointments (
 create table if not exists tlh_dig_second_xml_reviews (
   main_identifier   varchar(20)  not null primary key references tlh_dig_first_xml_reviews (main_identifier) on update cascade on delete cascade,
   input             text         not null,
-  reviewer_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete restrict,
+  reviewer_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete cascade ,
   review_date       date         not null default now(),
 
   foreign key (main_identifier, reviewer_username) references tlh_dig_second_xml_review_appointments (main_identifier, username) on update cascade on delete cascade
@@ -153,6 +153,6 @@ create table if not exists tlh_dig_second_xml_reviews (
 create table if not exists tlh_dig_approved_transliterations (
   main_identifier   varchar(20)  not null primary key references tlh_dig_second_xml_reviews (main_identifier) on update cascade on delete cascade,
   input             text         not null,
-  approval_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete restrict,
+  approval_username varchar(100) not null references tlh_dig_users (username) on update cascade on delete cascade ,
   approval_date     date         not null default now()
 );

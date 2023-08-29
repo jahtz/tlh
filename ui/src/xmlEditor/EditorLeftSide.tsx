@@ -10,6 +10,7 @@ import update from 'immutability-helper';
 import {FontSizeSelector} from './FontSizeSelector';
 import {NodePath} from './insertablePositions';
 import {tlhXmlEditorConfig} from './tlhXmlEditorConfig';
+import {EditorView} from 'codemirror';
 
 export interface EditorLeftSideProps extends NodeDisplayIProps {
   filename: string;
@@ -104,7 +105,8 @@ export function EditorLeftSide({
 
       <div className="flex p-4 rounded-b border border-slate-300 shadow-md flex-auto overflow-auto">
         {state.xmlSource
-          ? <ReactCodeMirror style={{fontSize: `${state.fontSize}%`}} value={state.xmlSource} extensions={[xml()]} onChange={setXmlSource}/>
+          ? <ReactCodeMirror style={{fontSize: `${state.fontSize}%`}} value={state.xmlSource} extensions={[xml(), EditorView.lineWrapping]}
+                             onChange={setXmlSource}/>
           : (
             <div className={classNames(state.useSerifFont ? 'font-hpm-serif' : 'font-hpm')} style={{fontSize: `${state.fontSize}%`}}>
               <NodeDisplay rootNode={node as XmlElementNode} node={node} currentSelectedPath={currentSelectedPath} onSelect={onNodeSelect}

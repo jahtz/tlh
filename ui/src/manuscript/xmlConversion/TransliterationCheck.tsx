@@ -6,10 +6,15 @@ import {Attributes, writeNode, xmlElementNode, xmlTextNode} from 'simple_xml';
 import {tlhXmlEditorConfig} from '../../xmlEditor/tlhXmlEditorConfig';
 import {ManuscriptIdentifierType} from '../../graphql';
 
-interface IProps {
+export interface XmlCreationValues {
   mainIdentifier: string;
   mainIdentifierType: ManuscriptIdentifierType;
+  author: string;
+  creationDate: string;
   transliterationReleaseDate: string;
+}
+
+interface IProps extends XmlCreationValues {
   initialTransliteration: string;
   onConvert: (value: string) => void;
 }
@@ -32,7 +37,15 @@ const manuscriptIdentifierTag = (identifierType: ManuscriptIdentifierType): stri
   [ManuscriptIdentifierType.ExcavationNumber]: 'AO:ExcNr'
 }[identifierType]);
 
-export function TransliterationCheck({mainIdentifier, mainIdentifierType, transliterationReleaseDate, initialTransliteration, onConvert}: IProps): JSX.Element {
+export function TransliterationCheck({
+  mainIdentifier,
+  mainIdentifierType,
+  author,
+  creationDate,
+  transliterationReleaseDate,
+  initialTransliteration,
+  onConvert
+}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [input, setInput] = useState(initialTransliteration);
@@ -42,6 +55,7 @@ export function TransliterationCheck({mainIdentifier, mainIdentifierType, transl
       xmlElementNode('AOHeader', {}, [
         xmlElementNode('docID', {}, [xmlTextNode(mainIdentifier)]),
         xmlElementNode('meta', {}, [
+          xmlElementNode('author', {author, date: creationDate}),
           xmlElementNode('creation-date', {date: transliterationReleaseDate}),
         ])
       ]),

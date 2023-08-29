@@ -65,6 +65,8 @@ export function StandAloneOXTED({editorConfig}: IProps): ReactElement {
   const readFile = async (file: File) => {
     const parseResult = await loadNewXml(file, editorConfig.readConfig);
 
+    // FIXME: source editor for broken docs!
+
     parseResult.handle(
       (rootNode) => setLoadedDocument({rootNode, filename: file.name}),
       (value) => alert(value)

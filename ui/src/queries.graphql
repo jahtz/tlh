@@ -149,6 +149,8 @@ query XmlConversion($mainIdentifier: String!) {
     mainIdentifier {
       mainIdentifierType: identifierType
     }
+    author: creatorUsername
+    creationDate
     status
     xmlConversionData
     transliterationReleaseDate

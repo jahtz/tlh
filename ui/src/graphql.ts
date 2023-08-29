@@ -148,6 +148,7 @@ export const enum ManuscriptLanguageAbbreviations {
 export type ManuscriptMetaData = {
   __typename?: 'ManuscriptMetaData';
   bibliography?: Maybe<Scalars['String']['output']>;
+  creationDate: Scalars['String']['output'];
   creatorUsername: Scalars['String']['output'];
   cthClassification?: Maybe<Scalars['Int']['output']>;
   defaultLanguage: ManuscriptLanguageAbbreviations;
@@ -424,7 +425,7 @@ export type XmlConversionQueryVariables = Exact<{
 }>;
 
 
-export type XmlConversionQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', status: ManuscriptStatus, xmlConversionData?: string | null, transliterationReleaseDate?: string | null, mainIdentifier: { __typename?: 'ManuscriptIdentifier', mainIdentifierType: ManuscriptIdentifierType } } | null };
+export type XmlConversionQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', creationDate: string, status: ManuscriptStatus, xmlConversionData?: string | null, transliterationReleaseDate?: string | null, author: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', mainIdentifierType: ManuscriptIdentifierType } } | null };
 
 export type SubmitXmlConversionMutationVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
@@ -999,6 +1000,8 @@ export const XmlConversionDocument = gql`
     mainIdentifier {
       mainIdentifierType: identifierType
     }
+    author: creatorUsername
+    creationDate
     status
     xmlConversionData
     transliterationReleaseDate

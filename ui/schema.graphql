@@ -72,6 +72,7 @@ enum ManuscriptLanguageAbbreviations {
 
 type ManuscriptMetaData {
   bibliography: String
+  creationDate: String!
   creatorUsername: String!
   cthClassification: Int
   defaultLanguage: ManuscriptLanguageAbbreviations!

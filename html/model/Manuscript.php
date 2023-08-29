@@ -40,6 +40,7 @@ class Manuscript extends AbstractManuscript
   use HasTransliterationReview, HasXmlConversion, HasFirstXmlReview, HasSecondXmlReview;
 
   public string $status;
+  public string $creationDate;
 
   function __construct(
     ManuscriptIdentifier $mainIdentifier,
@@ -50,11 +51,13 @@ class Manuscript extends AbstractManuscript
     ?int                 $cthClassification,
     ?string              $bibliography,
     string               $status,
-    string               $creatorUsername
+    string               $creatorUsername,
+    string $creationDate
   )
   {
     parent::__construct($mainIdentifier, $palaeographicClassification, $palaeographicClassificationSure, $defaultLanguage, $provenance, $cthClassification, $bibliography, $creatorUsername);
     $this->status = $status;
+    $this->creationDate = $creationDate;
   }
 
   static function fromDbAssocArray(array $row): Manuscript
@@ -68,7 +71,8 @@ class Manuscript extends AbstractManuscript
       $row['cth_classification'],
       $row['bibliography'],
       $row['status'],
-      $row['creator_username']
+      $row['creator_username'],
+      $row['creation_date']
     );
   }
 
@@ -257,6 +261,7 @@ Manuscript::$graphQLType = new ObjectType([
     'cthClassification' => Type::int(),
     'bibliography' => Type::string(),
     'creatorUsername' => Type::nonNull(Type::string()),
+    'creationDate' => Type::nonNull(Type::string()),
     'palaeographicClassification' => Type::nonNull(AbstractManuscript::$palaeographicClassificationGraphQLEnumType),
     'palaeographicClassificationSure' => Type::nonNull(Type::boolean()),
     'defaultLanguage' => Type::nonNull(ManuscriptLanguage::$enumType),
