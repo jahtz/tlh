@@ -23,10 +23,19 @@ interface LoadedDocument {
 
 function initialState(): LoadedDocument | undefined {
   const maybeEditorState = localStorage.getItem(locStoreKey);
-  return maybeEditorState ? JSON.parse(maybeEditorState) : undefined;
+
+  if (maybeEditorState === null) {
+    return undefined;
+  }
+
+  const parsed = JSON.parse(maybeEditorState);
+
+  return 'filename' in parsed && 'source' in parsed ? parsed : undefined;
 }
 
-const autoSave = (filename: string, rootNode: XmlNode): void => localStorage.setItem(locStoreKey, JSON.stringify({filename, rootNode}));
+const autoSave = (filename: string, rootNode: XmlNode): void => {
+  localStorage.setItem(locStoreKey, JSON.stringify({filename, source: writeXml(rootNode as XmlElementNode)}));
+};
 
 export const writeXml = (rootNode: XmlElementNode, expand = false): string => {
   reCountNodeNumbers(rootNode, 'node', 'n');
