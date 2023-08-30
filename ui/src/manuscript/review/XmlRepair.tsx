@@ -19,7 +19,7 @@ export function XmlRepair({brokenXml, onUpdate}: IProps): ReactElement {
 
   return (
     <>
-      {parseResult instanceof MyLeft && <pre className="my-4 p-2 rounded bg-red-600 text-white">{parseResult.value}</pre>}
+      {parseResult instanceof MyLeft && <div className="my-4 p-2 rounded bg-red-600 text-white">{parseResult.value}</div>}
 
       <div className="my-4 p-2 border border-slate-500">
         <XmlSourceEditor source={brokenXml} onChange={setXmlContent}/>
