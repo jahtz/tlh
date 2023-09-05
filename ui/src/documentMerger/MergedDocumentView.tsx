@@ -1,6 +1,6 @@
 import {MergeLine} from './mergeDocument';
 import {JSX, useState} from 'react';
-import {MergeDocumentLine} from './DocumentMerger';
+import {MergeDocumentLine, PublicationMap} from './DocumentMerger';
 import {useTranslation} from 'react-i18next';
 import {
   findFirstXmlElementByTagName,
@@ -16,11 +16,12 @@ import {
 import xmlFormat from 'xml-formatter';
 import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
 import {makeDownload} from '../downloadHelper';
+import {defaultAoXmlAttributes} from '../manuscript/xmlConversion/TransliterationCheck';
 
 interface IProps {
   lines: MergeLine[];
   header: XmlElementNode;
-  publicationMapping: Map<string, string[]>;
+  publicationMapping: PublicationMap;
 }
 
 interface exportState {
@@ -28,106 +29,87 @@ interface exportState {
   isExportDisabled: boolean;
 }
 
+function writePublicationMapping(publicationMap: PublicationMap): XmlNode[] {
+  const publications: XmlNode[] = [];
+
+  Array.from(publicationMap.values())
+    .forEach((publication, index) => {
+      if (index > 0) {
+        publications.push(xmlTextNode('+'));
+      }
+
+      // FIXME: move to new format!
+      publications.push(
+        xmlElementNode('AO:TxtPubl', {}, [
+          xmlTextNode(`${publication[1]} {€${publication[0]}}`.replaceAll(/[\n\t/]/, ''))
+        ])
+      );
+    });
+
+  return [
+    xmlElementNode('AO:Manuscripts', {}, publications)
+  ];
+}
+
+const getPublicationMappingString = (publicationMapping: XmlNode[]): string[] => publicationMapping
+  .filter((publication): publication is XmlElementNode => isXmlElementNode(publication))
+  .flatMap(({children}) => children)
+  .flatMap((childPub) => {
+    if (isXmlTextNode(childPub)) {
+      return [childPub.textContent];
+    } else if (isXmlElementNode(childPub) && isXmlTextNode(childPub.children[0])) {
+      return [childPub.children[0].textContent];
+    } else {
+      return [];
+    }
+  });
+
 export function MergedDocumentView({lines, header, publicationMapping}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
   const [state, setState] = useState<exportState>({mergerName: '', isExportDisabled: true});
 
-
   function onExport(): void {
     const lineNodes = lines
       .map<XmlNode[]>(({lineNumberNode, rest}) => [lineNumberNode, ...rest])
       .flat();
-    const publMapping = writePublMapping();
-    const publicationMappingString: string[] = getPublicationMappingString(publMapping);
-    const childNodes = publMapping.concat(lineNodes);
-    const newBody: XmlElementNode = {
-      tagName: 'body',
-      attributes: {},
-      children: [xmlElementNode('div1', {'type': 'transliteration'}, [xmlElementNode('text', {'xml:lang': 'XXXlang'}, childNodes)])]
-    };
 
-    header.children.forEach((node) => {
-      if (isXmlElementNode(node) && node.tagName === 'meta') {
-        node.children.forEach((cnode) => {
-            if (isXmlElementNode(cnode) && cnode.tagName === 'merge') {
-              cnode.attributes['editor'] = state.mergerName;
-              cnode.attributes['docs'] = publicationMappingString.join(' ');
-              console.log(cnode.attributes['editor']);
-            }
-          }
-        );
-      }
-    });
+    const aoManuscriptsNode = writePublicationMapping(publicationMapping);
+    const publicationMappingString: string[] = getPublicationMappingString(aoManuscriptsNode);
 
+    header.children
+      .filter((node): node is XmlElementNode => isXmlElementNode(node))
+      .filter(({tagName}) => tagName === 'meta')
+      .flatMap(({children}) => children)
+      .filter((childNode): childNode is XmlElementNode => isXmlElementNode(childNode))
+      .filter(({tagName}) => tagName === 'merge')
+      .forEach((childNode) => {
+        childNode.attributes['editor'] = state.mergerName;
+        childNode.attributes['docs'] = publicationMappingString.join(' ');
+        // console.log(childNode.attributes['editor']);
+      });
 
-    const AOxml: XmlElementNode = {
-      tagName: 'AOxml',
-      attributes: {
-        'xmlns:hpm': 'http://hethiter.net/ns/hpm/1.0',
-        'xmlns:AO': 'http://hethiter.net/ns/AO/1.0',
-        'xmlns:dc': 'http://purl.org/dc/elements/1.1/',
-        'xmlns:meta': 'urn:oasis:names:tc:opendocument:xmlns:meta:1.0',
-        'xmlns:text': 'urn:oasis:names:tc:opendocument:xmlns:text:1.0',
-        'xmlns:table': 'urn:oasis:names:tc:opendocument:xmlns:table:1.0',
-        'xmlns:draw': 'urn:oasis:names:tc:opendocument:xmlns:drawing:1.0',
-        'xmlns:xlink': 'http://www.w3.org/1999/xlink'
-      },
-      children: [header, newBody]
-    };
-
+    const AOxml: XmlElementNode = xmlElementNode('AOxml', defaultAoXmlAttributes, [
+        header,
+        xmlElementNode('body', {}, [
+          xmlElementNode('div1', {type: 'transliteration'}, [
+            // TODO: update text lang in merged document!
+            xmlElementNode('text', {'xml:lang': 'XXXlang'}, [...aoManuscriptsNode, ...lineNodes])
+          ])
+        ])
+      ]
+    );
 
     const exported: string = writeNode(AOxml, tlhXmlEditorConfig.writeConfig).join('\n');
     console.log(exported);
-    let filename = 'merged';
+
     const docIDnode = findFirstXmlElementByTagName(header, 'docID');
 
-    if (docIDnode && isXmlTextNode(docIDnode.children[0])) {
-      filename = docIDnode.children[0].textContent;
-    }
+    const filename = docIDnode && isXmlTextNode(docIDnode.children[0])
+      ? docIDnode.children[0].textContent
+      : 'merged';
 
     makeDownload(exported, filename + '.xml');
-  }
-
-  function writePublMapping(): XmlNode[] {
-    const publications: XmlNode[] = [];
-    console.log(publicationMapping);
-    let i = 0;
-    for (const publ of Array.from(publicationMapping.values())) {
-      if (i > 0) {
-        publications.push(xmlTextNode('+'));
-      }
-      console.log(publ[1] + '{€' + publ[0] + '}');
-      publications.push(xmlElementNode('AO:TxtPubl',
-        {},
-        [xmlTextNode(
-          (publ[1] + ' {€' + publ[0] + '}')
-            .replaceAll('\n', '')
-            .replaceAll('\t', '')
-        )]));
-      i++;
-    }
-
-    return [xmlElementNode('AO:Manuscripts', {}, publications)];
-  }
-
-
-  function getPublicationMappingString(publMapping: XmlNode[]): string [] {
-    const output: string[] = [];
-
-    for (const publication of publMapping) {
-      if (isXmlElementNode(publication)) {
-        for (const childPub of publication.children) {
-          if (isXmlElementNode(childPub) && isXmlTextNode(childPub.children[0])) {
-            output.push(childPub.children[0].textContent);
-          } else if (isXmlTextNode(childPub)) {
-            output.push(childPub.textContent);
-          }
-        }
-      }
-    }
-
-    return output;
   }
 
   function setMergerReg(input: string) {

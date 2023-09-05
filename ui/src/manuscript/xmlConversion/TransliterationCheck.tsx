@@ -19,7 +19,7 @@ interface IProps extends XmlCreationValues {
   onConvert: (value: string) => void;
 }
 
-const defaultAoXmlAttributes: Attributes = {
+export const defaultAoXmlAttributes: Attributes = {
   'xmlns:hpm': 'http://hethiter.net/ns/hpm/1.0',
   'xmlns:AO': 'http://hethiter.net/ns/AO/1.0',
   'xmlns:dc': 'http://purl.org/dc/elements/1.1/',

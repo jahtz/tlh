@@ -2,7 +2,7 @@ import {useTranslation} from 'react-i18next';
 import {FileLoader} from '../forms/FileLoader';
 import {JSX, useState} from 'react';
 import update from 'immutability-helper';
-import {DocumentMerger} from './DocumentMerger';
+import {DocumentMerger, PublicationMap} from './DocumentMerger';
 import {loadNewXml, XmlElementNode} from 'simple_xml';
 import {MergeDocument, mergeHeader, MergeLine, readMergeDocument} from './mergeDocument';
 import {MergedDocumentView} from './MergedDocumentView';
@@ -34,7 +34,7 @@ interface MergedState {
   _type: 'MergedState';
   mergedLines: MergeLine[];
   header: XmlElementNode;
-  publicationMapping: Map<string, string[]>;
+  publicationMapping: PublicationMap;
 }
 
 type IState = EmptyState | FirstFileLoadedState | SecondFileLoadedState | MergedState;
@@ -44,16 +44,21 @@ export function DocumentMergerContainer(): JSX.Element {
   const {t} = useTranslation('common');
   const [state, setState] = useState<IState>({_type: 'EmptyState'});
 
-  const loadFirstDocument = async (file: File): Promise<void> => loadNewXml(file, tlhXmlEditorConfig.readConfig)
-    .then((parseResult) =>
+  const loadFirstDocument = async (file: File): Promise<void> => {
+    try {
+      const parseResult = await loadNewXml(file, tlhXmlEditorConfig.readConfig);
+
       parseResult.handle(
         (rootNode) => setState((state) => update(state, {
           _type: {$set: 'FirstFileLoadedState'},
           firstFile: {$set: {filename: file.name, document: readMergeDocument(rootNode as XmlElementNode)}}
         })),
         (value) => alert(value)
-      )
-    );
+      );
+    } catch (exception) {
+      console.error(exception);
+    }
+  };
 
   const loadSecondDocument = async (file: File): Promise<void> => loadNewXml(file, tlhXmlEditorConfig.readConfig).then((parseResult) =>
     parseResult.handle(
@@ -66,7 +71,7 @@ export function DocumentMergerContainer(): JSX.Element {
     )
   );
 
-  function onMerge(mergedLines: MergeLine[], publicationMapping: Map<string, string[]>): void {
+  function onMerge(mergedLines: MergeLine[], publicationMapping: PublicationMap): void {
     let header: XmlElementNode;
     if ('firstFile' in state && 'secondFile' in state) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment

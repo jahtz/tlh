@@ -2,26 +2,26 @@ import {MergeDocument, MergeLine, mergeLines, replaceLNR, resetPublicationMap} f
 import {ReactElement, useReducer, useState} from 'react';
 import {zipWithOffset} from './zipWithOffset';
 import {useTranslation} from 'react-i18next';
-import {IoAddCircleOutline, IoChevronDown, IoChevronUp, IoRemoveCircleOutline} from 'react-icons/io5';
 import {NodeDisplay} from '../xmlEditor/NodeDisplay';
 import {xmlElementNode} from 'simple_xml';
+import {LineToMerge} from './LineToMerge';
+import {PublicationList} from './PublicationList';
+
+export type PublicationMap = Map<string, string[]>;
 
 interface IProps {
   firstDocument: MergeDocument;
   secondDocument: MergeDocument;
-  //publicationMap: Map<string, string[]>;
-  onMerge: (lines: MergeLine[], publicationMapping: Map<string, string[]>) => void;
-  MergedPublicationMapping: Map<string, string[]> | undefined;
+  onMerge: (lines: MergeLine[], publicationMapping: PublicationMap) => void;
+  MergedPublicationMapping: PublicationMap | undefined;
 }
 
-export function MergeDocumentLine({line}: { line: MergeLine }): ReactElement {
-  return (
-    <>
-      <NodeDisplay node={line.lineNumberNode} isLeftSide={false}/>
-      {line.rest.map((n, index) => <NodeDisplay key={index} node={n} isLeftSide={false}/>)}
-    </>
-  );
-}
+export const MergeDocumentLine = ({line}: { line: MergeLine }): ReactElement => (
+  <>
+    <NodeDisplay node={line.lineNumberNode} isLeftSide={false}/>
+    {line.rest.map((n, index) => <NodeDisplay key={index} node={n} isLeftSide={false}/>)}
+  </>
+);
 
 export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps): ReactElement {
 
@@ -30,11 +30,11 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
   const forceUpdate = useReducer(() => ({}), {})[1] as () => void;
 
   let firstLines = firstDocument.lines;
-  const firstPublMap = firstDocument.publMap;
+  const firstPublMap = firstDocument.publicationMap;
   let secondLines = secondDocument.lines;
-  const secondPublMap = secondDocument.publMap;
+  const secondPublMap = secondDocument.publicationMap;
 
-  let publicationMap: Map<string, string[]> = new Map<string, string[]>();
+  let publicationMap: PublicationMap = new Map();
   if (secondDocument.MergedPublicationMapping === undefined) {
     secondDocument.MergedPublicationMapping = mergePublicationMap(firstPublMap, secondPublMap);
   }
@@ -43,20 +43,10 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
   removeDoubleUndefined();
 
   let data = zipWithOffset(firstLines, secondLines, offset);
-  const leftList = (() => {
-    const list = [];
-    for (let i = 0; i < data.length; i++) {
-      list.push(data[i][0]);
-    }
-    return list;
-  })();
-  const rightList = (() => {
-    const list = [];
-    for (let i = 0; i < data.length; i++) {
-      list.push(data[i][1]);
-    }
-    return list;
-  })();
+
+  const leftList = data.map((d) => d[0]);
+  const rightList = data.map((d) => d[1]);
+
   publicationMap = resetPublicationMap(publicationMap);
   console.log(publicationMap);
   console.log(data);
@@ -127,7 +117,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
     forceUpdate();
   }
 
-  function updateLNR(publication: string, newIndex: number, oldPublMap: Map<string, string[]>, doFirst: boolean, doSecond: boolean) {
+  function updateLNR(publication: string, newIndex: number, oldPublMap: PublicationMap, doFirst: boolean, doSecond: boolean): PublicationMap {
     const publIndices: number[] = Array.from(oldPublMap.values()).map((item) => parseInt(item[0]));
 
     //check if valid
@@ -165,7 +155,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
     return oldPublMap;
   }
 
-  function mergePublicationMap(leftMap: Map<string, string[]>, rightMap: Map<string, string[]>) {
+  function mergePublicationMap(leftMap: PublicationMap, rightMap: PublicationMap): PublicationMap {
     const leftIndices = Array.from(leftMap.keys());
     const rightIndices = Array.from(rightMap.keys());
 
@@ -188,79 +178,29 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
     return new Map([...Array.from(leftMap.entries()), ...Array.from(rightMap.entries())]);
   }
 
-  function PublicationList({publMap}: { publMap: Map<string, string[]> }): ReactElement {
-    return (
-      <ul className="grid-container-element-header publication">
-        {
-          Array.from(publMap.values()).sort((a, b) => {
-            return a[1].localeCompare(b[1], undefined, {numeric: true, sensitivity: 'base'});
-          }).map((item, i) =>
-            <PublicationLine publicationString={item} key={i}></PublicationLine>)
-        }
-      </ul>
-    );
-  }
-
-  function PublicationLine({publicationString}: { publicationString: string[] }): ReactElement {
-    return (
-      <li className="grid-child-element-header publication">
-        <span className="publication grid-child-element">{publicationString[1]}</span>
-        <span className="publication grid-child-element">€&nbsp;
-          <input type="number" defaultValue={publicationString[0]} onChange={(event) => {
-            publicationMap = updateLNR(publicationString[1], Number.parseInt(event.target.value), publicationMap, true, true);
-            publicationMap = resetPublicationMap(publicationMap);
-            forceUpdate();
-          }}></input></span>
-      </li>
-    );
-  }
-
-  function LeftList(): ReactElement {
-    return (
-      <ul className="grid-child-element draggablediv" draggable="true" onDragStart={handleDrag} onDragEnd={() => handleDragEnd(true)}>
-        {leftList.map((entry, index) => <li className={index % 5 == 4 && 'marker' || undefined} onMouseOver={() => listMouseOver(index)}
-                                            onDragOver={() => handleDragOver(true, index)} data-index={index} key={index}>
-          <button onClick={() => addLine(true, index)}><IoAddCircleOutline/></button>
-          {entry && <MergeDocumentLine line={entry}/>}
-          {(entry === undefined || entry.lineNumberNode.tagName == 'EMPTY LINE') && <>
-            <button onClick={() => removeLine(true, index)}><IoRemoveCircleOutline/></button>
-            <br/></>}
-        </li>)}
-      </ul>
-    );
-  }
-
-  function RightList(): ReactElement {
-    return (
-      <ul className="grid-child-element draggablediv" draggable="true" onDragStart={handleDrag} onDragEnd={() => handleDragEnd(false)}>
-        {rightList.map((entry, index) => <li className={index % 5 == 4 && 'marker' || undefined} onMouseOver={() => listMouseOver(index)}
-                                             onDragOver={() => handleDragOver(false, index)} data-index={index} key={index}>
-          <button onClick={() => addLine(false, index)}><IoAddCircleOutline/></button>
-          {entry && <MergeDocumentLine line={entry}/>}
-          {(entry === undefined || entry.lineNumberNode.tagName == 'EMPTY LINE') && <>
-            <button onClick={() => removeLine(false, index)}><IoRemoveCircleOutline/></button>
-            <br/></>}
-        </li>)}
-      </ul>
-    );
-  }
+  const onPublicationListChange = (newValue: number, identifier: string): void => {
+    publicationMap = updateLNR(identifier, newValue, publicationMap, true, true);
+    publicationMap = resetPublicationMap(publicationMap);
+    forceUpdate();
+  };
 
   return (
     <>
-      <div className="grid grid-cols-5 mb-2">
+      <div className="my-2 grid grid-cols-5">
         <span className="p-2 border border-slate-500 rounded-l">{t('offset')}</span>
-        <button className="p-2 border border-slate-500" type="button" onClick={() => setOffset((value) => value - 1)}><IoChevronDown/></button>
+        <button className="p-2 border border-slate-500" type="button" onClick={() => setOffset((value) => value - 1)}>&#x2207;</button>
         <input className="p-2 border border-slate-500" type="number" value={offset} onChange={(event) => setOffset(parseInt(event.target.value))}/>
-        <button className="p-2 border border-slate-500" type="button" onClick={() => setOffset((value) => value + 1)}><IoChevronUp/></button>
+        <button className="p-2 border border-slate-500" type="button" onClick={() => setOffset((value) => value + 1)}>&#x2206;</button>
         <button className="p-2 border bg-blue-600 text-white rounded-r" type="button" onClick={performMerge}>{t('performMerge')}</button>
       </div>
-      <div className="grid-container-element-header">
-        <PublicationList publMap={publicationMap}/>
-      </div>
 
-      <div className="grid-container-element">
-        <LeftList/>
-        <RightList/>
+      <PublicationList publicationMap={publicationMap} onChange={onPublicationListChange}/>
+
+      <div className="grid grid-cols-2 gap-2">
+        <LineToMerge isLeft={true} lines={leftList} handleDrag={handleDrag} handleDragEnd={handleDragEnd} handleDragOver={handleDragOver}
+                     listMouseOver={listMouseOver} addLine={addLine} removeLine={removeLine}/>
+        <LineToMerge isLeft={false} lines={rightList} handleDrag={handleDrag} handleDragEnd={handleDragEnd} handleDragOver={handleDragOver}
+                     listMouseOver={listMouseOver} addLine={addLine} removeLine={removeLine}/>
       </div>
     </>
   );

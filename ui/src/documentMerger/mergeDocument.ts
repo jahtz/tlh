@@ -1,5 +1,6 @@
-import {findFirstXmlElementByTagName, isXmlElementNode, isXmlTextNode, xmlElementNode, XmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
+import {findFirstXmlElementByTagName, isXmlElementNode, isXmlTextNode, xmlElementNode, XmlElementNode, XmlNode, XmlTextNode, xmlTextNode} from 'simple_xml';
 import {ZipWithOffsetResult} from './zipWithOffset';
+import {PublicationMap} from './DocumentMerger';
 
 export const txtPublicationRegex = /(?<publication>[\W\w]+)({€(?<lnr>\d+)})/;
 export const lineNumberRegex = /{(?<index>€(?<numbers>\d+|\d+\+\d+))}\s*(?<lines>[\W\w]+)/;
@@ -13,8 +14,8 @@ export interface MergeDocument {
   prior: XmlNode[];
   header: XmlElementNode;
   lines: MergeLine[];
-  publMap: Map<string, string[]>;
-  MergedPublicationMapping: Map<string, string[]> | undefined;
+  publicationMap: PublicationMap;
+  MergedPublicationMapping: PublicationMap | undefined;
 }
 
 let leftTxtId = '';
@@ -27,18 +28,22 @@ export function readMergeDocument(rootNode: XmlElementNode): MergeDocument {
     throw new Error('could not read document!');
   }
 
-  const publicationMap: Map<string, string[]> = new Map<string, string[]>();
-  aoManuscript.children.forEach((node) => {
-    if (isXmlElementNode(node) && (node.tagName === 'AO:TxtPubl' || node.tagName === 'AO:InvNr')) {
-      node.children.forEach((nnode) => {
-        if (isXmlTextNode(nnode)) {
-          parsePublicationMapping(nnode.textContent, publicationMap);
-        }
-      });
-    }
-  });
+  const publicationMap: PublicationMap = new Map();
 
-  const result: MergeDocument = {prior: [], header: rootNode, lines: [], publMap: publicationMap, MergedPublicationMapping: undefined};
+  aoManuscript.children
+    .filter((node): node is XmlElementNode => isXmlElementNode(node))
+    .filter(({tagName}) => tagName === 'AO:TxtPubl' || tagName === 'AO:InvNr')
+    .flatMap(({children}) => children)
+    .filter((node): node is XmlTextNode => isXmlTextNode(node))
+    .forEach((childNode) => parsePublicationMapping(childNode.textContent, publicationMap));
+
+  const result: MergeDocument = {
+    prior: [],
+    header: rootNode,
+    lines: [],
+    publicationMap,
+    MergedPublicationMapping: undefined
+  };
 
   element.children.forEach((node) => {
     if (isXmlElementNode(node) && node.tagName === 'lb') {
@@ -109,7 +114,7 @@ function mergeLine(
   const lineNumber = computeNewLineNumber(lnr, rnr) || (lnr + rnr);
 
   const language = leftLineNumberNode.attributes.lg || '';
-  const txtid = (leftLineNumberNode.attributes.txtid + '+').replace('++','+') || '';
+  const txtid = (leftLineNumberNode.attributes.txtid + '+').replace('++', '+') || '';
   leftTxtId = txtid;
   const lineNumberNode: XmlElementNode = {
     tagName: 'lb', children: [], attributes: {'txtid': txtid, 'lnr': lineNumber, 'lg': language}
@@ -129,7 +134,7 @@ function iterateTxtId({lineNumberNode: leftLineNumberNode, rest: leftRest}: Merg
   return {lineNumberNode, rest: [...leftRest]};
 }
 
-function parsePublicationMapping(txtPublication: string, publMap: Map<string, string[]>) {
+function parsePublicationMapping(txtPublication: string, publMap: PublicationMap): PublicationMap {
   // <publicationString, {oldPubNr, newPublNr}>
   const publMatch = txtPublication.match(txtPublicationRegex);
   let publName: string;
@@ -158,6 +163,7 @@ function parsePublicationMapping(txtPublication: string, publMap: Map<string, st
 export function mergeHeader(firstDocumentHeader: XmlElementNode, secondDocumentHeader: XmlElementNode): XmlElementNode {
   const docID = findFirstXmlElementByTagName(firstDocumentHeader, 'docID');
   let newDocID = 'docID';
+
   if (docID && isXmlTextNode(docID.children[0])) {
     newDocID = docID.children[0].textContent + '+';
   }
@@ -184,18 +190,20 @@ export function mergeHeader(firstDocumentHeader: XmlElementNode, secondDocumentH
   return {
     tagName: 'AOHeader',
     attributes: {},
-    children: [xmlElementNode('docID', {}, [xmlTextNode(newDocID)]),
+    children: [
+      xmlElementNode('docID', {}, [xmlTextNode(newDocID)]),
       xmlElementNode('meta', {}, [
-        xmlElementNode('merge', {'date': new Date().toISOString(), 'editor':'DocumentMerger'}, []),
+        xmlElementNode('merge', {'date': new Date().toISOString(), 'editor': 'DocumentMerger'}, []),
         xmlElementNode('annotation', {}, []),
         merged
-      ])]
+      ])
+    ]
   };
 }
 
-export function replaceLNR(node: XmlElementNode, publicationMap: Map<string, string[]>) {
+export function replaceLNR(node: XmlElementNode, publicationMap: PublicationMap): string {
   let textLine: string = node.attributes['lnr'] ? node.attributes['lnr'] : 'empty';
-  
+
   const lineMatch = textLine.match(lineNumberRegex);
   if (textLine && lineMatch && lineMatch.groups) {
     let lineIndex = lineMatch.groups.index;
@@ -230,8 +238,9 @@ export function replaceLNR(node: XmlElementNode, publicationMap: Map<string, str
   return textLine;
 }
 
-export function resetPublicationMap(publMap: Map<string, string[]>) {
+export function resetPublicationMap(publMap: PublicationMap): PublicationMap {
   const updatedMappings: Map<string, string> = new Map<string, string>();
+
   Array.from(publMap.entries()).map((entry) => {
     const index = entry[0];
     const mapping = entry[1];
@@ -239,6 +248,7 @@ export function resetPublicationMap(publMap: Map<string, string[]>) {
       updatedMappings.set(index, mapping[0]);
     }
   });
+
   if (updatedMappings) {
     Array.from(updatedMappings.entries()).map((mapping) => {
       const pMap: string[] | undefined = publMap.get(mapping[0]);
