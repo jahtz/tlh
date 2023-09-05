@@ -13,7 +13,7 @@ import {TransliterationParseResultDisplay} from './ColumnParseResultComponent';
 import {getNameForManuscriptLanguageAbbreviation} from '../forms/manuscriptLanguageAbbreviations';
 import update from 'immutability-helper';
 import {WithQuery} from '../WithQuery';
-import {blueButtonClasses, greenButtonClasses} from '../defaultDesign';
+import {blueButtonClasses, greenButtonClasses} from '../designElements/defaultDesign';
 
 interface IProps {
   initialManuscript: ManuscriptMetaDataFragment;

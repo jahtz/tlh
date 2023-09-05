@@ -1,6 +1,6 @@
 import {JSX, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {blueButtonClasses} from '../../defaultDesign';
+import {blueButtonClasses} from '../../designElements/defaultDesign';
 import {XmlSourceEditor} from '../../xmlEditor/XmlSourceEditor';
 
 interface IProps {

@@ -14,7 +14,7 @@ import update from 'immutability-helper';
 import {TransliterationTextArea} from './TransliterationTextArea';
 import {WithQuery} from '../WithQuery';
 import {ErrorMessage, InfoMessage, SuccessMessage} from '../designElements/Messages';
-import {blueButtonClasses} from '../defaultDesign';
+import {blueButtonClasses} from '../designElements/defaultDesign';
 
 interface InnerProps {
   mainIdentifier: string;

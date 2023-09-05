@@ -2,7 +2,7 @@ import {ReactElement, useState} from 'react';
 import {MyLeft, parseNewXml} from 'simple_xml';
 import {tlhXmlEditorConfig} from '../../xmlEditor/tlhXmlEditorConfig';
 import {useTranslation} from 'react-i18next';
-import {blueButtonClasses} from '../../defaultDesign';
+import {blueButtonClasses} from '../../designElements/defaultDesign';
 import {XmlSourceEditor} from '../../xmlEditor/XmlSourceEditor';
 
 interface IProps {

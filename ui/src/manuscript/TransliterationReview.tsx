@@ -5,7 +5,7 @@ import {homeUrl} from '../urls';
 import {TransliterationTextArea} from './TransliterationTextArea';
 import {useTranslation} from 'react-i18next';
 import {ReactElement, useState} from 'react';
-import {blueButtonClasses} from '../defaultDesign';
+import {blueButtonClasses} from '../designElements/defaultDesign';
 import {SuccessMessage} from '../designElements/Messages';
 
 interface IProps {

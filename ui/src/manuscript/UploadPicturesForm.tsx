@@ -5,7 +5,7 @@ import {PicturesBlock} from './PicturesBlock';
 import {Link, Navigate, useParams} from 'react-router-dom';
 import {ManuscriptIdentWithCreatorFragment, Rights, useDeletePictureMutation, useUploadPicturesQuery} from '../graphql';
 import {WithQuery} from '../WithQuery';
-import {blueButtonClasses, redButtonClasses} from '../defaultDesign';
+import {blueButtonClasses, redButtonClasses} from '../designElements/defaultDesign';
 import {User} from '../newStore';
 import update from 'immutability-helper';
 

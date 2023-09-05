@@ -4,26 +4,10 @@ interface IProps {
   children: ReactElement | string;
 }
 
-export function SuccessMessage({children}: IProps): ReactElement {
-  return (
-    <div className="my-4 p-2 rounded bg-green-500 text-white text-center">
-      {children}
-    </div>
-  );
-}
+const messageClasses = (color: string): string => `my-4 p-2 rounded bg-${color}-500 text-white text-center`;
 
-export function InfoMessage({children}: IProps): ReactElement {
-  return (
-    <div className="my-4 p-2 rounded bg-cyan-500 text-white text-center">
-      {children}
-    </div>
-  );
-}
+export const SuccessMessage = ({children}: IProps): ReactElement => <div className={messageClasses('green')}>{children}</div>;
 
-export function ErrorMessage({children}: IProps):ReactElement{
-  return (
-    <div className="my-4 p-2 rounded bg-red-500 text-white text-center">
-      {children}
-    </div>
-  );
-}
+export const InfoMessage = ({children}: IProps): ReactElement => <div className={messageClasses('cyan')}>{children}</div>;
+
+export const ErrorMessage = ({children}: IProps): ReactElement => <div className={messageClasses('red')}>{children}</div>;

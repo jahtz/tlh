@@ -3,7 +3,7 @@ import {ReactElement} from 'react';
 import {useTranslation} from 'react-i18next';
 import {InsertablePositions} from './insertablePositions';
 import {SelectableButton} from '../genericElements/Buttons';
-import {amberButtonClasses, blueButtonClasses} from '../defaultDesign';
+import {amberButtonClasses, blueButtonClasses} from '../designElements/defaultDesign';
 
 interface IProps {
   editorConfig: XmlEditorConfig;

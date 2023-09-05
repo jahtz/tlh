@@ -16,7 +16,7 @@ import {FontSizeSelectorProps} from './FontSizeSelector';
 import {writeXml} from './StandAloneOXTED';
 import {fetchCuneiform} from './elementEditors/LineBreakEditor';
 import {getPriorSiblingPath} from '../nodeIterators';
-import {buttonClasses} from '../defaultDesign';
+import {buttonClasses} from '../designElements/defaultDesign';
 
 export function buildActionSpec(innerAction: Spec<XmlNode>, path: number[]): Spec<XmlNode> {
   return path.reduceRight(

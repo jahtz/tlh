@@ -4,7 +4,7 @@ import {allDocEditTypes, attributesForDocEditType, DocumentEditTypes, nameForDoc
 import {useTranslation} from 'react-i18next';
 import {Attributes, xmlElementNode, XmlElementNode} from 'simple_xml';
 import update from 'immutability-helper';
-import {defaultInputClasses} from '../defaultDesign';
+import {defaultInputClasses} from '../designElements/defaultDesign';
 
 interface IProps {
   setExportNode: (node: XmlElementNode) => void;
