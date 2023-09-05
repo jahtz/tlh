@@ -15,15 +15,11 @@ interface FormValues {
   submitKeys: string;
 }
 
-function dismantleFormEntry(entry: string): string[] {
-  return Array.from(
-    new Set(
-      entry.split(splitKey)
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0)
-    )
-  );
-}
+const dismantleFormEntry = (entry: string): string[] => Array.from(
+  new Set(
+    entry.split(splitKey).map((s) => s.trim()).filter((s) => s.length > 0)
+  )
+);
 
 export function Preferences(): JSX.Element {
 
