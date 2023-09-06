@@ -1,7 +1,8 @@
 import {MergeLine} from './mergeDocument';
 import {JSX, useState} from 'react';
-import {MergeDocumentLine, PublicationMap} from './DocumentMerger';
+import {MergeDocumentLine} from './DocumentMerger';
 import {useTranslation} from 'react-i18next';
+import {getPublicationMappingString, PublicationMap, writePublicationMapping} from './publicationMap';
 import {
   findFirstXmlElementByTagName,
   isXmlElementNode,
@@ -10,10 +11,9 @@ import {
   writeNodeWithDefaultWriteConfig,
   XmlElementNode,
   xmlElementNode,
-  XmlNode,
-  xmlTextNode
+  XmlNode
 } from 'simple_xml';
-import xmlFormat from 'xml-formatter';
+import xmlFormat, {XMLFormatterOptions} from 'xml-formatter';
 import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
 import {makeDownload} from '../downloadHelper';
 import {defaultAoXmlAttributes} from '../manuscript/xmlConversion/TransliterationCheck';
@@ -24,50 +24,17 @@ interface IProps {
   publicationMapping: PublicationMap;
 }
 
-interface exportState {
+interface ExportState {
   mergerName: string;
   isExportDisabled: boolean;
 }
 
-function writePublicationMapping(publicationMap: PublicationMap): XmlNode[] {
-  const publications: XmlNode[] = [];
-
-  Array.from(publicationMap.values())
-    .forEach((publication, index) => {
-      if (index > 0) {
-        publications.push(xmlTextNode('+'));
-      }
-
-      // FIXME: move to new format!
-      publications.push(
-        xmlElementNode('AO:TxtPubl', {}, [
-          xmlTextNode(`${publication[1]} {€${publication[0]}}`.replaceAll(/[\n\t/]/, ''))
-        ])
-      );
-    });
-
-  return [
-    xmlElementNode('AO:Manuscripts', {}, publications)
-  ];
-}
-
-const getPublicationMappingString = (publicationMapping: XmlNode[]): string[] => publicationMapping
-  .filter((publication): publication is XmlElementNode => isXmlElementNode(publication))
-  .flatMap(({children}) => children)
-  .flatMap((childPub) => {
-    if (isXmlTextNode(childPub)) {
-      return [childPub.textContent];
-    } else if (isXmlElementNode(childPub) && isXmlTextNode(childPub.children[0])) {
-      return [childPub.children[0].textContent];
-    } else {
-      return [];
-    }
-  });
+const xmlFormatOptions: XMLFormatterOptions = {indentation: '  ', collapseContent: true, lineSeparator: '\n'};
 
 export function MergedDocumentView({lines, header, publicationMapping}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
-  const [state, setState] = useState<exportState>({mergerName: '', isExportDisabled: true});
+  const [state, setState] = useState<ExportState>({mergerName: '', isExportDisabled: true});
 
   function onExport(): void {
     const lineNodes = lines
@@ -90,15 +57,14 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
       });
 
     const AOxml: XmlElementNode = xmlElementNode('AOxml', defaultAoXmlAttributes, [
-        header,
-        xmlElementNode('body', {}, [
-          xmlElementNode('div1', {type: 'transliteration'}, [
-            // TODO: update text lang in merged document!
-            xmlElementNode('text', {'xml:lang': 'XXXlang'}, [...aoManuscriptsNode, ...lineNodes])
-          ])
+      header,
+      xmlElementNode('body', {}, [
+        xmlElementNode('div1', {type: 'transliteration'}, [
+          // TODO: update text lang in merged document!
+          xmlElementNode('text', {'xml:lang': 'XXXlang'}, [aoManuscriptsNode, ...lineNodes])
         ])
-      ]
-    );
+      ])
+    ]);
 
     const exported: string = writeNode(AOxml, tlhXmlEditorConfig.writeConfig).join('\n');
     console.log(exported);
@@ -112,9 +78,9 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
     makeDownload(exported, filename + '.xml');
   }
 
-  function setMergerReg(input: string) {
-    setState({mergerName: input, isExportDisabled: (input == '')});
-  }
+  const setMergerReg = (mergerName: string): void => setState({mergerName, isExportDisabled: (mergerName == '')});
+
+  const formattedXml = xmlFormat(writeNodeWithDefaultWriteConfig(header).join('\n'), xmlFormatOptions);
 
   return (
     <>
@@ -123,14 +89,13 @@ export function MergedDocumentView({lines, header, publicationMapping}: IProps):
         <input name="mergerName" id="mergerName" placeholder={t('editorAbbreviation')} className="mt-2 p-2 rounded border w-full"
                onChange={e => setMergerReg(e.target.value)}></input>
       </div>
-      <button type="button" className="mb-2 p-2 rounded bg-blue-500 text-white w-full" onClick={onExport} disabled={state.isExportDisabled}>{
-        state.isExportDisabled ? t('disabled_export') : t('export')
-      }</button>
-      <pre><code>{xmlFormat(writeNodeWithDefaultWriteConfig(header).join('\n'), {
-        indentation: '  ',
-        collapseContent: true,
-        lineSeparator: '\n'
-      })}</code></pre>
+
+      <button type="button" className="mb-2 p-2 rounded bg-blue-500 text-white w-full" onClick={onExport} disabled={state.isExportDisabled}>
+        {state.isExportDisabled ? t('disabled_export') : t('export')}
+      </button>
+
+      <pre><code>{formattedXml}</code></pre>
+
       {lines.map((l, index) => <p key={index}><MergeDocumentLine line={l}/></p>)}
     </>
   );

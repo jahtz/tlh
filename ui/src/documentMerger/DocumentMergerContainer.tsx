@@ -2,7 +2,8 @@ import {useTranslation} from 'react-i18next';
 import {FileLoader} from '../forms/FileLoader';
 import {JSX, useState} from 'react';
 import update from 'immutability-helper';
-import {DocumentMerger, PublicationMap} from './DocumentMerger';
+import {DocumentMerger} from './DocumentMerger';
+import {PublicationMap} from './publicationMap';
 import {loadNewXml, XmlElementNode} from 'simple_xml';
 import {MergeDocument, mergeHeader, MergeLine, readMergeDocument} from './mergeDocument';
 import {MergedDocumentView} from './MergedDocumentView';
@@ -60,28 +61,29 @@ export function DocumentMergerContainer(): JSX.Element {
     }
   };
 
-  const loadSecondDocument = async (file: File): Promise<void> => loadNewXml(file, tlhXmlEditorConfig.readConfig).then((parseResult) =>
-    parseResult.handle(
-      (rootNode) =>
-        setState((state) => update(state, {
-          _type: {$set: 'SecondFileLoadedState'},
-          secondFile: {$set: {filename: file.name, document: readMergeDocument(rootNode as XmlElementNode)}}
-        })),
-      (value) => alert(value)
-    )
-  );
+  const loadSecondDocument = async (file: File): Promise<void> => {
+    try {
+      const parseResult = await loadNewXml(file, tlhXmlEditorConfig.readConfig);
+
+      parseResult.handle(
+        (rootNode) =>
+          setState((state) => update(state, {
+            _type: {$set: 'SecondFileLoadedState'},
+            secondFile: {$set: {filename: file.name, document: readMergeDocument(rootNode as XmlElementNode)}}
+          })),
+        (value) => alert(value)
+      );
+    } catch (exception) {
+      console.error(exception);
+    }
+  };
 
   function onMerge(mergedLines: MergeLine[], publicationMapping: PublicationMap): void {
-    let header: XmlElementNode;
     if ('firstFile' in state && 'secondFile' in state) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      header = mergeHeader(state.firstFile.document.header, state.secondFile.document.header);
+      const header = mergeHeader(state.firstFile.document.header, state.secondFile.document.header);
 
+      setState((state) => update(state, {$set: {_type: 'MergedState', mergedLines, header, publicationMapping}}));
     }
-    setState((state) => update(state, {
-      $set: {_type: 'MergedState', mergedLines, header, publicationMapping}
-    }));
   }
 
   return (
@@ -100,7 +102,7 @@ export function DocumentMergerContainer(): JSX.Element {
           <FileLoader onLoad={loadSecondDocument} accept={'text/xml'} text={t('loadSecondFile') || 'loadSecondFile'}/>)
         || (state._type === 'SecondFileLoadedState' &&
           <DocumentMerger firstDocument={state.firstFile.document} secondDocument={state.secondFile.document}
-                          MergedPublicationMapping={state.secondFile.document.MergedPublicationMapping} onMerge={onMerge}/>)
+                          mergedPublicationMapping={state.secondFile.document.mergedPublicationMapping} onMerge={onMerge}/>)
         || (state._type === 'MergedState' &&
           <MergedDocumentView lines={state.mergedLines} header={state.header} publicationMapping={state.publicationMapping}/>)}
 

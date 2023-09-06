@@ -6,14 +6,14 @@ import {NodeDisplay} from '../xmlEditor/NodeDisplay';
 import {xmlElementNode} from 'simple_xml';
 import {LineToMerge} from './LineToMerge';
 import {PublicationList} from './PublicationList';
+import {PublicationMap} from './publicationMap';
 
-export type PublicationMap = Map<string, string[]>;
 
 interface IProps {
   firstDocument: MergeDocument;
   secondDocument: MergeDocument;
   onMerge: (lines: MergeLine[], publicationMapping: PublicationMap) => void;
-  MergedPublicationMapping: PublicationMap | undefined;
+  mergedPublicationMapping: PublicationMap | undefined;
 }
 
 export const MergeDocumentLine = ({line}: { line: MergeLine }): ReactElement => (
@@ -29,16 +29,17 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
   const [offset, setOffset] = useState(0);
   const forceUpdate = useReducer(() => ({}), {})[1] as () => void;
 
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [startIndex, setStartIndex] = useState(0);
+
   let firstLines = firstDocument.lines;
-  const firstPublMap = firstDocument.publicationMap;
   let secondLines = secondDocument.lines;
-  const secondPublMap = secondDocument.publicationMap;
 
   let publicationMap: PublicationMap = new Map();
-  if (secondDocument.MergedPublicationMapping === undefined) {
-    secondDocument.MergedPublicationMapping = mergePublicationMap(firstPublMap, secondPublMap);
+  if (secondDocument.mergedPublicationMapping === undefined) {
+    secondDocument.mergedPublicationMapping = mergePublicationMap(firstDocument.publicationMap, secondDocument.publicationMap);
   }
-  publicationMap = secondDocument.MergedPublicationMapping;
+  publicationMap = secondDocument.mergedPublicationMapping;
 
   removeDoubleUndefined();
 
@@ -48,19 +49,9 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
   const rightList = data.map((d) => d[1]);
 
   publicationMap = resetPublicationMap(publicationMap);
-  console.log(publicationMap);
-  console.log(data);
 
-  function performMerge(): void {
-    onMerge(mergeLines(data), publicationMap);
-  }
-
-  let startIndex = 0;
-  let currentIndex = 0;
-
-  function handleDrag(): void {
-    startIndex = currentIndex;
-  }
+  const performMerge = (): void => onMerge(mergeLines(data), publicationMap);
+  const handleDrag = (): void => setStartIndex(currentIndex);
 
   function handleDragEnd(isLeft: boolean): void {
     const offset1 = (isLeft ? -(currentIndex - startIndex - offset) : (currentIndex - startIndex + offset));
@@ -71,7 +62,8 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
   }
 
   function removeDoubleUndefined(): void {
-    let max_length: number = firstLines.length > secondLines.length ? firstLines.length : secondLines.length;
+    let max_length = Math.max(firstLines.length, secondLines.length);
+
     for (let i = 0; i < max_length; i++) {
       if (firstLines[i] === undefined && secondLines[i] === undefined) {
         firstLines.splice(i, 1);
@@ -83,24 +75,25 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
 
   function handleDragOver(isLeft: boolean, currentMouseIndex: number): void {
     // TODO: fix broken offset update onDragOver
-    currentIndex = currentMouseIndex;
-  }
-
-  function listMouseOver(currentMouseIndex: number): void {
-    currentIndex = currentMouseIndex;
+    setCurrentIndex(currentMouseIndex);
   }
 
   const addLine = (isLeft: boolean, index: number): void => {
-    const undef: unknown = undefined;
-    const emptyLine: MergeLine = {lineNumberNode: xmlElementNode('EMPTY LINE', {}, []), rest: []};
-
     if (isLeft) {
-      if (offset < 0) index = index + offset;
-      firstLines = firstLines.splice(index + 1, 0, emptyLine as MergeLine);
+      if (offset < 0) {
+        index = index + offset;
+      }
+      firstLines = firstLines.splice(index + 1, 0, {lineNumberNode: xmlElementNode('EMPTY LINE'), rest: []});
     } else {
-      if (offset > 0) index = index - offset;
+      const undef: unknown = undefined;
+
+      if (offset > 0) {
+        index = index - offset;
+      }
+      // FIXME: wtf?
       secondLines = secondLines.splice(index + 1, 0, undef as MergeLine);
     }
+
     //removeDoubleUndefined();
     data = zipWithOffset(firstLines, secondLines, offset);
     forceUpdate();
@@ -108,17 +101,21 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
 
   function removeLine(isLeft: boolean, index: number): void {
     if (isLeft && (firstLines[index] === undefined || firstLines[index].lineNumberNode.tagName == 'EMPTY LINE')) {
-      if (offset < 0) index = index + offset;
+      if (offset < 0) {
+        index = index + offset;
+      }
       firstLines.splice(index, 1);
     } else if (secondLines[index] === undefined || secondLines[index].lineNumberNode.tagName == 'EMPTY LINE') {
-      if (offset > 0) index = index - offset;
+      if (offset > 0) {
+        index = index - offset;
+      }
       secondLines.splice(index, 1);
     }
     forceUpdate();
   }
 
   function updateLNR(publication: string, newIndex: number, oldPublMap: PublicationMap, doFirst: boolean, doSecond: boolean): PublicationMap {
-    const publIndices: number[] = Array.from(oldPublMap.values()).map((item) => parseInt(item[0]));
+    const publIndices: number[] = Array.from(oldPublMap.values()).map(([fragmentNumber]) => fragmentNumber);
 
     //check if valid
     if (newIndex > 0 && !(publIndices.includes(newIndex, 0))) {
@@ -127,11 +124,12 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
         const item = entry[1];
         if (item[1] == publication) {
           const index = item[0];
-          item[0] = newIndex.toString();
+          item[0] = newIndex;
           oldPublMap.delete(oldIndex);
-          oldPublMap.set((parseInt(index)).toString(), item);
+          oldPublMap.set((index).toString(), item);
         }
       });
+
       if (doFirst) {
         Array.from(firstLines).map((entry) => {
           if (entry) {
@@ -140,6 +138,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
           }
         });
       }
+
       if (doSecond) {
         Array.from(secondLines).map((entry) => {
           if (entry) {
@@ -148,6 +147,7 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
           }
         });
       }
+
       oldPublMap = resetPublicationMap(oldPublMap);
     }
 
@@ -172,9 +172,11 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
 
       const mapIntersect = rightMap.get(intersect);
       if (mapIntersect) {
+        // FIXME: remove updateLNR!
         rightMap = updateLNR(mapIntersect[1], parseInt(newIndex.toString()), rightMap, false, true);
       }
     }
+
     return new Map([...Array.from(leftMap.entries()), ...Array.from(rightMap.entries())]);
   }
 
@@ -186,21 +188,21 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
 
   return (
     <>
-      <div className="my-2 grid grid-cols-5">
-        <span className="p-2 border border-slate-500 rounded-l">{t('offset')}</span>
-        <button className="p-2 border border-slate-500" type="button" onClick={() => setOffset((value) => value - 1)}>&#x2207;</button>
-        <input className="p-2 border border-slate-500" type="number" value={offset} onChange={(event) => setOffset(parseInt(event.target.value))}/>
-        <button className="p-2 border border-slate-500" type="button" onClick={() => setOffset((value) => value + 1)}>&#x2206;</button>
-        <button className="p-2 border bg-blue-600 text-white rounded-r" type="button" onClick={performMerge}>{t('performMerge')}</button>
+      <div className="my-2 grid grid-cols-5 gap-2">
+        <span className="p-2 rounded border border-slate-500">{t('offset')}</span>
+        <button className="p-2 rounded border border-slate-500" type="button" onClick={() => setOffset((value) => value - 1)}>&#x2207;</button>
+        <input className="p-2 rounded border border-slate-500" type="number" value={offset} onChange={(event) => setOffset(parseInt(event.target.value))}/>
+        <button className="p-2 rounded border border-slate-500" type="button" onClick={() => setOffset((value) => value + 1)}>&#x2206;</button>
+        <button className="p-2 rounded border bg-blue-600 text-white" type="button" onClick={performMerge}>{t('performMerge')}</button>
       </div>
 
       <PublicationList publicationMap={publicationMap} onChange={onPublicationListChange}/>
 
       <div className="grid grid-cols-2 gap-2">
         <LineToMerge isLeft={true} lines={leftList} handleDrag={handleDrag} handleDragEnd={handleDragEnd} handleDragOver={handleDragOver}
-                     listMouseOver={listMouseOver} addLine={addLine} removeLine={removeLine}/>
+                     listMouseOver={setCurrentIndex} addLine={addLine} removeLine={removeLine}/>
         <LineToMerge isLeft={false} lines={rightList} handleDrag={handleDrag} handleDragEnd={handleDragEnd} handleDragOver={handleDragOver}
-                     listMouseOver={listMouseOver} addLine={addLine} removeLine={removeLine}/>
+                     listMouseOver={setCurrentIndex} addLine={addLine} removeLine={removeLine}/>
       </div>
     </>
   );
