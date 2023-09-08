@@ -8,7 +8,7 @@ export function zipWithOffset<T>(first: T[], second: T[], offset: number): ZipWi
 
   const result: ZipWithOffsetResult<T> = [];
 
-  const maxIndex = first.length*2 + second.length*2 + offset;
+  const maxIndex = first.length * 2 + second.length * 2 + offset;
 
   for (let index = 0; index < maxIndex; index++) {
     const firstIndex = index;

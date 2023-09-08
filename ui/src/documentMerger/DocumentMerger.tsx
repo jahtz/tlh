@@ -4,16 +4,21 @@ import {zipWithOffset} from './zipWithOffset';
 import {useTranslation} from 'react-i18next';
 import {NodeDisplay} from '../xmlEditor/NodeDisplay';
 import {xmlElementNode} from 'simple_xml';
-import {LineToMerge} from './LineToMerge';
+import {LineToMerger} from './DocToMerge';
 import {PublicationList} from './PublicationList';
 import {PublicationMap} from './publicationMap';
-
+import update from 'immutability-helper';
 
 interface IProps {
   firstDocument: MergeDocument;
   secondDocument: MergeDocument;
   onMerge: (lines: MergeLine[], publicationMapping: PublicationMap) => void;
   mergedPublicationMapping: PublicationMap | undefined;
+}
+
+interface IState {
+  firstLines: MergeLine[];
+  secondLines: MergeLine[];
 }
 
 export const MergeDocumentLine = ({line}: { line: MergeLine }): ReactElement => (
@@ -23,21 +28,57 @@ export const MergeDocumentLine = ({line}: { line: MergeLine }): ReactElement => 
   </>
 );
 
+type UpdateLNR = (publication: string, newIndex: number, oldPublMap: PublicationMap, doFirst: boolean, doSecond: boolean) => PublicationMap;
+
+function mergePublicationMap(leftMap: PublicationMap, rightMap: PublicationMap, updateLNR: UpdateLNR): PublicationMap {
+  const leftIndices = Array.from(leftMap.keys());
+  const rightIndices = Array.from(rightMap.keys());
+
+  rightIndices
+    .filter(value => leftIndices.includes(value))
+    .reverse()
+    .forEach((intersect) => {
+        let newIndex = parseInt(intersect);
+
+        while (leftIndices.includes(newIndex.toString()) || rightIndices.includes(newIndex.toString())) {
+          newIndex++;
+        }
+
+        leftIndices.push(newIndex.toString());
+        rightIndices.splice(rightIndices.indexOf(newIndex.toString()), 1);
+
+        const mapIntersect = rightMap.get(intersect);
+
+        if (mapIntersect) {
+          // FIXME: remove updateLNR since it updates state!
+          rightMap = updateLNR(mapIntersect[1], newIndex, rightMap, false, true);
+        }
+      }
+    );
+
+  return new Map([
+    ...Array.from(leftMap.entries()),
+    ...Array.from(rightMap.entries())
+  ]);
+}
+
+
 export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps): ReactElement {
 
   const {t} = useTranslation('common');
-  const [offset, setOffset] = useState(0);
-  const forceUpdate = useReducer(() => ({}), {})[1] as () => void;
 
+  const [offset, setOffset] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [startIndex, setStartIndex] = useState(0);
 
-  let firstLines = firstDocument.lines;
-  let secondLines = secondDocument.lines;
+  const [{firstLines, secondLines}, setState] = useState<IState>({firstLines: firstDocument.lines, secondLines: secondDocument.lines});
+
+  /** @deprecated */
+  const forceUpdate = useReducer(() => ({}), {})[1] as () => void;
 
   let publicationMap: PublicationMap = new Map();
   if (secondDocument.mergedPublicationMapping === undefined) {
-    secondDocument.mergedPublicationMapping = mergePublicationMap(firstDocument.publicationMap, secondDocument.publicationMap);
+    secondDocument.mergedPublicationMapping = mergePublicationMap(firstDocument.publicationMap, secondDocument.publicationMap, updateLNR);
   }
   publicationMap = secondDocument.mergedPublicationMapping;
 
@@ -45,22 +86,24 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
 
   let data = zipWithOffset(firstLines, secondLines, offset);
 
-  const leftList = data.map((d) => d[0]);
-  const rightList = data.map((d) => d[1]);
-
   publicationMap = resetPublicationMap(publicationMap);
 
   const performMerge = (): void => onMerge(mergeLines(data), publicationMap);
   const handleDrag = (): void => setStartIndex(currentIndex);
 
   function handleDragEnd(isLeft: boolean): void {
-    const offset1 = (isLeft ? -(currentIndex - startIndex - offset) : (currentIndex - startIndex + offset));
-    setOffset(offset1);
+    setOffset(
+      isLeft ?
+        -(currentIndex - startIndex - offset)
+        : currentIndex - startIndex + offset
+    );
+
     removeDoubleUndefined();
     data = zipWithOffset(firstLines, secondLines, offset);
     forceUpdate();
   }
 
+  /** @deprecated */
   function removeDoubleUndefined(): void {
     let max_length = Math.max(firstLines.length, secondLines.length);
 
@@ -83,20 +126,22 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
       if (offset < 0) {
         index = index + offset;
       }
-      firstLines = firstLines.splice(index + 1, 0, {lineNumberNode: xmlElementNode('EMPTY LINE'), rest: []});
-    } else {
-      const undef: unknown = undefined;
 
+      setState((state) => update(state, {
+        firstLines: (fl) => fl.splice(index + 1, 0, {lineNumberNode: xmlElementNode('EMPTY LINE'), rest: []})
+      }));
+    } else {
       if (offset > 0) {
         index = index - offset;
       }
-      // FIXME: wtf?
-      secondLines = secondLines.splice(index + 1, 0, undef as MergeLine);
-    }
 
-    //removeDoubleUndefined();
-    data = zipWithOffset(firstLines, secondLines, offset);
-    forceUpdate();
+      // FIXME: wtf?
+      const undef: unknown = undefined;
+
+      setState((state) => update(state, {
+        secondLines: (sl) => sl.splice(index + 1, 0, undef as MergeLine)
+      }));
+    }
   };
 
   function removeLine(isLeft: boolean, index: number): void {
@@ -104,14 +149,15 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
       if (offset < 0) {
         index = index + offset;
       }
-      firstLines.splice(index, 1);
+
+      setState((state) => update(state, {firstLines: (fl) => fl.splice(index, 1)}));
     } else if (secondLines[index] === undefined || secondLines[index].lineNumberNode.tagName == 'EMPTY LINE') {
       if (offset > 0) {
         index = index - offset;
       }
-      secondLines.splice(index, 1);
+
+      setState((state) => update(state, {secondLines: (sl) => sl.splice(index, 1)}));
     }
-    forceUpdate();
   }
 
   function updateLNR(publication: string, newIndex: number, oldPublMap: PublicationMap, doFirst: boolean, doSecond: boolean): PublicationMap {
@@ -155,31 +201,6 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
     return oldPublMap;
   }
 
-  function mergePublicationMap(leftMap: PublicationMap, rightMap: PublicationMap): PublicationMap {
-    const leftIndices = Array.from(leftMap.keys());
-    const rightIndices = Array.from(rightMap.keys());
-
-    const indexIntersection = rightIndices.filter(value => leftIndices.includes(value));
-    for (const intersect of indexIntersection.reverse()) {
-      let newIndex = intersect;
-
-      while (leftIndices.includes(newIndex, 0) || rightIndices.includes(newIndex, 0)) {
-        newIndex = (parseInt(newIndex) + 1).toString();
-      }
-
-      leftIndices.push(newIndex);
-      rightIndices.splice(rightIndices.indexOf(newIndex, 0), 1);
-
-      const mapIntersect = rightMap.get(intersect);
-      if (mapIntersect) {
-        // FIXME: remove updateLNR!
-        rightMap = updateLNR(mapIntersect[1], parseInt(newIndex.toString()), rightMap, false, true);
-      }
-    }
-
-    return new Map([...Array.from(leftMap.entries()), ...Array.from(rightMap.entries())]);
-  }
-
   const onPublicationListChange = (newValue: number, identifier: string): void => {
     publicationMap = updateLNR(identifier, newValue, publicationMap, true, true);
     publicationMap = resetPublicationMap(publicationMap);
@@ -198,11 +219,16 @@ export function DocumentMerger({firstDocument, secondDocument, onMerge}: IProps)
 
       <PublicationList publicationMap={publicationMap} onChange={onPublicationListChange}/>
 
-      <div className="grid grid-cols-2 gap-2">
-        <LineToMerge isLeft={true} lines={leftList} handleDrag={handleDrag} handleDragEnd={handleDragEnd} handleDragOver={handleDragOver}
-                     listMouseOver={setCurrentIndex} addLine={addLine} removeLine={removeLine}/>
-        <LineToMerge isLeft={false} lines={rightList} handleDrag={handleDrag} handleDragEnd={handleDragEnd} handleDragOver={handleDragOver}
-                     listMouseOver={setCurrentIndex} addLine={addLine} removeLine={removeLine}/>
+      <div className="[&>*:nth-child(5n)]:bg-gray-300">
+        {data.map(([leftLine, rightLine], index) =>
+          <div key={index} className="grid grid-cols-2 gap-2">
+            <LineToMerger entry={leftLine} handleDrag={handleDrag} handleDragEnd={() => handleDragEnd(true)} handleDragOver={() => handleDragOver(true, index)}
+                          listMouseOver={() => setCurrentIndex(index)} addLine={() => addLine(true, index)} removeLine={() => removeLine(true, index)}/>
+
+            <LineToMerger entry={rightLine} handleDrag={handleDrag} handleDragEnd={() => handleDragEnd(false)}
+                          handleDragOver={() => handleDragOver(false, index)} listMouseOver={() => setCurrentIndex(index)} addLine={() => addLine(false, index)}
+                          removeLine={() => removeLine(false, index)}/>
+          </div>)}
       </div>
     </>
   );
