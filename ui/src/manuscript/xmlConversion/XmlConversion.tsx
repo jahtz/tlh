@@ -8,7 +8,7 @@ import {TransliterationCheck} from './TransliterationCheck';
 import {XmlCheck} from './XmlCheck';
 import {SuccessMessage} from '../../designElements/Messages';
 import {isXmlElementNode, XmlNode} from 'simple_xml';
-import {convertToXml, XmlCreationValues} from './convertToXml';
+import {createCompleteDocument, XmlCreationValues} from './createCompleteDocument';
 import {writeXml} from '../../xmlEditor/StandAloneOXTED';
 
 interface IProps extends XmlCreationValues {
@@ -45,12 +45,14 @@ function Inner({mainIdentifier, mainIdentifierType, author, creationDate, transl
     }
   };
 
+  const xmlCreationValues = {mainIdentifier, mainIdentifierType, author, creationDate, transliterationReleaseDate};
+
   const onConvert = (children: XmlNode[]): void => {
 
     // filter out "illegal nodes", like <LINE_PREFIX/>
     const filteredNodes = children.filter((node) => !isXmlElementNode(node) || !tagNamesToFilter.includes(node.tagName));
 
-    const content = convertToXml(filteredNodes, {mainIdentifier, mainIdentifierType, author, creationDate, transliterationReleaseDate});
+    const content = createCompleteDocument(filteredNodes, xmlCreationValues);
 
     setState({_type: 'XmlCheck', content: writeXml(content)});
   };
@@ -64,7 +66,7 @@ function Inner({mainIdentifier, mainIdentifierType, author, creationDate, transl
     ) : (
       <>
         {state._type === 'TransliterationCheck'
-          ? <TransliterationCheck initialTransliteration={initialInput} onConvert={onConvert}/>
+          ? <TransliterationCheck xmlCreationValues={xmlCreationValues} initialTransliteration={initialInput} onConvert={onConvert}/>
           : <XmlCheck key={state._type} initialXml={state.content} annotated={state._type === 'AnnotatedXmlCheck'} loading={loading} onSubmit={onSubmit}/>}
         {error && <div className="my-2 p-2 rounded bg-red-500 text-white text-center w-full">{error.message}</div>}
       </>

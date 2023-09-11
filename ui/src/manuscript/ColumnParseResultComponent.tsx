@@ -2,19 +2,26 @@ import {useTranslation} from 'react-i18next';
 import {JSX} from 'react';
 import {BulmaTabs} from '../genericElements/BulmaTabs';
 import {LineParseResultDisplay} from './LineParseResultDisplay';
-import {writeNode} from 'simple_xml';
-import {tlhXmlEditorConfig} from '../xmlEditor/tlhXmlEditorConfig';
 import {LineParseResult} from './LineParseResult';
 import {makeDownload} from '../downloadHelper';
+import {createCompleteDocument, XmlCreationValues} from './xmlConversion/createCompleteDocument';
+import {writeXml} from '../xmlEditor/StandAloneOXTED';
 
 interface IProps {
+  xmlCreationValues: XmlCreationValues;
   showStatusLevel: boolean;
   lines: LineParseResult[];
 }
 
-const exportLines = (lines: LineParseResult[]): string[] => lines.map(
-  ({nodes}) => nodes.map((node) => writeNode(node, tlhXmlEditorConfig.writeConfig)).join(' ')
-);
+const exportLines = (lines: LineParseResult[], xmlCreationValues: XmlCreationValues): string[] => {
+  const nodes = lines.map(({nodes}) => nodes).flat();
+
+  const converted = createCompleteDocument(nodes, xmlCreationValues);
+
+  return writeXml(converted).split('\n');
+
+//  return lines.map(({nodes}) => nodes.map((node) => writeNode(node, tlhXmlEditorConfig.writeConfig)).join(' '));
+};
 
 export function TransliterationParseResultDisplay({lines, showStatusLevel}: IProps): JSX.Element {
   return (
@@ -24,11 +31,11 @@ export function TransliterationParseResultDisplay({lines, showStatusLevel}: IPro
   );
 }
 
-export function ColumnParseResultComponent({lines, showStatusLevel}: IProps): JSX.Element {
+export function ColumnParseResultComponent({xmlCreationValues, lines, showStatusLevel}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
-  const exportedXmlLines = exportLines(lines);
+  const exportedXmlLines = exportLines(lines, xmlCreationValues);
 
   const onXmlExport = () => makeDownload(exportedXmlLines.join('\n'), 'exported.xml');
 
@@ -36,7 +43,7 @@ export function ColumnParseResultComponent({lines, showStatusLevel}: IProps): JS
     <BulmaTabs tabs={{
       rendered: {
         name: t('rendered'),
-        render: () => <TransliterationParseResultDisplay showStatusLevel={showStatusLevel} lines={lines}/>
+        render: () => <TransliterationParseResultDisplay xmlCreationValues={xmlCreationValues} showStatusLevel={showStatusLevel} lines={lines}/>
       },
       asXml: {
         name: t('xmlView'),

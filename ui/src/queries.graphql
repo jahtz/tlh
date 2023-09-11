@@ -64,10 +64,12 @@ fragment ManuscriptMetaData on ManuscriptMetaData {
   palaeographicClassificationSure
   provenance
   creatorUsername
+  creationDate
   status
   pictureUrls
   provisionalTransliteration
   transliterationReleased
+  transliterationReleaseDate
 }
 
 query Manuscript($mainIdentifier: String!) {
@@ -108,15 +110,16 @@ mutation DeletePicture($mainIdentifier: String!, $pictureName: String!) {
 
 fragment TransliterationInputData on ManuscriptMetaData {
   mainIdentifier {
-    ...ManuscriptIdentifier
+    identifierType
   }
   provisionalTransliteration
-  status
   creatorUsername
+  creationDate
 }
 
 query TransliterationInput($mainIdentifier: String!) {
   manuscript(mainIdentifier: $mainIdentifier) {
+    status
     ...TransliterationInputData
   }
 }
@@ -129,10 +132,20 @@ mutation uploadTransliteration($mainIdentifier: String!, $input: String!) {
 
 # /manuscripts/:id/reviewTransliteration
 
+fragment TransliterationReviewData on ManuscriptMetaData {
+  mainIdentifier {
+    mainIdentifierType: identifierType
+  }
+  initialInput: transliterationReviewData
+  author: creatorUsername
+  creationDate
+  transliterationReleaseDate
+}
+
 query ReviewTransliteration($mainIdentifier: String!) {
   manuscript(mainIdentifier: $mainIdentifier) {
     status
-    transliterationReviewData
+    ...TransliterationReviewData
   }
 }
 
@@ -144,17 +157,21 @@ mutation SubmitTransliterationReview($mainIdentifier: String!, $review: String!)
 
 # /manuscripts/:id/xmlConversion
 
+fragment XmlCreationData on ManuscriptMetaData {
+  mainIdentifier {
+    mainIdentifierType: identifierType
+  }
+  author: creatorUsername
+  creationDate
+  transliterationReleaseDate
+}
+
 # TODO: data for xml header...
 query XmlConversion($mainIdentifier: String!) {
   manuscript(mainIdentifier: $mainIdentifier) {
-    mainIdentifier {
-      mainIdentifierType: identifierType
-    }
-    author: creatorUsername
-    creationDate
+    ...XmlCreationData
     status
     xmlConversionData
-    transliterationReleaseDate
   }
 }
 

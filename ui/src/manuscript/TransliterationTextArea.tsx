@@ -3,14 +3,16 @@ import {JSX} from 'react';
 import {TLHParser} from 'simtex';
 import {ColumnParseResultComponent} from './ColumnParseResultComponent';
 import {convertLine} from './LineParseResult';
+import {XmlCreationValues} from './xmlConversion/createCompleteDocument';
 
 interface IProps {
+  xmlCreationValues: XmlCreationValues;
   input: string;
   onChange: (value: string) => void;
   disabled: boolean;
 }
 
-export function TransliterationTextArea({input, onChange, disabled}: IProps): JSX.Element {
+export function TransliterationTextArea({xmlCreationValues, input, onChange, disabled}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -30,7 +32,7 @@ export function TransliterationTextArea({input, onChange, disabled}: IProps): JS
         <label className="my-2 font-bold block text-center">{t('parseResult')}:</label>
 
         {parsed.length > 0
-          ? <ColumnParseResultComponent showStatusLevel={true} lines={parsed}/>
+          ? <ColumnParseResultComponent xmlCreationValues={xmlCreationValues} showStatusLevel={true} lines={parsed}/>
           : <div className="p-2 italic text-cyan-500 text-center">{t('no_result_yet')}...</div>}
       </section>
     </div>

@@ -15,6 +15,7 @@ import {TransliterationTextArea} from './TransliterationTextArea';
 import {WithQuery} from '../WithQuery';
 import {ErrorMessage, InfoMessage, SuccessMessage} from '../designElements/Messages';
 import {blueButtonClasses} from '../defaultDesign';
+import {XmlCreationValues} from './xmlConversion/createCompleteDocument';
 
 interface InnerProps {
   mainIdentifier: string;
@@ -32,9 +33,16 @@ const buttonClasses = (mainColor: string) => `px-4 py-2 rounded bg-${mainColor}-
 
 function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: InnerProps): ReactElement {
 
+  const {
+    mainIdentifier: {identifierType: mainIdentifierType},
+    creatorUsername: author,
+    creationDate,
+    provisionalTransliteration
+  } = manuscript;
+
   const {t} = useTranslation('common');
   const [{input, isSaved, isReleased}, setTransliteration] = useState<IState>({
-    input: manuscript.provisionalTransliteration || '',
+    input: provisionalTransliteration || '',
     isSaved: true,
     isReleased: initialIsReleased
   });
@@ -63,9 +71,11 @@ function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: I
     }
   };
 
+  const xmlCreationValues: XmlCreationValues = {mainIdentifierType, mainIdentifier, author, creationDate, transliterationReleaseDate: undefined};
+
   return (
     <>
-      <TransliterationTextArea input={input} onChange={updateTransliteration} disabled={isReleased}/>
+      <TransliterationTextArea xmlCreationValues={xmlCreationValues} input={input} onChange={updateTransliteration} disabled={isReleased}/>
 
       {uploadError && <ErrorMessage>{uploadError.message}</ErrorMessage>}
       {releaseError && <ErrorMessage>{releaseError.message}</ErrorMessage>}

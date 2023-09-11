@@ -14,6 +14,7 @@ import {getNameForManuscriptLanguageAbbreviation} from '../forms/manuscriptLangu
 import update from 'immutability-helper';
 import {WithQuery} from '../WithQuery';
 import {blueButtonClasses, greenButtonClasses} from '../defaultDesign';
+import {XmlCreationValues} from './xmlConversion/createCompleteDocument';
 
 interface IProps {
   initialManuscript: ManuscriptMetaDataFragment;
@@ -38,7 +39,14 @@ function Inner({initialManuscript}: IProps): ReactElement {
     ? new TLHParser(manuscript.provisionalTransliteration).getLines().map(convertLine)
     : undefined;
 
-  const mainIdentifier = manuscript.mainIdentifier.identifier;
+  const {
+    mainIdentifier: {identifier: mainIdentifier, identifierType: mainIdentifierType},
+    creatorUsername: author,
+    creationDate,
+    transliterationReleaseDate
+  } = manuscript;
+
+  const xmlCreationValues: XmlCreationValues = {mainIdentifier, author, creationDate, transliterationReleaseDate, mainIdentifierType};
 
   const onReleaseTransliteration = async (): Promise<void> => {
     if (manuscript.transliterationReleased) {
@@ -129,7 +137,7 @@ function Inner({initialManuscript}: IProps): ReactElement {
         {parsedTransliteration !== undefined
           ? (
             <div className="my-3">
-              <TransliterationParseResultDisplay showStatusLevel={false} lines={parsedTransliteration}/>
+              <TransliterationParseResultDisplay xmlCreationValues={xmlCreationValues} showStatusLevel={false} lines={parsedTransliteration}/>
             </div>
           )
           : <div className="my-4 p-2 italic text-cyan-500 text-center">{t('noTransliterationCreatedYet')}.</div>}
