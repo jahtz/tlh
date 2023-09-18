@@ -1,34 +1,39 @@
 import {ReactElement, useState} from 'react';
-import {writeNode, XmlElementNode} from 'simple_xml';
+import {Attributes, writeNode, XmlElementNode} from 'simple_xml';
 import update from 'immutability-helper';
 import {fetchMorphologicalAnalyses} from '../../../model/morphologicalAnalysis';
 import {tlhXmlEditorConfig} from '../../tlhXmlEditorConfig';
 import {NodeDisplay} from '../../NodeDisplay';
 import {useTranslation} from 'react-i18next';
+import {blueButtonClasses, whiteButtonClasses} from '../../../defaultDesign';
 
 interface IProps {
-  oldNode: XmlElementNode<'w'>;
+  oldAttributes: Attributes;
   initialParsedWord: XmlElementNode<'w'>;
   language: string;
   submitEdit: (node: XmlElementNode<'w'>) => void;
 }
 
-export function ParsedWord({oldNode, initialParsedWord: initialParsedWord, language, submitEdit}: IProps): ReactElement {
+export function ParsedWord({oldAttributes, initialParsedWord: initialParsedWord, language, submitEdit}: IProps): ReactElement {
 
   const {t} = useTranslation('common');
   const [parsedNode, setParsedNode] = useState(initialParsedWord);
 
-  const copyMorphologicalAnalyses = (): void => setParsedNode((state) => update(state, {attributes: {$set: oldNode.attributes}}));
+  const copyMorphologicalAnalyses = (): void => setParsedNode((state) => update(state, {attributes: {$set: oldAttributes}}));
 
-  const updateMorphologies = (): Promise<void> => fetchMorphologicalAnalyses(writeNode(parsedNode, tlhXmlEditorConfig.writeConfig).join(''), language)
-    .then((res) => {
+  const updateMorphologies = async (): Promise<void> => {
+    try {
+      const res = await fetchMorphologicalAnalyses(writeNode(parsedNode, tlhXmlEditorConfig.writeConfig).join(''), language);
+
       if (res) {
         setParsedNode((state) => update(state, {attributes: {$set: res}}));
       } else {
         alert('Could not find any morphological analyses...');
       }
-    })
-    .catch((err) => console.error(err));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <>
@@ -39,15 +44,17 @@ export function ParsedWord({oldNode, initialParsedWord: initialParsedWord, langu
       <div className="mt-2 p-2 rounded bg-white">{writeNode(parsedNode, tlhXmlEditorConfig.writeConfig).join('')}</div>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
-        <button type="button" className="p-2 rounded border border-slate-500 bg-white w-full" onClick={copyMorphologicalAnalyses}>
-          {t('copyMorphologicalAnalyses')}
-        </button>
-        <button type="button" className="p-2 rounded border border-slate-500 bg-white w-full" onClick={updateMorphologies}>
-          {t('fetchMorphologicalAnalyses')}
-        </button>
+        <div className="text-center">
+          <button type="button" className={whiteButtonClasses} onClick={copyMorphologicalAnalyses}>{t('copyMorphologicalAnalyses')}</button>
+        </div>
+        <div className="text-center">
+          <button type="button" className={whiteButtonClasses} onClick={updateMorphologies}>{t('fetchMorphologicalAnalyses')}</button>
+        </div>
       </div>
 
-      <button type="button" onClick={() => submitEdit(parsedNode)} className="mt-4 p-2 rounded bg-blue-600 text-white w-full">{t('submitEdit')}</button>
+      <div className="text-center">
+        <button type="button" className={blueButtonClasses} onClick={() => submitEdit(parsedNode)}>{t('submitEdit')}</button>
+      </div>
     </>
   );
 }

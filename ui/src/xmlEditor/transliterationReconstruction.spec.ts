@@ -1,4 +1,4 @@
-import {reconstructTransliterationForWordNode, TransliterationReconstruction} from './transliterationReconstruction';
+import {reconstructTransliterationForNodes, TransliterationReconstruction} from './transliterationReconstruction';
 import {XmlElementNode, xmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
 
 type Child = XmlElementNode | string;
@@ -154,7 +154,7 @@ describe('textReconstruction', () =>
   test.each<TestData>(testCases)(
     '$# should reconstruct $expected correctly',
     ({node, reconstruction}) => {
-      expect(reconstructTransliterationForWordNode(node as XmlElementNode<'w'>)).toEqual<TransliterationReconstruction>({reconstruction, warnings: []});
+      expect(reconstructTransliterationForNodes(node.children)).toEqual<TransliterationReconstruction>({reconstruction, warnings: []});
     }
   )
 );

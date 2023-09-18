@@ -33,7 +33,7 @@ export function ForgotPasswordForm(): ReactElement {
 
           <div className="my-4">
             <label htmlFor="mail" className="font-bold">{t('email')}:</label>
-            <Field type="email" name="mail" id="mail" placeholder={t('email')} required className={inputClasses(touched.mail, errors.mail)}/>
+            <Field type="email" name="mail" id="mail" placeholder={t('email')} required className={inputClasses(!!touched.mail, !!errors.mail)}/>
             <ErrorMessage name="mail">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
           </div>
 

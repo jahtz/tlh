@@ -16,7 +16,7 @@ import {FontSizeSelectorProps} from './FontSizeSelector';
 import {writeXml} from './StandAloneOXTED';
 import {fetchCuneiform} from './elementEditors/LineBreakEditor';
 import {getPriorSiblingPath} from '../nodeIterators';
-import {buttonClasses} from '../defaultDesign';
+import {coloredButtonClasses} from '../defaultDesign';
 
 export function buildActionSpec(innerAction: Spec<XmlNode>, path: number[]): Spec<XmlNode> {
   return path.reduceRight(
@@ -322,7 +322,7 @@ export function XmlDocumentEditor({
   }
 
   const makeOtherButton = ({color, onClick, title}: ButtonConfig): ReactElement => (
-    <button type="button" className={buttonClasses(color)} onClick={() => onClick(state.rootNode as XmlElementNode)}>{title}</button>
+    <button type="button" className={coloredButtonClasses(color)} onClick={() => onClick(state.rootNode as XmlElementNode)}>{title}</button>
   );
 
   const otherButton = otherButtonConfig

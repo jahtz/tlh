@@ -55,13 +55,13 @@ export function ResetPasswordForm(): ReactElement {
           <div className="my-4">
             <label htmlFor="newPassword" className="font-bold">{t('password')}</label>
             <Field type="password" id="newPassword" name="newPassword" placeholder={t('newPassword')} required autoFocus
-                   className={inputClasses(touched.newPassword, errors.newPassword)}/>
+                   className={inputClasses(!!touched.newPassword, !!errors.newPassword)}/>
           </div>
 
           <div className="my-4">
             <label htmlFor="newPasswordRepeat" className="font-bold">{t('passwordRepeat')}</label>
             <Field type="password" id="newPaswordRepeat" name="newPasswordRepeat" placeholder={t('repeatNewPassword')} required
-                   className={inputClasses(touched.newPasswordRepeat, errors.newPasswordRepeat)}/>
+                   className={inputClasses(!!touched.newPasswordRepeat, !!errors.newPasswordRepeat)}/>
           </div>
 
           {data?.resetPassword && <div className={greenMessageClasses}>{t('passwordSuccessfullyReset')}!</div>}

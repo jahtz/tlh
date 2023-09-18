@@ -38,39 +38,40 @@ export function RegisterForm(): ReactElement {
           <Form>
             <div className="mb-4">
               <label htmlFor="username" className="font-bold">{t('username')}:</label>
-              <Field name="username" id="username" placeholder={t('username')} required autoFocus className={inputClasses(touched.username, errors.username)}/>
+              <Field name="username" id="username" placeholder={t('username')} required autoFocus
+                     className={inputClasses(!!touched.username, !!errors.username)}/>
               <ErrorMessage name="username">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
             </div>
 
             <div className="mb-4">
               <label htmlFor="password" className="font-bold">{t('password')}:</label>
               <Field type="password" name="password" id="password" placeholder={t('password')} required
-                     className={inputClasses(touched.password, errors.password)}/>
+                     className={inputClasses(!!touched.password, !!errors.password)}/>
               <ErrorMessage name="password">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
             </div>
 
             <div className="mb-4">
               <label htmlFor="passwordRepeat" className="font-bold">{t('passwordRepeat')}:</label>
               <Field type="password" name="passwordRepeat" id="passwordRepeat" placeholder={t('passwordRepeat')} required
-                     className={inputClasses(touched.passwordRepeat, errors.passwordRepeat)}/>
+                     className={inputClasses(!!touched.passwordRepeat, !!errors.passwordRepeat)}/>
               <ErrorMessage name="passwordRepeat">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
             </div>
 
             <div className="mb-4">
               <label htmlFor="name" className="font-bold">{t('name')}:</label>
-              <Field name="name" id="name" placeholder={t('name')} required className={inputClasses(touched.name, errors.name)}/>
+              <Field name="name" id="name" placeholder={t('name')} required className={inputClasses(!!touched.name, !!errors.name)}/>
               <ErrorMessage name="name">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
             </div>
 
             <div className="mb-4">
               <label htmlFor="email" className="font-bold">{t('email')}:</label>
-              <Field type="email" name="email" placeholder={t('email')} required className={inputClasses(touched.email, errors.email)}/>
+              <Field type="email" name="email" placeholder={t('email')} required className={inputClasses(!!touched.email, !!errors.email)}/>
               <ErrorMessage name="email">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
             </div>
 
             <div className="mb-4">
               <label htmlFor="affiliation" className="font-bold">{t('affiliation')}:</label>
-              <Field name="affiliation" id="affiliation" placeholder={t('affiliation')} className={inputClasses(touched.affiliation, errors.affiliation)}/>
+              <Field name="affiliation" id="affiliation" placeholder={t('affiliation')} className={inputClasses(!!touched.affiliation, !!errors.affiliation)}/>
               <ErrorMessage name="affiliation">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
             </div>
 

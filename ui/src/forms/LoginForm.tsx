@@ -53,14 +53,14 @@ export function LoginForm(): JSX.Element {
           <div className="my-4">
             <label htmlFor="username" className="font-bold">{t('username')}:</label>
             <Field name="username" id="username" placeholder={t('username')} required autoFocus
-                   className={inputClasses(touched.username, errors.username)}/>
+                   className={inputClasses(!!touched.username, !!errors.username)}/>
             <ErrorMessage name="username">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
           </div>
 
           <div className="my-4">
             <label htmlFor="password" className="font-bold">{t('password')}</label>
             <Field type="password" name="password" id="password" placeholder={t('password')} required
-                   className={inputClasses(touched.password, errors.password)}/>
+                   className={inputClasses(!!touched.password, !!errors.password)}/>
             <ErrorMessage name="password">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
           </div>
 

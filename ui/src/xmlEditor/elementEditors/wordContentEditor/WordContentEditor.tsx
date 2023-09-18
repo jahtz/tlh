@@ -1,11 +1,13 @@
-import {JSX, useState} from 'react';
+import {ReactElement, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {XmlElementNode} from 'simple_xml';
-import classNames from 'classnames';
-import {reconstructTransliterationForWordNode} from '../../transliterationReconstruction';
+import {isXmlElementNode, XmlElementNode, XmlNode} from 'simple_xml';
 import {ParagraphLanguageType, StatusLevel, Word} from 'simtex';
-import {IResult, NewAbstractResult, NewNewError, NewNewOk} from '../../../newResult';
+import {myError, myOk, MyResult} from '../../../newResult';
+import {WordWithLbContentEditor} from './WordWithLbContentEditor';
+import {WordWithoutLbContentEditor} from './WordWithoutLbContentEditor';
+import classNames from 'classnames';
 import {ParsedWord} from './ParsedWord';
+import {amberButtonClasses} from '../../../defaultDesign';
 
 interface IProps {
   oldNode: XmlElementNode<'w'>;
@@ -15,80 +17,77 @@ interface IProps {
 }
 
 const convertLangauge = (language: string): ParagraphLanguageType | null => {
-  switch (language) {
-    case 'Akk' :
-      return ParagraphLanguageType.Akk;
-    case 'Sum' :
-      return ParagraphLanguageType.Sum;
-    case 'Luw':
-      return ParagraphLanguageType.Luw;
-    case 'Pal':
-      return ParagraphLanguageType.Pal;
-    case 'Hur':
-      return ParagraphLanguageType.Hur;
-    case 'Hat':
-      return ParagraphLanguageType.Hat;
-    case 'Hit' :
-      return ParagraphLanguageType.Hit;
-    default:
-      return null;
-  }
+  return {
+    'Akk': ParagraphLanguageType.Akk,
+    'Sum': ParagraphLanguageType.Sum,
+    'Luw': ParagraphLanguageType.Luw,
+    'Pal': ParagraphLanguageType.Pal,
+    'Hur': ParagraphLanguageType.Hur,
+    'Hat': ParagraphLanguageType.Hat,
+    'Hit': ParagraphLanguageType.Hit
+  }[language] || null;
 };
 
-type State = IResult<XmlElementNode<'w'>, string[]>;
+export type WordContentEditState = MyResult<XmlElementNode<'w'>, string[]>;
 
-function readTransliteration(transliteration: string, language: string): NewAbstractResult<XmlElementNode<'w'>, string[]> {
+export function readTransliteration(transliteration: string, language: string): WordContentEditState {
   const word = Word.parseWord(convertLangauge(language), transliteration);
 
-  if (word instanceof Word) {
-    return word.getStatus().getLevel() === StatusLevel.ok
-      ? new NewNewOk(word.exportXml() as XmlElementNode<'w'>)
-      : new NewNewError(word.getStatus().getEvents().map((event) => event.getMessage()));
+  if (!(word instanceof Word)) {
+    return myError([]);
+  }
+
+  return word.getStatus().getLevel() === StatusLevel.ok
+    ? myOk(word.exportXml() as XmlElementNode<'w'>)
+    : myError(word.getStatus().getEvents().map((event) => event.getMessage()));
+}
+
+type SplitAtLbResult = { preLbContent: XmlNode[], lbNode: XmlElementNode, postLbContent: XmlNode[] };
+
+function splitAtLbTag(children: XmlNode[]): SplitAtLbResult | undefined {
+  const lbTagIndex = children.findIndex((node) => isXmlElementNode(node) && node.tagName === 'lb');
+
+  if (lbTagIndex === -1) {
+    return undefined;
   } else {
-    return new NewNewError([]);
+    return {
+      preLbContent: children.slice(0, lbTagIndex),
+      lbNode: children[lbTagIndex] as XmlElementNode,
+      postLbContent: children.slice(lbTagIndex + 1, children.length)
+    };
   }
 }
 
-export function WordContentEditor({oldNode, language, cancelEdit, updateNode}: IProps): JSX.Element {
+export function WordContentEditor({oldNode, language, cancelEdit, updateNode}: IProps): ReactElement {
 
   const {t} = useTranslation('common');
 
-  const {
-    reconstruction: initialTransliteration,
-    warnings: transliterationReconstructionWarnings
-  } = reconstructTransliterationForWordNode(oldNode as XmlElementNode<'w'>);
+  const maybeSplit = splitAtLbTag(oldNode.children);
 
-  const [state, setState] = useState<State>(
-    readTransliteration(initialTransliteration, language).toInterface()
+  const [state, setState] = useState<WordContentEditState | undefined>(
+    // FIXME: initial state!
+    // maybeSplit ? undefined : undefined
   );
 
   return (
     <div>
-      {transliterationReconstructionWarnings.length > 0 && <div className="my-4 p-2 rounded bg-red-600 text-white text-center">
-        <p className="font-bold">{t('errorWhileTransliterationReconstruction')}:</p>
-        <pre>{transliterationReconstructionWarnings}</pre>
-      </div>}
+      {maybeSplit
+        ? <WordWithLbContentEditor {...maybeSplit} language={language} onNewParseResult={setState}/>
+        : <WordWithoutLbContentEditor childNodes={oldNode.children} language={language} onNewParseResult={setState}/>}
 
-      <div className="flex">
-        <label htmlFor="newTransliteration" className="p-2 rounded-l border-l border-y border-slate-500 font-bold">
-          {t('newTransliteration')} ({t('language')}: {language}):
-        </label>
-
-        <input defaultValue={initialTransliteration} className="flex-grow rounded-r border border-slate-500 p-2"
-               id="newTransliteration" placeholder={t('newTransliteration') || 'newTransliteration'}
-               onChange={(event) => setState(readTransliteration(event.target.value, language).toInterface())}/>
-      </div>
-
-      <div className="mt-4 rounded-t">
-        <div className={classNames('p-2', 'rounded-t', state.status ? 'bg-green-500' : 'bg-red-600', 'text-white', 'font-bold')}>{t('result')}</div>
+      {state && <div className="mt-4 rounded-t">
+        <div className={classNames('p-2 rounded-t text-white font-bold', state.status ? 'bg-green-500' : 'bg-red-600')}>{t('result')}</div>
         <div className={classNames('p-4', state.status ? 'bg-green-50' : 'bg-red-200')}>
           {state.status
-            ? <ParsedWord key={JSON.stringify(state.value)} oldNode={oldNode} initialParsedWord={state.value} language={language} submitEdit={updateNode}/>
+            ? <ParsedWord key={JSON.stringify(state.value)} oldAttributes={oldNode.attributes} initialParsedWord={state.value} language={language}
+                          submitEdit={updateNode}/>
             : <pre>{JSON.stringify(state, null, 2)}</pre>}
         </div>
-      </div>
+      </div>}
 
-      <button type="button" onClick={cancelEdit} className="mt-4 p-2 rounded bg-amber-400 w-full">{t('cancelEdit')}</button>
+      <div className="text-center">
+        <button type="button" onClick={cancelEdit} className={amberButtonClasses}>{t('cancelEdit')}</button>
+      </div>
     </div>
   );
 }

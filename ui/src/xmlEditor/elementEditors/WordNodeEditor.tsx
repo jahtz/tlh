@@ -143,9 +143,13 @@ export function WordNodeEditor({node, path, updateEditedNode, setKeyHandlingEnab
   const onCancel = () => setState('DefaultState');
 
   if (state === 'EditContent') {
-    const language = node.attributes.lg || lineBreakLanguage || textLanguage || 'Hit';
-
-    return <WordContentEditor oldNode={node} language={language} cancelEdit={cancelEdit} updateNode={handleEditUpdate}/>;
+    return (
+      <WordContentEditor
+        oldNode={node}
+        language={node.attributes.lg || lineBreakLanguage || textLanguage || 'Hit'}
+        cancelEdit={cancelEdit}
+        updateNode={handleEditUpdate}/>
+    );
   }
 
   return (

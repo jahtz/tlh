@@ -23,9 +23,7 @@ function mapReconstruction({reconstruction, warnings}: TransliterationReconstruc
   return {reconstruction: f(reconstruction), warnings};
 }
 
-export const reconstructTransliterationForWordNode = ({children}: XmlElementNode<'w'>): TransliterationReconstruction => convertChildren(children);
-
-const convertChildren = (children: XmlNode[]): TransliterationReconstruction => children
+export const reconstructTransliterationForNodes = (children: XmlNode[]): TransliterationReconstruction => children
   .map((node) => reconstructTransliterationFromNode(node))
   .reduce(joinReconstructions, emptyTransliterationReconstruction);
 
@@ -37,8 +35,6 @@ const reconstructTransliterationFromNode = (node: XmlNode): TransliterationRecon
 
 function reconstructTransliterationFromElementNode(node: XmlElementNode): TransliterationReconstruction {
   switch (node.tagName) {
-    case 'lb':
-      return recon('\n');
     case 'add_in':
       return recon('〈');
     case 'add_fin':
@@ -71,13 +67,13 @@ function reconstructTransliterationFromElementNode(node: XmlElementNode): Transl
     case 'surpl':
       return recon(`〈〈${node.attributes.c}〉〉`);
     case 'num':
-      return convertChildren(node.children);
+      return reconstructTransliterationForNodes(node.children);
     case 'sGr':
-      return convertChildren(node.children);
+      return reconstructTransliterationForNodes(node.children);
     case 'aGr':
-      return mapReconstruction(convertChildren(node.children), (innerContent) => innerContent.startsWith('-') || innerContent.startsWith('+') ? innerContent : '_' + innerContent);
+      return mapReconstruction(reconstructTransliterationForNodes(node.children), (innerContent) => innerContent.startsWith('-') || innerContent.startsWith('+') ? innerContent : '_' + innerContent);
     case 'd':
-      return mapReconstruction(convertChildren(node.children), (innerContent) => `°${innerContent}°`);
+      return mapReconstruction(reconstructTransliterationForNodes(node.children), (innerContent) => `°${innerContent}°`);
     default:
       return {reconstruction: '_?_', warnings: [(`tagName ${node.tagName} is not yet supported!`)]};
   }
