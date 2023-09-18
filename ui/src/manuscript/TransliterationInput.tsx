@@ -14,7 +14,7 @@ import update from 'immutability-helper';
 import {TransliterationTextArea} from './TransliterationTextArea';
 import {WithQuery} from '../WithQuery';
 import {ErrorMessage, InfoMessage, SuccessMessage} from '../designElements/Messages';
-import {blueButtonClasses} from '../defaultDesign';
+import {amberButtonClasses, blueButtonClasses} from '../defaultDesign';
 import {XmlCreationValues} from './xmlConversion/createCompleteDocument';
 
 interface InnerProps {
@@ -28,8 +28,6 @@ interface IState {
   isSaved: boolean;
   isReleased: boolean;
 }
-
-const buttonClasses = (mainColor: string) => `px-4 py-2 rounded bg-${mainColor}-500 text-white drop-shadow-xl disabled:opacity-50`;
 
 function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: InnerProps): ReactElement {
 
@@ -75,7 +73,7 @@ function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: I
 
   return (
     <>
-      <TransliterationTextArea xmlCreationValues={xmlCreationValues} input={input} onChange={updateTransliteration} disabled={isReleased}/>
+      <TransliterationTextArea xmlCreationValues={xmlCreationValues} initialInput={input} onChange={updateTransliteration} disabled={isReleased}/>
 
       {uploadError && <ErrorMessage>{uploadError.message}</ErrorMessage>}
       {releaseError && <ErrorMessage>{releaseError.message}</ErrorMessage>}
@@ -100,7 +98,7 @@ function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: I
       </div>
 
       <div className="my-4 p-4 text-center">
-        <button type="button" className={buttonClasses('amber')} onClick={onReleaseTransliteration}
+        <button type="button" className={amberButtonClasses} onClick={onReleaseTransliteration}
                 disabled={uploadLoading || releaseLoading || !isSaved || isReleased}>
           {t('releaseTransliteration')}
         </button>

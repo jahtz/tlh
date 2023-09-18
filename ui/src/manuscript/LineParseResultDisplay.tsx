@@ -27,7 +27,7 @@ export function LineParseResultDisplay({showStatusLevel, line: {statusLevel, eve
 
   return (
     <div>
-      {showStatusLevel && <span className="text-gray-500">({displayStatusLevel(statusLevel)})</span>}
+      {showStatusLevel && <span>({displayStatusLevel(statusLevel)})</span>}
 
       &nbsp;{nodes.map((node, index) => <NodeDisplay key={index} node={node} isLeftSide={false}/>)}
 

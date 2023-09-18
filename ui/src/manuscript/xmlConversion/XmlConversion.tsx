@@ -7,21 +7,20 @@ import {useTranslation} from 'react-i18next';
 import {TransliterationCheck} from './TransliterationCheck';
 import {XmlCheck} from './XmlCheck';
 import {SuccessMessage} from '../../designElements/Messages';
-import {isXmlElementNode, XmlNode} from 'simple_xml';
-import {createCompleteDocument, XmlCreationValues} from './createCompleteDocument';
-import {writeXml} from '../../xmlEditor/StandAloneOXTED';
+import {XmlCreationValues} from './createCompleteDocument';
+import {TLHParser} from 'simtex';
+import {exportXmlFromParser} from '../exportFromParser';
 
 interface IProps extends XmlCreationValues {
   initialInput: string;
   initialIsConverted: boolean;
 }
 
-type IState = { _type: 'TransliterationCheck'; } | { _type: 'XmlCheck'; content: string; } | { _type: 'AnnotatedXmlCheck'; content: string; };
+type IState = { _type: 'TransliterationCheck'; }
+  | { _type: 'XmlCheck'; content: string; }
+  | { _type: 'AnnotatedXmlCheck'; content: string; };
 
-const headers = {'Content-Type': 'application/xml*'};
-
-// TODO: add other nodes to filter out...
-const tagNamesToFilter = ['LINE_PREFIX', 'PARSER_ERROR', 'PUBLICATION_NUMBER', 'INVENTORY_NUMBER', 'IDENTIFIER', 'UNDEFINED_DEGREE_SIGN', 'LANGUAGE_CHANGE', 'GAP', 'DELIMITER', 'BASIC', 'METADATA'];
+const headers: HeadersInit = {'Content-Type': 'application/xml*'};
 
 function Inner({mainIdentifier, mainIdentifierType, author, creationDate, transliterationReleaseDate, initialInput, initialIsConverted}: IProps): ReactElement {
 
@@ -31,31 +30,23 @@ function Inner({mainIdentifier, mainIdentifierType, author, creationDate, transl
 
   const converted = initialIsConverted || !!data?.reviewerMutations?.submitXmlConversion;
 
-  const onSubmit = async (conversion: string) => {
-    if (state._type === 'XmlCheck') {
-      const response = await fetch(tlhDocumentAnalyzerUrl, {method: 'POST', body: conversion, headers});
-      const content = await response.text();
-      setState({_type: 'AnnotatedXmlCheck', content});
-    } else if (state._type === 'AnnotatedXmlCheck') {
-      try {
+  const onSubmit = async (conversion: string): Promise<void> => {
+    try {
+      if (state._type === 'XmlCheck') {
+        const response = await fetch(tlhDocumentAnalyzerUrl, {method: 'POST', body: conversion, headers});
+        const content = await response.text();
+        setState({_type: 'AnnotatedXmlCheck', content});
+      } else if (state._type === 'AnnotatedXmlCheck') {
         await submitXmlConversion({variables: {mainIdentifier, conversion}});
-      } catch (exception) {
-        console.error(exception);
       }
+    } catch (exception) {
+      console.error(exception);
     }
   };
 
   const xmlCreationValues = {mainIdentifier, mainIdentifierType, author, creationDate, transliterationReleaseDate};
 
-  const onConvert = (children: XmlNode[]): void => {
-
-    // filter out "illegal nodes", like <LINE_PREFIX/>
-    const filteredNodes = children.filter((node) => !isXmlElementNode(node) || !tagNamesToFilter.includes(node.tagName));
-
-    const content = createCompleteDocument(filteredNodes, xmlCreationValues);
-
-    setState({_type: 'XmlCheck', content: writeXml(content)});
-  };
+  const onConvert = (input: string): void => setState({_type: 'XmlCheck', content: exportXmlFromParser(new TLHParser(input), xmlCreationValues)});
 
   return converted
     ? (

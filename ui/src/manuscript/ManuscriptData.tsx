@@ -9,12 +9,11 @@ import {PicturesBlock} from './PicturesBlock';
 import {createTransliterationUrl, homeUrl, managePicturesUrl} from '../urls';
 import {TLHParser} from 'simtex';
 import {convertLine} from './LineParseResult';
-import {TransliterationParseResultDisplay} from './ColumnParseResultComponent';
+import {TransliterationParseResultDisplay} from './ParseResultComponent';
 import {getNameForManuscriptLanguageAbbreviation} from '../forms/manuscriptLanguageAbbreviations';
 import update from 'immutability-helper';
 import {WithQuery} from '../WithQuery';
 import {blueButtonClasses, greenButtonClasses} from '../defaultDesign';
-import {XmlCreationValues} from './xmlConversion/createCompleteDocument';
 
 interface IProps {
   initialManuscript: ManuscriptMetaDataFragment;
@@ -25,7 +24,6 @@ function Inner({initialManuscript}: IProps): ReactElement {
   const {t} = useTranslation('common');
   const activeUser: User | null = useSelector(activeUserSelector);
   const [releaseTransliteration] = useReleaseTransliterationMutation();
-
   const [manuscript, setManuscript] = useState(initialManuscript);
 
   if (!manuscript) {
@@ -39,14 +37,7 @@ function Inner({initialManuscript}: IProps): ReactElement {
     ? new TLHParser(manuscript.provisionalTransliteration).getLines().map(convertLine)
     : undefined;
 
-  const {
-    mainIdentifier: {identifier: mainIdentifier, identifierType: mainIdentifierType},
-    creatorUsername: author,
-    creationDate,
-    transliterationReleaseDate
-  } = manuscript;
-
-  const xmlCreationValues: XmlCreationValues = {mainIdentifier, author, creationDate, transliterationReleaseDate, mainIdentifierType};
+  const mainIdentifier = manuscript.mainIdentifier.identifierType;
 
   const onReleaseTransliteration = async (): Promise<void> => {
     if (manuscript.transliterationReleased) {
@@ -137,7 +128,7 @@ function Inner({initialManuscript}: IProps): ReactElement {
         {parsedTransliteration !== undefined
           ? (
             <div className="my-3">
-              <TransliterationParseResultDisplay xmlCreationValues={xmlCreationValues} showStatusLevel={false} lines={parsedTransliteration}/>
+              <TransliterationParseResultDisplay showStatusLevel={false} lines={parsedTransliteration}/>
             </div>
           )
           : <div className="my-4 p-2 italic text-cyan-500 text-center">{t('noTransliterationCreatedYet')}.</div>}

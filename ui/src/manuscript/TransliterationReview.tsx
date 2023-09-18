@@ -30,7 +30,7 @@ function Inner({mainIdentifier, manuscript}: IProps): ReactElement {
 
   return (
     <>
-      <TransliterationTextArea input={input} xmlCreationValues={xmlCreationValues} onChange={setInput} disabled={reviewed}/>
+      <TransliterationTextArea initialInput={input} xmlCreationValues={xmlCreationValues} onChange={setInput} disabled={reviewed}/>
 
       {error && <div className="my-2 p-2 rounded bg-red-500 text-white text-center w-full">{error.message}</div>}
 
