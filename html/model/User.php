@@ -45,6 +45,11 @@ class User
     return $this->rights === 'ExecutiveEditor';
   }
 
+  private static function fromDbAssocRow(array $row): User
+  {
+    return new User($row['username'], $row['pw_hash'], $row['name'], $row['affiliation'], $row['email'], $row['rights']);
+  }
+
   // GraphQL
 
   /** @throws MySafeGraphQLException */
@@ -71,9 +76,27 @@ class User
   static function selectUserFromDatabase(string $username): ?User
   {
     return SqlHelpers::executeSingleReturnRowQuery(
-      "select username, pw_hash, name, affiliation, email, rights from tlh_dig_users where username = ?;",
+      "select * from tlh_dig_users where username = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $username),
-      fn(array $row): User => new User($row['username'], $row['pw_hash'], $row['name'], $row['affiliation'], $row['email'], $row['rights'])
+      fn(array $row): User => User::fromDbAssocRow($row)
+    );
+  }
+
+  static function selectUserByMail(string $mail): ?User
+  {
+    return SqlHelpers::executeSingleReturnRowQuery(
+      "select * from tlh_dig_users where email = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $mail),
+      fn(array $row): User => User::fromDbAssocRow($row)
+    );
+  }
+
+  static function selectUserByPwRecoveryUuid(string $uuid): ?User
+  {
+    return SqlHelpers::executeSingleReturnRowQuery(
+      "select * from tlh_dig_users where pw_recovery_key = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $uuid),
+      fn(array $row): User => User::fromDbAssocRow($row)
     );
   }
 
@@ -84,7 +107,7 @@ class User
     $first = $page * $pageSize;
 
     return SqlHelpers::executeMultiSelectQuery(
-      "select username, pw_hash, name, affiliation, email, rights from tlh_dig_users order by username limit ?, ?;",
+      "select * from tlh_dig_users order by username limit ?, ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ii', $first, $pageSize),
       fn(array $row): User => new User($row['username'], $row['pw_hash'], $row['name'], $row['affiliation'], $row['email'], $row['rights'])
     );
@@ -106,6 +129,24 @@ class User
     return SqlHelpers::executeSingleChangeQuery(
       "insert into tlh_dig_users (username, pw_hash, name, affiliation, email) values (?, ?, ?, ?, ?);",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('sssss', $this->username, $this->pwHash, $this->name, $this->affiliation, $this->email)
+    );
+  }
+
+  /** @throws Exception */
+  function upsertPasswortRecoveryToken(?string $token): bool
+  {
+    return SqlHelpers::executeSingleChangeQuery(
+      "update tlh_dig_users set pw_recovery_key = ? where username = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $token, $this->username)
+    );
+  }
+
+  /** @throws Exception */
+  function updatePasswordHashAfterRecovery(string $newPwHash): bool
+  {
+    return SqlHelpers::executeSingleChangeQuery(
+      "update tlh_dig_users set pw_hash = ?, pw_recovery_key = null where username = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('ss', $newPwHash, $this->username)
     );
   }
 }

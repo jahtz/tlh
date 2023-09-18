@@ -7,15 +7,17 @@ import {
   createTransliterationUrl,
   documentMergerUrl,
   firstXmlReviewUrl,
+  forgotPasswordUrl,
   homeUrl,
   loginUrl,
+  managePicturesUrl,
   oxtedUrl,
   pipelineManagementUrl,
   preferencesUrl,
   registerUrl,
+  resetPasswordUrl,
   secondXmlReviewUrl,
   transliterationReviewUrl,
-  managePicturesUrl,
   userManagementUrl,
   xmlComparatorUrl,
   xmlConversionUrl
@@ -41,6 +43,8 @@ import {XmlConversion} from './manuscript/xmlConversion/XmlConversion';
 import {PipelineOverview} from './pipeline/PipelineOverview';
 import {XmlReview} from './manuscript/review/XmlReview';
 import {DocumentApproval} from './manuscript/DocumentApproval';
+import {ForgotPasswordForm} from './forms/ForgotPasswordForm';
+import {ResetPasswordForm} from './forms/ResetPasswordForm';
 
 export const router = createBrowserRouter([
     {
@@ -51,6 +55,8 @@ export const router = createBrowserRouter([
 
         {path: registerUrl, element: <RegisterForm/>},
         {path: loginUrl, element: <LoginForm/>},
+        {path: forgotPasswordUrl, element: <ForgotPasswordForm/>},
+        {path: resetPasswordUrl, element: <ResetPasswordForm/>},
         {path: userManagementUrl, element: <RequireAuth minRights={Rights.ExecutiveEditor}>{() => <UserManagement/>}</RequireAuth>},
 
         {path: createManuscriptUrl, element: <RequireAuth>{() => <CreateManuscriptForm/>}</RequireAuth>},

@@ -2,8 +2,8 @@ import {JSX, useState} from 'react';
 import {LoginMutationVariables, useLoginMutation} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
-import {homeUrl} from '../urls';
-import {Navigate} from 'react-router-dom';
+import {homeUrl, forgotPasswordUrl} from '../urls';
+import {Link, Navigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {activeUserSelector, login} from '../newStore';
 import {object as yupObject, Schema, string as yupString} from 'yup';
@@ -35,25 +35,25 @@ export function LoginForm(): JSX.Element {
     return <Navigate to={homeUrl}/>;
   }
 
-  function handleSubmit(values: LoginMutationVariables): void {
-    loginMutation({variables: values})
-      .then(({data}) => {
-        if (data && data.login) {
-          setInvalidLoginTry(false);
-          dispatch(login(data.login));
-        } else {
-          setInvalidLoginTry(true);
-        }
-      })
-      .catch((e) => {
+  async function handleSubmit(values: LoginMutationVariables): Promise<void> {
+    try {
+      const {data} = await loginMutation({variables: values});
+
+      if (data?.login) {
         setInvalidLoginTry(false);
-        console.error(e);
-      });
+        dispatch(login(data.login));
+      } else {
+        setInvalidLoginTry(true);
+      }
+    } catch (e) {
+      setInvalidLoginTry(false);
+      console.error(e);
+    }
   }
 
   return (
     <div className="container mx-auto">
-      <h1 className="font-bold text-2xl text-center mb-4">{t('login')}</h1>
+      <h1 className="font-bold text-2xl text-center">{t('login')}</h1>
 
       <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
         {({touched, errors}) => <Form>
@@ -72,13 +72,17 @@ export function LoginForm(): JSX.Element {
                      touched.password ? (errors.password ? borderColors.error : borderColors.success) : borderColors.default)}/>
           </div>
 
+          <div className="my-4 text-center">
+            <Link to={forgotPasswordUrl} className="p-2 rounded border border-slate-500">{t('forgotPassword')}?</Link>
+          </div>
+
           {invalidLoginTry && <div className="p-4 rounded border border-red-600 bg-red-500 text-white text-center">
             {t('invalidUsernamePasswordCombination')}.
           </div>}
 
           {error && <div className="p-4 rounded border border-red-600 bg-red-500 text-white text-center">{error.message}</div>}
 
-          <button type="submit" disabled={loading} className="mt-4 p-2 rounded border w-full bg-blue-500 text-white">
+          <button type="submit" disabled={loading} className="my-4 p-2 rounded border w-full bg-blue-500 text-white">
             {t('login')}
           </button>
         </Form>}

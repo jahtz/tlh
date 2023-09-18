@@ -34,3 +34,13 @@ mutation UpdateUserRights($username: String!, $newRights: Rights!) {
     updateUserRights(username: $username, newRights: $newRights)
   }
 }
+
+# /forgotPassword
+
+mutation ForgotPassword($mail:String!) {
+  forgotPassword(mail: $mail)
+}
+
+mutation ResetPassword($uuid: String!, $newPassword: String!, $newPasswordRepeat: String!) {
+  resetPassword(uuid: $uuid, newPassword: $newPassword, newPasswordRepeat: $newPasswordRepeat)
+}

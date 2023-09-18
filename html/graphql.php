@@ -3,6 +3,7 @@
 require_once __DIR__ . '/cors.php';
 require_once __DIR__ . '/jwt_helpers.php';
 require_once __DIR__ . '/MySafeGraphQLException.php';
+require_once __DIR__ . '/mailer.php';
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -19,6 +20,7 @@ use GraphQL\GraphQL;
 use GraphQL\Type\{Schema, SchemaConfig};
 use GraphQL\Type\Definition\{ObjectType, Type};
 use model\{ExecutiveEditor, Manuscript, ManuscriptInput, Reviewer, RootQuery, User};
+use Ramsey\Uuid\Uuid;
 use function jwt_helpers\{createJsonWebToken, extractJsonWebToken};
 
 /** @throws MySafeGraphQLException */
@@ -56,6 +58,70 @@ function resolveUser(): ?User
   return User::selectUserFromDatabase($username);
 }
 
+/** @throws MySafeGraphQLException */
+function resolveForgotPassword(string $mail): ?string
+{
+  // check if mail exists...
+  $maybeUser = User::selectUserByMail($mail);
+
+  if (is_null($maybeUser)) {
+    return null;
+  }
+
+  // Save pw recovery code...
+
+  $uuid = Uuid::uuid4()->toString();
+
+  try {
+    $maybeUser->upsertPasswortRecoveryToken($uuid);
+  } catch (Exception $exception) {
+    error_log($exception);
+    throw new MySafeGraphQLException("Internal error...");
+  }
+
+  $serverUrl = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://{$_SERVER['HTTP_HOST']}";
+
+  error_log($serverUrl);
+
+  // generate mail with url...
+  $url = "$serverUrl/tlh_editor/public/resetPassword?uuid=$uuid";
+
+  $mailSent = sendSingleMail(
+    $maybeUser->email,
+    "Password reset",
+    "Click on this link $url to reset your password!"
+  );
+
+  if (!$mailSent) {
+    error_log("URL: $url");
+  }
+
+  return $mail;
+}
+
+/** @throws MySafeGraphQLException */
+function resolveResetPassword(string $uuid, string $newPassword, string $newPasswordRepeat): ?string
+{
+  if ($newPassword !== $newPasswordRepeat) {
+    throw new MySafeGraphQLException("Passwords don't match!");
+  }
+
+  $maybeUser = User::selectUserByPwRecoveryUuid($uuid);
+
+  if (is_null($maybeUser)) {
+    return null;
+  }
+
+  try {
+    $maybeUser->updatePasswordHashAfterRecovery(password_hash($newPassword, PASSWORD_DEFAULT));
+
+    return "Password successfully reset!";
+  } catch (Exception $exception) {
+    error_log($exception);
+    return null;
+  }
+}
+
 $mutationType = new ObjectType([
   'name' => 'Mutation',
   'fields' => [
@@ -73,6 +139,22 @@ $mutationType = new ObjectType([
       ],
       'type' => Type::string(),
       'resolve' => fn(?int $_rootValue, array $args) => resolveLogin($args['username'], $args['password'])
+    ],
+    'forgotPassword' => [
+      'args' => [
+        'mail' => Type::nonNull(Type::string())
+      ],
+      'type' => Type::string(),
+      'resolve' => fn(?int $_rootValue, array $args) => resolveForgotPassword($args['mail'])
+    ],
+    'resetPassword' => [
+      'args' => [
+        'uuid' => Type::nonNull(Type::string()),
+        'newPassword' => Type::nonNull(Type::string()),
+        'newPasswordRepeat' => Type::nonNull(Type::string())
+      ],
+      'type' => Type::string(),
+      'resolve' => fn(?int $_rootValue, array $args) => resolveResetPassword($args['uuid'], $args['newPassword'], $args['newPasswordRepeat'])
     ],
     'createManuscript' => [
       'type' => Type::nonNull(Type::string()),

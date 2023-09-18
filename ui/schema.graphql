@@ -122,9 +122,11 @@ enum ManuscriptStatus {
 type Mutation {
   createManuscript(values: ManuscriptMetaDataInput): String!
   executiveEditor: ExecutiveEditorMutations
+  forgotPassword(mail: String!): String
   login(password: String!, username: String!): String
   manuscript(mainIdentifier: String!): ManuscriptMutations
   register(userInput: UserInput!): String
+  resetPassword(newPassword: String!, newPasswordRepeat: String!, uuid: String!): String
   reviewerMutations: ReviewerMutations
 }
 

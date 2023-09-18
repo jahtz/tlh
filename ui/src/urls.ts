@@ -18,6 +18,8 @@ export const createManuscriptUrl = '/createManuscript';
 
 export const registerUrl = '/registerForm';
 export const loginUrl = '/login';
+export const forgotPasswordUrl = '/forgotPassword';
+export const resetPasswordUrl = '/resetPassword';
 
 export const preferencesUrl = '/preferences';
 
