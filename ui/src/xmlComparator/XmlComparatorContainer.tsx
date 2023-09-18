@@ -2,7 +2,7 @@ import {JSX, useState} from 'react';
 import {FileLoader} from '../forms/FileLoader';
 import {useTranslation} from 'react-i18next';
 import {allXmlComparatorConfig, emptyXmlComparatorConfig, XmlComparatorConfig} from './xmlComparatorConfig';
-import {ObjectSelect, SelectOption} from '../forms/BulmaFields';
+import {ObjectSelect, SelectOption} from '../forms/ObjectSelect';
 import classNames from 'classnames';
 import {XmlComparator} from './XmlComparator';
 import update from 'immutability-helper';

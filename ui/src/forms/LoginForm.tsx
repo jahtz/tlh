@@ -1,19 +1,13 @@
 import {JSX, useState} from 'react';
 import {LoginMutationVariables, useLoginMutation} from '../graphql';
 import {useTranslation} from 'react-i18next';
-import {Field, Form, Formik} from 'formik';
-import {homeUrl, forgotPasswordUrl} from '../urls';
+import {ErrorMessage, Field, Form, Formik} from 'formik';
+import {forgotPasswordUrl, homeUrl} from '../urls';
 import {Link, Navigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {activeUserSelector, login} from '../newStore';
 import {object as yupObject, Schema, string as yupString} from 'yup';
-import classNames from 'classnames';
-
-export const borderColors = {
-  error: 'border-red-500',
-  success: 'border-green-500',
-  default: 'border-slate-500'
-};
+import {amberButtonClasses, blueButtonClasses, explTextClasses, inputClasses, redMessageClasses} from '../defaultDesign';
 
 const initialValues: LoginMutationVariables = {username: '', password: ''};
 
@@ -22,7 +16,6 @@ const validationSchema: Schema<LoginMutationVariables> = yupObject({
   password: yupString().min(4).max(50).required()
 }).required();
 
-
 export function LoginForm(): JSX.Element {
 
   const {t} = useTranslation('common');
@@ -30,8 +23,7 @@ export function LoginForm(): JSX.Element {
   const [invalidLoginTry, setInvalidLoginTry] = useState(false);
   const [loginMutation, {loading, error}] = useLoginMutation();
 
-  if (useSelector(activeUserSelector)) {
-    // User is already logged in
+  if (useSelector(activeUserSelector)) { // User is already logged in
     return <Navigate to={homeUrl}/>;
   }
 
@@ -61,30 +53,27 @@ export function LoginForm(): JSX.Element {
           <div className="my-4">
             <label htmlFor="username" className="font-bold">{t('username')}:</label>
             <Field name="username" id="username" placeholder={t('username')} required autoFocus
-                   className={classNames('mt-2', 'p-2', 'rounded', 'border', 'w-full',
-                     touched.username ? (errors.username ? borderColors.error : borderColors.success) : borderColors.default)}/>
+                   className={inputClasses(touched.username, errors.username)}/>
+            <ErrorMessage name="username">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
           </div>
 
           <div className="my-4">
             <label htmlFor="password" className="font-bold">{t('password')}</label>
             <Field type="password" name="password" id="password" placeholder={t('password')} required
-                   className={classNames('mt-2', 'p-2', 'rounded', 'border', 'w-full',
-                     touched.password ? (errors.password ? borderColors.error : borderColors.success) : borderColors.default)}/>
+                   className={inputClasses(touched.password, errors.password)}/>
+            <ErrorMessage name="password">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
           </div>
+
+          {invalidLoginTry && <div className={redMessageClasses}>{t('invalidUsernamePasswordCombination')}.</div>}
+
+          {error && <div className={redMessageClasses}>{error.message}</div>}
 
           <div className="my-4 text-center">
-            <Link to={forgotPasswordUrl} className="p-2 rounded border border-slate-500">{t('forgotPassword')}?</Link>
+            <Link to={forgotPasswordUrl} className={amberButtonClasses}>{t('forgotPassword')}?</Link>
           </div>
-
-          {invalidLoginTry && <div className="p-4 rounded border border-red-600 bg-red-500 text-white text-center">
-            {t('invalidUsernamePasswordCombination')}.
-          </div>}
-
-          {error && <div className="p-4 rounded border border-red-600 bg-red-500 text-white text-center">{error.message}</div>}
-
-          <button type="submit" disabled={loading} className="my-4 p-2 rounded border w-full bg-blue-500 text-white">
-            {t('login')}
-          </button>
+          <div className="text-center">
+            <button type="submit" disabled={loading} className={blueButtonClasses}>{t('login')}</button>
+          </div>
         </Form>}
       </Formik>
     </div>

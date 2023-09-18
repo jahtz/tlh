@@ -1,8 +1,9 @@
 import {ErrorMessage, Field, FormikErrors, FormikTouched} from 'formik';
-import {JSX} from 'react';
+import {ReactElement} from 'react';
 import {ManuscriptIdentifierInput, ManuscriptIdentifierType} from '../graphql';
 import {useTranslation} from 'react-i18next';
 import classnames from 'classnames';
+import {explTextClasses} from '../defaultDesign';
 
 interface ManuscriptIdentifierOption {
   type: ManuscriptIdentifierType;
@@ -16,8 +17,7 @@ interface IProps {
   touched: FormikTouched<ManuscriptIdentifierInput> | undefined;
 }
 
-
-export function ManuscriptIdInputField({mainId, deleteFunc, errors, touched}: IProps): JSX.Element {
+export function ManuscriptIdInputField({mainId, deleteFunc, errors, touched}: IProps): ReactElement {
 
   const {t} = useTranslation('common');
 
@@ -50,9 +50,8 @@ export function ManuscriptIdInputField({mainId, deleteFunc, errors, touched}: IP
         {deleteFunc && <button type="button" className="px-4 py-2 rounded-r bg-red-500 text-white" onClick={deleteFunc}>-</button>}
       </div>
 
-      <ErrorMessage name={`${mainId}.identifier`}>{msg => <p className="help is-danger">{msg}</p>}</ErrorMessage>
-
-      <ErrorMessage name={`${mainId}.identifierType`}>{msg => <p className="help is-danger">{msg}</p>}</ErrorMessage>
+      <ErrorMessage name={`${mainId}.identifier`}>{msg => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
+      <ErrorMessage name={`${mainId}.identifierType`}>{msg => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
     </>
   );
 }

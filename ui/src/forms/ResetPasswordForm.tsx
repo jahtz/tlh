@@ -5,8 +5,7 @@ import {useTranslation} from 'react-i18next';
 import {Field, Form, Formik} from 'formik';
 import * as yup from 'yup';
 import {useResetPasswordMutation} from '../graphql';
-import classNames from 'classnames';
-import {blueButtonClasses} from '../defaultDesign';
+import {blueButtonClasses, greenMessageClasses, inputClasses, redMessageClasses} from '../defaultDesign';
 
 interface FormValues {
   newPassword: string;
@@ -55,19 +54,19 @@ export function ResetPasswordForm(): ReactElement {
 
           <div className="my-4">
             <label htmlFor="newPassword" className="font-bold">{t('password')}</label>
-            <Field type="password" id="newPassword" name="newPassword" placeholder={t('newPassword')}
-                   className={classNames('my-2 p-2 rounded border w-full', touched.newPassword && errors.newPassword ? 'border-red-500' : 'border-slate-500')}/>
+            <Field type="password" id="newPassword" name="newPassword" placeholder={t('newPassword')} required autoFocus
+                   className={inputClasses(touched.newPassword, errors.newPassword)}/>
           </div>
 
           <div className="my-4">
             <label htmlFor="newPasswordRepeat" className="font-bold">{t('passwordRepeat')}</label>
-            <Field type="password" id="newPaswordRepeat" name="newPasswordRepeat" placeholder={t('repeatNewPassword')}
-                   className={classNames('my-2 p-2 rounded border w-full', touched.newPasswordRepeat && errors.newPasswordRepeat ? 'border-red-500' : 'border-slate-500')}/>
+            <Field type="password" id="newPaswordRepeat" name="newPasswordRepeat" placeholder={t('repeatNewPassword')} required
+                   className={inputClasses(touched.newPasswordRepeat, errors.newPasswordRepeat)}/>
           </div>
 
-          {data?.resetPassword && <div>{t('passwordSuccessfullyReset')}!</div>}
+          {data?.resetPassword && <div className={greenMessageClasses}>{t('passwordSuccessfullyReset')}!</div>}
 
-          {error && <div>{error.message}</div>}
+          {error && <div className={redMessageClasses}>{error.message}</div>}
 
           <div className="text-center">
             <button type="submit" className={blueButtonClasses} disabled={loading}>{t('resetPassword')}</button>

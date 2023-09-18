@@ -1,29 +1,24 @@
 import {ReactElement} from 'react';
-import {Field, Form, Formik} from 'formik';
+import {ErrorMessage, Field, Form, Formik} from 'formik';
 import {useTranslation} from 'react-i18next';
-import {blueButtonClasses} from '../defaultDesign';
+import {amberMessageClasses, blueButtonClasses, explTextClasses, inputClasses, redMessageClasses} from '../defaultDesign';
 import * as yup from 'yup';
-import classNames from 'classnames';
-import {useForgotPasswordMutation} from '../graphql';
+import {ForgotPasswordMutationVariables, useForgotPasswordMutation} from '../graphql';
 
-interface FormValues {
-  mail: string;
-}
-
-const forgotPwFormSchema = yup.object({
+const forgotPwFormSchema: yup.ObjectSchema<ForgotPasswordMutationVariables> = yup.object({
   mail: yup.string().email().required()
 }).required();
 
-const initialValues: FormValues = {mail: ''};
+const initialValues: ForgotPasswordMutationVariables = {mail: ''};
 
 export function ForgotPasswordForm(): ReactElement {
 
   const {t} = useTranslation('common');
   const [forgotPassword, {data, loading, error}] = useForgotPasswordMutation();
 
-  const onSubmit = async ({mail}: FormValues): Promise<void> => {
+  const onSubmit = async (variables: ForgotPasswordMutationVariables): Promise<void> => {
     try {
-      await forgotPassword({variables: {mail}});
+      await forgotPassword({variables});
     } catch (exception) {
       console.error(exception);
     }
@@ -35,16 +30,16 @@ export function ForgotPasswordForm(): ReactElement {
 
       <Formik initialValues={initialValues} validationSchema={forgotPwFormSchema} onSubmit={onSubmit}>
         {({touched, errors}) => <Form>
+
           <div className="my-4">
             <label htmlFor="mail" className="font-bold">{t('email')}:</label>
-            <Field type="email" name="mail" id="mail" placeholder={t('email')}
-                   className={classNames('my-2 p-2 rounded border w-full', touched.mail && errors.mail ? 'border-red-500' : 'border-slate-500 ')}/>
-            {errors.mail && <p>{errors.mail}</p>}
+            <Field type="email" name="mail" id="mail" placeholder={t('email')} required className={inputClasses(touched.mail, errors.mail)}/>
+            <ErrorMessage name="mail">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
           </div>
 
-          {data?.forgotPassword && <div className="my-4">{t('emailSentIfUserExists')}</div>}
+          {data?.forgotPassword && <div className={amberMessageClasses}>{t('emailSentIfUserExists')}</div>}
 
-          {error && <div className="my-4 p-2">{error.message}</div>}
+          {error && <div className={redMessageClasses}>{error.message}</div>}
 
           <div className="text-center">
             <button type="submit" className={blueButtonClasses} disabled={loading}>{t('submit')}</button>

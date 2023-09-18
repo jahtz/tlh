@@ -4,6 +4,7 @@ import {getNameForPalaeoClassification} from '../model/manuscriptProperties/pala
 import {useTranslation} from 'react-i18next';
 import {PalaeographicClassification} from '../graphql';
 import {JSX} from 'react';
+import {explTextClasses} from '../defaultDesign';
 
 interface IProps {
   palaeoClassSure: boolean;
@@ -50,9 +51,8 @@ export function PalaeoClassField({palaeoClassSure, setPalaeoClassSure}: IProps):
         </button>
       </div>
 
-      <ErrorMessage name="palaeographicClassification">{msg => <p className="help is-danger">{msg}</p>}</ErrorMessage>
-
-      <ErrorMessage name="palaeographicClassificationSure">{msg => <p className="help is-danger">{msg}</p>}</ErrorMessage>
+      <ErrorMessage name="palaeographicClassification">{msg => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
+      <ErrorMessage name="palaeographicClassificationSure">{msg => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
     </div>
   );
 

@@ -1,34 +1,33 @@
 import {useRegisterMutation, UserInput} from '../graphql';
 import {useTranslation} from 'react-i18next';
-import {Field, Form, Formik} from 'formik';
-import {object as yupObject, Schema, string as yupString} from 'yup';
-import {JSX} from 'react';
-import classNames from 'classnames';
+import {ErrorMessage, Field, Form, Formik} from 'formik';
+import * as yup from 'yup';
+import {ReactElement} from 'react';
+import {blueButtonClasses, explTextClasses, greenMessageClasses, inputClasses, redMessageClasses} from '../defaultDesign';
 
 const initialValues: UserInput = {username: '', password: '', passwordRepeat: '', name: '', email: '', affiliation: ''};
 
-const validationSchema: Schema<UserInput> = yupObject({
-  username: yupString().min(4).max(50).required(),
-  password: yupString().min(4).max(50).required(),
-  passwordRepeat: yupString().min(4).max(50).required(),
-  name: yupString().required(),
-  email: yupString().email().required(),
-  affiliation: yupString().notRequired()
+const validationSchema: yup.ObjectSchema<UserInput> = yup.object({
+  username: yup.string().min(4).max(50).required(),
+  password: yup.string().min(4).max(50).required(),
+  passwordRepeat: yup.string().min(4).max(50).required(),
+  name: yup.string().required(),
+  email: yup.string().email().required(),
+  affiliation: yup.string().notRequired()
 }).required();
 
-const redBorder = 'border-red-500';
-const greenBorder = 'border-green-500';
-const defaultBorder = 'border-slate-500';
-
-export function RegisterForm(): JSX.Element {
+export function RegisterForm(): ReactElement {
 
   const {t} = useTranslation('common');
   const [register, {data, loading, error}] = useRegisterMutation();
 
-  function onSubmit(values: UserInput): void {
-    register({variables: {userInput: values}})
-      .catch((e) => console.error(e));
-  }
+  const onSubmit = async (values: UserInput): Promise<void> => {
+    try {
+      await register({variables: {userInput: values}});
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <div className="container mx-auto">
@@ -39,49 +38,49 @@ export function RegisterForm(): JSX.Element {
           <Form>
             <div className="mb-4">
               <label htmlFor="username" className="font-bold">{t('username')}:</label>
-              <Field name="username" id="username" placeholder={t('username')}
-                     className={classNames('mt-2 p-2 rounded border w-full', touched.username ? (errors.username ? redBorder : greenBorder) : defaultBorder)}/>
+              <Field name="username" id="username" placeholder={t('username')} required autoFocus className={inputClasses(touched.username, errors.username)}/>
+              <ErrorMessage name="username">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
             </div>
 
             <div className="mb-4">
               <label htmlFor="password" className="font-bold">{t('password')}:</label>
-              <Field type="password" name="password" id="password" placeholder={t('password')}
-                     className={classNames('mt-2 p-2 rounded border w-full', touched.password ? (errors.password ? redBorder : greenBorder) : defaultBorder)}/>
+              <Field type="password" name="password" id="password" placeholder={t('password')} required
+                     className={inputClasses(touched.password, errors.password)}/>
+              <ErrorMessage name="password">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
             </div>
 
             <div className="mb-4">
               <label htmlFor="passwordRepeat" className="font-bold">{t('passwordRepeat')}:</label>
-              <Field type="password" name="passwordRepeat" id="passwordRepeat" placeholder={t('passwordRepeat')}
-                     className={classNames('mt-2 p-2 rounded border w-full', touched.passwordRepeat ? (errors.passwordRepeat ? redBorder : greenBorder) : defaultBorder)}/>
+              <Field type="password" name="passwordRepeat" id="passwordRepeat" placeholder={t('passwordRepeat')} required
+                     className={inputClasses(touched.passwordRepeat, errors.passwordRepeat)}/>
+              <ErrorMessage name="passwordRepeat">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
             </div>
 
             <div className="mb-4">
               <label htmlFor="name" className="font-bold">{t('name')}:</label>
-              <Field name="name" id="name" placeholder={t('name')}
-                     className={classNames('mt-2 p-2 rounded border w-full', touched.name ? (errors.name ? redBorder : greenBorder) : defaultBorder)}/>
+              <Field name="name" id="name" placeholder={t('name')} required className={inputClasses(touched.name, errors.name)}/>
+              <ErrorMessage name="name">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
             </div>
 
             <div className="mb-4">
               <label htmlFor="email" className="font-bold">{t('email')}:</label>
-              <Field type="email" name="email" placeholder={t('email')}
-                     className={classNames('mt-2 p-2 rounded border w-full', touched.email ? (errors.email ? redBorder : greenBorder) : defaultBorder)}/>
+              <Field type="email" name="email" placeholder={t('email')} required className={inputClasses(touched.email, errors.email)}/>
+              <ErrorMessage name="email">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
             </div>
 
             <div className="mb-4">
               <label htmlFor="affiliation" className="font-bold">{t('affiliation')}:</label>
-              <Field name="affiliation" id="affiliation" placeholder={t('affiliation')}
-                     className={classNames('mt-2 p-2 rounded border w-full', touched.affiliation ? (errors.affiliation ? redBorder : greenBorder) : defaultBorder)}/>
+              <Field name="affiliation" id="affiliation" placeholder={t('affiliation')} className={inputClasses(touched.affiliation, errors.affiliation)}/>
+              <ErrorMessage name="affiliation">{(msg) => <p className={explTextClasses}>{msg}</p>}</ErrorMessage>
             </div>
 
-            {data?.register && <div className="p-4 rounded border border-green-600 bg-green-500 text-white text-center">
-              {t('userRegistered{{who}}', {who: data.register})}.
-            </div>}
+            {data?.register && <div className={greenMessageClasses}>{t('userRegistered{{who}}', {who: data.register})}.</div>}
 
-            {error && <div className="p-4 rounded border border-red-600 bg-red-500 text-white text-center">{error.message}</div>}
+            {error && <div className={redMessageClasses}>{error.message}</div>}
 
-            <button type="submit" disabled={loading || !!data?.register} className="mt-4 p-2 rounded border w-full bg-blue-500 text-white">
-              {t('register')}
-            </button>
+            <div className="text-center">
+              <button type="submit" disabled={loading || !!data?.register} className={blueButtonClasses}>{t('register')}</button>
+            </div>
           </Form>
         }
       </Formik>
