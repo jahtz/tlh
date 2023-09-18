@@ -59,13 +59,13 @@ function resolveUser(): ?User
 }
 
 /** @throws MySafeGraphQLException */
-function resolveForgotPassword(string $mail): ?string
+function resolveForgotPassword(string $mail): bool
 {
   // check if mail exists...
   $maybeUser = User::selectUserByMail($mail);
 
   if (is_null($maybeUser)) {
-    return null;
+    return true;
   }
 
   // Save pw recovery code...
@@ -96,7 +96,7 @@ function resolveForgotPassword(string $mail): ?string
     error_log("URL: $url");
   }
 
-  return $mail;
+  return true;
 }
 
 /** @throws MySafeGraphQLException */
@@ -144,8 +144,8 @@ $mutationType = new ObjectType([
       'args' => [
         'mail' => Type::nonNull(Type::string())
       ],
-      'type' => Type::string(),
-      'resolve' => fn(?int $_rootValue, array $args) => resolveForgotPassword($args['mail'])
+      'type' => Type::nonNull(Type::boolean()),
+      'resolve' => fn(?int $_rootValue, array $args): bool => resolveForgotPassword($args['mail'])
     ],
     'resetPassword' => [
       'args' => [

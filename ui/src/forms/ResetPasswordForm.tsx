@@ -7,8 +7,6 @@ import * as yup from 'yup';
 import {useResetPasswordMutation} from '../graphql';
 import classNames from 'classnames';
 import {blueButtonClasses} from '../defaultDesign';
-import {Simulate} from 'react-dom/test-utils';
-
 
 interface FormValues {
   newPassword: string;
@@ -40,6 +38,7 @@ export function ResetPasswordForm(): ReactElement {
     if (newPassword !== newPasswordRepeat) {
       return;
     }
+
     try {
       await resetPassword({variables: {uuid, newPassword, newPasswordRepeat}});
     } catch (exception) {
@@ -67,6 +66,8 @@ export function ResetPasswordForm(): ReactElement {
           </div>
 
           {data?.resetPassword && <div>{t('passwordSuccessfullyReset')}!</div>}
+
+          {error && <div>{error.message}</div>}
 
           <div className="text-center">
             <button type="submit" className={blueButtonClasses} disabled={loading}>{t('resetPassword')}</button>

@@ -215,7 +215,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createManuscript: Scalars['String']['output'];
   executiveEditor?: Maybe<ExecutiveEditorMutations>;
-  forgotPassword?: Maybe<Scalars['String']['output']>;
+  forgotPassword: Scalars['Boolean']['output'];
   login?: Maybe<Scalars['String']['output']>;
   manuscript?: Maybe<ManuscriptMutations>;
   register?: Maybe<Scalars['String']['output']>;
@@ -566,7 +566,7 @@ export type ForgotPasswordMutationVariables = Exact<{
 }>;
 
 
-export type ForgotPasswordMutation = { __typename?: 'Mutation', forgotPassword?: string | null };
+export type ForgotPasswordMutation = { __typename?: 'Mutation', forgotPassword: boolean };
 
 export type ResetPasswordMutationVariables = Exact<{
   uuid: Scalars['String']['input'];

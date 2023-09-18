@@ -44,7 +44,7 @@ export function ForgotPasswordForm(): ReactElement {
 
           {data?.forgotPassword && <div className="my-4">{t('emailSentIfUserExists')}</div>}
 
-          {error && <div className="my-4">{error.message}</div>}
+          {error && <div className="my-4 p-2">{error.message}</div>}
 
           <div className="text-center">
             <button type="submit" className={blueButtonClasses} disabled={loading}>{t('submit')}</button>

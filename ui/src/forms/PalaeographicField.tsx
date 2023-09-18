@@ -6,8 +6,8 @@ import {PalaeographicClassification} from '../graphql';
 import {JSX} from 'react';
 
 interface IProps {
-  palaeographicClassificationSure: boolean;
-  setPalaeographicClassificationSure: (value: boolean) => void;
+  palaeoClassSure: boolean;
+  setPalaeoClassSure: (value: boolean) => void;
 }
 
 export const palaeographicClassifications: PalaeographicClassification[] = [
@@ -22,7 +22,7 @@ export const palaeographicClassifications: PalaeographicClassification[] = [
   PalaeographicClassification.Unclassified,
 ];
 
-export function PalaeographicClassificationField({palaeographicClassificationSure, setPalaeographicClassificationSure}: IProps): JSX.Element {
+export function PalaeoClassField({palaeoClassSure, setPalaeoClassSure}: IProps): JSX.Element {
 
   const {t} = useTranslation('common');
 
@@ -39,13 +39,13 @@ export function PalaeographicClassificationField({palaeographicClassificationSur
           )}
         </Field>
 
-        <button type="button" onClick={() => setPalaeographicClassificationSure(true)}
-                className={classNames('p-2', palaeographicClassificationSure ? ['bg-blue-600', 'text-white'] : ['border', 'border-slate-500'])}>
+        <button type="button" onClick={() => setPalaeoClassSure(true)}
+                className={classNames('p-2', palaeoClassSure ? ['bg-blue-600', 'text-white'] : ['border', 'border-slate-500'])}>
           {t('sure')}
         </button>
 
-        <button type="button" onClick={() => setPalaeographicClassificationSure(false)}
-                className={classNames('p-2', 'rounded-r', palaeographicClassificationSure ? ['border', 'border-slate-500'] : ['bg-blue-600', 'text-white'])}>
+        <button type="button" onClick={() => setPalaeoClassSure(false)}
+                className={classNames('p-2', 'rounded-r', palaeoClassSure ? ['border', 'border-slate-500'] : ['bg-blue-600', 'text-white'])}>
           {t('notSure')}
         </button>
       </div>
