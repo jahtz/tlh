@@ -1,9 +1,3 @@
-const borderColors = {
-  error: 'border-red-500',
-  success: 'border-green-500',
-  default: 'border-slate-500'
-};
-
 //  Buttons
 
 import classNames from 'classnames';
@@ -20,7 +14,7 @@ export const redButtonClasses = buttonClasses('red');
 export const defaultInputClasses = 'my-2 p-2 rounded border border-slate-500 bg-white w-full';
 
 export const inputClasses = (touched: boolean | undefined, errors: string | undefined): string =>
-  classNames('mt-2 p-2 rounded border w-full', touched ? (errors ? borderColors.error : borderColors.success) : borderColors.default);
+  classNames('mt-2 p-2 rounded border w-full', touched ? (errors ? 'border-red-500' : 'border-green-500') : 'border-slate-500');
 
 // Messages
 
