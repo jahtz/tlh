@@ -16,9 +16,15 @@ const exportLine = (line: Line): XmlNode[] => {
 };
 
 export function exportXmlNodesFromParser(parser: TLHParser): XmlNode[] {
+  const lines = parser.getLines();
+
+  if (lines.length === 0) {
+    return [];
+  }
+
   const nodes: XmlNode[] = [];
 
-  const [firstLine, ...otherLines] = parser.getLines();
+  const [firstLine, ...otherLines] = lines;
 
   let previousLineNodes: XmlNode[] = exportLine(firstLine);
 
