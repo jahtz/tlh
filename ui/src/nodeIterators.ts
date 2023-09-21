@@ -41,6 +41,10 @@ export function getPriorSiblingPath(rootNode: XmlElementNode, path: number[], un
 
   const parent = getElementByPath(rootNode, pathStart);
 
+  if (parent.children.length === 0) {
+    return undefined;
+  }
+
   for (let index = path[path.length - 1]; index >= 0; index--) {
     const child = parent.children[index];
     if (isXmlElementNode(child) && child.tagName === untilTagName) {

@@ -13,8 +13,8 @@ export const deviConfig: XmlEditorSingleNodeConfig<'devi', 'expl'> = {
   ),
   edit: (props) => <DeviEditor {...props}/>,
   insertablePositions: {
-    beforeElement: ['w'],
-    afterElement: ['w']
+    beforeElement: ['lb', 'w'],
+    afterElement: ['w'],
   }
 };
 
