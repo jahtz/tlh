@@ -15,6 +15,8 @@ export const deviConfig: XmlEditorSingleNodeConfig<'devi', 'expl'> = {
   insertablePositions: {
     beforeElement: ['lb', 'w'],
     afterElement: ['w'],
+    asFirstChildOf: ['devi'],
+    asLastChildOf: ['div1', 'cl']
   }
 };
 

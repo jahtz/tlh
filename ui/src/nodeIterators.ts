@@ -27,6 +27,13 @@ export function getSiblingsUntil(rootNode: XmlElementNode, path: number[], until
   );
 }
 
+function arrayRemoveLast<T>(a: T[]): [T[], T | undefined] {
+  const aCopy = [...a];
+  const last = aCopy.pop();
+
+  return [aCopy, last];
+}
+
 export function getPriorSibling(rootNode: XmlElementNode, path: number[], untilTagName: string): XmlElementNode | undefined {
   const parent = getElementByPath(rootNode, path.slice(0, -1));
 
@@ -37,15 +44,17 @@ export function getPriorSibling(rootNode: XmlElementNode, path: number[], untilT
 }
 
 export function getPriorSiblingPath(rootNode: XmlElementNode, path: number[], untilTagName: string): number[] | undefined {
-  const pathStart = path.slice(0, -1);
+  const [pathStart, pathEnd] = arrayRemoveLast(path);
 
   const parent = getElementByPath(rootNode, pathStart);
 
-  if (parent.children.length === 0) {
+  if (parent.children.length === 0 || pathEnd === undefined) {
     return undefined;
   }
 
-  for (let index = path[path.length - 1]; index >= 0; index--) {
+  const lastIndex = pathEnd === parent.children.length ? pathEnd - 1 : pathEnd;
+
+  for (let index = lastIndex; index >= 0; index--) {
     const child = parent.children[index];
     if (isXmlElementNode(child) && child.tagName === untilTagName) {
       return [...pathStart, index];
