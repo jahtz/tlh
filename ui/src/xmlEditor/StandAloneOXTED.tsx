@@ -97,8 +97,6 @@ export function StandAloneOXTED({ editorConfig }: IProps): ReactElement {
       return;
     }
 
-    // TODO: check all attributes?
-
     // set update type
     const tagNameToInsert = exportAddNode.tagName === DocumentEditTypes.Annotation || exportAddNode.tagName === DocumentEditTypes.Validation
       ? 'annotation'
