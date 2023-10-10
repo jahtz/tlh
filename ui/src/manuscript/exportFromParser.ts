@@ -1,7 +1,7 @@
-import {Line, TLHParser} from 'simtex';
-import {isXmlElementNode, XmlElementNode, XmlNode} from 'simple_xml';
-import {createCompleteDocument, XmlCreationValues} from './xmlConversion/createCompleteDocument';
-import {writeXml} from '../xmlEditor/StandAloneOXTED';
+import { Line, TLHParser } from 'simtex';
+import { isXmlElementNode, XmlElementNode, XmlNode } from 'simple_xml';
+import { createCompleteDocument, XmlCreationValues } from './xmlConversion/createCompleteDocument';
+import { writeXml } from '../xmlEditor/StandAloneOXTED';
 
 // TODO: add other nodes to filter out...
 const tagNamesToFilter: string[] = [
@@ -36,7 +36,7 @@ export function exportXmlNodesFromParser(parser: TLHParser): XmlNode[] {
       // filter out "illegal nodes"
       .filter((node) => !isXmlElementNode(node) || !tagNamesToFilter.includes(node.tagName));
 
-    if (line.isPartPreviousLine()) {
+    if (line.isPartPreviousLine() && currentLineNodes.length >= 2) {
       const lastWFromPrevious = previousLineNodes.pop() as XmlElementNode<'w'>;
       const [lb, firstW, ...rest] = currentLineNodes;
 
