@@ -1,14 +1,14 @@
-import {ReactElement, useState} from 'react';
-import {FileLoader} from '../forms/FileLoader';
-import {findFirstXmlElementByTagName, writeNode, XmlElementNode, XmlNode} from 'simple_xml';
-import {XmlDocumentEditor} from './XmlDocumentEditor';
-import {XmlEditorConfig} from './editorConfig';
-import {useTranslation} from 'react-i18next';
-import {reCountNodeNumbers, tlhXmlEditorConfig} from './tlhXmlEditorConfig';
-import {OxtedExportData} from './OxtedExportData';
-import {makeDownload} from '../downloadHelper';
-import {DocumentEditTypes} from './documentEditTypes';
-import {XmlValidityChecker} from './XmlValidityChecker';
+import { ReactElement, useState } from 'react';
+import { FileLoader } from '../forms/FileLoader';
+import { findFirstXmlElementByTagName, writeNode, XmlElementNode, XmlNode } from 'simple_xml';
+import { XmlDocumentEditor } from './XmlDocumentEditor';
+import { XmlEditorConfig } from './editorConfig';
+import { useTranslation } from 'react-i18next';
+import { reCountNodeNumbers, tlhXmlEditorConfig } from './tlhXmlEditorConfig';
+import { OxtedExportData } from './OxtedExportData';
+import { makeDownload } from '../downloadHelper';
+import { DocumentEditTypes } from './documentEditTypes';
+import { XmlValidityChecker } from './XmlValidityChecker';
 
 const locStoreKey = 'editorState';
 
@@ -34,7 +34,7 @@ function initialState(): LoadedDocument | undefined {
 }
 
 const autoSave = (filename: string, rootNode: XmlNode): void => {
-  localStorage.setItem(locStoreKey, JSON.stringify({filename, source: writeXml(rootNode as XmlElementNode)}));
+  localStorage.setItem(locStoreKey, JSON.stringify({ filename, source: writeXml(rootNode as XmlElementNode) }));
 };
 
 export const writeXml = (rootNode: XmlElementNode, expand = false): string => {
@@ -66,16 +66,16 @@ export const writeXml = (rootNode: XmlElementNode, expand = false): string => {
   }
 };
 
-export function StandAloneOXTED({editorConfig}: IProps): ReactElement {
+export function StandAloneOXTED({ editorConfig }: IProps): ReactElement {
 
-  const {t} = useTranslation('common');
+  const { t } = useTranslation('common');
   const [loadedDocument, setLoadedDocument] = useState<LoadedDocument | undefined>(initialState());
   const [exportAddNode, setExportAddNode] = useState<XmlElementNode>();
 
   const readFile = async (file: File) => {
     const source = await file.text();
 
-    setLoadedDocument({source, filename: file.name});
+    setLoadedDocument({ source, filename: file.name });
   };
 
   function download(rootNode: XmlElementNode): void {
@@ -85,6 +85,15 @@ export function StandAloneOXTED({editorConfig}: IProps): ReactElement {
 
     if (exportAddNode === undefined) {
       alert(t('pleaseSpecifyAuthor'));
+      return;
+    }
+
+    const attributesWithoutValue = Object.entries(exportAddNode.attributes)
+      .filter(([/* _ */, value]) => value === undefined || value.trim().length === 0)
+      .map(([key]) => key);
+
+    if (attributesWithoutValue.length > 0) {
+      alert(t('pleaseSpecifyAttributes') + ': ' + attributesWithoutValue.join(','));
       return;
     }
 
@@ -119,13 +128,13 @@ export function StandAloneOXTED({editorConfig}: IProps): ReactElement {
           <XmlValidityChecker xmlSource={loadedDocument.source}>
             {(rootNode) =>
               <XmlDocumentEditor node={rootNode} editorConfig={editorConfig} onExportXml={download} filename={loadedDocument.filename}
-                                 closeFile={closeFile} autoSave={(node) => autoSave(loadedDocument.filename, node)}>
-                <OxtedExportData setExportNode={setExportAddNode}/>
+                closeFile={closeFile} autoSave={(node) => autoSave(loadedDocument.filename, node)}>
+                <OxtedExportData setExportNode={setExportAddNode} />
               </XmlDocumentEditor>}
           </XmlValidityChecker>
         ) : (
           <div className="container mx-auto">
-            <FileLoader accept="text/xml" onLoad={readFile}/>
+            <FileLoader accept="text/xml" onLoad={readFile} />
           </div>
         )}
     </div>
