@@ -59,7 +59,7 @@ function resolveUser(): ?User
 }
 
 /** @throws MySafeGraphQLException */
-function resolveForgotPassword(string $mail): bool
+function resolveForgotPassword(string $mail, string $version): bool
 {
   // check if mail exists...
   $maybeUser = User::selectUserByMail($mail);
@@ -84,7 +84,7 @@ function resolveForgotPassword(string $mail): bool
   error_log($serverUrl);
 
   // generate mail with url...
-  $url = "$serverUrl/tlh_editor/public/resetPassword?uuid=$uuid";
+  $url = "$serverUrl/tlh_editor/$version/public/resetPassword?uuid=$uuid";
 
   $mailSent = sendSingleMail(
     $maybeUser->email,
@@ -142,10 +142,11 @@ $mutationType = new ObjectType([
     ],
     'forgotPassword' => [
       'args' => [
-        'mail' => Type::nonNull(Type::string())
+        'mail' => Type::nonNull(Type::string()),
+        'version' => Type::nonNull(Type::string())
       ],
       'type' => Type::nonNull(Type::boolean()),
-      'resolve' => fn(?int $_rootValue, array $args): bool => resolveForgotPassword($args['mail'])
+      'resolve' => fn(?int $_rootValue, array $args): bool => resolveForgotPassword($args['mail'], $args['version'])
     ],
     'resetPassword' => [
       'args' => [

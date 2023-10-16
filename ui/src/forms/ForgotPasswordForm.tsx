@@ -5,20 +5,20 @@ import {amberMessageClasses, blueButtonClasses, explTextClasses, inputClasses, r
 import * as yup from 'yup';
 import {ForgotPasswordMutationVariables, useForgotPasswordMutation} from '../graphql';
 
-const forgotPwFormSchema: yup.ObjectSchema<ForgotPasswordMutationVariables> = yup.object({
+type BaseFormValues = Omit<ForgotPasswordMutationVariables, 'version'>;
+
+const forgotPwFormSchema: yup.ObjectSchema<BaseFormValues> = yup.object({
   mail: yup.string().email().required()
 }).required();
-
-const initialValues: ForgotPasswordMutationVariables = {mail: ''};
 
 export function ForgotPasswordForm(): ReactElement {
 
   const {t} = useTranslation('common');
   const [forgotPassword, {data, loading, error}] = useForgotPasswordMutation();
 
-  const onSubmit = async (variables: ForgotPasswordMutationVariables): Promise<void> => {
+  const onSubmit = async ({mail}: BaseFormValues): Promise<void> => {
     try {
-      await forgotPassword({variables});
+      await forgotPassword({variables: {mail, version: process.env.REACT_APP_VERSION || ''}});
     } catch (exception) {
       console.error(exception);
     }
@@ -28,7 +28,7 @@ export function ForgotPasswordForm(): ReactElement {
     <div className="container mx-auto">
       <h1 className="my-2 font-bold text-2xl text-center">{t('forgotPassword')}</h1>
 
-      <Formik initialValues={initialValues} validationSchema={forgotPwFormSchema} onSubmit={onSubmit}>
+      <Formik initialValues={{mail: ''}} validationSchema={forgotPwFormSchema} onSubmit={onSubmit}>
         {({touched, errors}) => <Form>
 
           <div className="my-4">
