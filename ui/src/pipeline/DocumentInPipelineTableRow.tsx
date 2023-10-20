@@ -3,17 +3,20 @@ import {
   useAppointFirstXmlReviewerMutation,
   useAppointSecondXmlReviewerMutation,
   useAppointTransliterationReviewerMutation,
-  useAppointXmlConverterMutation
+  useAppointXmlConverterMutation,
+  useDeleteManuscriptMutation
 } from '../graphql';
-import {JSX} from 'react';
-import {UserSelect} from './UserSelect';
+import { JSX } from 'react';
+import { UserSelect } from './UserSelect';
+import { useTranslation } from 'react-i18next';
+import { DeleteIcon } from '../designElements/icons';
 
 interface IProps extends DocumentInPipelineFragment {
   allReviewers: string[];
 }
 
 const formatDate = (value: string): string => new Date(value)
-  .toLocaleDateString(undefined, {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
+  .toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
 function getOrThrow<T>(value: T | null | undefined, message: string): T {
   if (value) {
@@ -23,7 +26,7 @@ function getOrThrow<T>(value: T | null | undefined, message: string): T {
   }
 }
 
-const DateCheckMark = ({date, user}: { date: string; user: string; }): JSX.Element => <span><code>{user}</code>, {date}</span>;
+const DateCheckMark = ({ date, user }: { date: string; user: string; }): JSX.Element => <span><code>{user}</code>, {date}</span>;
 
 export function DocumentInPipelineTableRow({
   allReviewers,
@@ -39,29 +42,47 @@ export function DocumentInPipelineTableRow({
   secondXmlReviewDateString
 }: IProps): JSX.Element {
 
-  const [executeAppointTransliterationReviewer, {loading: executeAppointTransliterationReviewerLoading/*, error*/}] = useAppointTransliterationReviewerMutation();
-  const [executeAppointXmlConverter, {loading: executeAppointXmlConvertLoading/*, error*/}] = useAppointXmlConverterMutation();
-  const [executeAppointFirstXmlReviewer, {loading: executeAppointFirstXmlReviewerLoading /*, error */}] = useAppointFirstXmlReviewerMutation();
-  const [executeAppointSecondXmlReviewer, {loading: executeAppointSecondXmlReviewerLoading /*, error */}] = useAppointSecondXmlReviewerMutation();
+  const { t } = useTranslation('common');
+
+  const [executeAppointTransliterationReviewer, { loading: executeAppointTransliterationReviewerLoading/*, error*/ }] = useAppointTransliterationReviewerMutation();
+  const [executeAppointXmlConverter, { loading: executeAppointXmlConvertLoading/*, error*/ }] = useAppointXmlConverterMutation();
+  const [executeAppointFirstXmlReviewer, { loading: executeAppointFirstXmlReviewerLoading /*, error */ }] = useAppointFirstXmlReviewerMutation();
+  const [executeAppointSecondXmlReviewer, { loading: executeAppointSecondXmlReviewerLoading /*, error */ }] = useAppointSecondXmlReviewerMutation();
+  const [deleteManuscript, { loading: deleteManuscriptLoading/*, error */ }] = useDeleteManuscriptMutation();
 
   const onChangeAppointedTransliterationReviewer = async (reviewer: string): Promise<string> => {
-    const {data} = await executeAppointTransliterationReviewer({variables: {manuscriptIdentifier, reviewer}});
+    const { data } = await executeAppointTransliterationReviewer({ variables: { manuscriptIdentifier, reviewer } });
     return getOrThrow(data?.executiveEditor?.appointTransliterationReviewer, 'TODO!');
   };
 
   const onChangeAppointedXmlConverter = async (converter: string): Promise<string> => {
-    const {data} = await executeAppointXmlConverter({variables: {manuscriptIdentifier, converter}});
+    const { data } = await executeAppointXmlConverter({ variables: { manuscriptIdentifier, converter } });
     return getOrThrow(data?.executiveEditor?.appointXmlConverter, 'TODO');
   };
 
   const onChangeAppointFirstXmlReviewer = async (reviewer: string): Promise<string> => {
-    const {data} = await executeAppointFirstXmlReviewer({variables: {manuscriptIdentifier, reviewer}});
+    const { data } = await executeAppointFirstXmlReviewer({ variables: { manuscriptIdentifier, reviewer } });
     return getOrThrow(data?.executiveEditor?.appointFirstXmlReviewer, 'TODO!');
   };
 
   const onChangeAppointSecondXmlReviewer = async (reviewer: string): Promise<string> => {
-    const {data} = await executeAppointSecondXmlReviewer({variables: {manuscriptIdentifier, reviewer}});
+    const { data } = await executeAppointSecondXmlReviewer({ variables: { manuscriptIdentifier, reviewer } });
     return getOrThrow(data?.executiveEditor?.appointSecondXmlReviewer, 'TODO!');
+  };
+
+  const onDeleteManuscript = async (): Promise<void> => {
+    // FIXME: confirm!
+    if (!confirm(t('reallyDeleteManuscript'))) {
+      return;
+    }
+
+    const { data } = await deleteManuscript({ variables: { manuscriptIdentifier } });
+
+    if (data?.executiveEditor?.deleteManuscript) {
+      window.location.reload();
+    } else {
+      console.info('Manuscript was not deleted...');
+    }
   };
 
   const transliterationReviewDate = transliterationReviewDateString ? formatDate(transliterationReviewDateString) : undefined;
@@ -77,30 +98,37 @@ export function DocumentInPipelineTableRow({
 
       <td className="p-2">
         {transliterationReviewDate !== undefined
-          ? <DateCheckMark date={transliterationReviewDate} user={appointedTransliterationReviewer || 'ERROR!'}/>
-          : <UserSelect currentSelected={appointedTransliterationReviewer || undefined} allUsers={allReviewers}
-                        loading={executeAppointTransliterationReviewerLoading} onNewUser={onChangeAppointedTransliterationReviewer}/>}
+          ? <DateCheckMark date={transliterationReviewDate} user={appointedTransliterationReviewer || 'ERROR!'} />
+          : <UserSelect currentSelected={appointedTransliterationReviewer} allUsers={allReviewers} loading={executeAppointTransliterationReviewerLoading}
+            onNewUser={onChangeAppointedTransliterationReviewer} />}
       </td>
 
       <td className="p-2">
         {xmlConversionDate !== undefined
-          ? <DateCheckMark date={xmlConversionDate} user={appointedXmlConverter || 'ERROR!'}/>
-          : <UserSelect currentSelected={appointedXmlConverter || undefined} allUsers={allReviewers} loading={executeAppointXmlConvertLoading}
-                        onNewUser={onChangeAppointedXmlConverter}/>}
+          ? <DateCheckMark date={xmlConversionDate} user={appointedXmlConverter || 'ERROR!'} />
+          : <UserSelect currentSelected={appointedXmlConverter} allUsers={allReviewers} loading={executeAppointXmlConvertLoading}
+            onNewUser={onChangeAppointedXmlConverter} />}
       </td>
 
       <td className="p-2">
         {firstXmlReviewDate !== undefined
-          ? <DateCheckMark date={firstXmlReviewDate} user={appointedFirstXmlReviewer || 'ERROR!'}/>
-          : <UserSelect currentSelected={appointedFirstXmlReviewer || undefined} allUsers={allReviewers} loading={executeAppointFirstXmlReviewerLoading}
-                        onNewUser={onChangeAppointFirstXmlReviewer}/>}
+          ? <DateCheckMark date={firstXmlReviewDate} user={appointedFirstXmlReviewer || 'ERROR!'} />
+          : <UserSelect currentSelected={appointedFirstXmlReviewer} allUsers={allReviewers} loading={executeAppointFirstXmlReviewerLoading}
+            onNewUser={onChangeAppointFirstXmlReviewer} />}
       </td>
 
       <td className="p-2">
         {secondXmlReviewDate !== undefined
-          ? <DateCheckMark date={secondXmlReviewDate} user={appointedSecondXmlReviewer || 'ERROR!'}/>
-          : <UserSelect currentSelected={appointedSecondXmlReviewer || undefined} allUsers={allReviewers} loading={executeAppointSecondXmlReviewerLoading}
-                        onNewUser={onChangeAppointSecondXmlReviewer}/>}
+          ? <DateCheckMark date={secondXmlReviewDate} user={appointedSecondXmlReviewer || 'ERROR!'} />
+          : <UserSelect currentSelected={appointedSecondXmlReviewer} allUsers={allReviewers} loading={executeAppointSecondXmlReviewerLoading}
+            onNewUser={onChangeAppointSecondXmlReviewer} />}
+      </td>
+
+      <td className="p-2">
+        <button type="button" onClick={onDeleteManuscript} title={t('deleteManuscript')} disabled={deleteManuscriptLoading}
+          className="px-4 py-2 rounded bg-red-600 text-white">
+          <DeleteIcon />
+        </button>
       </td>
     </tr>
   );

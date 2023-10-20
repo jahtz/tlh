@@ -44,17 +44,16 @@ class Manuscript extends AbstractManuscript
 
   function __construct(
     ManuscriptIdentifier $mainIdentifier,
-    string               $palaeographicClassification,
-    bool                 $palaeographicClassificationSure,
-    string               $defaultLanguage,
-    ?string              $provenance,
-    ?int                 $cthClassification,
-    ?string              $bibliography,
-    string               $status,
-    string               $creatorUsername,
-    string               $creationDate
-  )
-  {
+    string $palaeographicClassification,
+    bool $palaeographicClassificationSure,
+    string $defaultLanguage,
+    ?string $provenance,
+    ?int $cthClassification,
+    ?string $bibliography,
+    string $status,
+    string $creatorUsername,
+    string $creationDate
+  ) {
     parent::__construct($mainIdentifier, $palaeographicClassification, $palaeographicClassificationSure, $defaultLanguage, $provenance, $cthClassification, $bibliography, $creatorUsername);
     $this->status = $status;
     $this->creationDate = $creationDate;
@@ -81,7 +80,7 @@ class Manuscript extends AbstractManuscript
     return SqlHelpers::executeSingleReturnRowQuery(
       "select count(*) as manuscript_count from tlh_dig_manuscripts where status = 'Approved' or creator_username = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $username),
-      fn(array $row): int => (int)$row['manuscript_count']
+      fn(array $row): int => (int) $row['manuscript_count']
     ) ?? -1;
   }
 
@@ -104,7 +103,7 @@ class Manuscript extends AbstractManuscript
     return SqlHelpers::executeMultiSelectQuery(
       "select main_identifier from tlh_dig_manuscripts where creator_username = ?;",
       fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $username),
-      fn(array $row): string => (string)$row['main_identifier'],
+      fn(array $row): string => (string) $row['main_identifier'],
     );
   }
 
@@ -221,6 +220,14 @@ class Manuscript extends AbstractManuscript
       fn(array $row): string => $row['release_date']
     );
   }
+
+  function delete(): bool
+  {
+    return SqlHelpers::executeSingleChangeQuery(
+      "delete from tlh_dig_manuscripts where main_identifier = ?;",
+      fn(mysqli_stmt $stmt): bool => $stmt->bind_param('s', $this->mainIdentifier->identifier),
+    );
+  }
 }
 
 // GraphQL
@@ -315,8 +322,8 @@ Manuscript::$graphQLType = new ObjectType([
         $manuscript,
         $user,
         fn(Manuscript $manuscript): ?ReviewData => $args['reviewType'] === XmlReviewType::firstXmlReview
-          ? $manuscript->selectFirstXmlReviewData()
-          : $manuscript->selectSecondXmlReviewData()
+        ? $manuscript->selectFirstXmlReviewData()
+        : $manuscript->selectSecondXmlReviewData()
       )
     ]
   ]

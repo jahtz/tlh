@@ -162,14 +162,13 @@ function resolveReviewer(string $username): User
  * @throws MySafeGraphQLException
  */
 function resolveAppointUser(
-  string   $stepName,
-  User     $executiveEditor,
-  string   $usernameToAppoint,
-  string   $mainIdentifier,
+  string $stepName,
+  User $executiveEditor,
+  string $usernameToAppoint,
+  string $mainIdentifier,
   callable $selectStepAlreadyPerformed,
   callable $upsertStepAppointmentData
-): bool
-{
+): bool {
   $reviewer = resolveReviewer($usernameToAppoint);
   $manuscript = Manuscript::resolveManuscriptById($mainIdentifier);
 
@@ -292,7 +291,7 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         $manuscript = Manuscript::resolveManuscriptById($manuscriptIdentifier);
 
         // TODO: check conditions -> not submitted yet...!
-
+      
         if (!$manuscript->selectSecondXmlReviewPerformed()) {
           throw new MySafeGraphQLException("Second xml review of manuscript $manuscriptIdentifier was not yet performed!");
         }
@@ -309,6 +308,36 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         );
 
         return $inserted;
+      }
+    ],
+    'deleteManuscript' => [
+      'type' => Type::nonNull(Type::boolean()),
+      'args' => [
+        'manuscriptIdentifier' => Type::nonNull(Type::string()),
+      ],
+      'resolve' => function (User $_user, array $args): bool {
+        $manuscriptIdentifier = $args['manuscriptIdentifier'];
+
+        error_log($manuscriptIdentifier);
+
+        $maybeManuscript = Manuscript::selectManuscriptById($manuscriptIdentifier);
+
+        if (is_null($maybeManuscript)) {
+          return false;
+        }
+
+        $deleted = $maybeManuscript->delete();
+
+        if (!$deleted) {
+          return false;
+        }
+
+        sendMailToAdmins(
+          "The Manuscript $manuscriptIdentifier was deleted",
+          "The Manuscript $manuscriptIdentifier was deleted",
+        );
+
+        return true;
       }
     ]
   ]

@@ -261,3 +261,9 @@ mutation AppointSecondXmlReviewer($manuscriptIdentifier: String!, $reviewer: Str
     appointSecondXmlReviewer(manuscriptIdentifier: $manuscriptIdentifier, reviewer: $reviewer)
   }
 }
+
+mutation DeleteManuscript($manuscriptIdentifier: String!) {
+  executiveEditor{
+    deleteManuscript(manuscriptIdentifier: $manuscriptIdentifier)
+  }
+}

@@ -78,6 +78,7 @@ export type ExecutiveEditorMutations = {
   appointSecondXmlReviewer: Scalars['String']['output'];
   appointTransliterationReviewer: Scalars['String']['output'];
   appointXmlConverter: Scalars['String']['output'];
+  deleteManuscript: Scalars['Boolean']['output'];
   submitApproval: Scalars['Boolean']['output'];
   updateUserRights: Rights;
 };
@@ -103,6 +104,11 @@ export type ExecutiveEditorMutationsAppointTransliterationReviewerArgs = {
 
 export type ExecutiveEditorMutationsAppointXmlConverterArgs = {
   converter: Scalars['String']['input'];
+  manuscriptIdentifier: Scalars['String']['input'];
+};
+
+
+export type ExecutiveEditorMutationsDeleteManuscriptArgs = {
   manuscriptIdentifier: Scalars['String']['input'];
 };
 
@@ -529,6 +535,13 @@ export type AppointSecondXmlReviewerMutationVariables = Exact<{
 
 
 export type AppointSecondXmlReviewerMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', appointSecondXmlReviewer: string } | null };
+
+export type DeleteManuscriptMutationVariables = Exact<{
+  manuscriptIdentifier: Scalars['String']['input'];
+}>;
+
+
+export type DeleteManuscriptMutation = { __typename?: 'Mutation', executiveEditor?: { __typename?: 'ExecutiveEditorMutations', deleteManuscript: boolean } | null };
 
 export type RegisterMutationVariables = Exact<{
   userInput: UserInput;
@@ -1455,6 +1468,39 @@ export function useAppointSecondXmlReviewerMutation(baseOptions?: Apollo.Mutatio
 export type AppointSecondXmlReviewerMutationHookResult = ReturnType<typeof useAppointSecondXmlReviewerMutation>;
 export type AppointSecondXmlReviewerMutationResult = Apollo.MutationResult<AppointSecondXmlReviewerMutation>;
 export type AppointSecondXmlReviewerMutationOptions = Apollo.BaseMutationOptions<AppointSecondXmlReviewerMutation, AppointSecondXmlReviewerMutationVariables>;
+export const DeleteManuscriptDocument = gql`
+    mutation DeleteManuscript($manuscriptIdentifier: String!) {
+  executiveEditor {
+    deleteManuscript(manuscriptIdentifier: $manuscriptIdentifier)
+  }
+}
+    `;
+export type DeleteManuscriptMutationFn = Apollo.MutationFunction<DeleteManuscriptMutation, DeleteManuscriptMutationVariables>;
+
+/**
+ * __useDeleteManuscriptMutation__
+ *
+ * To run a mutation, you first call `useDeleteManuscriptMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteManuscriptMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteManuscriptMutation, { data, loading, error }] = useDeleteManuscriptMutation({
+ *   variables: {
+ *      manuscriptIdentifier: // value for 'manuscriptIdentifier'
+ *   },
+ * });
+ */
+export function useDeleteManuscriptMutation(baseOptions?: Apollo.MutationHookOptions<DeleteManuscriptMutation, DeleteManuscriptMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteManuscriptMutation, DeleteManuscriptMutationVariables>(DeleteManuscriptDocument, options);
+      }
+export type DeleteManuscriptMutationHookResult = ReturnType<typeof useDeleteManuscriptMutation>;
+export type DeleteManuscriptMutationResult = Apollo.MutationResult<DeleteManuscriptMutation>;
+export type DeleteManuscriptMutationOptions = Apollo.BaseMutationOptions<DeleteManuscriptMutation, DeleteManuscriptMutationVariables>;
 export const RegisterDocument = gql`
     mutation Register($userInput: UserInput!) {
   register(userInput: $userInput)
