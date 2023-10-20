@@ -230,7 +230,7 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         $args['reviewer'],
         $args['manuscriptIdentifier'],
         fn(Manuscript $manuscript): bool => $manuscript->selectTransliterationReviewPerformed(),
-        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): bool => $manuscript->upsertReviewerAppointmentForReleasedTransliteration($reviewer, $appointedBy)
+        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): string => $manuscript->upsertReviewerAppointmentForReleasedTransliteration($reviewer, $appointedBy)
       )
     ],
     'appointXmlConverter' => [
@@ -245,7 +245,7 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         $args['converter'],
         $args['manuscriptIdentifier'],
         fn(Manuscript $manuscript): bool => $manuscript->selectXmlConversionPerformed(),
-        fn(Manuscript $manuscript, string $converter, string $appointedBy): bool => $manuscript->upsertXmlConversionAppointment($converter, $appointedBy)
+        fn(Manuscript $manuscript, string $converter, string $appointedBy): string => $manuscript->upsertXmlConversionAppointment($converter, $appointedBy)
       )
     ],
     'appointFirstXmlReviewer' => [
@@ -260,7 +260,7 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         $args['reviewer'],
         $args['manuscriptIdentifier'],
         fn(Manuscript $manuscript): bool => $manuscript->selectFirstXmlReviewPerformed(),
-        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): bool => $manuscript->upsertFirstXmlReviewAppointment($reviewer, $appointedBy)
+        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): string => $manuscript->upsertFirstXmlReviewAppointment($reviewer, $appointedBy)
       )
     ],
     'appointSecondXmlReviewer' => [
@@ -275,7 +275,7 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         $args['reviewer'],
         $args['manuscriptIdentifier'],
         fn(Manuscript $manuscript): bool => $manuscript->selectSecondXmlReviewPerformed(),
-        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): bool => $manuscript->upsertSecondXmlReviewAppointment($reviewer, $appointedBy),
+        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): string => $manuscript->upsertSecondXmlReviewAppointment($reviewer, $appointedBy),
       )
     ],
     'submitApproval' => [

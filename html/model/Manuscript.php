@@ -353,7 +353,7 @@ Manuscript::$graphQLMutationsType = new ObjectType([
     ],
     'releaseTransliteration' => [
       'type' => Type::nonNull(Type::string()),
-      'resolve' => function (Manuscript $manuscript, array $args, ?User $user): bool {
+      'resolve' => function (Manuscript $manuscript, array $args, ?User $user): string {
         if (is_null($user)) {
           throw new MySafeGraphQLException('User is not logged in!');
         } else if ($manuscript->creatorUsername !== $user->username) {
