@@ -35,7 +35,7 @@
     "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/schema-ast": "^4.0.0",
     "@graphql-codegen/typescript-operations": "^4.0.0",
-    "@graphql-codegen/typescript-react-apollo": "^3.3.7",
+    "@graphql-codegen/typescript-react-apollo": "^4.0.0",
     "@types/codemirror": "^5.60.5",
     "@types/diff": "^5.0.0",
     "@types/jest": "^29.0.0",
