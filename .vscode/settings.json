@@ -1,5 +1,9 @@
 {
   "eslint.workingDirectories": [
     "./ui"
-  ]
+  ],
+  "editor.rulers": [
+    160
+  ],
+  "php.version": "7.4",
 }
