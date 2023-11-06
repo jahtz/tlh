@@ -53,15 +53,14 @@ Reviewer::$queryType = new ObjectType([
  * @throws MySafeGraphQLException
  */
 function resolveSubmitStep(
-  string   $stepName,
-  User     $user,
-  string   $mainIdentifier,
+  string $stepName,
+  User $user,
+  string $mainIdentifier,
   callable $selectPriorStepPerformed,
   callable $selectAppointedUsername,
   callable $selectStepIsAlreadyPerformed,
   callable $insertStepData
-): string
-{
+): string {
   $manuscript = Manuscript::resolveManuscriptById($mainIdentifier);
 
   // ensure that prior step is performed
@@ -94,7 +93,7 @@ function resolveSubmitStep(
 }
 
 /** @throws MySafeGraphQLException */
-function resolveSubmitTransliterationReview(User $user, string $mainIdentifier, string $review): bool
+function resolveSubmitTransliterationReview(User $user, string $mainIdentifier, string $review): string
 {
   return resolveSubmitStep(
     "Transliteration review",
@@ -121,7 +120,7 @@ function verifyXml(string $xml): void
 }
 
 /** @throws MySafeGraphQLException */
-function resolveSubmitXmlConversion(User $user, string $mainIdentifier, string $conversion): bool
+function resolveSubmitXmlConversion(User $user, string $mainIdentifier, string $conversion): string
 {
   verifyXml($conversion);
 
@@ -137,7 +136,7 @@ function resolveSubmitXmlConversion(User $user, string $mainIdentifier, string $
 }
 
 /** @throws MySafeGraphQLException */
-function resolveSubmitFirstXmlReview(User $user, string $mainIdentifier, string $review): bool
+function resolveSubmitFirstXmlReview(User $user, string $mainIdentifier, string $review): string
 {
   verifyXml($review);
 
@@ -153,7 +152,7 @@ function resolveSubmitFirstXmlReview(User $user, string $mainIdentifier, string 
 }
 
 /** @throws MySafeGraphQLException */
-function resolveSubmitSecondXmlReview(User $user, string $mainIdentifier, string $review): bool
+function resolveSubmitSecondXmlReview(User $user, string $mainIdentifier, string $review): string
 {
   verifyXml($review);
 
@@ -177,7 +176,7 @@ Reviewer::$mutationType = new ObjectType([
         'mainIdentifier' => Type::nonNull(Type::string()),
         'review' => Type::nonNull(Type::string()),
       ],
-      'resolve' => fn(User $user, array $args): bool => resolveSubmitTransliterationReview($user, $args['mainIdentifier'], $args['review'])
+      'resolve' => fn(User $user, array $args): string => resolveSubmitTransliterationReview($user, $args['mainIdentifier'], $args['review'])
     ],
     'submitXmlConversion' => [
       'type' => Type::nonNull(Type::string()),
@@ -185,7 +184,7 @@ Reviewer::$mutationType = new ObjectType([
         'mainIdentifier' => Type::nonNull(Type::string()),
         'conversion' => Type::nonNull(Type::string())
       ],
-      'resolve' => fn(User $user, array $args): bool => resolveSubmitXmlConversion($user, $args['mainIdentifier'], $args['conversion'])
+      'resolve' => fn(User $user, array $args): string => resolveSubmitXmlConversion($user, $args['mainIdentifier'], $args['conversion'])
     ],
     'submitXmlReview' => [
       'type' => Type::nonNull(Type::string()),
@@ -194,7 +193,7 @@ Reviewer::$mutationType = new ObjectType([
         'review' => Type::nonNull(Type::string()),
         'reviewType' => Type::nonNull(XmlReviewType::$graphQLType)
       ],
-      'resolve' => fn(User $user, array $args): bool => $args['reviewType'] === XmlReviewType::firstXmlReview
+      'resolve' => fn(User $user, array $args): string => $args['reviewType'] === XmlReviewType::firstXmlReview
         ? resolveSubmitFirstXmlReview($user, $args['mainIdentifier'], $args['review'])
         : resolveSubmitSecondXmlReview($user, $args['mainIdentifier'], $args['review'])
     ]

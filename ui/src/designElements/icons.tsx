@@ -1,0 +1,1 @@
+export const DeleteIcon = () => <>&#10006;</>;

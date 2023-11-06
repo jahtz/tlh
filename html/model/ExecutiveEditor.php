@@ -162,14 +162,13 @@ function resolveReviewer(string $username): User
  * @throws MySafeGraphQLException
  */
 function resolveAppointUser(
-  string   $stepName,
-  User     $executiveEditor,
-  string   $usernameToAppoint,
-  string   $mainIdentifier,
+  string $stepName,
+  User $executiveEditor,
+  string $usernameToAppoint,
+  string $mainIdentifier,
   callable $selectStepAlreadyPerformed,
   callable $upsertStepAppointmentData
-): bool
-{
+): bool {
   $reviewer = resolveReviewer($usernameToAppoint);
   $manuscript = Manuscript::resolveManuscriptById($mainIdentifier);
 
@@ -231,7 +230,7 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         $args['reviewer'],
         $args['manuscriptIdentifier'],
         fn(Manuscript $manuscript): bool => $manuscript->selectTransliterationReviewPerformed(),
-        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): bool => $manuscript->upsertReviewerAppointmentForReleasedTransliteration($reviewer, $appointedBy)
+        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): string => $manuscript->upsertReviewerAppointmentForReleasedTransliteration($reviewer, $appointedBy)
       )
     ],
     'appointXmlConverter' => [
@@ -246,7 +245,7 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         $args['converter'],
         $args['manuscriptIdentifier'],
         fn(Manuscript $manuscript): bool => $manuscript->selectXmlConversionPerformed(),
-        fn(Manuscript $manuscript, string $converter, string $appointedBy): bool => $manuscript->upsertXmlConversionAppointment($converter, $appointedBy)
+        fn(Manuscript $manuscript, string $converter, string $appointedBy): string => $manuscript->upsertXmlConversionAppointment($converter, $appointedBy)
       )
     ],
     'appointFirstXmlReviewer' => [
@@ -261,7 +260,7 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         $args['reviewer'],
         $args['manuscriptIdentifier'],
         fn(Manuscript $manuscript): bool => $manuscript->selectFirstXmlReviewPerformed(),
-        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): bool => $manuscript->upsertFirstXmlReviewAppointment($reviewer, $appointedBy)
+        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): string => $manuscript->upsertFirstXmlReviewAppointment($reviewer, $appointedBy)
       )
     ],
     'appointSecondXmlReviewer' => [
@@ -276,7 +275,7 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         $args['reviewer'],
         $args['manuscriptIdentifier'],
         fn(Manuscript $manuscript): bool => $manuscript->selectSecondXmlReviewPerformed(),
-        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): bool => $manuscript->upsertSecondXmlReviewAppointment($reviewer, $appointedBy),
+        fn(Manuscript $manuscript, string $reviewer, string $appointedBy): string => $manuscript->upsertSecondXmlReviewAppointment($reviewer, $appointedBy),
       )
     ],
     'submitApproval' => [
@@ -292,7 +291,7 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         $manuscript = Manuscript::resolveManuscriptById($manuscriptIdentifier);
 
         // TODO: check conditions -> not submitted yet...!
-
+      
         if (!$manuscript->selectSecondXmlReviewPerformed()) {
           throw new MySafeGraphQLException("Second xml review of manuscript $manuscriptIdentifier was not yet performed!");
         }
@@ -309,6 +308,36 @@ ExecutiveEditor::$mutationsType = new ObjectType([
         );
 
         return $inserted;
+      }
+    ],
+    'deleteManuscript' => [
+      'type' => Type::nonNull(Type::boolean()),
+      'args' => [
+        'manuscriptIdentifier' => Type::nonNull(Type::string()),
+      ],
+      'resolve' => function (User $_user, array $args): bool {
+        $manuscriptIdentifier = $args['manuscriptIdentifier'];
+
+        error_log($manuscriptIdentifier);
+
+        $maybeManuscript = Manuscript::selectManuscriptById($manuscriptIdentifier);
+
+        if (is_null($maybeManuscript)) {
+          return false;
+        }
+
+        $deleted = $maybeManuscript->delete();
+
+        if (!$deleted) {
+          return false;
+        }
+
+        sendMailToAdmins(
+          "The Manuscript $manuscriptIdentifier was deleted",
+          "The Manuscript $manuscriptIdentifier was deleted",
+        );
+
+        return true;
       }
     ]
   ]

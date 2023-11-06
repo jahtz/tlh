@@ -40,6 +40,7 @@ type ExecutiveEditorMutations {
   appointSecondXmlReviewer(manuscriptIdentifier: String!, reviewer: String!): String!
   appointTransliterationReviewer(manuscriptIdentifier: String!, reviewer: String!): String!
   appointXmlConverter(converter: String!, manuscriptIdentifier: String!): String!
+  deleteManuscript(manuscriptIdentifier: String!): Boolean!
   submitApproval(input: String!, manuscriptIdentifier: String!): Boolean!
   updateUserRights(newRights: Rights!, username: String!): Rights!
 }
