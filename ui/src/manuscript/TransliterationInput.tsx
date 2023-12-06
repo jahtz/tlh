@@ -1,7 +1,7 @@
-import {ReactElement, useState} from 'react';
-import {useTranslation} from 'react-i18next';
-import {User} from '../newStore';
-import {homeUrl} from '../urls';
+import { ReactElement, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { User } from '../newStore';
+import { homeUrl } from '../urls';
 import {
   ManuscriptStatus,
   TransliterationInputDataFragment,
@@ -9,18 +9,19 @@ import {
   useTransliterationInputQuery,
   useUploadTransliterationMutation
 } from '../graphql';
-import {Link, Navigate, useParams} from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import update from 'immutability-helper';
-import {TransliterationTextArea} from './TransliterationTextArea';
-import {WithQuery} from '../WithQuery';
-import {ErrorMessage, InfoMessage, SuccessMessage} from '../designElements/Messages';
-import {amberButtonClasses, blueButtonClasses} from '../defaultDesign';
-import {XmlCreationValues} from './xmlConversion/createCompleteDocument';
+import { TransliterationTextArea } from './TransliterationTextArea';
+import { WithQuery } from '../WithQuery';
+import { ErrorMessage, InfoMessage, SuccessMessage } from '../designElements/Messages';
+import { amberButtonClasses, blueButtonClasses } from '../defaultDesign';
+import { XmlCreationValues } from './xmlConversion/createCompleteDocument';
 
 interface InnerProps {
   mainIdentifier: string;
   manuscript: TransliterationInputDataFragment;
   initialIsReleased: boolean;
+  lang: string;
 }
 
 interface IState {
@@ -29,31 +30,31 @@ interface IState {
   isReleased: boolean;
 }
 
-function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: InnerProps): ReactElement {
+function TransliterationInput({ mainIdentifier, manuscript, initialIsReleased, lang }: InnerProps): ReactElement {
 
   const {
-    mainIdentifier: {identifierType: mainIdentifierType},
+    mainIdentifier: { identifierType: mainIdentifierType },
     creatorUsername: author,
     creationDate,
     provisionalTransliteration
   } = manuscript;
 
-  const {t} = useTranslation('common');
-  const [{input, isSaved, isReleased}, setTransliteration] = useState<IState>({
+  const { t } = useTranslation('common');
+  const [{ input, isSaved, isReleased }, setTransliteration] = useState<IState>({
     input: provisionalTransliteration || '',
     isSaved: true,
     isReleased: initialIsReleased
   });
-  const [uploadTransliteration, {loading: uploadLoading, error: uploadError}] = useUploadTransliterationMutation();
-  const [releaseTransliteration, {loading: releaseLoading, error: releaseError}] = useReleaseTransliterationMutation();
+  const [uploadTransliteration, { loading: uploadLoading, error: uploadError }] = useUploadTransliterationMutation();
+  const [releaseTransliteration, { loading: releaseLoading, error: releaseError }] = useReleaseTransliterationMutation();
 
-  const updateTransliteration = (value: string): void => setTransliteration((state) => update(state, {input: {$set: value}, isSaved: {$set: false}}));
+  const updateTransliteration = (value: string): void => setTransliteration((state) => update(state, { input: { $set: value }, isSaved: { $set: false } }));
 
   const upload = async () => {
-    const res = await uploadTransliteration({variables: {mainIdentifier, input}});
+    const res = await uploadTransliteration({ variables: { mainIdentifier, input } });
 
     if (res.data?.manuscript?.updateTransliteration) {
-      setTransliteration((state) => update(state, {isSaved: {$set: true}}));
+      setTransliteration((state) => update(state, { isSaved: { $set: true } }));
     }
   };
 
@@ -62,18 +63,18 @@ function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: I
       return;
     }
 
-    const {data} = await releaseTransliteration({variables: {mainIdentifier}});
+    const { data } = await releaseTransliteration({ variables: { mainIdentifier } });
 
     if (data?.manuscript?.releaseTransliteration) {
-      setTransliteration((state) => update(state, {isReleased: {$set: true}}));
+      setTransliteration((state) => update(state, { isReleased: { $set: true } }));
     }
   };
 
-  const xmlCreationValues: XmlCreationValues = {mainIdentifierType, mainIdentifier, author, creationDate, transliterationReleaseDate: undefined};
+  const xmlCreationValues: XmlCreationValues = { mainIdentifierType, mainIdentifier, author, creationDate, lang, transliterationReleaseDate: undefined };
 
   return (
     <>
-      <TransliterationTextArea xmlCreationValues={xmlCreationValues} initialInput={input} onChange={updateTransliteration} disabled={isReleased}/>
+      <TransliterationTextArea xmlCreationValues={xmlCreationValues} initialInput={input} onChange={updateTransliteration} disabled={isReleased} />
 
       {uploadError && <ErrorMessage>{uploadError.message}</ErrorMessage>}
       {releaseError && <ErrorMessage>{releaseError.message}</ErrorMessage>}
@@ -99,7 +100,7 @@ function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: I
 
       <div className="my-4 p-4 text-center">
         <button type="button" className={amberButtonClasses} onClick={onReleaseTransliteration}
-                disabled={uploadLoading || releaseLoading || !isSaved || isReleased}>
+          disabled={uploadLoading || releaseLoading || !isSaved || isReleased}>
           {t('releaseTransliteration')}
         </button>
       </div>
@@ -107,24 +108,24 @@ function TransliterationInput({mainIdentifier, manuscript, initialIsReleased}: I
   );
 }
 
-export function TransliterationInputContainer({currentUser}: { currentUser: User }): ReactElement {
+export function TransliterationInputContainer({ currentUser }: { currentUser: User }): ReactElement {
 
-  const {mainIdentifier} = useParams<'mainIdentifier'>();
+  const { mainIdentifier } = useParams<'mainIdentifier'>();
 
   if (mainIdentifier === undefined) {
-    return <Navigate to={homeUrl}/>;
+    return <Navigate to={homeUrl} />;
   }
 
-  const {t} = useTranslation('common');
+  const { t } = useTranslation('common');
 
-  const query = useTransliterationInputQuery({variables: {mainIdentifier}});
+  const query = useTransliterationInputQuery({ variables: { mainIdentifier } });
 
   return (
     <div className="container mx-auto">
       <h1 className="my-4 font-bold text-xl text-center">{decodeURIComponent(mainIdentifier)}: {t('createTransliteration')}</h1>
 
       <WithQuery query={query}>
-        {({manuscript}) => {
+        {({ manuscript }) => {
 
           if (!manuscript) {
             return <div className="p-2 italic text-cyan-500 text-center w-full">{t('manuscriptNotFound')}</div>;
@@ -136,7 +137,7 @@ export function TransliterationInputContainer({currentUser}: { currentUser: User
 
           const isReleased = manuscript.status !== ManuscriptStatus.Created;
 
-          return <TransliterationInput mainIdentifier={mainIdentifier} manuscript={manuscript} initialIsReleased={isReleased}/>;
+          return <TransliterationInput mainIdentifier={mainIdentifier} manuscript={manuscript} initialIsReleased={isReleased} lang={manuscript.lang} />;
         }}
       </WithQuery>
     </div>

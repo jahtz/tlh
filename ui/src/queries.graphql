@@ -112,6 +112,7 @@ fragment TransliterationInputData on ManuscriptMetaData {
   mainIdentifier {
     identifierType
   }
+  lang: defaultLanguage
   provisionalTransliteration
   creatorUsername
   creationDate
@@ -138,6 +139,7 @@ fragment TransliterationReviewData on ManuscriptMetaData {
   }
   initialInput: transliterationReviewData
   author: creatorUsername
+  lang: defaultLanguage
   creationDate
   transliterationReleaseDate
 }
@@ -162,6 +164,7 @@ fragment XmlCreationData on ManuscriptMetaData {
     mainIdentifierType: identifierType
   }
   author: creatorUsername
+  lang: defaultLanguage
   creationDate
   transliterationReleaseDate
 }

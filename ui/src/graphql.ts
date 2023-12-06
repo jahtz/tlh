@@ -410,14 +410,14 @@ export type DeletePictureMutationVariables = Exact<{
 
 export type DeletePictureMutation = { __typename?: 'Mutation', manuscript?: { __typename?: 'ManuscriptMutations', deletePicture: boolean } | null };
 
-export type TransliterationInputDataFragment = { __typename?: 'ManuscriptMetaData', provisionalTransliteration?: string | null, creatorUsername: string, creationDate: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType } };
+export type TransliterationInputDataFragment = { __typename?: 'ManuscriptMetaData', provisionalTransliteration?: string | null, creatorUsername: string, creationDate: string, lang: ManuscriptLanguageAbbreviations, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType } };
 
 export type TransliterationInputQueryVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
 }>;
 
 
-export type TransliterationInputQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', status: ManuscriptStatus, provisionalTransliteration?: string | null, creatorUsername: string, creationDate: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType } } | null };
+export type TransliterationInputQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', status: ManuscriptStatus, provisionalTransliteration?: string | null, creatorUsername: string, creationDate: string, lang: ManuscriptLanguageAbbreviations, mainIdentifier: { __typename?: 'ManuscriptIdentifier', identifierType: ManuscriptIdentifierType } } | null };
 
 export type UploadTransliterationMutationVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
@@ -427,14 +427,14 @@ export type UploadTransliterationMutationVariables = Exact<{
 
 export type UploadTransliterationMutation = { __typename?: 'Mutation', manuscript?: { __typename?: 'ManuscriptMutations', updateTransliteration: boolean } | null };
 
-export type TransliterationReviewDataFragment = { __typename?: 'ManuscriptMetaData', creationDate: string, transliterationReleaseDate?: string | null, initialInput?: string | null, author: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', mainIdentifierType: ManuscriptIdentifierType } };
+export type TransliterationReviewDataFragment = { __typename?: 'ManuscriptMetaData', creationDate: string, transliterationReleaseDate?: string | null, initialInput?: string | null, author: string, lang: ManuscriptLanguageAbbreviations, mainIdentifier: { __typename?: 'ManuscriptIdentifier', mainIdentifierType: ManuscriptIdentifierType } };
 
 export type ReviewTransliterationQueryVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
 }>;
 
 
-export type ReviewTransliterationQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', status: ManuscriptStatus, creationDate: string, transliterationReleaseDate?: string | null, initialInput?: string | null, author: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', mainIdentifierType: ManuscriptIdentifierType } } | null };
+export type ReviewTransliterationQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', status: ManuscriptStatus, creationDate: string, transliterationReleaseDate?: string | null, initialInput?: string | null, author: string, lang: ManuscriptLanguageAbbreviations, mainIdentifier: { __typename?: 'ManuscriptIdentifier', mainIdentifierType: ManuscriptIdentifierType } } | null };
 
 export type SubmitTransliterationReviewMutationVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
@@ -444,14 +444,14 @@ export type SubmitTransliterationReviewMutationVariables = Exact<{
 
 export type SubmitTransliterationReviewMutation = { __typename?: 'Mutation', reviewerMutations?: { __typename?: 'ReviewerMutations', submitTransliterationReview: string } | null };
 
-export type XmlCreationDataFragment = { __typename?: 'ManuscriptMetaData', creationDate: string, transliterationReleaseDate?: string | null, author: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', mainIdentifierType: ManuscriptIdentifierType } };
+export type XmlCreationDataFragment = { __typename?: 'ManuscriptMetaData', creationDate: string, transliterationReleaseDate?: string | null, author: string, lang: ManuscriptLanguageAbbreviations, mainIdentifier: { __typename?: 'ManuscriptIdentifier', mainIdentifierType: ManuscriptIdentifierType } };
 
 export type XmlConversionQueryVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
 }>;
 
 
-export type XmlConversionQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', status: ManuscriptStatus, xmlConversionData?: string | null, creationDate: string, transliterationReleaseDate?: string | null, author: string, mainIdentifier: { __typename?: 'ManuscriptIdentifier', mainIdentifierType: ManuscriptIdentifierType } } | null };
+export type XmlConversionQuery = { __typename?: 'Query', manuscript?: { __typename?: 'ManuscriptMetaData', status: ManuscriptStatus, xmlConversionData?: string | null, creationDate: string, transliterationReleaseDate?: string | null, author: string, lang: ManuscriptLanguageAbbreviations, mainIdentifier: { __typename?: 'ManuscriptIdentifier', mainIdentifierType: ManuscriptIdentifierType } } | null };
 
 export type SubmitXmlConversionMutationVariables = Exact<{
   mainIdentifier: Scalars['String']['input'];
@@ -659,6 +659,7 @@ export const TransliterationInputDataFragmentDoc = gql`
   mainIdentifier {
     identifierType
   }
+  lang: defaultLanguage
   provisionalTransliteration
   creatorUsername
   creationDate
@@ -671,6 +672,7 @@ export const TransliterationReviewDataFragmentDoc = gql`
   }
   initialInput: transliterationReviewData
   author: creatorUsername
+  lang: defaultLanguage
   creationDate
   transliterationReleaseDate
 }
@@ -681,6 +683,7 @@ export const XmlCreationDataFragmentDoc = gql`
     mainIdentifierType: identifierType
   }
   author: creatorUsername
+  lang: defaultLanguage
   creationDate
   transliterationReleaseDate
 }

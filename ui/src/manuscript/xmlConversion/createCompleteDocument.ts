@@ -1,5 +1,5 @@
-import {Attributes, xmlElementNode, XmlElementNode, XmlNode, xmlTextNode} from 'simple_xml';
-import {ManuscriptIdentifierType} from '../../graphql';
+import { Attributes, xmlElementNode, XmlElementNode, XmlNode, xmlTextNode } from 'simple_xml';
+import { ManuscriptIdentifierType } from '../../graphql';
 
 const defaultAoXmlAttributes: Attributes = {
   'xmlns:hpm': 'http://hethiter.net/ns/hpm/1.0',
@@ -25,29 +25,30 @@ export interface XmlCreationValues {
   author: string;
   creationDate: string;
   transliterationReleaseDate: string | null | undefined;
+  lang: string;
 }
 
 export function createCompleteDocument(documentContent: XmlNode[], xmlCreationValues: XmlCreationValues): XmlElementNode {
-  const {mainIdentifier, mainIdentifierType, author, creationDate, transliterationReleaseDate} = xmlCreationValues;
+  const { mainIdentifier, mainIdentifierType, author, creationDate, transliterationReleaseDate, lang } = xmlCreationValues;
 
   const transliterationReleaseNode = transliterationReleaseDate
-    ? [xmlElementNode('creation-date', {date: transliterationReleaseDate})]
+    ? [xmlElementNode('creation-date', { date: transliterationReleaseDate })]
     : [];
 
   return xmlElementNode('AOxml', defaultAoXmlAttributes, [
     xmlElementNode('AOHeader', {}, [
       xmlElementNode('docID', {}, [xmlTextNode(mainIdentifier)]),
       xmlElementNode('meta', {}, [
-        xmlElementNode('author', {author, date: creationDate}),
+        xmlElementNode('author', { author, date: creationDate }),
         ...transliterationReleaseNode
       ])
     ]),
     xmlElementNode('body', {}, [
-      xmlElementNode('div1', {type: 'transliteration'}, [
+      xmlElementNode('div1', { type: 'transliteration' }, [
         xmlElementNode('AO:Manuscripts', {}, [
           xmlElementNode(manuscriptIdentifierTag(mainIdentifierType), {}, [xmlTextNode(mainIdentifier)])
         ]),
-        xmlElementNode('text', {},
+        xmlElementNode('text', { lang },
           documentContent
         )
       ])
