@@ -1,7 +1,6 @@
-import {AnyAction, configureStore, createSlice, EnhancedStore, PayloadAction} from '@reduxjs/toolkit';
-import {Rights} from './graphql';
-import {defaultEditorKeyConfig, EditorKeyConfig} from './xmlEditor/editorKeyConfig';
-import {ThunkMiddlewareFor} from '@reduxjs/toolkit/dist/getDefaultMiddleware';
+import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Rights } from './graphql';
+import { defaultEditorKeyConfig, EditorKeyConfig } from './xmlEditor/editorKeyConfig';
 
 function loadFromLocalStorage<T>(key: string, defaultValue: T): T {
   const foundString = localStorage.getItem(key);
@@ -36,9 +35,9 @@ export interface User {
 
 const userSlice = createSlice({
   name: 'user',
-  initialState: () => ({user: loadFromLocalStorage<User | null>(userKey, null)}),
+  initialState: () => ({ user: loadFromLocalStorage<User | null>(userKey, null) }),
   reducers: {
-    login(state, {payload}: PayloadAction<string>) {
+    login(state, { payload }: PayloadAction<string>) {
       const user = userFromToken(payload);
       localStorage.setItem(userKey, JSON.stringify(user));
       state.user = user;
@@ -50,9 +49,9 @@ const userSlice = createSlice({
   }
 });
 
-export const {login, logout} = userSlice.actions;
+export const { login, logout } = userSlice.actions;
 
-export const activeUserSelector: (store: StoreState) => User | null = ({user}) => user.user;
+export const activeUserSelector: (store: StoreState) => User | null = ({ user }) => user.user;
 
 // Preferences
 
@@ -60,18 +59,18 @@ const editorKeyConfigKey = 'preferences';
 
 const editorKeyConfigSlice = createSlice({
   name: 'editorKeyConfig',
-  initialState: () => ({editorKeyConfig: loadFromLocalStorage<EditorKeyConfig>(editorKeyConfigKey, defaultEditorKeyConfig)}),
+  initialState: () => ({ editorKeyConfig: loadFromLocalStorage<EditorKeyConfig>(editorKeyConfigKey, defaultEditorKeyConfig) }),
   reducers: {
-    updatePreferences(state, {payload}: PayloadAction<EditorKeyConfig>) {
+    updatePreferences(state, { payload }: PayloadAction<EditorKeyConfig>) {
       localStorage.setItem(editorKeyConfigKey, JSON.stringify(payload));
       state.editorKeyConfig = payload;
     }
   }
 });
 
-export const {updatePreferences} = editorKeyConfigSlice.actions;
+export const { updatePreferences } = editorKeyConfigSlice.actions;
 
-export const editorKeyConfigSelector: (store: StoreState) => EditorKeyConfig = ({editorKeyConfig}) => editorKeyConfig.editorKeyConfig;
+export const editorKeyConfigSelector: (store: StoreState) => EditorKeyConfig = ({ editorKeyConfig }) => editorKeyConfig.editorKeyConfig;
 
 // Store
 
@@ -80,7 +79,7 @@ interface StoreState {
   editorKeyConfig: { editorKeyConfig: EditorKeyConfig };
 }
 
-export const newStore: EnhancedStore<StoreState, AnyAction, [ThunkMiddlewareFor<StoreState>]> = configureStore({
+export const newStore = configureStore({
   reducer: {
     user: userSlice.reducer,
     editorKeyConfig: editorKeyConfigSlice.reducer,

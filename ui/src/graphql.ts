@@ -758,8 +758,13 @@ export function useIndexLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Inde
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<IndexQuery, IndexQueryVariables>(IndexDocument, options);
         }
+export function useIndexSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<IndexQuery, IndexQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<IndexQuery, IndexQueryVariables>(IndexDocument, options);
+        }
 export type IndexQueryHookResult = ReturnType<typeof useIndexQuery>;
 export type IndexLazyQueryHookResult = ReturnType<typeof useIndexLazyQuery>;
+export type IndexSuspenseQueryHookResult = ReturnType<typeof useIndexSuspenseQuery>;
 export type IndexQueryResult = Apollo.QueryResult<IndexQuery, IndexQueryVariables>;
 export const CreateManuscriptDocument = gql`
     mutation CreateManuscript($manuscriptMetaData: ManuscriptMetaDataInput) {
@@ -824,8 +829,13 @@ export function useManuscriptLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<ManuscriptQuery, ManuscriptQueryVariables>(ManuscriptDocument, options);
         }
+export function useManuscriptSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ManuscriptQuery, ManuscriptQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ManuscriptQuery, ManuscriptQueryVariables>(ManuscriptDocument, options);
+        }
 export type ManuscriptQueryHookResult = ReturnType<typeof useManuscriptQuery>;
 export type ManuscriptLazyQueryHookResult = ReturnType<typeof useManuscriptLazyQuery>;
+export type ManuscriptSuspenseQueryHookResult = ReturnType<typeof useManuscriptSuspenseQuery>;
 export type ManuscriptQueryResult = Apollo.QueryResult<ManuscriptQuery, ManuscriptQueryVariables>;
 export const ReleaseTransliterationDocument = gql`
     mutation ReleaseTransliteration($mainIdentifier: String!) {
@@ -892,8 +902,13 @@ export function useUploadPicturesLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<UploadPicturesQuery, UploadPicturesQueryVariables>(UploadPicturesDocument, options);
         }
+export function useUploadPicturesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<UploadPicturesQuery, UploadPicturesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<UploadPicturesQuery, UploadPicturesQueryVariables>(UploadPicturesDocument, options);
+        }
 export type UploadPicturesQueryHookResult = ReturnType<typeof useUploadPicturesQuery>;
 export type UploadPicturesLazyQueryHookResult = ReturnType<typeof useUploadPicturesLazyQuery>;
+export type UploadPicturesSuspenseQueryHookResult = ReturnType<typeof useUploadPicturesSuspenseQuery>;
 export type UploadPicturesQueryResult = Apollo.QueryResult<UploadPicturesQuery, UploadPicturesQueryVariables>;
 export const DeletePictureDocument = gql`
     mutation DeletePicture($mainIdentifier: String!, $pictureName: String!) {
@@ -962,8 +977,13 @@ export function useTransliterationInputLazyQuery(baseOptions?: Apollo.LazyQueryH
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<TransliterationInputQuery, TransliterationInputQueryVariables>(TransliterationInputDocument, options);
         }
+export function useTransliterationInputSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TransliterationInputQuery, TransliterationInputQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TransliterationInputQuery, TransliterationInputQueryVariables>(TransliterationInputDocument, options);
+        }
 export type TransliterationInputQueryHookResult = ReturnType<typeof useTransliterationInputQuery>;
 export type TransliterationInputLazyQueryHookResult = ReturnType<typeof useTransliterationInputLazyQuery>;
+export type TransliterationInputSuspenseQueryHookResult = ReturnType<typeof useTransliterationInputSuspenseQuery>;
 export type TransliterationInputQueryResult = Apollo.QueryResult<TransliterationInputQuery, TransliterationInputQueryVariables>;
 export const UploadTransliterationDocument = gql`
     mutation uploadTransliteration($mainIdentifier: String!, $input: String!) {
@@ -1032,8 +1052,13 @@ export function useReviewTransliterationLazyQuery(baseOptions?: Apollo.LazyQuery
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<ReviewTransliterationQuery, ReviewTransliterationQueryVariables>(ReviewTransliterationDocument, options);
         }
+export function useReviewTransliterationSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ReviewTransliterationQuery, ReviewTransliterationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ReviewTransliterationQuery, ReviewTransliterationQueryVariables>(ReviewTransliterationDocument, options);
+        }
 export type ReviewTransliterationQueryHookResult = ReturnType<typeof useReviewTransliterationQuery>;
 export type ReviewTransliterationLazyQueryHookResult = ReturnType<typeof useReviewTransliterationLazyQuery>;
+export type ReviewTransliterationSuspenseQueryHookResult = ReturnType<typeof useReviewTransliterationSuspenseQuery>;
 export type ReviewTransliterationQueryResult = Apollo.QueryResult<ReviewTransliterationQuery, ReviewTransliterationQueryVariables>;
 export const SubmitTransliterationReviewDocument = gql`
     mutation SubmitTransliterationReview($mainIdentifier: String!, $review: String!) {
@@ -1103,8 +1128,13 @@ export function useXmlConversionLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<XmlConversionQuery, XmlConversionQueryVariables>(XmlConversionDocument, options);
         }
+export function useXmlConversionSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<XmlConversionQuery, XmlConversionQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<XmlConversionQuery, XmlConversionQueryVariables>(XmlConversionDocument, options);
+        }
 export type XmlConversionQueryHookResult = ReturnType<typeof useXmlConversionQuery>;
 export type XmlConversionLazyQueryHookResult = ReturnType<typeof useXmlConversionLazyQuery>;
+export type XmlConversionSuspenseQueryHookResult = ReturnType<typeof useXmlConversionSuspenseQuery>;
 export type XmlConversionQueryResult = Apollo.QueryResult<XmlConversionQuery, XmlConversionQueryVariables>;
 export const SubmitXmlConversionDocument = gql`
     mutation SubmitXmlConversion($mainIdentifier: String!, $conversion: String!) {
@@ -1173,8 +1203,13 @@ export function useXmlReviewLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<XmlReviewQuery, XmlReviewQueryVariables>(XmlReviewDocument, options);
         }
+export function useXmlReviewSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<XmlReviewQuery, XmlReviewQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<XmlReviewQuery, XmlReviewQueryVariables>(XmlReviewDocument, options);
+        }
 export type XmlReviewQueryHookResult = ReturnType<typeof useXmlReviewQuery>;
 export type XmlReviewLazyQueryHookResult = ReturnType<typeof useXmlReviewLazyQuery>;
+export type XmlReviewSuspenseQueryHookResult = ReturnType<typeof useXmlReviewSuspenseQuery>;
 export type XmlReviewQueryResult = Apollo.QueryResult<XmlReviewQuery, XmlReviewQueryVariables>;
 export const SubmitXmlReviewDocument = gql`
     mutation SubmitXmlReview($mainIdentifier: String!, $review: String!, $reviewType: XmlReviewType!) {
@@ -1248,8 +1283,13 @@ export function useApprovalLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<A
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<ApprovalQuery, ApprovalQueryVariables>(ApprovalDocument, options);
         }
+export function useApprovalSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ApprovalQuery, ApprovalQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ApprovalQuery, ApprovalQueryVariables>(ApprovalDocument, options);
+        }
 export type ApprovalQueryHookResult = ReturnType<typeof useApprovalQuery>;
 export type ApprovalLazyQueryHookResult = ReturnType<typeof useApprovalLazyQuery>;
+export type ApprovalSuspenseQueryHookResult = ReturnType<typeof useApprovalSuspenseQuery>;
 export type ApprovalQueryResult = Apollo.QueryResult<ApprovalQuery, ApprovalQueryVariables>;
 export const SubmitApprovalDocument = gql`
     mutation SubmitApproval($mainIdentifier: String!, $input: String!) {
@@ -1317,8 +1357,13 @@ export function usePipelineOverviewLazyQuery(baseOptions?: Apollo.LazyQueryHookO
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<PipelineOverviewQuery, PipelineOverviewQueryVariables>(PipelineOverviewDocument, options);
         }
+export function usePipelineOverviewSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<PipelineOverviewQuery, PipelineOverviewQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<PipelineOverviewQuery, PipelineOverviewQueryVariables>(PipelineOverviewDocument, options);
+        }
 export type PipelineOverviewQueryHookResult = ReturnType<typeof usePipelineOverviewQuery>;
 export type PipelineOverviewLazyQueryHookResult = ReturnType<typeof usePipelineOverviewLazyQuery>;
+export type PipelineOverviewSuspenseQueryHookResult = ReturnType<typeof usePipelineOverviewSuspenseQuery>;
 export type PipelineOverviewQueryResult = Apollo.QueryResult<PipelineOverviewQuery, PipelineOverviewQueryVariables>;
 export const AppointTransliterationReviewerDocument = gql`
     mutation AppointTransliterationReviewer($manuscriptIdentifier: String!, $reviewer: String!) {
@@ -1599,8 +1644,13 @@ export function useUsersOverviewLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<UsersOverviewQuery, UsersOverviewQueryVariables>(UsersOverviewDocument, options);
         }
+export function useUsersOverviewSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<UsersOverviewQuery, UsersOverviewQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<UsersOverviewQuery, UsersOverviewQueryVariables>(UsersOverviewDocument, options);
+        }
 export type UsersOverviewQueryHookResult = ReturnType<typeof useUsersOverviewQuery>;
 export type UsersOverviewLazyQueryHookResult = ReturnType<typeof useUsersOverviewLazyQuery>;
+export type UsersOverviewSuspenseQueryHookResult = ReturnType<typeof useUsersOverviewSuspenseQuery>;
 export type UsersOverviewQueryResult = Apollo.QueryResult<UsersOverviewQuery, UsersOverviewQueryVariables>;
 export const UpdateUserRightsDocument = gql`
     mutation UpdateUserRights($username: String!, $newRights: Rights!) {
