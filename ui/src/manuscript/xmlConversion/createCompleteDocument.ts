@@ -48,7 +48,7 @@ export function createCompleteDocument(documentContent: XmlNode[], xmlCreationVa
         xmlElementNode('AO:Manuscripts', {}, [
           xmlElementNode(manuscriptIdentifierTag(mainIdentifierType), {}, [xmlTextNode(mainIdentifier)])
         ]),
-        xmlElementNode('text', { lang },
+        xmlElementNode('text', { 'xml:lang': lang },
           documentContent
         )
       ])
