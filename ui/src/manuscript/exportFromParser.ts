@@ -6,7 +6,7 @@ import { writeXml } from '../xmlEditor/StandAloneOXTED';
 // TODO: add other nodes to filter out...
 const tagNamesToFilter: string[] = [
   'LINE_PREFIX', 'PARSER_ERROR', 'PUBLICATION_NUMBER', 'INVENTORY_NUMBER', 'IDENTIFIER', 'UNDEFINED_DEGREE_SIGN', 'LANGUAGE_CHANGE', 'GAP',
-  'DELIMITER', 'BASIC', 'METADATA'
+  'DELIMITER', 'BASIC', 'METADATA', 'PARAGRAPH_LANGUAGE'
 ];
 
 const exportLine = (line: Line): XmlNode[] => {
