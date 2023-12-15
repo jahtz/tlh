@@ -15,7 +15,7 @@ const exportLine = (line: Line): XmlNode[] => {
     .filter((node) => !isXmlElementNode(node) || !tagNamesToFilter.includes(node.tagName));
 };
 
-export function exportXmlNodesFromParser(parser: TLHParser): XmlNode[] {
+function exportXmlNodesFromParser(parser: TLHParser): XmlNode[] {
   const lines = parser.getLines();
 
   if (lines.length === 0) {

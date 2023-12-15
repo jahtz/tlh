@@ -1,4 +1,4 @@
-import { Attributes, xmlElementNode, XmlElementNode, XmlNode, xmlTextNode } from 'simple_xml';
+import { Attributes, isXmlElementNode, xmlElementNode, XmlElementNode, XmlNode, xmlTextNode } from 'simple_xml';
 import { ManuscriptIdentifierType } from '../../graphql';
 
 const defaultAoXmlAttributes: Attributes = {
@@ -28,12 +28,32 @@ export interface XmlCreationValues {
   lang: string;
 }
 
+function writeLbTxtIdAttribute(nodes: XmlNode[], txtid: string): XmlNode[] {
+  return nodes.map((node) => {
+    if (!isXmlElementNode(node)) {
+      return node;
+    }
+
+    const { tagName, attributes: oldAttributes, children: oldChildren } = node;
+
+    const attributes = tagName === 'lb'
+      ? { ...oldAttributes, txtid }
+      : oldAttributes;
+
+    const children = writeLbTxtIdAttribute(oldChildren, txtid);
+
+    return { tagName, attributes, children };
+  });
+}
+
 export function createCompleteDocument(documentContent: XmlNode[], xmlCreationValues: XmlCreationValues): XmlElementNode {
   const { mainIdentifier, mainIdentifierType, author, creationDate, transliterationReleaseDate, lang } = xmlCreationValues;
 
   const transliterationReleaseNode = transliterationReleaseDate
     ? [xmlElementNode('creation-date', { date: transliterationReleaseDate })]
     : [];
+
+  const fixedDocContent = writeLbTxtIdAttribute(documentContent, mainIdentifier);
 
   return xmlElementNode('AOxml', defaultAoXmlAttributes, [
     xmlElementNode('AOHeader', {}, [
@@ -49,7 +69,7 @@ export function createCompleteDocument(documentContent: XmlNode[], xmlCreationVa
           xmlElementNode(manuscriptIdentifierTag(mainIdentifierType), {}, [xmlTextNode(mainIdentifier)])
         ]),
         xmlElementNode('text', { 'xml:lang': lang },
-          documentContent
+          fixedDocContent
         )
       ])
     ])
