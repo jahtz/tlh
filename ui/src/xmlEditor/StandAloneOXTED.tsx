@@ -104,6 +104,8 @@ export function StandAloneOXTED({ editorConfig }: IProps): ReactElement {
 
     const nodeToAddTo = findFirstXmlElementByTagName(rootNode, tagNameToInsert);
 
+    // FIXME: create nodeToAddTo if not exists!
+
     if (nodeToAddTo === undefined) {
       alert('Internal error!');
       return;
