@@ -11,7 +11,7 @@
   "config": {
     "vendor-dir": "html/vendor",
     "platform": {
-      "php": "7.4"
+      "php": "8.2.16"
     }
   }
 }

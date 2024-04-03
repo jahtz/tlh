@@ -177,7 +177,7 @@ export function WordNodeEditor({node, path, updateEditedNode, setKeyHandlingEnab
 
       {state === 'EditFootNoteState' &&
         <WordStringChildEditor title={t('footNote')} initialValue={footNote} onDelete={onRemoveFootNote} onCancel={onCancel} onSubmit={onFootNoteSubmit}
-                               onFocus={onFocus} onBlur={onBlur}/>}
+                               onFocus={onFocus} onBlur={onBlur} isFootNote={true}/>}
 
       {node.attributes.editingQuestion && <div className="my-2 p-2 rounded bg-teal-400 text-white text-center">
         {t('editingQuestion')}: <span className="font-bold">{node.attributes.editingQuestion}</span>!

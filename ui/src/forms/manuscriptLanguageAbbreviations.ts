@@ -7,7 +7,7 @@ export const manuscriptLanguageAbbreviations: ManuscriptLanguageAbbreviations[] 
   ManuscriptLanguageAbbreviations.Hat,
   ManuscriptLanguageAbbreviations.Hur,
   ManuscriptLanguageAbbreviations.Akk,
-  ManuscriptLanguageAbbreviations.Sum
+  ManuscriptLanguageAbbreviations.Sum,
 ];
 
 export function getNameForManuscriptLanguageAbbreviation(abb: ManuscriptLanguageAbbreviations, t: (key: string) => string): string {
